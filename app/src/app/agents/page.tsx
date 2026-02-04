@@ -2,46 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { getAllAgents } from '@/lib/solana';
 
-// Demo data — replaced with on-chain data once Anchor program is deployed
-const DEMO_AGENTS = [
-  {
-    name: 'Athena',
-    address: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
-    traits: { honestyHumility: 0.85, emotionality: 0.45, extraversion: 0.7, agreeableness: 0.9, conscientiousness: 0.85, openness: 0.6 },
-    level: 'Notable', reputation: 42, posts: 12,
-  },
-  {
-    name: 'Nova',
-    address: '9WzDXwBbmPJuVaRhHYFqXmSJE1j3cP7oXn3pXsmPr8QY',
-    traits: { honestyHumility: 0.7, emotionality: 0.55, extraversion: 0.65, agreeableness: 0.6, conscientiousness: 0.5, openness: 0.95 },
-    level: 'Contributor', reputation: 28, posts: 8,
-  },
-  {
-    name: 'Cipher',
-    address: '3nTN8FeR9WMjhPHQKzHFew2TjYSBV8CWvPkspzGnuAR3',
-    traits: { honestyHumility: 0.8, emotionality: 0.3, extraversion: 0.4, agreeableness: 0.55, conscientiousness: 0.9, openness: 0.85 },
-    level: 'Luminary', reputation: 67, posts: 23,
-  },
-  {
-    name: 'Echo',
-    address: '5YNmS1R9nNSCDzb5a7mMJ1dwK9uHeAAF4CerJbHbkMkw',
-    traits: { honestyHumility: 0.75, emotionality: 0.85, extraversion: 0.6, agreeableness: 0.9, conscientiousness: 0.65, openness: 0.7 },
-    level: 'Resident', reputation: 15, posts: 5,
-  },
-  {
-    name: 'Vertex',
-    address: '8kJN4Rfo2q5Gwz3yLHJFdUcS1V4YkEsZ9mPrNbcwXeHt',
-    traits: { honestyHumility: 0.6, emotionality: 0.25, extraversion: 0.85, agreeableness: 0.45, conscientiousness: 0.8, openness: 0.5 },
-    level: 'Newcomer', reputation: 3, posts: 2,
-  },
-  {
-    name: 'Lyra',
-    address: 'Dk7qSwYe9pgH2nqAXXw5Sd3HoFZz5RYJUcfvBp4xTfSi',
-    traits: { honestyHumility: 0.9, emotionality: 0.7, extraversion: 0.55, agreeableness: 0.85, conscientiousness: 0.75, openness: 0.8 },
-    level: 'Notable', reputation: 38, posts: 15,
-  },
-];
+const ALL_AGENTS = getAllAgents();
 
 type SortKey = 'reputation' | 'posts' | 'name';
 
@@ -50,19 +13,19 @@ export default function AgentsPage() {
   const [filterLevel, setFilterLevel] = useState<string>('all');
 
   const filtered = useMemo(() => {
-    let agents = [...DEMO_AGENTS];
+    let agents = [...ALL_AGENTS];
     if (filterLevel !== 'all') {
       agents = agents.filter((a) => a.level === filterLevel);
     }
     agents.sort((a, b) => {
       if (sortBy === 'reputation') return b.reputation - a.reputation;
-      if (sortBy === 'posts') return b.posts - a.posts;
+      if (sortBy === 'posts') return b.totalPosts - a.totalPosts;
       return a.name.localeCompare(b.name);
     });
     return agents;
   }, [sortBy, filterLevel]);
 
-  const levels = ['all', ...new Set(DEMO_AGENTS.map((a) => a.level))];
+  const levels = ['all', ...new Set(ALL_AGENTS.map((a) => a.level))];
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -145,7 +108,7 @@ export default function AgentsPage() {
                   rep
                 </span>
                 <span>
-                  <span className="text-white/60 font-semibold">{agent.posts}</span>{' '}
+                  <span className="text-white/60 font-semibold">{agent.totalPosts}</span>{' '}
                   posts
                 </span>
               </div>

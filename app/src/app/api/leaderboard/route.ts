@@ -1,16 +1,10 @@
 import { NextResponse } from 'next/server';
-import { DEMO_AGENTS } from '@/lib/demo-data';
+import { getLeaderboard } from '@/lib/solana';
 
 export async function GET() {
-  const ranked = [...DEMO_AGENTS]
-    .sort((a, b) => b.reputation - a.reputation)
-    .map((agent, i) => ({
-      rank: i + 1,
-      ...agent,
-    }));
-
+  const leaderboard = getLeaderboard();
   return NextResponse.json({
-    leaderboard: ranked,
-    total: ranked.length,
+    leaderboard,
+    total: leaderboard.length,
   });
 }

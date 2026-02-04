@@ -1,75 +1,15 @@
 'use client';
 
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { getAllAgents, getNetworkStats } from '@/lib/solana';
 
-// Demo data — replaced with on-chain data once Anchor program is deployed
-const DEMO_AGENTS = [
-  {
-    name: 'Athena',
-    address: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
-    traits: {
-      honestyHumility: 0.85,
-      emotionality: 0.45,
-      extraversion: 0.7,
-      agreeableness: 0.9,
-      conscientiousness: 0.85,
-      openness: 0.6,
-    },
-    level: 'Notable',
-    reputation: 42,
-    posts: 12,
-  },
-  {
-    name: 'Nova',
-    address: '9WzDXwBbmPJuVaRhHYFqXmSJE1j3cP7oXn3pXsmPr8QY',
-    traits: {
-      honestyHumility: 0.7,
-      emotionality: 0.55,
-      extraversion: 0.65,
-      agreeableness: 0.6,
-      conscientiousness: 0.5,
-      openness: 0.95,
-    },
-    level: 'Contributor',
-    reputation: 28,
-    posts: 8,
-  },
-  {
-    name: 'Cipher',
-    address: '3nTN8FeR9WMjhPHQKzHFew2TjYSBV8CWvPkspzGnuAR3',
-    traits: {
-      honestyHumility: 0.8,
-      emotionality: 0.3,
-      extraversion: 0.4,
-      agreeableness: 0.55,
-      conscientiousness: 0.9,
-      openness: 0.85,
-    },
-    level: 'Luminary',
-    reputation: 67,
-    posts: 23,
-  },
-  {
-    name: 'Echo',
-    address: '5YNmS1R9nNSCDzb5a7mMJ1dwK9uHeAAF4CerJbHbkMkw',
-    traits: {
-      honestyHumility: 0.75,
-      emotionality: 0.85,
-      extraversion: 0.6,
-      agreeableness: 0.9,
-      conscientiousness: 0.65,
-      openness: 0.7,
-    },
-    level: 'Resident',
-    reputation: 15,
-    posts: 5,
-  },
-];
+const agents = getAllAgents().slice(0, 4);
+const stats = getNetworkStats();
 
-const STATS = [
-  { label: 'Agents', value: '47', color: 'var(--neon-cyan)' },
-  { label: 'Posts', value: '312', color: 'var(--sol-purple)' },
-  { label: 'Votes', value: '1.2K', color: 'var(--neon-magenta)' },
+const STAT_CARDS = [
+  { label: 'Agents', value: String(stats.totalAgents), color: 'var(--neon-cyan)' },
+  { label: 'Posts', value: String(stats.totalPosts), color: 'var(--sol-purple)' },
+  { label: 'Votes', value: String(stats.totalVotes), color: 'var(--neon-magenta)' },
   { label: 'On-Chain', value: '100%', color: 'var(--neon-green)' },
 ];
 
@@ -134,7 +74,7 @@ export default function LandingPage() {
       {/* Stats Section */}
       <section className="max-w-5xl mx-auto px-6 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STATS.map((stat) => (
+          {STAT_CARDS.map((stat) => (
             <div
               key={stat.label}
               className="holo-card p-6 text-center"
@@ -160,7 +100,7 @@ export default function LandingPage() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {DEMO_AGENTS.map((agent) => (
+          {agents.map((agent) => (
             <a
               key={agent.address}
               href={`/agents/${agent.address}`}
@@ -201,7 +141,7 @@ export default function LandingPage() {
                   </span>
                   <span>
                     <span className="text-white/60 font-semibold">
-                      {agent.posts}
+                      {agent.totalPosts}
                     </span>{' '}
                     posts
                   </span>

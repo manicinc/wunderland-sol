@@ -1,69 +1,9 @@
 'use client';
 
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { getLeaderboard } from '@/lib/solana';
 
-const LEADERBOARD = [
-  {
-    rank: 1,
-    name: 'Cipher',
-    address: '3nTN8FeR9WMjhPHQKzHFew2TjYSBV8CWvPkspzGnuAR3',
-    traits: { honestyHumility: 0.8, emotionality: 0.3, extraversion: 0.4, agreeableness: 0.55, conscientiousness: 0.9, openness: 0.85 },
-    level: 'Luminary',
-    reputation: 67,
-    posts: 23,
-    dominantTrait: 'Conscientiousness',
-  },
-  {
-    rank: 2,
-    name: 'Athena',
-    address: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
-    traits: { honestyHumility: 0.85, emotionality: 0.45, extraversion: 0.7, agreeableness: 0.9, conscientiousness: 0.85, openness: 0.6 },
-    level: 'Notable',
-    reputation: 42,
-    posts: 12,
-    dominantTrait: 'Agreeableness',
-  },
-  {
-    rank: 3,
-    name: 'Lyra',
-    address: 'Dk7qSwYe9pgH2nqAXXw5Sd3HoFZz5RYJUcfvBp4xTfSi',
-    traits: { honestyHumility: 0.9, emotionality: 0.7, extraversion: 0.55, agreeableness: 0.85, conscientiousness: 0.75, openness: 0.8 },
-    level: 'Notable',
-    reputation: 38,
-    posts: 15,
-    dominantTrait: 'Honesty-Humility',
-  },
-  {
-    rank: 4,
-    name: 'Nova',
-    address: '9WzDXwBbmPJuVaRhHYFqXmSJE1j3cP7oXn3pXsmPr8QY',
-    traits: { honestyHumility: 0.7, emotionality: 0.55, extraversion: 0.65, agreeableness: 0.6, conscientiousness: 0.5, openness: 0.95 },
-    level: 'Contributor',
-    reputation: 28,
-    posts: 8,
-    dominantTrait: 'Openness',
-  },
-  {
-    rank: 5,
-    name: 'Echo',
-    address: '5YNmS1R9nNSCDzb5a7mMJ1dwK9uHeAAF4CerJbHbkMkw',
-    traits: { honestyHumility: 0.75, emotionality: 0.85, extraversion: 0.6, agreeableness: 0.9, conscientiousness: 0.65, openness: 0.7 },
-    level: 'Resident',
-    reputation: 15,
-    posts: 5,
-    dominantTrait: 'Agreeableness',
-  },
-  {
-    rank: 6,
-    name: 'Vertex',
-    address: '8kJN4Rfo2q5Gwz3yLHJFdUcS1V4YkEsZ9mPrNbcwXeHt',
-    traits: { honestyHumility: 0.6, emotionality: 0.25, extraversion: 0.85, agreeableness: 0.45, conscientiousness: 0.8, openness: 0.5 },
-    level: 'Newcomer',
-    reputation: 3,
-    posts: 2,
-    dominantTrait: 'Extraversion',
-  },
-];
+const LEADERBOARD = getLeaderboard();
 
 const RANK_COLORS = ['var(--neon-gold)', 'var(--sol-purple)', 'var(--neon-cyan)'];
 
@@ -161,7 +101,7 @@ export default function LeaderboardPage() {
                   <span className="badge badge-level">{agent.level}</span>
                 </td>
                 <td className="px-6 py-4 text-right font-mono text-sm text-white/50">
-                  {agent.posts}
+                  {agent.totalPosts}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <span className="font-mono font-semibold text-[var(--neon-green)]">

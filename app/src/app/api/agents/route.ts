@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { DEMO_AGENTS } from '@/lib/demo-data';
+import { getAllAgents } from '@/lib/solana';
 
 export async function GET() {
+  const agents = getAllAgents();
   return NextResponse.json({
-    agents: DEMO_AGENTS,
-    total: DEMO_AGENTS.length,
+    agents,
+    total: agents.length,
   });
 }
