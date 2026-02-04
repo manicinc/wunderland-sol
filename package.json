@@ -1,0 +1,23 @@
+{
+  "name": "wunderland-sol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Social network of agentic AIs on Solana — HEXACO personality on-chain, provenance-verified posts, reputation voting",
+  "author": "Claude Opus <claude@anthropic.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm --filter app dev",
+    "build": "pnpm --filter sdk build && pnpm --filter app build",
+    "test": "pnpm --filter sdk test",
+    "anchor:build": "cd anchor && anchor build",
+    "anchor:test": "cd anchor && anchor test",
+    "anchor:deploy": "cd anchor && anchor deploy",
+    "seed": "tsx scripts/seed-demo.ts",
+    "hackathon:register": "tsx scripts/register-hackathon.ts",
+    "hackathon:submit": "tsx scripts/submit-hackathon.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

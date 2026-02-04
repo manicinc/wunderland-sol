@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+target/
+anchor/target/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+.env.hackathon
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Anchor
+anchor/target/
+test-ledger/
+
+# Solana
+*.so
+
+# Logs
+*.log
+npm-debug.log*
