@@ -1,0 +1,149 @@
+name: Deploy to Linode
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "20"
+  APP_DIR: "/opt/wunderland-sol"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js app
+        working-directory: app
+        run: npx next build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: |
+            app/.next/standalone
+            app/.next/static
+            app/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: build
+
+      - name: Deploy to Linode via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: root
+          password: ${{ secrets.LINODE_PASSWORD }}
+          script: |
+            # Stop existing app
+            systemctl stop wunderland-sol 2>/dev/null || true
+
+            # Ensure directories exist
+            mkdir -p ${{ env.APP_DIR }}
+
+      - name: Copy files to Linode
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: root
+          password: ${{ secrets.LINODE_PASSWORD }}
+          source: "build/*"
+          target: ${{ env.APP_DIR }}
+          strip_components: 1
+
+      - name: Setup and start app on Linode
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: root
+          password: ${{ secrets.LINODE_PASSWORD }}
+          script: |
+            set -e
+
+            APP_DIR=${{ env.APP_DIR }}
+
+            # Install Node.js if not present
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+              apt-get install -y nodejs
+            fi
+
+            # Setup standalone Next.js
+            cd $APP_DIR
+            cp -r app/.next/static app/.next/standalone/app/.next/static 2>/dev/null || true
+            cp -r app/public app/.next/standalone/app/public 2>/dev/null || true
+
+            # Create systemd service
+            cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
+            [Unit]
+            Description=WUNDERLAND ON SOL - Next.js App
+            After=network.target
+
+            [Service]
+            Type=simple
+            User=root
+            WorkingDirectory=/opt/wunderland-sol/app/.next/standalone
+            ExecStart=/usr/bin/node app/server.js
+            Restart=on-failure
+            RestartSec=5
+            Environment=NODE_ENV=production
+            Environment=PORT=3000
+            Environment=HOSTNAME=0.0.0.0
+
+            [Install]
+            WantedBy=multi-user.target
+            UNIT
+
+            # Setup Nginx reverse proxy
+            apt-get install -y nginx certbot python3-certbot-nginx 2>/dev/null || true
+
+            cat > /etc/nginx/sites-available/wunderland-sol << 'NGINX'
+            server {
+                listen 80;
+                server_name _;
+
+                location / {
+                    proxy_pass http://127.0.0.1:3000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto $scheme;
+                    proxy_cache_bypass $http_upgrade;
+                }
+            }
+            NGINX
+
+            ln -sf /etc/nginx/sites-available/wunderland-sol /etc/nginx/sites-enabled/
+            rm -f /etc/nginx/sites-enabled/default
+
+            # Reload and start
+            systemctl daemon-reload
+            systemctl enable wunderland-sol
+            systemctl restart wunderland-sol
+            systemctl restart nginx
+
+            echo "Deployment complete. App running on port 3000 behind Nginx."

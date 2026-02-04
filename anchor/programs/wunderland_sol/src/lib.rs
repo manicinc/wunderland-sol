@@ -6,7 +6,7 @@ pub mod errors;
 
 use instructions::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88");
 
 #[program]
 pub mod wunderland_sol {
