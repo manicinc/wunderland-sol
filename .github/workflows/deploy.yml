@@ -10,7 +10,7 @@ env:
   APP_DIR: "/opt/wunderland-sol"
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,141 +31,104 @@ jobs:
         working-directory: app
         run: npx next build
 
-      - name: Prepare deployment bundle
+      - name: Prepare deployment tarball
         run: |
           mkdir -p deploy
-          # Debug: show standalone structure
-          echo "=== Standalone structure ==="
-          find app/.next/standalone -maxdepth 3 -type d
-          echo "=== Standalone files ==="
-          find app/.next/standalone -maxdepth 4 -name BUILD_ID -o -name server.js -o -name package.json | head -20
-          # Copy standalone output (includes server.js, node_modules, .next/server)
           cp -r app/.next/standalone/* deploy/
-          # Copy static assets into the standalone app directory
           mkdir -p deploy/app/.next
           cp -r app/.next/static deploy/app/.next/static
-          # Copy public assets if they exist
           mkdir -p deploy/app/public
           cp -r app/public/* deploy/app/public/ 2>/dev/null || true
-          # Debug: show deploy structure
-          echo "=== Deploy structure ==="
-          find deploy -maxdepth 3 -type d
-          echo "=== Deploy key files ==="
-          find deploy -maxdepth 5 -name BUILD_ID -o -name server.js | head -20
-          # Verify critical files
+          # Verify
           ls deploy/app/server.js
           ls deploy/app/.next/BUILD_ID
+          # Create tarball (preserves dot-directories)
+          cd deploy && tar czf /tmp/deploy.tar.gz . && cd ..
+          ls -lh /tmp/deploy.tar.gz
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nextjs-build
-          path: deploy
+      - name: Deploy to Linode
+        env:
+          LINODE_HOST: ${{ secrets.LINODE_HOST }}
+          LINODE_PASSWORD: ${{ secrets.LINODE_PASSWORD }}
+        run: |
+          sudo apt-get install -y sshpass
+          export SSHPASS="$LINODE_PASSWORD"
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-          path: deploy
+          # Stop app and clean dir
+          sshpass -e ssh -o StrictHostKeyChecking=no root@$LINODE_HOST "systemctl stop wunderland-sol 2>/dev/null || true; rm -rf /opt/wunderland-sol; mkdir -p /opt/wunderland-sol"
 
-      - name: Deploy to Linode via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.LINODE_HOST }}
-          username: root
-          password: ${{ secrets.LINODE_PASSWORD }}
-          script: |
-            systemctl stop wunderland-sol 2>/dev/null || true
-            rm -rf ${{ env.APP_DIR }}
-            mkdir -p ${{ env.APP_DIR }}
+          # Copy tarball
+          sshpass -e scp -o StrictHostKeyChecking=no /tmp/deploy.tar.gz root@$LINODE_HOST:/tmp/deploy.tar.gz
 
-      - name: Copy files to Linode
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.LINODE_HOST }}
-          username: root
-          password: ${{ secrets.LINODE_PASSWORD }}
-          source: "deploy/*"
-          target: ${{ env.APP_DIR }}
-          strip_components: 1
+          # Extract and setup
+          sshpass -e ssh -o StrictHostKeyChecking=no root@$LINODE_HOST << 'REMOTE'
+          set -e
 
-      - name: Setup and start app on Linode
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.LINODE_HOST }}
-          username: root
-          password: ${{ secrets.LINODE_PASSWORD }}
-          script: |
-            set -e
+          # Extract
+          cd /opt/wunderland-sol
+          tar xzf /tmp/deploy.tar.gz
+          rm /tmp/deploy.tar.gz
 
-            APP_DIR=${{ env.APP_DIR }}
+          # Verify
+          echo "=== Verify structure ==="
+          ls -la /opt/wunderland-sol/app/server.js
+          ls -la /opt/wunderland-sol/app/.next/BUILD_ID
+          ls /opt/wunderland-sol/node_modules/next/package.json
 
-            # Install Node.js if not present
-            if ! command -v node &> /dev/null; then
-              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-              apt-get install -y nodejs
-            fi
+          # Install Node.js if not present
+          if ! command -v node &> /dev/null; then
+            curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            apt-get install -y nodejs
+          fi
 
-            # Verify structure
-            echo "Checking deployment structure..."
-            ls -la $APP_DIR/app/server.js
-            ls $APP_DIR/node_modules/next/package.json
+          # Create systemd service
+          cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
+          [Unit]
+          Description=WUNDERLAND ON SOL - Next.js App
+          After=network.target
 
-            # Create systemd service
-            cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
-            [Unit]
-            Description=WUNDERLAND ON SOL - Next.js App
-            After=network.target
+          [Service]
+          Type=simple
+          User=root
+          WorkingDirectory=/opt/wunderland-sol/app
+          ExecStart=/usr/bin/node server.js
+          Restart=on-failure
+          RestartSec=5
+          Environment=NODE_ENV=production
+          Environment=PORT=3000
+          Environment=HOSTNAME=0.0.0.0
 
-            [Service]
-            Type=simple
-            User=root
-            WorkingDirectory=/opt/wunderland-sol/app
-            ExecStart=/usr/bin/node server.js
-            Restart=on-failure
-            RestartSec=5
-            Environment=NODE_ENV=production
-            Environment=PORT=3000
-            Environment=HOSTNAME=0.0.0.0
+          [Install]
+          WantedBy=multi-user.target
+          UNIT
 
-            [Install]
-            WantedBy=multi-user.target
-            UNIT
+          # Setup Nginx
+          apt-get install -y nginx 2>/dev/null || true
+          cat > /etc/nginx/sites-available/wunderland-sol << 'NGINX'
+          server {
+              listen 80;
+              server_name _;
+              location / {
+                  proxy_pass http://127.0.0.1:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_cache_bypass $http_upgrade;
+              }
+          }
+          NGINX
+          ln -sf /etc/nginx/sites-available/wunderland-sol /etc/nginx/sites-enabled/
+          rm -f /etc/nginx/sites-enabled/default
 
-            # Setup Nginx reverse proxy
-            apt-get install -y nginx 2>/dev/null || true
+          systemctl daemon-reload
+          systemctl enable wunderland-sol
+          systemctl restart wunderland-sol
+          systemctl restart nginx
 
-            cat > /etc/nginx/sites-available/wunderland-sol << 'NGINX'
-            server {
-                listen 80;
-                server_name _;
-
-                location / {
-                    proxy_pass http://127.0.0.1:3000;
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade $http_upgrade;
-                    proxy_set_header Connection 'upgrade';
-                    proxy_set_header Host $host;
-                    proxy_set_header X-Real-IP $remote_addr;
-                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto $scheme;
-                    proxy_cache_bypass $http_upgrade;
-                }
-            }
-            NGINX
-
-            ln -sf /etc/nginx/sites-available/wunderland-sol /etc/nginx/sites-enabled/
-            rm -f /etc/nginx/sites-enabled/default
-
-            # Reload and start
-            systemctl daemon-reload
-            systemctl enable wunderland-sol
-            systemctl restart wunderland-sol
-            systemctl restart nginx
-
-            # Wait and verify
-            sleep 3
-            systemctl is-active wunderland-sol && echo "App is running!" || (journalctl -u wunderland-sol --no-pager -n 20 && exit 1)
+          sleep 3
+          systemctl is-active wunderland-sol && echo "App is running!" || (journalctl -u wunderland-sol --no-pager -n 20 && exit 1)
+          REMOTE
