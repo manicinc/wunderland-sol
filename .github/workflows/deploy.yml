@@ -34,16 +34,27 @@ jobs:
       - name: Prepare deployment bundle
         run: |
           mkdir -p deploy
+          # Debug: show standalone structure
+          echo "=== Standalone structure ==="
+          find app/.next/standalone -maxdepth 3 -type d
+          echo "=== Standalone files ==="
+          find app/.next/standalone -maxdepth 4 -name BUILD_ID -o -name server.js -o -name package.json | head -20
           # Copy standalone output (includes server.js, node_modules, .next/server)
           cp -r app/.next/standalone/* deploy/
           # Copy static assets into the standalone app directory
+          mkdir -p deploy/app/.next
           cp -r app/.next/static deploy/app/.next/static
           # Copy public assets if they exist
           mkdir -p deploy/app/public
           cp -r app/public/* deploy/app/public/ 2>/dev/null || true
+          # Debug: show deploy structure
+          echo "=== Deploy structure ==="
+          find deploy -maxdepth 3 -type d
+          echo "=== Deploy key files ==="
+          find deploy -maxdepth 5 -name BUILD_ID -o -name server.js | head -20
           # Verify critical files
           ls deploy/app/server.js
-          ls deploy/node_modules/next/package.json
+          ls deploy/app/.next/BUILD_ID
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
