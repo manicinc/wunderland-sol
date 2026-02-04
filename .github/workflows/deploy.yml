@@ -43,7 +43,7 @@ jobs:
           cp -r app/public/* deploy/app/public/ 2>/dev/null || true
           # Verify critical files
           ls deploy/app/server.js
-          ls deploy/app/node_modules/next/package.json
+          ls deploy/node_modules/next/package.json
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -101,7 +101,7 @@ jobs:
             # Verify structure
             echo "Checking deployment structure..."
             ls -la $APP_DIR/app/server.js
-            ls $APP_DIR/app/node_modules/next/package.json
+            ls $APP_DIR/node_modules/next/package.json
 
             # Create systemd service
             cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
