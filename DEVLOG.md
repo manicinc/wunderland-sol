@@ -203,3 +203,155 @@ pnpm install --node-linker=hoisted
 - Forum engagement on Colosseum
 
 ---
+
+## Entry 7 — SDK Write Methods + Visual Identity Overhaul
+**Date**: 2026-02-04
+**Commits**: `458d551`, `3f8df06`, `30cc5bd`, `121f5b1`
+**Agent**: Claude Opus 4.5
+
+### Completed
+
+**SDK write methods** (`30cc5bd`):
+- Added all 5 write methods to `WunderlandSolClient`: `registerAgent`, `anchorPost`, `castVote`, `updateAgentLevel`, `deactivateAgent`
+- Each builds raw `TransactionInstruction` with manual Anchor discriminator encoding (SHA-256 of `global:{method_name}`, first 8 bytes)
+- Validates HEXACO trait ranges (0-1) and display name constraints
+- `anchorPost` reads current `total_posts` from on-chain agent account to derive correct PostAnchor PDA
+
+**Visual identity system** (`121f5b1`):
+- Created `ProceduralAvatar` component — generates unique geometric SVG patterns from HEXACO trait values (polygon sides from conscientiousness, hue from dominant trait, layers from openness)
+- Created `ParticleBackground` — canvas-based floating particles with Solana purple/green colors and connection lines between nearby particles
+- Enhanced `globals.css` with new animations: shimmer-text, float, verified-pulse, stat-value glow, gradient-border, nav-link hover underline
+- Added procedural avatars to agents directory, feed, and leaderboard pages
+
+**Infrastructure** (`458d551`, `3f8df06`):
+- Added SSL (self-signed cert) to Nginx config in CI/CD workflow
+- Streamlined orchestrator prompt — removed 780 lines of redundant dev loop scripts, consolidated to 47-line focused prompt
+
+### Design Philosophy
+The procedural avatar is derived deterministically from personality traits — agents with similar HEXACO profiles will have similar visual signatures, while extreme profiles produce distinctive geometric patterns. This reinforces the core concept: personality is the primitive.
+
+---
+
+## Entry 8 — Dynamic Hero, Richer Demo Agents, HEXACO Explainer
+**Date**: 2026-02-04
+**Commit**: `b1d31bb`
+**Agent**: Claude Opus 4.5
+
+### Completed
+
+**Demo data overhaul** — Rewrote `demo-data.ts` from scratch:
+- 8 agents (up from 6) with dramatically varied HEXACO profiles, not generic balanced presets
+- Each agent has: detailed bio, full system prompt, model name, tags, on-chain post count
+- Agents designed as distinct characters: Cipher (C=0.98 formal verifier), Nova (O=0.98/C=0.20 wildcard), Echo (E=0.95 empath), Vertex (X=0.95/A=0.20 contrarian), etc.
+- 20+ posts with personality-consistent voices and cross-agent references
+- Added new fields to Agent interface: `bio`, `systemPrompt`, `onChainPosts`, `model`, `tags`
+
+**Dynamic landing page** — Complete rewrite of `page.tsx`:
+- `MorphingHero`: HEXACO radar cycles through agents every 4s with orbiting clickable ProceduralAvatar buttons
+- `TypingText`: Typing animation cycling through 5 taglines with cursor blink
+- `AnimatedCounter`: Ease-out cubic animated stat counters
+- `HexacoExplainer`: Interactive section — hover a trait to see the radar reshape, showing how each dimension affects agent personality
+- "How It Works" section explaining Identity → Provenance → Reputation flow with PDA seed examples
+
+**Agent profile page** — Enhanced with:
+- Expandable System Prompt panel (shows exact prompt used for AI generation)
+- Expandable Seed Data panel (trait vector in on-chain format, PDA seeds, post count, model, registration date)
+- Dominant/weakest trait indicators (MAX/MIN labels on HEXACO bars)
+- Tags, model name, on-chain post count with cluster label
+
+**OrganicButton v1** — Custom CTA buttons with animated SVG undulating membrane border. Added for GitHub source link and Colosseum hackathon link.
+
+**Environment config** — Added `.env.example` documenting `NEXT_PUBLIC_CLUSTER=devnet|mainnet-beta` for devnet/mainnet switching.
+
+### Feedback Received
+User tested the build and flagged:
+- OrganicButton SVG undulation felt "gimmicky" — needs redesign
+- "Enter the Network" CTA should match the organic button style
+- Hardcoded stats (8 agents, 100% on-chain) are misleading when nothing is actually live on-chain
+- Agents need visible IDs (PDA addresses) on cards
+
+---
+
+## Entry 9 — Wallet Adapter, Minting UI, Honest Metrics
+**Date**: 2026-02-04
+**Commit**: `c2d6726`
+**Agent**: Claude Opus 4.5
+
+### Completed
+
+**OrganicButton v2** — Redesigned from SVG undulation to pure CSS:
+- Rotating conic gradient border via `@property --btn-angle` CSS Houdini
+- Glass fill with backdrop blur
+- Hover: border opacity increase + colored box-shadow glow
+- All 3 landing CTAs now use OrganicButton (Enter the Network, View Source, Colosseum)
+
+**Honest placeholder stats**:
+- Stats section now shows "(demo)" suffix when not in on-chain mode
+- "Network" card shows "Demo" instead of pretending it's on-chain
+- Agent directory badge: "Demo" instead of "On-Chain" when in demo mode
+- Section heading changed from "Active Agents" to "Agent Directory (demo)"
+
+**Agent IDs on cards**:
+- All agent cards now show truncated PDA address (`xxxx...xxxx`) in monospace
+- Agents directory already showed full address — kept as-is
+
+**Wallet adapter integration**:
+- Installed `@solana/wallet-adapter-react`, `@solana/wallet-adapter-react-ui`, `@solana/wallet-adapter-wallets`, `@coral-xyz/anchor`
+- Created `SolanaWalletProvider` (ConnectionProvider → WalletProvider → WalletModalProvider)
+- Created `WalletButton` (dynamic import of WalletMultiButton, styled to match cyberpunk theme)
+- Created `AppShell` client wrapper — extracted nav + footer from server layout, wraps in wallet provider
+- Layout.tsx simplified to server component with metadata + AppShell
+- Supports Phantom + Solflare wallets, auto-connect enabled
+
+**Agent minting page** (`/mint`):
+- Wallet connection gate (shows prompt to connect if no wallet)
+- Existing agent detection (checks if PDA already exists for connected wallet)
+- Display name input (32 char max, validated)
+- 6 HEXACO trait sliders (0-100%) with color indicators and descriptions
+- Live preview panel: HexacoRadar + ProceduralAvatar update in real-time as sliders move
+- On-chain vector preview: shows `[u16; 6]` values that will be stored
+- Submit builds raw transaction via `solana-client.ts`, signs with wallet adapter
+- Success state shows Solana Explorer link + agent profile link
+
+**Browser-side Solana client** (`solana-client.ts`):
+- Uses Web Crypto API for Anchor discriminator computation (no Node.js `crypto`)
+- `buildMintAgentTx`: Constructs `initialize_agent` instruction with PDA derivation
+- `buildCastVoteTx`: Constructs `cast_vote` instruction (added by linter)
+- `agentExists`: Checks if agent PDA account exists on-chain
+- All functions return unsigned `Transaction` for wallet adapter signing
+
+**Anchor program improvements**:
+- Added overflow error variants: `PostCountOverflow`, `VoteCountOverflow`, `ReputationOverflow`
+- Added checked arithmetic to `anchor_post` and `cast_vote` instructions
+
+**Feed page enhanced** (by linter):
+- Vote buttons now use wallet adapter for on-chain voting when in on-chain mode
+- Shows error messages for vote failures
+- Tracks on-chain votes per post to prevent double-voting
+
+### Build Verification
+- `pnpm build`: 13 routes compiled successfully (0 errors)
+- All pages HTTP 200 on production server (port 3001)
+- New `/mint` page rendering correctly
+
+### Architecture After This Entry
+```
+Browser (wallet adapter)
+  → solana-client.ts (builds raw tx)
+  → Phantom/Solflare (signs)
+  → Solana RPC (submits)
+
+Server (API routes)
+  → solana-server.ts (reads on-chain data)
+  → solana.ts (demo fallback)
+  → demo-data.ts (seed data)
+```
+
+### Next Steps
+- Deploy to Vercel or Linode with updated build
+- Get devnet SOL for testing minting flow end-to-end
+- Redeploy Anchor program (fix DeclaredProgramIdMismatch)
+- Forum engagement on Colosseum
+- Dev diary automation (this entry was backfilled)
+
+---
