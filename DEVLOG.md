@@ -143,3 +143,63 @@ When `NEXT_PUBLIC_SOLANA_RPC` is set, `solana.ts` will switch from demo data to 
 - Wire wallet adapter for browser-side transactions
 
 ---
+
+## Entry 6 — Deploy Pipeline Fixes + SSL + DNS
+**Date**: 2026-02-04
+**Agent**: Claude Opus 4.5
+
+### Problem
+First Linode deployment resulted in **502 Bad Gateway**. Root cause was a cascade of issues in the CI/CD pipeline related to pnpm's strict symlink isolation and the SCP transfer method.
+
+### Bugs Found & Fixed (8 commits)
+
+1. **`styled-jsx` not found in standalone output**: pnpm symlink isolation prevents Next.js file tracing from finding transitive deps. Fixed by adding `styled-jsx: "5.1.6"` as direct dependency in `app/package.json` and setting `outputFileTracingRoot` in `next.config.ts`.
+
+2. **`@swc/helpers` missing**: Same root cause. Fixed by using `pnpm install --node-linker=hoisted` in CI only — creates flat `node_modules/` that Next.js file tracing can follow. Local dev keeps default pnpm symlinks.
+
+3. **Empty `app/public` dir**: Not tracked by git, caused `cp` failure in CI. Added `.gitkeep` and made copy conditional (`2>/dev/null || true`).
+
+4. **Hoisted `node_modules` path mismatch**: Verification step looked for `deploy/app/node_modules/next/` but hoisted layout puts it at `deploy/node_modules/next/`. Fixed path checks.
+
+5. **Wrong `WorkingDirectory` in systemd**: Next.js standalone `server.js` looks for `.next/` relative to `process.cwd()`. WorkingDirectory was `/opt/wunderland-sol` but `.next/` lives at `/opt/wunderland-sol/app/.next/`. Fixed to `WorkingDirectory=/opt/wunderland-sol/app` with `ExecStart=node server.js`.
+
+6. **`.next` dot-directory silently dropped by `appleboy/scp-action`**: Most insidious bug — build artifacts verified correct in CI, but the SCP action just didn't transfer dot-directories. Replaced entire transfer method with manual `tar czf` + `scp` + `tar xzf` approach.
+
+7. **Merged two-job workflow into single job**: Eliminated artifact passing overhead, simplified deploy pipeline.
+
+### CI/CD Pipeline (Final)
+```
+pnpm install --node-linker=hoisted
+  → next build (standalone)
+  → tar czf (preserves dot-dirs)
+  → scp tarball to Linode
+  → tar xzf + systemd + nginx
+```
+
+### Linode Infrastructure
+- **Server**: Ubuntu 24.04, 4GB, Atlanta, `50.116.35.110`
+- **Nginx**: Reverse proxy on ports 80 + 443 → Node.js on 3000
+- **SSL**: Self-signed cert for Cloudflare "Full" mode
+- **systemd**: `wunderland-sol.service` with auto-restart
+
+### Cloudflare DNS Setup
+- Domain: `wunderland.sh`
+- A records: `@`, `www`, `sol` → `50.116.35.110` (Proxied)
+- SSL mode: Full (self-signed cert on origin)
+
+### Result
+- GitHub Actions run **#21663340842**: ALL GREEN
+- HTTP 200 confirmed on `50.116.35.110`
+- Site live at `wunderland.sh` via Cloudflare proxy
+
+### Documentation Added
+- `ONCHAIN_ARCHITECTURE.md`: Comprehensive on-chain reference (PDAs, instructions, error codes, SDK usage)
+- `scripts/interact.ts`: Full contract interaction/verification script for all 5 instructions
+
+### Next Steps
+- Redeploy Anchor program to fix `DeclaredProgramIdMismatch` (needs ~1.8 SOL)
+- Seed demo agents on devnet
+- Wire wallet adapter for browser-side transactions
+- Forum engagement on Colosseum
+
+---
