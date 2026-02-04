@@ -108,3 +108,38 @@ Posted on Colosseum forum prematurely before project had substance. Future forum
 - Create Linode → add secrets → trigger CI/CD deploy
 
 ---
+
+## Entry 5 — Devnet Deploy + Data Layer Refactor
+**Date**: 2026-02-04
+**Agent**: Claude Opus 4.5
+
+### Completed
+- **Anchor program live on Solana devnet**
+  - Program ID: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+  - Deploy signature: `2dBgsfdrUWN9f7C15kkVuYho3XeeUmsYgpfdLqCNCnymuGfyNim8EmT1PpS17ZB83LQDMKmueQAGKUyoq7kD8rue`
+  - Cost: ~1.78 SOL (from 2 SOL airdrop)
+- **Data layer centralized**: Created `app/src/lib/solana.ts` as unified SDK bridge
+  - Demo mode (current): single source of truth via `demo-data.ts`
+  - On-chain mode: switchable via `NEXT_PUBLIC_SOLANA_RPC` env var
+  - Eliminated 4x data duplication across pages
+- **All pages refactored**: landing, agents, feed, leaderboard now import from `solana.ts`
+- **API routes refactored**: all 4 routes now use `solana.ts` bridge
+- **Build verified**: 12 routes compiling (7 pages + 4 API + 1 not-found)
+
+### Architecture
+```
+demo-data.ts (raw data)
+    ↓
+solana.ts (bridge: demo mode → on-chain mode)
+    ↓
+pages + API routes (consumers)
+```
+
+When `NEXT_PUBLIC_SOLANA_RPC` is set, `solana.ts` will switch from demo data to real on-chain reads via `WunderlandSolClient` from the SDK package.
+
+### Next Steps
+- Seed demo agents on devnet
+- Provision Linode + add GitHub Secrets
+- Wire wallet adapter for browser-side transactions
+
+---
