@@ -31,14 +31,21 @@ jobs:
         working-directory: app
         run: npx next build
 
+      - name: Prepare deployment bundle
+        run: |
+          mkdir -p deploy
+          # Copy standalone output (includes server.js, node_modules, .next/server)
+          cp -r app/.next/standalone/* deploy/
+          # Copy static assets into the standalone app directory
+          cp -r app/.next/static deploy/app/.next/static
+          # Copy public assets
+          cp -r app/public deploy/app/public
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build
-          path: |
-            app/.next/standalone
-            app/.next/static
-            app/public
+          path: deploy
 
   deploy:
     needs: build
@@ -47,7 +54,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: nextjs-build
-          path: build
+          path: deploy
 
       - name: Deploy to Linode via SSH
         uses: appleboy/ssh-action@v1
@@ -56,10 +63,8 @@ jobs:
           username: root
           password: ${{ secrets.LINODE_PASSWORD }}
           script: |
-            # Stop existing app
             systemctl stop wunderland-sol 2>/dev/null || true
-
-            # Ensure directories exist
+            rm -rf ${{ env.APP_DIR }}
             mkdir -p ${{ env.APP_DIR }}
 
       - name: Copy files to Linode
@@ -68,7 +73,7 @@ jobs:
           host: ${{ secrets.LINODE_HOST }}
           username: root
           password: ${{ secrets.LINODE_PASSWORD }}
-          source: "build/*"
+          source: "deploy/*"
           target: ${{ env.APP_DIR }}
           strip_components: 1
 
@@ -89,10 +94,10 @@ jobs:
               apt-get install -y nodejs
             fi
 
-            # Setup standalone Next.js
-            cd $APP_DIR
-            cp -r app/.next/static app/.next/standalone/app/.next/static 2>/dev/null || true
-            cp -r app/public app/.next/standalone/app/public 2>/dev/null || true
+            # Verify structure
+            echo "Checking deployment structure..."
+            ls -la $APP_DIR/app/server.js
+            ls -la $APP_DIR/app/node_modules/styled-jsx/package.json
 
             # Create systemd service
             cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
@@ -103,7 +108,7 @@ jobs:
             [Service]
             Type=simple
             User=root
-            WorkingDirectory=/opt/wunderland-sol/app/.next/standalone
+            WorkingDirectory=/opt/wunderland-sol
             ExecStart=/usr/bin/node app/server.js
             Restart=on-failure
             RestartSec=5
@@ -116,7 +121,7 @@ jobs:
             UNIT
 
             # Setup Nginx reverse proxy
-            apt-get install -y nginx certbot python3-certbot-nginx 2>/dev/null || true
+            apt-get install -y nginx 2>/dev/null || true
 
             cat > /etc/nginx/sites-available/wunderland-sol << 'NGINX'
             server {
@@ -146,4 +151,6 @@ jobs:
             systemctl restart wunderland-sol
             systemctl restart nginx
 
-            echo "Deployment complete. App running on port 3000 behind Nginx."
+            # Wait and verify
+            sleep 3
+            systemctl is-active wunderland-sol && echo "App is running!" || (journalctl -u wunderland-sol --no-pager -n 20 && exit 1)
