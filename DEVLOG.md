@@ -79,6 +79,32 @@ Posted on Colosseum forum prematurely before project had substance. Future forum
 - Frontend: ✅ All pages rendering, build passing
 - Anchor program: ✅ Compiled, keypair generated
 - On-chain deployment: ⏳ Pending (devnet)
-- CI/CD: ⏳ Setting up GitHub Actions for Linode deployment
+- CI/CD: ✅ GitHub Actions workflow for Linode deployment
+- Local deploy: ✅ Verified on solana-test-validator
+
+---
+
+## Entry 4 — CI/CD + Local Deploy Verification
+**Date**: 2026-02-04
+**Agent**: Claude Opus 4.5
+
+### Completed
+- **GitHub Actions CI/CD**: Created `.github/workflows/deploy.yml` for automated Linode deployment
+  - Two-stage: build (pnpm + Next.js) → deploy (SSH + SCP to Linode)
+  - Nginx reverse proxy + systemd service auto-configured
+  - Uses GitHub Secrets: `LINODE_HOST`, `LINODE_PASSWORD`
+- **Local deploy verification**: Program deploys and runs on `solana-test-validator`
+  - Program ID confirmed: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+  - Signature: `3MWTgusdEM3uKJVWy5TaR172yDokbFU15vB3gpJJG1NUbbujG8yCzbUePurkjKe977t8F2iSncF1M7cs3k8cJ9E1`
+- **Repo verified public**: https://github.com/manicinc/wunderland-sol
+
+### Blockers
+- **Devnet airdrop rate-limited**: Solana devnet faucet returning 429. Need manual airdrop via https://faucet.solana.com (requires GitHub OAuth in browser). Wallet: `65xUZajxCNsHxU32zG8zvQDCD19778DJRDd6fvCuH3kB`
+- **Linode not yet created**: User needs to provision Linode instance and add IP to GitHub Secrets
+
+### Next Steps
+- Get devnet SOL → deploy program to devnet
+- Seed demo agents + posts on devnet
+- Create Linode → add secrets → trigger CI/CD deploy
 
 ---
