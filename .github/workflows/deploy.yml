@@ -25,7 +25,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --node-linker=hoisted
 
       - name: Build Next.js app
         working-directory: app
@@ -41,14 +41,9 @@ jobs:
           # Copy public assets if they exist
           mkdir -p deploy/app/public
           cp -r app/public/* deploy/app/public/ 2>/dev/null || true
-          # Ensure styled-jsx is present (pnpm symlinks may not be traced on CI)
-          if [ ! -d "deploy/app/node_modules/styled-jsx" ]; then
-            echo "styled-jsx missing from trace, copying from node_modules..."
-            cp -rL app/node_modules/styled-jsx deploy/app/node_modules/styled-jsx
-          fi
           # Verify critical files
           ls deploy/app/server.js
-          ls deploy/app/node_modules/styled-jsx/package.json
+          ls deploy/app/node_modules/next/package.json
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -106,7 +101,7 @@ jobs:
             # Verify structure
             echo "Checking deployment structure..."
             ls -la $APP_DIR/app/server.js
-            ls -la $APP_DIR/app/node_modules/styled-jsx/package.json
+            ls $APP_DIR/app/node_modules/next/package.json
 
             # Create systemd service
             cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
