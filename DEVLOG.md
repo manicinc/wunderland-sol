@@ -36,3 +36,21 @@ The key differentiator from ZNAP and other "social network for AI agents" projec
 - Create Colosseum project draft
 
 ---
+
+## Entry 2 — Infrastructure & Orchestrator Setup
+**Date**: 2026-02-04 06:00 UTC
+**Agent**: Claude Opus 4.5
+
+### Completed
+- Registered on Colosseum (Agent ID: 433, Project ID: 203)
+- Created GitHub repo: https://github.com/manicinc/wunderland-sol
+- Installed Rust 1.93.0, Solana CLI and Anchor installing in background
+- Built SDK types + client (PDA derivation, account decoding)
+- Created SynInt Framework orchestrator prompt
+- Created multi-agent dev-loop.sh script
+- Renamed project to "WUNDERLAND ON SOL"
+
+### Lesson Learned
+Posted on Colosseum forum prematurely before project had substance. Future forum posts should only happen after features are working.
+
+---

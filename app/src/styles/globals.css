@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+/* ============================================================
+   WUNDERLAND ON SOL — Holographic Cyberpunk Design System
+   ============================================================ */
+
+/* ---- Custom Properties ---- */
+:root {
+  /* Void background */
+  --bg-void: #0a0a0f;
+  --bg-surface: #0f0f18;
+  --bg-elevated: #14142a;
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass-hover: rgba(255, 255, 255, 0.06);
+
+  /* Solana gradient */
+  --sol-purple: #9945ff;
+  --sol-green: #14f195;
+
+  /* Neon accents */
+  --neon-cyan: #00f0ff;
+  --neon-magenta: #ff00e5;
+  --neon-gold: #ffd700;
+  --neon-green: #14f195;
+  --neon-red: #ff3366;
+
+  /* Text */
+  --text-primary: #f0f0f0;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --text-tertiary: rgba(255, 255, 255, 0.3);
+
+  /* Glass border */
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(153, 69, 255, 0.3);
+
+  /* HEXACO trait colors */
+  --hexaco-h: #ff6b9d; /* Honesty-Humility */
+  --hexaco-e: #c084fc; /* Emotionality */
+  --hexaco-x: #fbbf24; /* Extraversion */
+  --hexaco-a: #34d399; /* Agreeableness */
+  --hexaco-c: #60a5fa; /* Conscientiousness */
+  --hexaco-o: #f472b6; /* Openness */
+
+  /* Citizen levels */
+  --level-newcomer: #94a3b8;
+  --level-resident: #60a5fa;
+  --level-contributor: #34d399;
+  --level-notable: #fbbf24;
+  --level-luminary: #c084fc;
+  --level-founder: #ff6b9d;
+}
+
+/* ---- Base Styles ---- */
+html {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg-void);
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Glass Panel ---- */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+}
+
+.glass:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-glow);
+}
+
+/* ---- Holographic Card ---- */
+.holo-card {
+  position: relative;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.holo-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 0deg,
+    rgba(0, 240, 255, 0.05),
+    rgba(255, 0, 229, 0.05),
+    rgba(255, 215, 0, 0.05),
+    rgba(20, 241, 149, 0.05),
+    rgba(0, 240, 255, 0.05)
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  animation: holo-rotate 8s linear infinite;
+  pointer-events: none;
+}
+
+.holo-card:hover::before {
+  opacity: 1;
+}
+
+.holo-card:hover {
+  border-color: var(--border-glow);
+  box-shadow:
+    0 0 20px rgba(153, 69, 255, 0.15),
+    0 0 40px rgba(153, 69, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+@keyframes holo-rotate {
+  from { filter: hue-rotate(0deg); }
+  to { filter: hue-rotate(360deg); }
+}
+
+/* ---- Neon Glow ---- */
+.neon-glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2);
+}
+
+.neon-glow-magenta {
+  text-shadow: 0 0 10px rgba(255, 0, 229, 0.5), 0 0 30px rgba(255, 0, 229, 0.2);
+}
+
+.neon-glow-green {
+  text-shadow: 0 0 10px rgba(20, 241, 149, 0.5), 0 0 30px rgba(20, 241, 149, 0.2);
+}
+
+.neon-border {
+  box-shadow: 0 0 15px rgba(153, 69, 255, 0.3), inset 0 0 15px rgba(153, 69, 255, 0.05);
+}
+
+/* ---- Solana Gradient ---- */
+.sol-gradient {
+  background: linear-gradient(135deg, var(--sol-purple), var(--sol-green));
+}
+
+.sol-gradient-text {
+  background: linear-gradient(135deg, var(--sol-purple), var(--sol-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---- Scan Lines ---- */
+.scan-lines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* ---- Pulse Animation ---- */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ---- Badge ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+.badge-verified {
+  background: rgba(20, 241, 149, 0.1);
+  color: var(--neon-green);
+  border: 1px solid rgba(20, 241, 149, 0.3);
+}
+
+.badge-level {
+  background: rgba(153, 69, 255, 0.1);
+  color: var(--sol-purple);
+  border: 1px solid rgba(153, 69, 255, 0.3);
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(153, 69, 255, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(153, 69, 255, 0.5);
+}
+
+/* ---- Typography ---- */
+.font-display {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
