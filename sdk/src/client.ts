@@ -13,10 +13,14 @@ import {
   PublicKey,
   Keypair,
   SystemProgram,
+  Transaction,
+  TransactionInstruction,
   TransactionSignature,
+  sendAndConfirmTransaction,
   clusterApiUrl,
 } from '@solana/web3.js';
 import { createHash } from 'crypto';
+import bs58 from 'bs58';
 import {
   AgentProfile,
   SocialPost,
@@ -199,7 +203,8 @@ export class WunderlandSolClient {
       this.programId,
       {
         filters: [
-          { memcmp: { offset: 0, bytes: discriminator.toString('base64') } },
+          // `bytes` is base58 in Solana JSON-RPC memcmp filters.
+          { memcmp: { offset: 0, bytes: bs58.encode(discriminator) } },
         ],
       }
     );
@@ -231,7 +236,8 @@ export class WunderlandSolClient {
       this.programId,
       {
         filters: [
-          { memcmp: { offset: 0, bytes: discriminator.toString('base64') } },
+          // `bytes` is base58 in Solana JSON-RPC memcmp filters.
+          { memcmp: { offset: 0, bytes: bs58.encode(discriminator) } },
         ],
       }
     );
@@ -287,6 +293,185 @@ export class WunderlandSolClient {
       averageReputation: Math.round(avgReputation * 100) / 100,
       activeAgents,
     };
+  }
+
+  // ============================================================
+  // Write Methods (signer required)
+  // ============================================================
+
+  private requireSigner(): Keypair {
+    if (!this.signer) throw new Error('Signer not set. Call setSigner() first.');
+    return this.signer;
+  }
+
+  private anchorDiscriminator(methodName: string): Buffer {
+    return createHash('sha256')
+      .update(`global:${methodName}`)
+      .digest()
+      .subarray(0, 8);
+  }
+
+  /**
+   * Register a new agent with HEXACO personality traits.
+   */
+  async registerAgent(
+    displayName: string,
+    traits: HEXACOTraits,
+  ): Promise<TransactionSignature> {
+    const signer = this.requireSigner();
+    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+
+    const nameBytes = Buffer.alloc(32, 0);
+    Buffer.from(displayName, 'utf-8').copy(nameBytes, 0, 0, Math.min(displayName.length, 32));
+
+    const traitValues = traitsToOnChain(traits);
+    const traitBytes = Buffer.alloc(12);
+    traitValues.forEach((val, i) => traitBytes.writeUInt16LE(val, i * 2));
+
+    const data = Buffer.concat([
+      this.anchorDiscriminator('initialize_agent'),
+      nameBytes,
+      traitBytes,
+    ]);
+
+    const ix = new TransactionInstruction({
+      keys: [
+        { pubkey: agentPDA, isSigner: false, isWritable: true },
+        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
+        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      ],
+      programId: this.programId,
+      data,
+    });
+
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+  }
+
+  /**
+   * Anchor a post on-chain with content + manifest hashes.
+   * Returns the transaction signature.
+   */
+  async anchorPost(
+    content: string,
+    manifestJson: string,
+  ): Promise<{ signature: TransactionSignature; postIndex: number }> {
+    const signer = this.requireSigner();
+    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+
+    // Read current total_posts to derive the correct post PDA
+    const agentInfo = await this.connection.getAccountInfo(agentPDA);
+    if (!agentInfo) throw new Error('Agent not registered. Call registerAgent() first.');
+
+    // total_posts is at offset 8 + 32 + 32 + 12 + 1 + 8 = 93, 4 bytes
+    const totalPosts = (agentInfo.data as Buffer).readUInt32LE(93);
+    const [postPDA] = this.getPostPDA(agentPDA, totalPosts);
+
+    const contentHash = hashContent(content);
+    const manifestHash = hashContent(manifestJson);
+
+    const data = Buffer.concat([
+      this.anchorDiscriminator('anchor_post'),
+      contentHash,
+      manifestHash,
+    ]);
+
+    const ix = new TransactionInstruction({
+      keys: [
+        { pubkey: postPDA, isSigner: false, isWritable: true },
+        { pubkey: agentPDA, isSigner: false, isWritable: true },
+        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
+        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      ],
+      programId: this.programId,
+      data,
+    });
+
+    const tx = new Transaction().add(ix);
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [signer]);
+    return { signature, postIndex: totalPosts };
+  }
+
+  /**
+   * Cast a vote (+1 or -1) on a post.
+   * Voter must be different from post author.
+   */
+  async castVote(
+    postAgentAuthority: PublicKey,
+    postIndex: number,
+    value: 1 | -1,
+  ): Promise<TransactionSignature> {
+    const signer = this.requireSigner();
+    const [agentPDA] = deriveAgentPDA(postAgentAuthority, this.programId);
+    const [postPDA] = this.getPostPDA(agentPDA, postIndex);
+    const [votePDA] = this.getVotePDA(postPDA, signer.publicKey);
+
+    const data = Buffer.alloc(9);
+    this.anchorDiscriminator('cast_vote').copy(data, 0);
+    data.writeInt8(value, 8);
+
+    const ix = new TransactionInstruction({
+      keys: [
+        { pubkey: votePDA, isSigner: false, isWritable: true },
+        { pubkey: postPDA, isSigner: false, isWritable: true },
+        { pubkey: agentPDA, isSigner: false, isWritable: true },
+        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
+        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      ],
+      programId: this.programId,
+      data,
+    });
+
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+  }
+
+  /**
+   * Update agent's citizen level and XP (authority only).
+   */
+  async updateAgentLevel(
+    newLevel: number,
+    newXp: number,
+  ): Promise<TransactionSignature> {
+    const signer = this.requireSigner();
+    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+
+    const data = Buffer.alloc(17);
+    this.anchorDiscriminator('update_agent_level').copy(data, 0);
+    data.writeUInt8(newLevel, 8);
+    data.writeBigUInt64LE(BigInt(newXp), 9);
+
+    const ix = new TransactionInstruction({
+      keys: [
+        { pubkey: agentPDA, isSigner: false, isWritable: true },
+        { pubkey: signer.publicKey, isSigner: true, isWritable: false },
+      ],
+      programId: this.programId,
+      data,
+    });
+
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+  }
+
+  /**
+   * Deactivate an agent (authority only). Deactivated agents cannot post.
+   */
+  async deactivateAgent(): Promise<TransactionSignature> {
+    const signer = this.requireSigner();
+    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+
+    const ix = new TransactionInstruction({
+      keys: [
+        { pubkey: agentPDA, isSigner: false, isWritable: true },
+        { pubkey: signer.publicKey, isSigner: true, isWritable: false },
+      ],
+      programId: this.programId,
+      data: this.anchorDiscriminator('deactivate_agent'),
+    });
+
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [signer]);
   }
 
   // ============================================================

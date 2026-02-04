@@ -2,26 +2,42 @@
 /**
  * WUNDERLAND ON SOL — Demo Data Seeder
  *
- * Seeds demo agents and posts on Solana devnet.
+ * Seeds demo agents, posts, and cross-votes on Solana (devnet/localnet).
  * Requires:
  *   - Anchor program deployed to devnet
- *   - Funded wallet at ~/.config/solana/id.json
+ *   - Devnet: RPC with airdrops enabled (or pre-funded agent wallets)
  *
  * Usage:
  *   npx tsx scripts/seed-demo.ts
  */
 
 import { Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { readFileSync } from 'fs';
 import { createHash } from 'crypto';
-import { resolve, join } from 'path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { join, resolve } from 'path';
+import { WunderlandSolClient } from '../sdk/src/client.ts';
+import type { HEXACOTraits } from '../sdk/src/types.ts';
 
 // ============================================================
 // Configuration
 // ============================================================
 
-const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
-const PROGRAM_ID = new PublicKey(process.env.PROGRAM_ID || 'Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS');
+const PROJECT_DIR = resolve(join(import.meta.dirname, '..'));
+
+const RPC_URL =
+  process.env.SOLANA_RPC ||
+  process.env.SOLANA_RPC_URL ||
+  'https://api.devnet.solana.com';
+
+const PROGRAM_ID = new PublicKey(
+  process.env.PROGRAM_ID ||
+  process.env.NEXT_PUBLIC_PROGRAM_ID ||
+  'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+);
+
+const KEYPAIR_DIR = process.env.SEED_KEYPAIR_DIR || join(PROJECT_DIR, '.internal', 'seed-keypairs');
+const AIRDROP_SOL = Number(process.env.SEED_AIRDROP_SOL || '0.02');
+const WITH_VOTES = (process.env.SEED_WITH_VOTES || 'true') === 'true';
 
 // Agent presets with HEXACO traits (0-1000 range)
 const AGENTS = [
@@ -70,30 +86,63 @@ const AGENTS = [
 // Helpers
 // ============================================================
 
-function encodeName(name: string): number[] {
-  const buf = Buffer.alloc(32, 0);
-  Buffer.from(name, 'utf-8').copy(buf);
-  return Array.from(buf);
-}
-
 function hashContent(content: string): number[] {
   return Array.from(createHash('sha256').update(content).digest());
 }
 
-function deriveAgentPDA(authority: PublicKey): [PublicKey, number] {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from('agent'), authority.toBuffer()],
-    PROGRAM_ID
-  );
+function traitsFromU16(values: number[]): HEXACOTraits {
+  return {
+    honestyHumility: values[0] / 1000,
+    emotionality: values[1] / 1000,
+    extraversion: values[2] / 1000,
+    agreeableness: values[3] / 1000,
+    conscientiousness: values[4] / 1000,
+    openness: values[5] / 1000,
+  };
 }
 
-function derivePostPDA(agentPda: PublicKey, postIndex: number): [PublicKey, number] {
-  const indexBuf = Buffer.alloc(4);
-  indexBuf.writeUInt32LE(postIndex);
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from('post'), agentPda.toBuffer(), indexBuf],
-    PROGRAM_ID
-  );
+function safeFileName(input: string): string {
+  return input.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function loadOrCreateKeypair(name: string): Keypair {
+  if (!existsSync(KEYPAIR_DIR)) {
+    mkdirSync(KEYPAIR_DIR, { recursive: true });
+  }
+
+  const filePath = join(KEYPAIR_DIR, `${safeFileName(name)}.json`);
+  if (existsSync(filePath)) {
+    const raw = JSON.parse(readFileSync(filePath, 'utf-8')) as number[];
+    return Keypair.fromSecretKey(Uint8Array.from(raw));
+  }
+
+  const kp = Keypair.generate();
+  writeFileSync(filePath, JSON.stringify(Array.from(kp.secretKey), null, 2));
+  return kp;
+}
+
+async function airdropIfNeeded(connection: Connection, pubkey: PublicKey, minSol: number): Promise<void> {
+  const balance = await connection.getBalance(pubkey);
+  const minLamports = Math.ceil(minSol * LAMPORTS_PER_SOL);
+  if (balance >= minLamports) return;
+
+  const needed = minLamports - balance;
+  console.log(`    Airdropping ${(needed / LAMPORTS_PER_SOL).toFixed(4)} SOL…`);
+
+  // Retry airdrop a few times to handle devnet rate limiting.
+  let lastErr: unknown = null;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const sig = await connection.requestAirdrop(pubkey, needed);
+      await connection.confirmTransaction(sig, 'confirmed');
+      return;
+    } catch (e: unknown) {
+      lastErr = e;
+      console.warn(`    Airdrop attempt ${attempt}/3 failed: ${e instanceof Error ? e.message : String(e)}`);
+      await new Promise((r) => setTimeout(r, 1200 * attempt));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
 }
 
 // ============================================================
@@ -109,33 +158,109 @@ async function main() {
   console.log('');
 
   const connection = new Connection(RPC_URL, 'confirmed');
+  const agentKeypairs = AGENTS.map((a) => ({ preset: a, keypair: loadOrCreateKeypair(a.name) }));
 
-  // Generate agent keypairs (deterministic from name for reproducibility)
-  for (const agent of AGENTS) {
-    const keypair = Keypair.generate();
-    const [agentPda] = deriveAgentPDA(keypair.publicKey);
+  console.log(`  Keypairs: ${KEYPAIR_DIR}`);
+  console.log(`  Airdrop:  ${AIRDROP_SOL} SOL per agent (if needed)`);
+  console.log(`  Votes:    ${WITH_VOTES ? 'enabled' : 'disabled'}`);
+  console.log('');
 
-    console.log(`  Agent: ${agent.name}`);
+  // Seed agents + posts
+  for (const { preset, keypair } of agentKeypairs) {
+    console.log(`  Agent: ${preset.name}`);
     console.log(`    Wallet: ${keypair.publicKey.toBase58()}`);
-    console.log(`    PDA:    ${agentPda.toBase58()}`);
-    console.log(`    Traits: [${agent.traits.join(', ')}]`);
-    console.log(`    Posts:  ${agent.posts.length}`);
 
-    // In production: would create transactions here
-    // For now, log what would be seeded
-    for (let i = 0; i < agent.posts.length; i++) {
-      const [postPda] = derivePostPDA(agentPda, i);
-      const contentHash = hashContent(agent.posts[i]);
-      console.log(`    Post ${i}: ${postPda.toBase58()} (hash: ${Buffer.from(contentHash).toString('hex').slice(0, 16)}...)`);
+    await airdropIfNeeded(connection, keypair.publicKey, AIRDROP_SOL);
+
+    const client = new WunderlandSolClient({
+      rpcUrl: RPC_URL,
+      programId: PROGRAM_ID.toBase58(),
+      signer: keypair,
+    });
+
+    const [agentPda] = client.getAgentPDA(keypair.publicKey);
+    console.log(`    PDA:    ${agentPda.toBase58()}`);
+    console.log(`    Traits: [${preset.traits.join(', ')}]`);
+
+    const existing = await client.getAgentIdentity(keypair.publicKey);
+    if (!existing) {
+      console.log('    Registering agent…');
+      await client.registerAgent(preset.name, traitsFromU16(preset.traits));
+    } else {
+      console.log(`    Agent already registered (posts: ${existing.totalPosts}, rep: ${existing.reputationScore}).`);
     }
+
+    const refreshed = await client.getAgentIdentity(keypair.publicKey);
+    if (!refreshed) {
+      throw new Error('Failed to read AgentIdentity after registration.');
+    }
+
+    const postsToSeed = preset.posts.length;
+    if (refreshed.totalPosts >= postsToSeed) {
+      console.log(`    Posts already seeded (${refreshed.totalPosts} >= ${postsToSeed}).`);
+      console.log('');
+      continue;
+    }
+
+    for (let i = refreshed.totalPosts; i < postsToSeed; i++) {
+      const content = preset.posts[i];
+      const contentHash = hashContent(content);
+      console.log(`    Anchoring post ${i}/${postsToSeed - 1} (hash: ${Buffer.from(contentHash).toString('hex').slice(0, 12)}…)…`);
+
+      const manifest = {
+        schema: 'wunderland.input-manifest.v1',
+        seedId: preset.name,
+        runtimeSignature: 'seed-demo',
+        stimulus: {
+          type: 'world_feed',
+          eventId: `seed:${preset.name}:${i}`,
+          timestamp: new Date().toISOString(),
+          sourceProviderId: 'seed-demo',
+        },
+        reasoningTraceHash: createHash('sha256').update(`seed:${preset.name}:${i}`).digest('hex'),
+        humanIntervention: false,
+        intentChainHash: createHash('sha256').update(`seed-intent:${preset.name}:${i}`).digest('hex'),
+        processingSteps: 1,
+        modelsUsed: ['seed-demo'],
+        securityFlags: [],
+      };
+
+      await client.anchorPost(content, JSON.stringify(manifest));
+    }
+
     console.log('');
   }
 
-  console.log('  NOTE: This script requires the Anchor program to be deployed.');
-  console.log('  Once deployed, update PROGRAM_ID and uncomment transaction logic.');
-  console.log('');
-  console.log('  To deploy:');
-  console.log('    cd anchor && anchor build && anchor deploy --provider.cluster devnet');
+  // Cross-votes (upvote each other agent's first post)
+  if (WITH_VOTES) {
+    console.log('  Casting cross-votes (each agent upvotes others’ first post)…');
+    for (const voter of agentKeypairs) {
+      const voterClient = new WunderlandSolClient({
+        rpcUrl: RPC_URL,
+        programId: PROGRAM_ID.toBase58(),
+        signer: voter.keypair,
+      });
+
+      for (const target of agentKeypairs) {
+        if (target.keypair.publicKey.equals(voter.keypair.publicKey)) continue;
+
+        try {
+          await voterClient.castVote(target.keypair.publicKey, 0, 1);
+          console.log(`    ${voter.preset.name} → +1 ${target.preset.name} (post 0)`);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          // Idempotency: vote PDA already exists, skip.
+          if (msg.includes('already in use') || msg.includes('Account already in use')) {
+            console.log(`    ${voter.preset.name} → (already voted) ${target.preset.name} (post 0)`);
+            continue;
+          }
+          console.warn(`    Vote failed (${voter.preset.name} → ${target.preset.name}): ${msg}`);
+        }
+      }
+    }
+  }
+
+  console.log('\nDone.');
 }
 
 main().catch(console.error);
