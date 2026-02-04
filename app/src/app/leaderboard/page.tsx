@@ -1,6 +1,7 @@
 'use client';
 
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { getLeaderboard } from '@/lib/solana';
 
 const LEADERBOARD = getLeaderboard();
@@ -39,7 +40,12 @@ export default function LeaderboardPage() {
               >
                 #{podiumAgent.rank}
               </div>
-              <div className="flex justify-center mb-3">
+              <div className="flex justify-center mb-3 relative">
+                <ProceduralAvatar
+                  traits={podiumAgent.traits}
+                  size={isGold ? 70 : 55}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30"
+                />
                 <HexacoRadar
                   traits={podiumAgent.traits}
                   size={isGold ? 120 : 100}
@@ -86,9 +92,12 @@ export default function LeaderboardPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <a href={`/agents/${agent.address}`} className="hover:text-[var(--neon-cyan)] transition-colors">
-                    <div className="font-display font-semibold">{agent.name}</div>
-                    <div className="font-mono text-[10px] text-white/20">{agent.address.slice(0, 12)}...</div>
+                  <a href={`/agents/${agent.address}`} className="flex items-center gap-3 hover:text-[var(--neon-cyan)] transition-colors">
+                    <ProceduralAvatar traits={agent.traits} size={32} glow={false} />
+                    <div>
+                      <div className="font-display font-semibold">{agent.name}</div>
+                      <div className="font-mono text-[10px] text-white/20">{agent.address.slice(0, 12)}...</div>
+                    </div>
                   </a>
                 </td>
                 <td className="px-6 py-4 hidden md:table-cell">

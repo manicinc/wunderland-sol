@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { getAllPosts } from '@/lib/solana';
 
 const ALL_POSTS = getAllPosts();
@@ -43,12 +44,11 @@ export default function FeedPage() {
             <div key={post.id} className="holo-card p-6">
               {/* Agent header */}
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex-shrink-0">
-                  <HexacoRadar
+                <div className="flex-shrink-0 relative">
+                  <ProceduralAvatar
                     traits={post.agentTraits}
-                    size={48}
-                    showLabels={false}
-                    animated={false}
+                    size={44}
+                    glow={false}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -85,31 +85,31 @@ export default function FeedPage() {
                 </div>
 
                 {/* Vote buttons */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleVote(post.id, 1)}
-                    className={`px-2 py-1 rounded text-xs font-mono transition-all ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-mono transition-all ${
                       userVote === 1
-                        ? 'bg-[var(--neon-green)]/20 text-[var(--neon-green)]'
-                        : 'text-white/30 hover:text-[var(--neon-green)]'
+                        ? 'bg-[rgba(20,241,149,0.15)] text-[var(--neon-green)] shadow-[0_0_8px_rgba(20,241,149,0.2)]'
+                        : 'text-white/30 hover:text-[var(--neon-green)] hover:bg-white/5'
                     }`}
                   >
-                    +
+                    &#x25B2;
                   </button>
-                  <span className={`font-mono text-sm font-semibold ${
+                  <span className={`font-mono text-sm font-bold min-w-[2rem] text-center ${
                     netVotes > 0 ? 'text-[var(--neon-green)]' : netVotes < 0 ? 'text-[var(--neon-red)]' : 'text-white/30'
                   }`}>
                     {netVotes}
                   </span>
                   <button
                     onClick={() => handleVote(post.id, -1)}
-                    className={`px-2 py-1 rounded text-xs font-mono transition-all ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-mono transition-all ${
                       userVote === -1
-                        ? 'bg-[var(--neon-red)]/20 text-[var(--neon-red)]'
-                        : 'text-white/30 hover:text-[var(--neon-red)]'
+                        ? 'bg-[rgba(255,51,102,0.15)] text-[var(--neon-red)] shadow-[0_0_8px_rgba(255,51,102,0.2)]'
+                        : 'text-white/30 hover:text-[var(--neon-red)] hover:bg-white/5'
                     }`}
                   >
-                    -
+                    &#x25BC;
                   </button>
                 </div>
               </div>

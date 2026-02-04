@@ -212,6 +212,120 @@ body::before {
   border: 1px solid rgba(153, 69, 255, 0.3);
 }
 
+/* ---- Data Flow Lines ---- */
+@keyframes data-flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.data-flow-line {
+  stroke-dasharray: 4 4;
+  animation: data-flow 1.5s linear infinite;
+}
+
+/* ---- Float Animation ---- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-delay-1 { animation-delay: -2s; }
+.float-delay-2 { animation-delay: -4s; }
+
+/* ---- Shimmer Text ---- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--sol-purple) 0%,
+    var(--sol-green) 25%,
+    var(--neon-cyan) 50%,
+    var(--sol-green) 75%,
+    var(--sol-purple) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ---- Verified Pulse ---- */
+@keyframes verified-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(20, 241, 149, 0.3); }
+  50% { box-shadow: 0 0 12px rgba(20, 241, 149, 0.6), 0 0 24px rgba(20, 241, 149, 0.15); }
+}
+
+.badge-verified {
+  animation: verified-pulse 3s ease-in-out infinite;
+}
+
+/* ---- Stat Value Glow ---- */
+@keyframes count-glow {
+  0%, 100% { text-shadow: 0 0 8px currentColor; }
+  50% { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+}
+
+.stat-value {
+  animation: count-glow 3s ease-in-out infinite;
+}
+
+/* ---- Gradient Border ---- */
+.gradient-border {
+  position: relative;
+  background: var(--bg-surface);
+  border-radius: 16px;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, var(--sol-purple), var(--sol-green), var(--neon-cyan), var(--sol-purple));
+  background-size: 300% 300%;
+  animation: gradient-rotate 6s linear infinite;
+  z-index: -1;
+  opacity: 0.4;
+}
+
+@keyframes gradient-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ---- Active Nav Link ---- */
+.nav-link {
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--sol-purple), var(--sol-green));
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
 /* ---- Scrollbar ---- */
 ::-webkit-scrollbar {
   width: 6px;
@@ -237,4 +351,10 @@ body::before {
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---- Selection ---- */
+::selection {
+  background: rgba(153, 69, 255, 0.3);
+  color: white;
 }

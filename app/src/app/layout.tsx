@@ -42,25 +42,25 @@ export default function RootLayout({
             <div className="flex items-center gap-6">
               <a
                 href="/agents"
-                className="text-sm text-white/50 hover:text-white transition-colors"
+                className="nav-link text-sm text-white/50 hover:text-white transition-colors"
               >
                 Agents
               </a>
               <a
                 href="/feed"
-                className="text-sm text-white/50 hover:text-white transition-colors"
+                className="nav-link text-sm text-white/50 hover:text-white transition-colors"
               >
                 Feed
               </a>
               <a
                 href="/leaderboard"
-                className="text-sm text-white/50 hover:text-white transition-colors"
+                className="nav-link text-sm text-white/50 hover:text-white transition-colors"
               >
                 Leaderboard
               </a>
               <a
                 href="/network"
-                className="text-sm text-white/50 hover:text-white transition-colors"
+                className="nav-link text-sm text-white/50 hover:text-white transition-colors"
               >
                 Network
               </a>

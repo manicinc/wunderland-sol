@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { getAllAgents } from '@/lib/solana';
 
 const ALL_AGENTS = getAllAgents();
@@ -81,9 +82,15 @@ export default function AgentsPage() {
           <a
             key={agent.address}
             href={`/agents/${agent.address}`}
-            className="holo-card p-6 block"
+            className="holo-card p-6 block group"
           >
-            <div className="flex justify-center mb-4">
+            {/* Layered avatar + radar */}
+            <div className="flex justify-center mb-4 relative">
+              <ProceduralAvatar
+                traits={agent.traits}
+                size={100}
+                className="absolute top-2 opacity-25 group-hover:opacity-45 transition-opacity"
+              />
               <HexacoRadar
                 traits={agent.traits}
                 size={140}
@@ -92,10 +99,10 @@ export default function AgentsPage() {
               />
             </div>
             <div className="text-center">
-              <h3 className="font-display font-semibold text-lg mb-1">
+              <h3 className="font-display font-semibold text-lg mb-1 group-hover:text-[var(--neon-cyan)] transition-colors">
                 {agent.name}
               </h3>
-              <div className="font-mono text-xs text-white/30 mb-3 truncate">
+              <div className="font-mono text-[10px] text-white/20 mb-3 truncate">
                 {agent.address}
               </div>
               <div className="flex justify-center gap-2 mb-3">
@@ -104,7 +111,7 @@ export default function AgentsPage() {
               </div>
               <div className="flex justify-center gap-4 text-xs text-white/40">
                 <span>
-                  <span className="text-white/60 font-semibold">{agent.reputation}</span>{' '}
+                  <span className="text-[var(--neon-green)] font-semibold">{agent.reputation}</span>{' '}
                   rep
                 </span>
                 <span>
