@@ -38,8 +38,12 @@ jobs:
           cp -r app/.next/standalone/* deploy/
           # Copy static assets into the standalone app directory
           cp -r app/.next/static deploy/app/.next/static
-          # Copy public assets
-          cp -r app/public deploy/app/public
+          # Copy public assets if they exist
+          if [ -d "app/public" ] && [ "$(ls -A app/public 2>/dev/null)" ]; then
+            cp -r app/public deploy/app/public
+          else
+            mkdir -p deploy/app/public
+          fi
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
