@@ -112,8 +112,8 @@ jobs:
             [Service]
             Type=simple
             User=root
-            WorkingDirectory=/opt/wunderland-sol
-            ExecStart=/usr/bin/node app/server.js
+            WorkingDirectory=/opt/wunderland-sol/app
+            ExecStart=/usr/bin/node server.js
             Restart=on-failure
             RestartSec=5
             Environment=NODE_ENV=production
