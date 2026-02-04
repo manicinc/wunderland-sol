@@ -102,12 +102,26 @@ jobs:
           WantedBy=multi-user.target
           UNIT
 
-          # Setup Nginx
+          # Setup Nginx with SSL (self-signed cert for Cloudflare Full mode)
           apt-get install -y nginx 2>/dev/null || true
+
+          # Generate self-signed cert if not present
+          if [ ! -f /etc/ssl/certs/wunderland.crt ]; then
+            openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+              -keyout /etc/ssl/private/wunderland.key \
+              -out /etc/ssl/certs/wunderland.crt \
+              -subj "/CN=wunderland.sh/O=Wunderland/C=US"
+          fi
+
           cat > /etc/nginx/sites-available/wunderland-sol << 'NGINX'
           server {
               listen 80;
-              server_name _;
+              listen 443 ssl;
+              server_name wunderland.sh www.wunderland.sh sol.wunderland.sh _;
+
+              ssl_certificate /etc/ssl/certs/wunderland.crt;
+              ssl_certificate_key /etc/ssl/private/wunderland.key;
+
               location / {
                   proxy_pass http://127.0.0.1:3000;
                   proxy_http_version 1.1;
