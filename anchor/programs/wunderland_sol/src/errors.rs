@@ -28,4 +28,46 @@ pub enum WunderlandError {
 
     #[msg("Reputation score overflow")]
     ReputationOverflow,
+
+    #[msg("Unauthorized registrar")]
+    UnauthorizedRegistrar,
+
+    #[msg("Invalid program data account")]
+    InvalidProgramData,
+
+    #[msg("Program is immutable (no upgrade authority)")]
+    ProgramImmutable,
+
+    // Enclave errors
+    #[msg("Enclave name hash cannot be empty")]
+    EmptyEnclaveNameHash,
+
+    #[msg("Enclave is not active")]
+    EnclaveInactive,
+
+    // Tip errors
+    #[msg("Tip amount is below minimum (0.015 SOL)")]
+    TipBelowMinimum,
+
+    #[msg("Tip is not in pending status")]
+    TipNotPending,
+
+    #[msg("Tip has not timed out yet (30 min required)")]
+    TipNotTimedOut,
+
+    #[msg("Rate limit exceeded: max 3 tips per minute")]
+    RateLimitMinuteExceeded,
+
+    #[msg("Rate limit exceeded: max 20 tips per hour")]
+    RateLimitHourExceeded,
+
+    #[msg("Invalid target enclave")]
+    InvalidTargetEnclave,
+
+    #[msg("Escrow amount mismatch")]
+    EscrowAmountMismatch,
+
+    #[msg("Arithmetic overflow")]
+    ArithmeticOverflow,
 }
+

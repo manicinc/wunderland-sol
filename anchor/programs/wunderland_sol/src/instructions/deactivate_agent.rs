@@ -1,20 +1,31 @@
 use anchor_lang::prelude::*;
-use crate::state::AgentIdentity;
+use crate::state::{AgentIdentity, ProgramConfig};
+use crate::errors::WunderlandError;
 
 #[derive(Accounts)]
 pub struct DeactivateAgent<'info> {
     #[account(
+        seeds = [b"config"],
+        bump = config.bump,
+        constraint = config.registrar == registrar.key() @ WunderlandError::UnauthorizedRegistrar
+    )]
+    pub config: Account<'info, ProgramConfig>,
+
+    #[account(
         mut,
-        seeds = [b"agent", authority.key().as_ref()],
+        seeds = [b"agent", agent_authority.key().as_ref()],
         bump = agent_identity.bump,
-        has_one = authority,
+        constraint = agent_identity.authority == agent_authority.key(),
     )]
     pub agent_identity: Account<'info, AgentIdentity>,
 
-    pub authority: Signer<'info>,
+    /// CHECK: Agent authority pubkey (does not need to sign for admin deactivation).
+    pub agent_authority: UncheckedAccount<'info>,
+
+    pub registrar: Signer<'info>,
 }
 
-pub fn handler(
+pub(crate) fn handler(
     ctx: Context<DeactivateAgent>,
 ) -> Result<()> {
     let agent = &mut ctx.accounts.agent_identity;

@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
-use crate::state::{AgentIdentity, PostAnchor, ReputationVote};
+
 use crate::errors::WunderlandError;
+use crate::state::{AgentIdentity, PostAnchor, ReputationVote};
 
 #[derive(Accounts)]
 pub struct CastVote<'info> {
@@ -27,23 +28,24 @@ pub struct CastVote<'info> {
     )]
     pub post_agent: Account<'info, AgentIdentity>,
 
+    /// Voter must be a registered agent (prevents non-agent wallets voting).
+    #[account(
+        seeds = [b"agent", voter.key().as_ref()],
+        bump = voter_agent.bump,
+        constraint = voter_agent.authority == voter.key(),
+        constraint = voter_agent.is_active @ WunderlandError::AgentInactive,
+    )]
+    pub voter_agent: Account<'info, AgentIdentity>,
+
     #[account(mut)]
     pub voter: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(
-    ctx: Context<CastVote>,
-    value: i8,
-) -> Result<()> {
-    // Validate vote value
-    require!(
-        value == 1 || value == -1,
-        WunderlandError::InvalidVoteValue
-    );
+pub fn handler(ctx: Context<CastVote>, value: i8) -> Result<()> {
+    require!(value == 1 || value == -1, WunderlandError::InvalidVoteValue);
 
-    // Cannot vote on your own post
     require!(
         ctx.accounts.voter.key() != ctx.accounts.post_agent.authority,
         WunderlandError::SelfVote
@@ -60,7 +62,6 @@ pub fn handler(
     vote.timestamp = clock.unix_timestamp;
     vote.bump = ctx.bumps.reputation_vote;
 
-    // Update post vote counts
     if value == 1 {
         post.upvotes = post
             .upvotes
@@ -73,13 +74,18 @@ pub fn handler(
             .ok_or(WunderlandError::VoteCountOverflow)?;
     }
 
-    // Update agent reputation
     agent.reputation_score = agent
         .reputation_score
         .checked_add(value as i64)
         .ok_or(WunderlandError::ReputationOverflow)?;
     agent.updated_at = clock.unix_timestamp;
 
-    msg!("Vote cast: {} on post {} by {}", value, post.post_index, ctx.accounts.voter.key());
+    msg!(
+        "Vote cast: {} on post {} by {}",
+        value,
+        post.post_index,
+        ctx.accounts.voter.key()
+    );
     Ok(())
 }
+

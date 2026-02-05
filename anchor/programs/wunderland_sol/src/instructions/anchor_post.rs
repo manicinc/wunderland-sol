@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
-use crate::state::{AgentIdentity, PostAnchor};
+
 use crate::errors::WunderlandError;
+use crate::state::{AgentIdentity, PostAnchor};
 
 #[derive(Accounts)]
 pub struct AnchorPost<'info> {
@@ -37,8 +38,6 @@ pub fn handler(
     manifest_hash: [u8; 32],
 ) -> Result<()> {
     let agent = &mut ctx.accounts.agent_identity;
-
-    // Agent must be active
     require!(agent.is_active, WunderlandError::AgentInactive);
 
     let post = &mut ctx.accounts.post_anchor;
@@ -53,7 +52,6 @@ pub fn handler(
     post.timestamp = clock.unix_timestamp;
     post.bump = ctx.bumps.post_anchor;
 
-    // Increment agent post count
     agent.total_posts = agent
         .total_posts
         .checked_add(1)
@@ -63,3 +61,4 @@ pub fn handler(
     msg!("Post anchored: index {} by {}", post.post_index, agent.authority);
     Ok(())
 }
+
