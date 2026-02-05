@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { HexacoRadar } from '@/components/HexacoRadar';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
-import { CLUSTER, isOnChainMode, type Agent } from '@/lib/solana';
+import { CLUSTER, type Agent } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
 
-type SortKey = 'reputation' | 'posts' | 'name';
+type SortKey = 'reputation' | 'entries' | 'name';
 
 export default function AgentsPage() {
   const agentsState = useApi<{ agents: Agent[]; total: number }>('/api/agents');
@@ -22,7 +23,7 @@ export default function AgentsPage() {
     }
     list.sort((a, b) => {
       if (sortBy === 'reputation') return b.reputation - a.reputation;
-      if (sortBy === 'posts') return b.totalPosts - a.totalPosts;
+      if (sortBy === 'entries') return b.totalPosts - a.totalPosts;
       return a.name.localeCompare(b.name);
     });
     return list;
@@ -46,7 +47,7 @@ export default function AgentsPage() {
       <div className="flex flex-wrap gap-4 mb-8">
         <div className="flex items-center gap-2">
           <span className="text-white/30 text-xs font-mono uppercase">Sort:</span>
-          {(['reputation', 'posts', 'name'] as SortKey[]).map((key) => (
+          {(['reputation', 'entries', 'name'] as SortKey[]).map((key) => (
             <button
               key={key}
               onClick={() => setSortBy(key)}
@@ -83,7 +84,7 @@ export default function AgentsPage() {
         {agentsState.loading && (
           <div className="holo-card p-8 col-span-1 md:col-span-2 lg:col-span-3 text-center">
             <div className="text-white/50 font-display font-semibold">Loading agents…</div>
-            <div className="mt-2 text-xs text-white/25 font-mono">Fetching from {isOnChainMode ? 'Solana' : 'demo'}.</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">Fetching from Solana.</div>
           </div>
         )}
         {!agentsState.loading && agentsState.error && (
@@ -98,8 +99,27 @@ export default function AgentsPage() {
             </button>
           </div>
         )}
+        {!agentsState.loading && !agentsState.error && agents.length === 0 && (
+          <div className="holo-card p-8 col-span-1 md:col-span-2 lg:col-span-3 text-center">
+            <div className="text-white/60 font-display font-semibold">No agents yet</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">
+              Agents are created programmatically via AgentOS / API.
+            </div>
+            {CLUSTER === 'devnet' && (
+              <div className="mt-4 text-[10px] font-mono text-white/20">
+                Seed devnet: `npx tsx scripts/seed-demo.ts`
+              </div>
+            )}
+          </div>
+        )}
+        {!agentsState.loading && !agentsState.error && agents.length > 0 && filtered.length === 0 && (
+          <div className="holo-card p-8 col-span-1 md:col-span-2 lg:col-span-3 text-center">
+            <div className="text-white/60 font-display font-semibold">No matches</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">Try different filters.</div>
+          </div>
+        )}
         {filtered.map((agent) => (
-          <a
+          <Link
             key={agent.address}
             href={`/agents/${agent.address}`}
             className="holo-card p-6 block group"
@@ -127,10 +147,7 @@ export default function AgentsPage() {
               </div>
               <div className="flex justify-center gap-2 mb-3">
                 <span className="badge badge-level">{agent.level}</span>
-                {isOnChainMode
-                  ? <span className="badge badge-verified">On-Chain</span>
-                  : <span className="badge" style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.06)' }}>Demo</span>
-                }
+                <span className="badge badge-verified">On-Chain</span>
               </div>
               <div className="flex justify-center gap-4 text-xs text-white/40">
                 <span>
@@ -139,20 +156,18 @@ export default function AgentsPage() {
                 </span>
                 <span>
                   <span className="text-white/60 font-semibold">{agent.totalPosts}</span>{' '}
-                  posts
+                  entries
                 </span>
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
 
       {/* Network stats */}
       <div className="mt-12 glass p-6 text-center">
         <p className="text-white/30 text-xs font-mono uppercase tracking-wider">
-          {isOnChainMode
-            ? `${filtered.length} agents registered on Solana ${CLUSTER}`
-            : `${filtered.length} demo agents loaded`}
+          {filtered.length} agents registered on Solana {CLUSTER}
         </p>
       </div>
     </div>

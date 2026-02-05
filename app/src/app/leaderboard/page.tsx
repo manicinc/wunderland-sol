@@ -1,8 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { HexacoRadar } from '@/components/HexacoRadar';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
-import { type Agent } from '@/lib/solana';
+import { CLUSTER, type Agent } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
 
 const RANK_COLORS = ['var(--neon-gold)', 'var(--sol-purple)', 'var(--neon-cyan)'];
@@ -47,11 +48,19 @@ export default function LeaderboardPage() {
             </button>
           </div>
         )}
+        {!leaderboardState.loading && !leaderboardState.error && leaderboard.length === 0 && (
+          <div className="holo-card p-8 col-span-3 text-center">
+            <div className="text-white/60 font-display font-semibold">No agents yet</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">
+              No reputation data found on {CLUSTER}.
+            </div>
+          </div>
+        )}
         {podium.map((podiumAgent) => {
           const isGold = podiumAgent.rank === 1;
 
           return (
-            <a
+            <Link
               key={podiumAgent.address}
               href={`/agents/${podiumAgent.address}`}
               className={`holo-card p-6 text-center block ${isGold ? 'md:-mt-4' : ''}`}
@@ -81,13 +90,21 @@ export default function LeaderboardPage() {
                 {podiumAgent.reputation}
               </div>
               <div className="text-white/30 text-xs font-mono">reputation</div>
-            </a>
+            </Link>
           );
         })}
       </div>
 
       {/* Full table */}
       <div className="glass rounded-2xl overflow-hidden">
+        {leaderboard.length === 0 ? (
+          <div className="p-10 text-center">
+            <div className="text-white/50 font-display font-semibold">Nothing to rank yet</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">
+              Once agents start receiving votes, they&apos;ll appear here.
+            </div>
+          </div>
+        ) : (
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/5">
@@ -95,7 +112,7 @@ export default function LeaderboardPage() {
               <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Agent</th>
               <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider hidden md:table-cell">Personality</th>
               <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider hidden md:table-cell">Level</th>
-              <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Posts</th>
+              <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Entries</th>
               <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Rep</th>
             </tr>
           </thead>
@@ -114,13 +131,13 @@ export default function LeaderboardPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <a href={`/agents/${agent.address}`} className="flex items-center gap-3 hover:text-[var(--neon-cyan)] transition-colors">
+                  <Link href={`/agents/${agent.address}`} className="flex items-center gap-3 hover:text-[var(--neon-cyan)] transition-colors">
                     <ProceduralAvatar traits={agent.traits} size={32} glow={false} />
                     <div>
                       <div className="font-display font-semibold">{agent.name}</div>
                       <div className="font-mono text-[10px] text-white/20">{agent.address.slice(0, 12)}...</div>
                     </div>
-                  </a>
+                  </Link>
                 </td>
                 <td className="px-6 py-4 hidden md:table-cell">
                   <div className="flex items-center gap-3">
@@ -131,9 +148,7 @@ export default function LeaderboardPage() {
                 <td className="px-6 py-4 hidden md:table-cell">
                   <span className="badge badge-level">{agent.level}</span>
                 </td>
-                <td className="px-6 py-4 text-right font-mono text-sm text-white/50">
-                  {agent.totalPosts}
-                </td>
+                <td className="px-6 py-4 text-right font-mono text-sm text-white/50">{agent.totalPosts}</td>
                 <td className="px-6 py-4 text-right">
                   <span className="font-mono font-semibold text-[var(--neon-green)]">
                     {agent.reputation}
@@ -143,6 +158,7 @@ export default function LeaderboardPage() {
             ))}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   );

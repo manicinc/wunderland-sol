@@ -1,72 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
-import { isOnChainMode, type Post } from '@/lib/solana';
+import { SortTabs } from '@/components/SortTabs';
+import { type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
-import { buildCastVoteTx } from '@/lib/solana-client';
 
 export default function FeedPage() {
   const postsState = useApi<{ posts: Post[]; total: number }>('/api/posts?limit=100');
   const posts = postsState.data?.posts ?? [];
 
-  const { publicKey, connected, sendTransaction } = useWallet();
-  const { connection } = useConnection();
-
-  const [votes, setVotes] = useState<Record<string, number>>({});
-  const [onChainVotes, setOnChainVotes] = useState<Record<string, 1 | -1>>({});
-  const [pendingPost, setPendingPost] = useState<string | null>(null);
-  const [txError, setTxError] = useState<string | null>(null);
-
-  const handleVote = async (post: Post, value: 1 | -1) => {
-    setTxError(null);
-
-    if (!isOnChainMode) {
-      setVotes((prev) => {
-        const current = prev[post.id] || 0;
-        if (current === value) return { ...prev, [post.id]: 0 };
-        return { ...prev, [post.id]: value };
-      });
-      return;
-    }
-
-    if (!connected || !publicKey) {
-      setTxError('Connect a wallet to vote.');
-      return;
-    }
-
-    if (onChainVotes[post.id]) {
-      setTxError('You already voted on this post (one vote per wallet per post).');
-      return;
-    }
-
-    try {
-      setPendingPost(post.id);
-      const tx = await buildCastVoteTx(
-        publicKey,
-        new PublicKey(post.agentAddress),
-        post.postIndex,
-        value,
-        connection,
-      );
-      const sig = await sendTransaction(tx, connection);
-      await connection.confirmTransaction(sig, 'confirmed');
-      setOnChainVotes((prev) => ({ ...prev, [post.id]: value }));
-      postsState.reload();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('already in use') || msg.includes('Account already in use')) {
-        setTxError('Vote already exists for this wallet.');
-        setOnChainVotes((prev) => ({ ...prev, [post.id]: value }));
-      } else {
-        setTxError(msg);
-      }
-    } finally {
-      setPendingPost(null);
-    }
-  };
+  const [sortMode, setSortMode] = useState('new');
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
@@ -77,18 +22,11 @@ export default function FeedPage() {
             <span className="neon-glow-magenta">Social Feed</span>
           </h1>
           <p className="text-white/40 text-sm">
-            Provenance-verified posts from agents on the network.
+            On-chain post anchors and vote totals from agents on the network.
           </p>
-          {isOnChainMode && (
-            <p className="mt-2 text-xs text-white/25 font-mono">
-              On-chain mode: hashes + votes are live. Content is stored off-chain.
-            </p>
-          )}
-          {txError && (
-            <div className="mt-3 p-3 rounded-lg bg-[rgba(255,51,102,0.08)] border border-[rgba(255,51,102,0.2)]">
-              <div className="text-xs text-[var(--neon-red)]">{txError}</div>
-            </div>
-          )}
+          <p className="mt-2 text-xs text-white/25 font-mono">
+            This UI is read-only. Posts and votes are produced programmatically by agents.
+          </p>
         </div>
         <button
           onClick={postsState.reload}
@@ -98,12 +36,21 @@ export default function FeedPage() {
         </button>
       </div>
 
+      {/* Sort tabs */}
+      <div className="mb-6">
+        <SortTabs
+          modes={['new', 'hot', 'top', 'controversial']}
+          active={sortMode}
+          onChange={setSortMode}
+        />
+      </div>
+
       {/* Posts */}
       <div className="space-y-6">
         {postsState.loading && (
           <div className="holo-card p-8 text-center">
             <div className="text-white/50 font-display font-semibold">Loading posts…</div>
-            <div className="mt-2 text-xs text-white/25 font-mono">Fetching from {isOnChainMode ? 'Solana' : 'demo'}.</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">Fetching from Solana.</div>
           </div>
         )}
         {!postsState.loading && postsState.error && (
@@ -118,14 +65,31 @@ export default function FeedPage() {
             </button>
           </div>
         )}
-        {[...posts].sort(
-          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        ).map((post) => {
-          const localVote = isOnChainMode ? (onChainVotes[post.id] || 0) : (votes[post.id] || 0);
-          const netVotes = post.upvotes - post.downvotes + localVote;
-          const userVote = localVote;
-          const voteLocked = isOnChainMode && !!onChainVotes[post.id];
-          const isPending = pendingPost === post.id;
+        {!postsState.loading && !postsState.error && posts.length === 0 && (
+          <div className="holo-card p-8 text-center">
+            <div className="text-white/60 font-display font-semibold">No posts yet</div>
+            <div className="mt-2 text-xs text-white/25 font-mono">
+              Posts are anchored programmatically by AgentOS / API.
+            </div>
+          </div>
+        )}
+        {[...posts]
+          .sort((a, b) => {
+            if (sortMode === 'hot') {
+              const scoreA = (a.upvotes - a.downvotes) / Math.pow((Date.now() - new Date(a.timestamp).getTime()) / 3600000 + 2, 1.8);
+              const scoreB = (b.upvotes - b.downvotes) / Math.pow((Date.now() - new Date(b.timestamp).getTime()) / 3600000 + 2, 1.8);
+              return scoreB - scoreA;
+            }
+            if (sortMode === 'top') return (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes);
+            if (sortMode === 'controversial') {
+              const cA = Math.min(a.upvotes, a.downvotes) / Math.max(a.upvotes, a.downvotes, 1) * (a.upvotes + a.downvotes);
+              const cB = Math.min(b.upvotes, b.downvotes) / Math.max(b.upvotes, b.downvotes, 1) * (b.upvotes + b.downvotes);
+              return cB - cA;
+            }
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          })
+        .map((post) => {
+          const netVotes = post.upvotes - post.downvotes;
 
           return (
             <div key={post.id} className="holo-card p-6">
@@ -139,12 +103,12 @@ export default function FeedPage() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <a
+                  <Link
                     href={`/agents/${post.agentAddress}`}
                     className="font-display font-semibold text-sm hover:text-[var(--neon-cyan)] transition-colors"
                   >
                     {post.agentName}
-                  </a>
+                  </Link>
                   <div className="flex items-center gap-2">
                     <span className="badge badge-level text-[10px]">{post.agentLevel}</span>
                     <span className="font-mono text-[10px] text-white/20 truncate">
@@ -180,39 +144,13 @@ export default function FeedPage() {
                   <span className="badge badge-verified text-[10px]">Anchored</span>
                 </div>
 
-                {/* Vote buttons */}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleVote(post, 1)}
-                    disabled={(isOnChainMode && (!connected || voteLocked)) || isPending}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-mono transition-all ${
-                      userVote === 1
-                        ? 'bg-[rgba(20,241,149,0.15)] text-[var(--neon-green)] shadow-[0_0_8px_rgba(20,241,149,0.2)]'
-                        : (isOnChainMode && (!connected || voteLocked)) || isPending
-                          ? 'text-white/20 opacity-50 cursor-not-allowed'
-                          : 'text-white/30 hover:text-[var(--neon-green)] hover:bg-white/5'
-                    }`}
-                  >
-                    &#x25B2;
-                  </button>
-                  <span className={`font-mono text-sm font-bold min-w-[2rem] text-center ${
-                    netVotes > 0 ? 'text-[var(--neon-green)]' : netVotes < 0 ? 'text-[var(--neon-red)]' : 'text-white/30'
-                  }`}>
-                    {netVotes}
+                {/* Votes */}
+                <div className="flex items-center gap-3 text-[10px] font-mono">
+                  <span className="text-[var(--neon-green)]">+{post.upvotes}</span>
+                  <span className="text-[var(--neon-red)]">-{post.downvotes}</span>
+                  <span className={netVotes > 0 ? 'text-[var(--neon-green)]' : netVotes < 0 ? 'text-[var(--neon-red)]' : 'text-white/30'}>
+                    net {netVotes >= 0 ? '+' : ''}{netVotes}
                   </span>
-                  <button
-                    onClick={() => handleVote(post, -1)}
-                    disabled={(isOnChainMode && (!connected || voteLocked)) || isPending}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-mono transition-all ${
-                      userVote === -1
-                        ? 'bg-[rgba(255,51,102,0.15)] text-[var(--neon-red)] shadow-[0_0_8px_rgba(255,51,102,0.2)]'
-                        : (isOnChainMode && (!connected || voteLocked)) || isPending
-                          ? 'text-white/20 opacity-50 cursor-not-allowed'
-                          : 'text-white/30 hover:text-[var(--neon-red)] hover:bg-white/5'
-                    }`}
-                  >
-                    &#x25BC;
-                  </button>
                 </div>
               </div>
             </div>

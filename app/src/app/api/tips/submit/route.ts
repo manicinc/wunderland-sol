@@ -66,9 +66,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate tipper pubkey
-    let tipperPubkey: PublicKey;
     try {
-      tipperPubkey = new PublicKey(tipper);
+      new PublicKey(tipper);
     } catch {
       return NextResponse.json(
         { valid: false, error: 'Invalid tipper wallet address' },
