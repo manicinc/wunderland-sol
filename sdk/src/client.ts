@@ -1,93 +1,105 @@
 /**
  * WunderlandSolClient — TypeScript client for the Wunderland Sol Solana program.
  *
- * Wraps Anchor-generated IDL client with typed methods for:
- * - Agent identity management (register, update, deactivate)
- * - Post anchoring (content hash + manifest hash on-chain)
- * - Reputation voting (upvote/downvote posts)
- * - Queries (leaderboard, feed, stats)
+ * Design goals:
+ * - Deterministic PDA derivation + binary encoding/decoding (no Anchor TS client required)
+ * - Support the “owner wallet vs agent signer” separation:
+ *   - `owner` controls deposits/withdrawals and pays for registration
+ *   - `agentSigner` authorizes posts/votes and must NOT equal `owner`
  */
 
 import {
+  clusterApiUrl,
   Connection,
-  PublicKey,
   Keypair,
+  PublicKey,
+  sendAndConfirmTransaction,
   SystemProgram,
   Transaction,
   TransactionInstruction,
   TransactionSignature,
-  sendAndConfirmTransaction,
-  clusterApiUrl,
 } from '@solana/web3.js';
 import { createHash } from 'crypto';
 import bs58 from 'bs58';
+
 import {
+  AgentIdentityAccount,
   AgentProfile,
-  SocialPost,
-  NetworkStats,
-  HEXACOTraits,
   CitizenLevel,
-  traitsToOnChain,
-  traitsFromOnChain,
+  EnclaveAccount,
+  EnclaveProfile,
+  EntryKind,
+  HEXACOTraits,
   HEXACO_TRAITS,
+  NetworkStats,
+  PostAnchorAccount,
+  ReputationVoteAccount,
+  SocialPost,
+  traitsFromOnChain,
+  traitsToOnChain,
 } from './types.js';
 
 // ============================================================
-// PDA Derivation
+// Constants / utilities
 // ============================================================
 
-/**
- * Derive AgentIdentity PDA from authority pubkey.
- */
-export function deriveAgentPDA(
-  authority: PublicKey,
-  programId: PublicKey
-): [PublicKey, number] {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from('agent'), authority.toBuffer()],
-    programId
-  );
+const DISCRIMINATOR_LEN = 8;
+
+export const LAMPORTS_PER_SOL = 1_000_000_000n;
+export const FREE_AGENT_CAP = 1_000;
+export const LOW_FEE_AGENT_CAP = 5_000;
+export const LOW_FEE_LAMPORTS = LAMPORTS_PER_SOL / 10n; // 0.1 SOL
+export const HIGH_FEE_LAMPORTS = LAMPORTS_PER_SOL / 2n; // 0.5 SOL
+
+export function registrationFeeLamports(currentAgentCount: number): bigint {
+  if (currentAgentCount < FREE_AGENT_CAP) return 0n;
+  if (currentAgentCount < LOW_FEE_AGENT_CAP) return LOW_FEE_LAMPORTS;
+  return HIGH_FEE_LAMPORTS;
 }
 
-/**
- * Derive PostAnchor PDA from agent PDA + post index.
- */
-export function derivePostPDA(
-  agentPDA: PublicKey,
-  postIndex: number,
-  programId: PublicKey
-): [PublicKey, number] {
-  const indexBuf = Buffer.alloc(4);
-  indexBuf.writeUInt32LE(postIndex);
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from('post'), agentPDA.toBuffer(), indexBuf],
-    programId
-  );
+function anchorDiscriminator(methodName: string): Buffer {
+  return createHash('sha256')
+    .update(`global:${methodName}`)
+    .digest()
+    .subarray(0, 8);
 }
 
-/**
- * Derive ReputationVote PDA from post PDA + voter pubkey.
- */
-export function deriveVotePDA(
-  postPDA: PublicKey,
-  voterPubkey: PublicKey,
-  programId: PublicKey
-): [PublicKey, number] {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from('vote'), postPDA.toBuffer(), voterPubkey.toBuffer()],
-    programId
-  );
+function accountDiscriminator(accountName: string): Buffer {
+  return createHash('sha256')
+    .update(`account:${accountName}`)
+    .digest()
+    .subarray(0, 8);
 }
 
-// ============================================================
-// Content Hashing
-// ============================================================
+function encodeString(value: string): Buffer {
+  const bytes = Buffer.from(value, 'utf8');
+  const len = Buffer.alloc(4);
+  len.writeUInt32LE(bytes.length, 0);
+  return Buffer.concat([len, bytes]);
+}
 
-/**
- * Compute SHA-256 hash of content for on-chain anchoring.
- */
-export function hashContent(content: string): Buffer {
-  return createHash('sha256').update(content, 'utf8').digest();
+function encodeU16Array(values: readonly number[], expectedLen: number): Buffer {
+  if (values.length !== expectedLen) {
+    throw new Error(`Expected ${expectedLen} u16 values, got ${values.length}.`);
+  }
+  const out = Buffer.alloc(expectedLen * 2);
+  for (let i = 0; i < expectedLen; i++) {
+    out.writeUInt16LE(values[i] >>> 0, i * 2);
+  }
+  return out;
+}
+
+function encodeFixedBytes(value: Uint8Array, expectedLen: number, label: string): Buffer {
+  if (value.length !== expectedLen) {
+    throw new Error(`${label} must be ${expectedLen} bytes, got ${value.length}.`);
+  }
+  return Buffer.from(value);
+}
+
+function encodeFixedString32(value: string): Buffer {
+  const out = Buffer.alloc(32, 0);
+  Buffer.from(value, 'utf8').copy(out, 0, 0, 32);
+  return out;
 }
 
 function validateHexacoTraits(traits: HEXACOTraits): void {
@@ -100,10 +112,7 @@ function validateHexacoTraits(traits: HEXACOTraits): void {
 }
 
 function sortJsonRecursively(value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return value.map(sortJsonRecursively);
-  }
-
+  if (Array.isArray(value)) return value.map(sortJsonRecursively);
   if (value && typeof value === 'object') {
     const record = value as Record<string, unknown>;
     const sorted: Record<string, unknown> = {};
@@ -112,15 +121,11 @@ function sortJsonRecursively(value: unknown): unknown {
     }
     return sorted;
   }
-
-  if (typeof value === 'bigint') {
-    return value.toString();
-  }
-
+  if (typeof value === 'bigint') return value.toString();
   return value;
 }
 
-function canonicalizeJsonString(maybeJson: string): string {
+export function canonicalizeJsonString(maybeJson: string): string {
   try {
     const parsed = JSON.parse(maybeJson) as unknown;
     return JSON.stringify(sortJsonRecursively(parsed));
@@ -129,19 +134,542 @@ function canonicalizeJsonString(maybeJson: string): string {
   }
 }
 
+export function hashSha256Bytes(bytes: Uint8Array): Uint8Array {
+  return createHash('sha256').update(bytes).digest();
+}
+
+export function hashSha256Utf8(text: string): Uint8Array {
+  return hashSha256Bytes(Buffer.from(text, 'utf8'));
+}
+
 // ============================================================
-// Client Configuration
+// PDA derivation (program is canonical)
+// ============================================================
+
+/**
+ * ProgramConfig PDA.
+ * Seeds: ["config"]
+ */
+export function deriveConfigPDA(programId: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('config')], programId);
+}
+
+/**
+ * Derive AgentIdentity PDA.
+ * Seeds: ["agent", owner_wallet_pubkey, agent_id(32)]
+ */
+export function deriveAgentPDA(
+  owner: PublicKey,
+  agentId: Uint8Array,
+  programId: PublicKey,
+): [PublicKey, number] {
+  const agentIdBytes = encodeFixedBytes(agentId, 32, 'agentId');
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('agent'), owner.toBuffer(), agentIdBytes],
+    programId,
+  );
+}
+
+/**
+ * Derive AgentVault PDA.
+ * Seeds: ["vault", agent_identity_pda]
+ */
+export function deriveVaultPDA(agentIdentityPda: PublicKey, programId: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('vault'), agentIdentityPda.toBuffer()], programId);
+}
+
+/**
+ * Derive Enclave PDA.
+ * Seeds: ["enclave", name_bytes]
+ */
+export function deriveEnclavePDA(name: string, programId: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('enclave'), Buffer.from(name, 'utf8')], programId);
+}
+
+/**
+ * Derive PostAnchor PDA for an entry index.
+ * Seeds: ["post", agent_identity_pda, entry_index_u32_le]
+ */
+export function derivePostPDA(
+  agentIdentityPda: PublicKey,
+  entryIndex: number,
+  programId: PublicKey,
+): [PublicKey, number] {
+  const indexBuf = Buffer.alloc(4);
+  indexBuf.writeUInt32LE(entryIndex >>> 0, 0);
+  return PublicKey.findProgramAddressSync([Buffer.from('post'), agentIdentityPda.toBuffer(), indexBuf], programId);
+}
+
+/**
+ * Derive ReputationVote PDA.
+ * Seeds: ["vote", post_anchor_pda, voter_agent_identity_pda]
+ */
+export function deriveVotePDA(
+  postAnchorPda: PublicKey,
+  voterAgentIdentityPda: PublicKey,
+  programId: PublicKey,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('vote'), postAnchorPda.toBuffer(), voterAgentIdentityPda.toBuffer()],
+    programId,
+  );
+}
+
+/**
+ * Derive the upgradeable loader ProgramData PDA for a program.
+ * Seeds: [program_id]
+ * Program ID: BPFLoaderUpgradeab1e11111111111111111111111
+ */
+export function deriveProgramDataPDA(programId: PublicKey): [PublicKey, number] {
+  const loaderId = new PublicKey('BPFLoaderUpgradeab1e11111111111111111111111');
+  return PublicKey.findProgramAddressSync([programId.toBuffer()], loaderId);
+}
+
+/**
+ * Derive TipAnchor PDA.
+ * Seeds: ["tip", tipper, tip_nonce_u64_le]
+ */
+export function deriveTipPDA(
+  tipper: PublicKey,
+  tipNonce: bigint,
+  programId: PublicKey,
+): [PublicKey, number] {
+  const nonceBuf = Buffer.alloc(8);
+  nonceBuf.writeBigUInt64LE(tipNonce, 0);
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('tip'), tipper.toBuffer(), nonceBuf],
+    programId,
+  );
+}
+
+/**
+ * Derive TipEscrow PDA.
+ * Seeds: ["escrow", tip_pda]
+ */
+export function deriveTipEscrowPDA(tipPda: PublicKey, programId: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('escrow'), tipPda.toBuffer()], programId);
+}
+
+/**
+ * Derive TipperRateLimit PDA.
+ * Seeds: ["rate_limit", tipper]
+ */
+export function deriveTipperRateLimitPDA(tipper: PublicKey, programId: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('rate_limit'), tipper.toBuffer()], programId);
+}
+
+/**
+ * Derive GlobalTreasury PDA.
+ * Seeds: ["treasury"]
+ */
+export function deriveTreasuryPDA(programId: PublicKey): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('treasury')], programId);
+}
+
+// ============================================================
+// Instruction builders
+// ============================================================
+
+export function buildInitializeConfigIx(opts: {
+  programId: PublicKey;
+  authority: PublicKey;
+  configPda: PublicKey;
+  programDataPda: PublicKey;
+}): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.configPda, isSigner: false, isWritable: true },
+      { pubkey: opts.programDataPda, isSigner: false, isWritable: false },
+      { pubkey: opts.authority, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: anchorDiscriminator('initialize_config'),
+  });
+}
+
+export function buildInitializeAgentIx(opts: {
+  programId: PublicKey;
+  configPda: PublicKey;
+  owner: PublicKey;
+  agentIdentityPda: PublicKey;
+  vaultPda: PublicKey;
+  agentId: Uint8Array; // 32
+  displayName: string; // will be UTF-8 encoded into [u8;32]
+  hexacoTraits: HEXACOTraits;
+  metadataHash: Uint8Array; // 32
+  agentSigner: PublicKey;
+}): TransactionInstruction {
+  if (!opts.displayName.trim()) throw new Error('Display name cannot be empty.');
+  validateHexacoTraits(opts.hexacoTraits);
+
+  const agentIdBytes = encodeFixedBytes(opts.agentId, 32, 'agentId');
+  const displayNameBytes = encodeFixedString32(opts.displayName);
+  const traitBytes = encodeU16Array(traitsToOnChain(opts.hexacoTraits), 6);
+  const metadataHashBytes = encodeFixedBytes(opts.metadataHash, 32, 'metadataHash');
+
+  const data = Buffer.concat([
+    anchorDiscriminator('initialize_agent'),
+    agentIdBytes,
+    displayNameBytes,
+    traitBytes,
+    metadataHashBytes,
+    opts.agentSigner.toBuffer(),
+  ]);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.configPda, isSigner: false, isWritable: true },
+      { pubkey: opts.owner, isSigner: true, isWritable: true },
+      { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: true },
+      { pubkey: opts.vaultPda, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildCreateEnclaveIx(opts: {
+  programId: PublicKey;
+  configPda: PublicKey;
+  enclavePda: PublicKey;
+  creatorAgentPda: PublicKey;
+  agentSigner: PublicKey;
+  payer: PublicKey;
+  name: string;
+  metadataHash: Uint8Array;
+}): TransactionInstruction {
+  const metadataHashBytes = encodeFixedBytes(opts.metadataHash, 32, 'metadataHash');
+  const data = Buffer.concat([
+    anchorDiscriminator('create_enclave'),
+    encodeString(opts.name),
+    metadataHashBytes,
+  ]);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.configPda, isSigner: false, isWritable: true },
+      { pubkey: opts.enclavePda, isSigner: false, isWritable: true },
+      { pubkey: opts.creatorAgentPda, isSigner: false, isWritable: false },
+      { pubkey: opts.agentSigner, isSigner: true, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildAnchorPostIx(opts: {
+  programId: PublicKey;
+  postAnchorPda: PublicKey;
+  agentIdentityPda: PublicKey;
+  enclavePda: PublicKey;
+  agentSigner: PublicKey;
+  payer: PublicKey;
+  contentHash: Uint8Array;
+  manifestHash: Uint8Array;
+}): TransactionInstruction {
+  const contentHashBytes = encodeFixedBytes(opts.contentHash, 32, 'contentHash');
+  const manifestHashBytes = encodeFixedBytes(opts.manifestHash, 32, 'manifestHash');
+  const data = Buffer.concat([
+    anchorDiscriminator('anchor_post'),
+    Buffer.from(contentHashBytes),
+    Buffer.from(manifestHashBytes),
+  ]);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.postAnchorPda, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: true },
+      { pubkey: opts.enclavePda, isSigner: false, isWritable: false },
+      { pubkey: opts.agentSigner, isSigner: true, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildAnchorCommentIx(opts: {
+  programId: PublicKey;
+  commentAnchorPda: PublicKey;
+  agentIdentityPda: PublicKey;
+  enclavePda: PublicKey;
+  parentPostPda: PublicKey;
+  agentSigner: PublicKey;
+  payer: PublicKey;
+  contentHash: Uint8Array;
+  manifestHash: Uint8Array;
+}): TransactionInstruction {
+  const contentHashBytes = encodeFixedBytes(opts.contentHash, 32, 'contentHash');
+  const manifestHashBytes = encodeFixedBytes(opts.manifestHash, 32, 'manifestHash');
+  const data = Buffer.concat([
+    anchorDiscriminator('anchor_comment'),
+    Buffer.from(contentHashBytes),
+    Buffer.from(manifestHashBytes),
+  ]);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.commentAnchorPda, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: true },
+      { pubkey: opts.enclavePda, isSigner: false, isWritable: false },
+      { pubkey: opts.parentPostPda, isSigner: false, isWritable: true },
+      { pubkey: opts.agentSigner, isSigner: true, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildCastVoteIx(opts: {
+  programId: PublicKey;
+  reputationVotePda: PublicKey;
+  postAnchorPda: PublicKey;
+  postAgentPda: PublicKey;
+  voterAgentPda: PublicKey;
+  agentSigner: PublicKey;
+  payer: PublicKey;
+  value: 1 | -1;
+}): TransactionInstruction {
+  const data = Buffer.alloc(9);
+  anchorDiscriminator('cast_vote').copy(data, 0);
+  data.writeInt8(opts.value, 8);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.reputationVotePda, isSigner: false, isWritable: true },
+      { pubkey: opts.postAnchorPda, isSigner: false, isWritable: true },
+      { pubkey: opts.postAgentPda, isSigner: false, isWritable: true },
+      { pubkey: opts.voterAgentPda, isSigner: false, isWritable: false },
+      { pubkey: opts.agentSigner, isSigner: true, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildDepositToVaultIx(opts: {
+  programId: PublicKey;
+  agentIdentityPda: PublicKey;
+  vaultPda: PublicKey;
+  depositor: PublicKey;
+  lamports: bigint;
+}): TransactionInstruction {
+  const data = Buffer.alloc(16);
+  anchorDiscriminator('deposit_to_vault').copy(data, 0);
+  data.writeBigUInt64LE(opts.lamports, 8);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: false },
+      { pubkey: opts.vaultPda, isSigner: false, isWritable: true },
+      { pubkey: opts.depositor, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildWithdrawFromVaultIx(opts: {
+  programId: PublicKey;
+  agentIdentityPda: PublicKey;
+  vaultPda: PublicKey;
+  owner: PublicKey;
+  lamports: bigint;
+}): TransactionInstruction {
+  const data = Buffer.alloc(16);
+  anchorDiscriminator('withdraw_from_vault').copy(data, 0);
+  data.writeBigUInt64LE(opts.lamports, 8);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: false },
+      { pubkey: opts.vaultPda, isSigner: false, isWritable: true },
+      { pubkey: opts.owner, isSigner: true, isWritable: true },
+    ],
+    data,
+  });
+}
+
+export function buildRotateAgentSignerIx(opts: {
+  programId: PublicKey;
+  agentSigner: PublicKey;
+  agentIdentityPda: PublicKey;
+  newAgentSigner: PublicKey;
+}): TransactionInstruction {
+  const data = Buffer.concat([anchorDiscriminator('rotate_agent_signer'), opts.newAgentSigner.toBuffer()]);
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.agentSigner, isSigner: true, isWritable: false },
+      { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: true },
+    ],
+    data,
+  });
+}
+
+// ============================================================
+// Tip instruction builders
+// ============================================================
+
+/** Tip priority levels. */
+export type TipPriority = 'low' | 'normal' | 'high' | 'breaking';
+
+/** Tip source types. */
+export type TipSourceType = 'text' | 'url';
+
+/** Convert priority string to u8. */
+function tipPriorityToU8(priority: TipPriority): number {
+  switch (priority) {
+    case 'low': return 0;
+    case 'normal': return 1;
+    case 'high': return 2;
+    case 'breaking': return 3;
+    default: return 1;
+  }
+}
+
+/** Convert source type string to u8. */
+function tipSourceTypeToU8(sourceType: TipSourceType): number {
+  return sourceType === 'url' ? 1 : 0;
+}
+
+/** Derive priority from amount (lamports). */
+export function tipPriorityFromAmount(amount: bigint): TipPriority {
+  if (amount >= 40_000_000n) return 'breaking';
+  if (amount >= 35_000_000n) return 'high';
+  if (amount >= 25_000_000n) return 'normal';
+  return 'low';
+}
+
+export function buildSubmitTipIx(opts: {
+  programId: PublicKey;
+  tipper: PublicKey;
+  tipPda: PublicKey;
+  escrowPda: PublicKey;
+  rateLimitPda: PublicKey;
+  targetEnclave: PublicKey; // SystemProgram.programId for global
+  contentHash: Uint8Array; // 32 bytes
+  amount: bigint;
+  sourceType: TipSourceType;
+  tipNonce: bigint;
+}): TransactionInstruction {
+  const contentHashBytes = encodeFixedBytes(opts.contentHash, 32, 'contentHash');
+  const amountBuf = Buffer.alloc(8);
+  amountBuf.writeBigUInt64LE(opts.amount, 0);
+  const sourceTypeBuf = Buffer.alloc(1);
+  sourceTypeBuf.writeUInt8(tipSourceTypeToU8(opts.sourceType), 0);
+  const nonceBuf = Buffer.alloc(8);
+  nonceBuf.writeBigUInt64LE(opts.tipNonce, 0);
+
+  const data = Buffer.concat([
+    anchorDiscriminator('submit_tip'),
+    contentHashBytes,
+    amountBuf,
+    sourceTypeBuf,
+    nonceBuf,
+  ]);
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.tipper, isSigner: true, isWritable: true },
+      { pubkey: opts.rateLimitPda, isSigner: false, isWritable: true },
+      { pubkey: opts.tipPda, isSigner: false, isWritable: true },
+      { pubkey: opts.escrowPda, isSigner: false, isWritable: true },
+      { pubkey: opts.targetEnclave, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildSettleTipIx(opts: {
+  programId: PublicKey;
+  authority: PublicKey;
+  tipPda: PublicKey;
+  escrowPda: PublicKey;
+  treasuryPda: PublicKey;
+  enclavePda: PublicKey; // SystemProgram.programId for global
+  enclaveCreator: PublicKey; // Receives 30% for enclave-targeted tips
+}): TransactionInstruction {
+  const data = anchorDiscriminator('settle_tip');
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.authority, isSigner: true, isWritable: false },
+      { pubkey: opts.tipPda, isSigner: false, isWritable: true },
+      { pubkey: opts.escrowPda, isSigner: false, isWritable: true },
+      { pubkey: opts.treasuryPda, isSigner: false, isWritable: true },
+      { pubkey: opts.enclavePda, isSigner: false, isWritable: false },
+      { pubkey: opts.enclaveCreator, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildRefundTipIx(opts: {
+  programId: PublicKey;
+  authority: PublicKey;
+  tipPda: PublicKey;
+  escrowPda: PublicKey;
+  tipper: PublicKey;
+}): TransactionInstruction {
+  const data = anchorDiscriminator('refund_tip');
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.authority, isSigner: true, isWritable: false },
+      { pubkey: opts.tipPda, isSigner: false, isWritable: true },
+      { pubkey: opts.escrowPda, isSigner: false, isWritable: true },
+      { pubkey: opts.tipper, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+export function buildClaimTimeoutRefundIx(opts: {
+  programId: PublicKey;
+  tipper: PublicKey;
+  tipPda: PublicKey;
+  escrowPda: PublicKey;
+}): TransactionInstruction {
+  const data = anchorDiscriminator('claim_timeout_refund');
+
+  return new TransactionInstruction({
+    programId: opts.programId,
+    keys: [
+      { pubkey: opts.tipper, isSigner: true, isWritable: true },
+      { pubkey: opts.tipPda, isSigner: false, isWritable: true },
+      { pubkey: opts.escrowPda, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data,
+  });
+}
+
+// ============================================================
+// Client configuration
 // ============================================================
 
 export interface WunderlandSolConfig {
-  /** Solana RPC endpoint URL */
   rpcUrl?: string;
-  /** Solana cluster (devnet, testnet, mainnet-beta) */
   cluster?: 'devnet' | 'testnet' | 'mainnet-beta';
-  /** Program ID (deployed Anchor program) */
   programId: string;
-  /** Signer keypair for transactions */
-  signer?: Keypair;
 }
 
 // ============================================================
@@ -151,218 +679,170 @@ export interface WunderlandSolConfig {
 export class WunderlandSolClient {
   readonly connection: Connection;
   readonly programId: PublicKey;
-  private signer?: Keypair;
 
   constructor(config: WunderlandSolConfig) {
-    const rpcUrl =
-      config.rpcUrl || clusterApiUrl(config.cluster || 'devnet');
+    const rpcUrl = config.rpcUrl || clusterApiUrl(config.cluster || 'devnet');
     this.connection = new Connection(rpcUrl, 'confirmed');
     this.programId = new PublicKey(config.programId);
-    this.signer = config.signer;
   }
 
-  /**
-   * Set the signer keypair for transactions.
-   */
-  setSigner(signer: Keypair): void {
-    this.signer = signer;
+  // ---------- PDA helpers ----------
+
+  getConfigPDA(): [PublicKey, number] {
+    return deriveConfigPDA(this.programId);
   }
 
-  /**
-   * Get the AgentIdentity PDA for an authority.
-   */
-  getAgentPDA(authority: PublicKey): [PublicKey, number] {
-    return deriveAgentPDA(authority, this.programId);
+  getProgramDataPDA(): [PublicKey, number] {
+    return deriveProgramDataPDA(this.programId);
   }
 
-  /**
-   * Get the PostAnchor PDA for an agent + post index.
-   */
-  getPostPDA(
-    agentPDA: PublicKey,
-    postIndex: number
-  ): [PublicKey, number] {
-    return derivePostPDA(agentPDA, postIndex, this.programId);
+  getAgentPDA(owner: PublicKey, agentId: Uint8Array): [PublicKey, number] {
+    return deriveAgentPDA(owner, agentId, this.programId);
   }
 
-  /**
-   * Get the ReputationVote PDA for a post + voter.
-   */
-  getVotePDA(
-    postPDA: PublicKey,
-    voterPubkey: PublicKey
-  ): [PublicKey, number] {
-    return deriveVotePDA(postPDA, voterPubkey, this.programId);
+  getVaultPDA(agentIdentityPda: PublicKey): [PublicKey, number] {
+    return deriveVaultPDA(agentIdentityPda, this.programId);
   }
 
-  // ============================================================
-  // Read Methods (no signer required)
-  // ============================================================
-
-  /**
-   * Fetch an agent's on-chain identity.
-   * Returns null if the agent doesn't exist.
-   */
-  async getAgentIdentity(
-    authority: PublicKey
-  ): Promise<AgentProfile | null> {
-    const [pda] = this.getAgentPDA(authority);
-    const accountInfo = await this.connection.getAccountInfo(pda);
-    if (!accountInfo) return null;
-
-    // Decode account data (Anchor discriminator: first 8 bytes)
-    return this.decodeAgentIdentity(accountInfo.data, authority);
+  getEnclavePDA(name: string): [PublicKey, number] {
+    return deriveEnclavePDA(name, this.programId);
   }
 
-  /**
-   * Fetch a post anchor by agent PDA + index.
-   */
-  async getPostAnchor(
-    agentPDA: PublicKey,
-    postIndex: number
-  ): Promise<SocialPost | null> {
-    const [pda] = this.getPostPDA(agentPDA, postIndex);
-    const accountInfo = await this.connection.getAccountInfo(pda);
-    if (!accountInfo) return null;
-
-    return this.decodePostAnchor(accountInfo.data, postIndex);
+  getPostPDA(agentIdentityPda: PublicKey, entryIndex: number): [PublicKey, number] {
+    return derivePostPDA(agentIdentityPda, entryIndex, this.programId);
   }
 
-  /**
-   * Get all agents (via getProgramAccounts with discriminator filter).
-   */
+  getVotePDA(postAnchorPda: PublicKey, voterAgentIdentityPda: PublicKey): [PublicKey, number] {
+    return deriveVotePDA(postAnchorPda, voterAgentIdentityPda, this.programId);
+  }
+
+  // ---------- read methods ----------
+
+  async getProgramConfig(): Promise<{ pda: PublicKey; account: { authority: PublicKey; agentCount: number; enclaveCount: number } } | null> {
+    const [pda] = this.getConfigPDA();
+    const info = await this.connection.getAccountInfo(pda);
+    if (!info) return null;
+
+    const decoded = decodeProgramConfigAccount(info.data);
+    return { pda, account: { authority: decoded.authority, agentCount: decoded.agentCount, enclaveCount: decoded.enclaveCount } };
+  }
+
   async getAllAgents(): Promise<AgentProfile[]> {
-    // AgentIdentity discriminator (first 8 bytes of sha256("account:AgentIdentity"))
-    const discriminator = createHash('sha256')
-      .update('account:AgentIdentity')
-      .digest()
-      .subarray(0, 8);
+    const discriminator = accountDiscriminator('AgentIdentity');
+    const accounts = await this.connection.getProgramAccounts(this.programId, {
+      filters: [{ memcmp: { offset: 0, bytes: bs58.encode(discriminator) } }],
+    });
 
-    const accounts = await this.connection.getProgramAccounts(
-      this.programId,
-      {
-        filters: [
-          // `bytes` is base58 in Solana JSON-RPC memcmp filters.
-          { memcmp: { offset: 0, bytes: bs58.encode(discriminator) } },
-        ],
+    return accounts.flatMap((acc) => {
+      try {
+        return [decodeAgentProfile(acc.pubkey, acc.account.data)];
+      } catch {
+        return [];
       }
-    );
-
-    return accounts
-      .map((acc) => {
-        try {
-          return this.decodeAgentIdentity(
-            acc.account.data,
-            PublicKey.default
-          );
-        } catch {
-          return null;
-        }
-      })
-      .filter((a): a is AgentProfile => a !== null);
+    });
   }
 
-  /**
-   * Get recent posts across all agents.
-   */
-  async getRecentPosts(limit: number = 20): Promise<SocialPost[]> {
-    const discriminator = createHash('sha256')
-      .update('account:PostAnchor')
-      .digest()
-      .subarray(0, 8);
+  async getAllEnclaves(): Promise<EnclaveProfile[]> {
+    const discriminator = accountDiscriminator('Enclave');
+    const accounts = await this.connection.getProgramAccounts(this.programId, {
+      filters: [{ memcmp: { offset: 0, bytes: bs58.encode(discriminator) } }],
+    });
 
-    const accounts = await this.connection.getProgramAccounts(
-      this.programId,
-      {
-        filters: [
-          // `bytes` is base58 in Solana JSON-RPC memcmp filters.
-          { memcmp: { offset: 0, bytes: bs58.encode(discriminator) } },
-        ],
+    return accounts.flatMap((acc) => {
+      try {
+        return [decodeEnclaveProfile(acc.pubkey, acc.account.data)];
+      } catch {
+        return [];
       }
-    );
+    });
+  }
 
-    const rawPosts = accounts
-      .map((acc) => {
-        try {
-          const post = this.decodePostAnchor(acc.account.data, 0);
-          return {
-            ...post,
+  async getRecentEntries(opts?: { limit?: number; kind?: EntryKind }): Promise<SocialPost[]> {
+    const limit = opts?.limit ?? 20;
+    const discriminator = accountDiscriminator('PostAnchor');
+    const accounts = await this.connection.getProgramAccounts(this.programId, {
+      filters: [{ memcmp: { offset: 0, bytes: bs58.encode(discriminator) } }],
+    });
+
+    const entries = accounts.flatMap((acc) => {
+      try {
+        const decoded = decodePostAnchorAccount(acc.account.data);
+        const kind: EntryKind = decoded.kind;
+        if (opts?.kind && kind !== opts.kind) return [];
+        return [
+          {
             id: acc.pubkey.toBase58(),
             postPda: acc.pubkey.toBase58(),
-          };
-        } catch {
-          return null;
-        }
-      })
-      .filter((p): p is SocialPost => p !== null);
+            agentPda: decoded.agent.toBase58(),
+            enclavePda: decoded.enclave.toBase58(),
+            kind,
+            replyTo: decoded.replyTo.equals(PublicKey.default) ? undefined : decoded.replyTo.toBase58(),
+            agentName: '',
+            agentTraits: {
+              honestyHumility: 0,
+              emotionality: 0,
+              extraversion: 0,
+              agreeableness: 0,
+              conscientiousness: 0,
+              openness: 0,
+            },
+            agentLevel: CitizenLevel.NEWCOMER,
+            postIndex: decoded.postIndex,
+            content: '',
+            contentHash: Buffer.from(decoded.contentHash).toString('hex'),
+            manifestHash: Buffer.from(decoded.manifestHash).toString('hex'),
+            upvotes: decoded.upvotes,
+            downvotes: decoded.downvotes,
+            commentCount: decoded.commentCount,
+            timestamp: new Date(Number(decoded.timestamp) * 1000),
+            createdSlot: Number(decoded.createdSlot),
+          },
+        ];
+      } catch {
+        return [];
+      }
+    });
 
-    // Resolve agent profile fields (authority + display_name + traits + level)
-    const agentPdaStrings = Array.from(
-      new Set(rawPosts.map((p) => p.agentPda || p.agentAddress))
-    );
-    const agentPdas = agentPdaStrings.map((s) => new PublicKey(s));
+    // Resolve author display fields
+    const agentPdas = Array.from(new Set(entries.map((e) => e.agentPda))).map((s) => new PublicKey(s));
     const agentInfos = await this.connection.getMultipleAccountsInfo(agentPdas);
-
     const agentByPda = new Map<string, AgentProfile>();
     for (let i = 0; i < agentPdas.length; i++) {
       const info = agentInfos[i];
       if (!info) continue;
       try {
-        const decoded = this.decodeAgentIdentity(info.data as Buffer, PublicKey.default);
-        agentByPda.set(agentPdas[i].toBase58(), decoded);
+        agentByPda.set(agentPdas[i].toBase58(), decodeAgentProfile(agentPdas[i], info.data as Buffer));
       } catch {
         continue;
       }
     }
 
-    const posts = rawPosts.map((post) => {
-      const pda = post.agentPda || post.agentAddress;
-      const agent = agentByPda.get(pda);
-      if (!agent) return post;
-
+    const full = entries.map((e) => {
+      const agent = agentByPda.get(e.agentPda);
+      if (!agent) return e;
       return {
-        ...post,
-        agentAddress: agent.address,
+        ...e,
         agentName: agent.displayName,
         agentTraits: agent.hexacoTraits,
         agentLevel: agent.citizenLevel,
       };
     });
 
-    // Sort by timestamp descending
-    posts.sort(
-      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-    );
-    return posts.slice(0, limit);
+    full.sort((a, b) => (b.createdSlot ?? 0) - (a.createdSlot ?? 0) || b.timestamp.getTime() - a.timestamp.getTime());
+    return full.slice(0, limit);
   }
 
-  /**
-   * Get reputation leaderboard (agents sorted by reputation score).
-   */
   async getLeaderboard(limit: number = 50): Promise<AgentProfile[]> {
     const agents = await this.getAllAgents();
     agents.sort((a, b) => b.reputationScore - a.reputationScore);
     return agents.slice(0, limit);
   }
 
-  /**
-   * Get network statistics.
-   */
   async getNetworkStats(): Promise<NetworkStats> {
-    const agents = await this.getAllAgents();
-    const posts = await this.getRecentPosts(10000); // Get all posts
-
+    const [agents, posts] = await Promise.all([this.getAllAgents(), this.getRecentEntries({ limit: 100000, kind: 'post' })]);
     const activeAgents = agents.filter((a) => a.isActive).length;
-    const totalVotes = posts.reduce(
-      (sum, p) => sum + p.upvotes + p.downvotes,
-      0
-    );
-    const avgReputation =
-      agents.length > 0
-        ? agents.reduce((sum, a) => sum + a.reputationScore, 0) /
-          agents.length
-        : 0;
-
+    const totalVotes = posts.reduce((sum, p) => sum + p.upvotes + p.downvotes, 0);
+    const avgReputation = agents.length > 0 ? agents.reduce((sum, a) => sum + a.reputationScore, 0) / agents.length : 0;
     return {
       totalAgents: agents.length,
       totalPosts: posts.length,
@@ -372,333 +852,548 @@ export class WunderlandSolClient {
     };
   }
 
-  // ============================================================
-  // Write Methods (signer required)
-  // ============================================================
+  // ---------- write methods ----------
 
-  private requireSigner(): Keypair {
-    if (!this.signer) throw new Error('Signer not set. Call setSigner() first.');
-    return this.signer;
-  }
-
-  private anchorDiscriminator(methodName: string): Buffer {
-    return createHash('sha256')
-      .update(`global:${methodName}`)
-      .digest()
-      .subarray(0, 8);
-  }
-
-  /**
-   * Register a new agent with HEXACO personality traits.
-   */
-  async registerAgent(
-    displayName: string,
-    traits: HEXACOTraits,
-  ): Promise<TransactionSignature> {
-    const signer = this.requireSigner();
-    const [agentPDA] = this.getAgentPDA(signer.publicKey);
-
-    if (!displayName || displayName.trim().length === 0) {
-      throw new Error('Display name cannot be empty.');
-    }
-
-    const nameBytes = Buffer.alloc(32, 0);
-    Buffer.from(displayName, 'utf-8').copy(nameBytes, 0, 0, Math.min(displayName.length, 32));
-
-    validateHexacoTraits(traits);
-    const traitValues = traitsToOnChain(traits);
-    const traitBytes = Buffer.alloc(12);
-    traitValues.forEach((val, i) => traitBytes.writeUInt16LE(val, i * 2));
-
-    const data = Buffer.concat([
-      this.anchorDiscriminator('initialize_agent'),
-      nameBytes,
-      traitBytes,
-    ]);
-
-    const ix = new TransactionInstruction({
-      keys: [
-        { pubkey: agentPDA, isSigner: false, isWritable: true },
-        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
-        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      ],
+  async initializeConfig(authority: Keypair): Promise<TransactionSignature> {
+    const [configPda] = this.getConfigPDA();
+    const [programDataPda] = this.getProgramDataPDA();
+    const ix = buildInitializeConfigIx({
       programId: this.programId,
-      data,
+      authority: authority.publicKey,
+      configPda,
+      programDataPda,
+    });
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [authority]);
+  }
+
+  async initializeAgent(opts: {
+    owner: Keypair;
+    agentId: Uint8Array;
+    displayName: string;
+    hexacoTraits: HEXACOTraits;
+    metadataHash: Uint8Array;
+    agentSigner: PublicKey;
+  }): Promise<{ signature: TransactionSignature; agentIdentityPda: PublicKey; vaultPda: PublicKey }> {
+    const [configPda] = this.getConfigPDA();
+    const [agentIdentityPda] = this.getAgentPDA(opts.owner.publicKey, opts.agentId);
+    const [vaultPda] = this.getVaultPDA(agentIdentityPda);
+
+    const ix = buildInitializeAgentIx({
+      programId: this.programId,
+      configPda,
+      owner: opts.owner.publicKey,
+      agentIdentityPda,
+      vaultPda,
+      agentId: opts.agentId,
+      displayName: opts.displayName,
+      hexacoTraits: opts.hexacoTraits,
+      metadataHash: opts.metadataHash,
+      agentSigner: opts.agentSigner,
     });
 
     const tx = new Transaction().add(ix);
-    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [opts.owner]);
+    return { signature, agentIdentityPda, vaultPda };
   }
 
-  /**
-   * Anchor a post on-chain with content + manifest hashes.
-   * Returns the transaction signature.
-   */
-  async anchorPost(
-    content: string,
-    manifestJson: string,
-  ): Promise<{ signature: TransactionSignature; postIndex: number }> {
-    const signer = this.requireSigner();
-    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+  async createEnclave(opts: {
+    creatorAgentPda: PublicKey;
+    agentSigner: Keypair;
+    payer: Keypair;
+    name: string;
+    metadataHash: Uint8Array;
+  }): Promise<{ signature: TransactionSignature; enclavePda: PublicKey }> {
+    const [configPda] = this.getConfigPDA();
+    const [enclavePda] = this.getEnclavePDA(opts.name);
 
-    // Read current total_posts to derive the correct post PDA
-    const agentInfo = await this.connection.getAccountInfo(agentPDA);
-    if (!agentInfo) throw new Error('Agent not registered. Call registerAgent() first.');
-
-    // total_posts is at offset 8 + 32 + 32 + 12 + 1 + 8 = 93, 4 bytes
-    const totalPosts = (agentInfo.data as Buffer).readUInt32LE(93);
-    const [postPDA] = this.getPostPDA(agentPDA, totalPosts);
-
-    const contentHash = hashContent(content);
-    const manifestHash = hashContent(canonicalizeJsonString(manifestJson));
-
-    const data = Buffer.concat([
-      this.anchorDiscriminator('anchor_post'),
-      contentHash,
-      manifestHash,
-    ]);
-
-    const ix = new TransactionInstruction({
-      keys: [
-        { pubkey: postPDA, isSigner: false, isWritable: true },
-        { pubkey: agentPDA, isSigner: false, isWritable: true },
-        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
-        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      ],
+    const ix = buildCreateEnclaveIx({
       programId: this.programId,
-      data,
+      configPda,
+      enclavePda,
+      creatorAgentPda: opts.creatorAgentPda,
+      agentSigner: opts.agentSigner.publicKey,
+      payer: opts.payer.publicKey,
+      name: opts.name,
+      metadataHash: opts.metadataHash,
     });
 
     const tx = new Transaction().add(ix);
-    const signature = await sendAndConfirmTransaction(this.connection, tx, [signer]);
-    return { signature, postIndex: totalPosts };
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [opts.agentSigner, opts.payer]);
+    return { signature, enclavePda };
   }
 
-  /**
-   * Cast a vote (+1 or -1) on a post.
-   * Voter must be different from post author.
-   */
-  async castVote(
-    postAgentAuthority: PublicKey,
-    postIndex: number,
-    value: 1 | -1,
-  ): Promise<TransactionSignature> {
-    const signer = this.requireSigner();
-    const [agentPDA] = deriveAgentPDA(postAgentAuthority, this.programId);
-    const [postPDA] = this.getPostPDA(agentPDA, postIndex);
-    const [votePDA] = this.getVotePDA(postPDA, signer.publicKey);
+  async anchorPost(opts: {
+    agentIdentityPda: PublicKey;
+    agentSigner: Keypair;
+    payer: Keypair;
+    enclavePda: PublicKey;
+    contentHash: Uint8Array;
+    manifestHash: Uint8Array;
+  }): Promise<{ signature: TransactionSignature; postAnchorPda: PublicKey; entryIndex: number }> {
+    const agentInfo = await this.connection.getAccountInfo(opts.agentIdentityPda);
+    if (!agentInfo) throw new Error(`AgentIdentity not found: ${opts.agentIdentityPda.toBase58()}`);
+    const decodedAgent = decodeAgentIdentityAccount(agentInfo.data as Buffer);
 
-    const data = Buffer.alloc(9);
-    this.anchorDiscriminator('cast_vote').copy(data, 0);
-    data.writeInt8(value, 8);
+    const entryIndex = decodedAgent.totalPosts;
+    const [postAnchorPda] = this.getPostPDA(opts.agentIdentityPda, entryIndex);
 
-    const ix = new TransactionInstruction({
-      keys: [
-        { pubkey: votePDA, isSigner: false, isWritable: true },
-        { pubkey: postPDA, isSigner: false, isWritable: true },
-        { pubkey: agentPDA, isSigner: false, isWritable: true },
-        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
-        { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      ],
+    const ix = buildAnchorPostIx({
       programId: this.programId,
-      data,
+      postAnchorPda,
+      agentIdentityPda: opts.agentIdentityPda,
+      enclavePda: opts.enclavePda,
+      agentSigner: opts.agentSigner.publicKey,
+      payer: opts.payer.publicKey,
+      contentHash: opts.contentHash,
+      manifestHash: opts.manifestHash,
     });
 
     const tx = new Transaction().add(ix);
-    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [opts.agentSigner, opts.payer]);
+    return { signature, postAnchorPda, entryIndex };
   }
 
-  /**
-   * Update agent's citizen level and XP (authority only).
-   */
-  async updateAgentLevel(
-    newLevel: number,
-    newXp: number,
-  ): Promise<TransactionSignature> {
-    const signer = this.requireSigner();
-    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+  async anchorComment(opts: {
+    agentIdentityPda: PublicKey;
+    agentSigner: Keypair;
+    payer: Keypair;
+    enclavePda: PublicKey;
+    parentPostPda: PublicKey;
+    contentHash: Uint8Array;
+    manifestHash: Uint8Array;
+  }): Promise<{ signature: TransactionSignature; commentAnchorPda: PublicKey; entryIndex: number }> {
+    const agentInfo = await this.connection.getAccountInfo(opts.agentIdentityPda);
+    if (!agentInfo) throw new Error(`AgentIdentity not found: ${opts.agentIdentityPda.toBase58()}`);
+    const decodedAgent = decodeAgentIdentityAccount(agentInfo.data as Buffer);
 
-    if (!Number.isInteger(newLevel) || newLevel < 1 || newLevel > 6) {
-      throw new Error(`Invalid citizen level: ${String(newLevel)} (expected 1–6)`);
-    }
-    if (!Number.isSafeInteger(newXp) || newXp < 0) {
-      throw new Error(`Invalid XP: ${String(newXp)} (expected a safe integer >= 0)`);
-    }
+    const entryIndex = decodedAgent.totalPosts;
+    const [commentAnchorPda] = this.getPostPDA(opts.agentIdentityPda, entryIndex);
 
-    const data = Buffer.alloc(17);
-    this.anchorDiscriminator('update_agent_level').copy(data, 0);
-    data.writeUInt8(newLevel, 8);
-    data.writeBigUInt64LE(BigInt(newXp), 9);
-
-    const ix = new TransactionInstruction({
-      keys: [
-        { pubkey: agentPDA, isSigner: false, isWritable: true },
-        { pubkey: signer.publicKey, isSigner: true, isWritable: false },
-      ],
+    const ix = buildAnchorCommentIx({
       programId: this.programId,
-      data,
+      commentAnchorPda,
+      agentIdentityPda: opts.agentIdentityPda,
+      enclavePda: opts.enclavePda,
+      parentPostPda: opts.parentPostPda,
+      agentSigner: opts.agentSigner.publicKey,
+      payer: opts.payer.publicKey,
+      contentHash: opts.contentHash,
+      manifestHash: opts.manifestHash,
     });
 
     const tx = new Transaction().add(ix);
-    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [opts.agentSigner, opts.payer]);
+    return { signature, commentAnchorPda, entryIndex };
+  }
+
+  async castVote(opts: {
+    voterAgentPda: PublicKey;
+    agentSigner: Keypair;
+    payer: Keypair;
+    postAnchorPda: PublicKey;
+    postAgentPda: PublicKey;
+    value: 1 | -1;
+  }): Promise<{ signature: TransactionSignature; votePda: PublicKey }> {
+    const [votePda] = this.getVotePDA(opts.postAnchorPda, opts.voterAgentPda);
+    const ix = buildCastVoteIx({
+      programId: this.programId,
+      reputationVotePda: votePda,
+      postAnchorPda: opts.postAnchorPda,
+      postAgentPda: opts.postAgentPda,
+      voterAgentPda: opts.voterAgentPda,
+      agentSigner: opts.agentSigner.publicKey,
+      payer: opts.payer.publicKey,
+      value: opts.value,
+    });
+    const tx = new Transaction().add(ix);
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [opts.agentSigner, opts.payer]);
+    return { signature, votePda };
+  }
+
+  async depositToVault(opts: {
+    agentIdentityPda: PublicKey;
+    depositor: Keypair;
+    lamports: bigint;
+  }): Promise<TransactionSignature> {
+    const [vaultPda] = this.getVaultPDA(opts.agentIdentityPda);
+    const ix = buildDepositToVaultIx({
+      programId: this.programId,
+      agentIdentityPda: opts.agentIdentityPda,
+      vaultPda,
+      depositor: opts.depositor.publicKey,
+      lamports: opts.lamports,
+    });
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [opts.depositor]);
+  }
+
+  async withdrawFromVault(opts: {
+    agentIdentityPda: PublicKey;
+    owner: Keypair;
+    lamports: bigint;
+  }): Promise<TransactionSignature> {
+    const [vaultPda] = this.getVaultPDA(opts.agentIdentityPda);
+    const ix = buildWithdrawFromVaultIx({
+      programId: this.programId,
+      agentIdentityPda: opts.agentIdentityPda,
+      vaultPda,
+      owner: opts.owner.publicKey,
+      lamports: opts.lamports,
+    });
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [opts.owner]);
+  }
+
+  async rotateAgentSigner(opts: {
+    agentIdentityPda: PublicKey;
+    currentAgentSigner: Keypair;
+    newAgentSigner: PublicKey;
+  }): Promise<TransactionSignature> {
+    const ix = buildRotateAgentSignerIx({
+      programId: this.programId,
+      agentSigner: opts.currentAgentSigner.publicKey,
+      agentIdentityPda: opts.agentIdentityPda,
+      newAgentSigner: opts.newAgentSigner,
+    });
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [opts.currentAgentSigner]);
+  }
+
+  // ---------- tip methods ----------
+
+  getTipPDA(tipper: PublicKey, tipNonce: bigint): [PublicKey, number] {
+    return deriveTipPDA(tipper, tipNonce, this.programId);
+  }
+
+  getTipEscrowPDA(tipPda: PublicKey): [PublicKey, number] {
+    return deriveTipEscrowPDA(tipPda, this.programId);
+  }
+
+  getTipperRateLimitPDA(tipper: PublicKey): [PublicKey, number] {
+    return deriveTipperRateLimitPDA(tipper, this.programId);
+  }
+
+  getTreasuryPDA(): [PublicKey, number] {
+    return deriveTreasuryPDA(this.programId);
   }
 
   /**
-   * Deactivate an agent (authority only). Deactivated agents cannot post.
+   * Submit a tip to inject content into the agent stimulus feed.
+   * Content hash should be SHA-256 of the sanitized snapshot bytes.
    */
-  async deactivateAgent(): Promise<TransactionSignature> {
-    const signer = this.requireSigner();
-    const [agentPDA] = this.getAgentPDA(signer.publicKey);
+  async submitTip(opts: {
+    tipper: Keypair;
+    contentHash: Uint8Array;
+    amount: bigint;
+    sourceType: TipSourceType;
+    tipNonce: bigint;
+    targetEnclave?: PublicKey; // Omit for global broadcast
+  }): Promise<{ signature: TransactionSignature; tipPda: PublicKey; escrowPda: PublicKey }> {
+    const [tipPda] = this.getTipPDA(opts.tipper.publicKey, opts.tipNonce);
+    const [escrowPda] = this.getTipEscrowPDA(tipPda);
+    const [rateLimitPda] = this.getTipperRateLimitPDA(opts.tipper.publicKey);
+    const targetEnclave = opts.targetEnclave ?? SystemProgram.programId;
 
-    const ix = new TransactionInstruction({
-      keys: [
-        { pubkey: agentPDA, isSigner: false, isWritable: true },
-        { pubkey: signer.publicKey, isSigner: true, isWritable: false },
-      ],
+    const ix = buildSubmitTipIx({
       programId: this.programId,
-      data: this.anchorDiscriminator('deactivate_agent'),
+      tipper: opts.tipper.publicKey,
+      tipPda,
+      escrowPda,
+      rateLimitPda,
+      targetEnclave,
+      contentHash: opts.contentHash,
+      amount: opts.amount,
+      sourceType: opts.sourceType,
+      tipNonce: opts.tipNonce,
     });
 
     const tx = new Transaction().add(ix);
-    return sendAndConfirmTransaction(this.connection, tx, [signer]);
+    const signature = await sendAndConfirmTransaction(this.connection, tx, [opts.tipper]);
+    return { signature, tipPda, escrowPda };
   }
 
-  // ============================================================
-  // Decode Helpers (Anchor account deserialization)
-  // ============================================================
+  /**
+   * Settle a tip after successful processing.
+   * Splits escrow: 70% treasury, 30% enclave creator (if enclave-targeted).
+   */
+  async settleTip(opts: {
+    authority: Keypair;
+    tipPda: PublicKey;
+    enclavePda?: PublicKey; // SystemProgram.programId for global
+    enclaveCreator?: PublicKey; // Required for enclave-targeted tips
+  }): Promise<TransactionSignature> {
+    const [escrowPda] = this.getTipEscrowPDA(opts.tipPda);
+    const [treasuryPda] = this.getTreasuryPDA();
+    const enclavePda = opts.enclavePda ?? SystemProgram.programId;
+    const enclaveCreator = opts.enclaveCreator ?? SystemProgram.programId;
 
-  private decodeAgentIdentity(
-    data: Buffer,
-    authority: PublicKey
-  ): AgentProfile {
-    // Skip 8-byte discriminator
-    let offset = 8;
+    const ix = buildSettleTipIx({
+      programId: this.programId,
+      authority: opts.authority.publicKey,
+      tipPda: opts.tipPda,
+      escrowPda,
+      treasuryPda,
+      enclavePda,
+      enclaveCreator,
+    });
 
-    // authority: Pubkey (32 bytes)
-    const authorityBytes = data.subarray(offset, offset + 32);
-    const authorityPk = new PublicKey(authorityBytes);
-    offset += 32;
-
-    // display_name: [u8; 32]
-    const nameBytes = data.subarray(offset, offset + 32);
-    const displayName = Buffer.from(nameBytes)
-      .toString('utf8')
-      .replace(/\0/g, '')
-      .trim();
-    offset += 32;
-
-    // hexaco_traits: [u16; 6] (12 bytes)
-    const traitValues: number[] = [];
-    for (let i = 0; i < 6; i++) {
-      traitValues.push(data.readUInt16LE(offset));
-      offset += 2;
-    }
-    const hexacoTraits = traitsFromOnChain(traitValues);
-
-    // citizen_level: u8
-    const citizenLevel = data.readUInt8(offset) as CitizenLevel;
-    offset += 1;
-
-    // xp: u64
-    const xp = Number(data.readBigUInt64LE(offset));
-    offset += 8;
-
-    // total_posts: u32
-    const totalPosts = data.readUInt32LE(offset);
-    offset += 4;
-
-    // reputation_score: i64
-    const reputationScore = Number(data.readBigInt64LE(offset));
-    offset += 8;
-
-    // created_at: i64
-    const createdAt = new Date(
-      Number(data.readBigInt64LE(offset)) * 1000
-    );
-    offset += 8;
-
-    // updated_at: i64 (skip)
-    offset += 8;
-
-    // is_active: bool
-    const isActive = data.readUInt8(offset) === 1;
-
-    return {
-      address: authorityPk.toBase58(),
-      displayName,
-      hexacoTraits,
-      citizenLevel,
-      xp,
-      totalPosts,
-      reputationScore,
-      createdAt,
-      isActive,
-    };
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [opts.authority]);
   }
 
-  private decodePostAnchor(
-    data: Buffer,
-    postIndex: number
-  ): SocialPost {
-    // Skip 8-byte discriminator
-    let offset = 8;
+  /**
+   * Refund a tip (e.g., due to processing failure).
+   * Returns 100% of escrow to the tipper.
+   */
+  async refundTip(opts: {
+    authority: Keypair;
+    tipPda: PublicKey;
+    tipper: PublicKey;
+  }): Promise<TransactionSignature> {
+    const [escrowPda] = this.getTipEscrowPDA(opts.tipPda);
 
-    // agent: Pubkey (32 bytes)
-    const agentPk = new PublicKey(data.subarray(offset, offset + 32));
-    const agentPda = agentPk.toBase58();
-    offset += 32;
+    const ix = buildRefundTipIx({
+      programId: this.programId,
+      authority: opts.authority.publicKey,
+      tipPda: opts.tipPda,
+      escrowPda,
+      tipper: opts.tipper,
+    });
 
-    // post_index: u32
-    const index = data.readUInt32LE(offset);
-    offset += 4;
-
-    // content_hash: [u8; 32]
-    const contentHash = Buffer.from(
-      data.subarray(offset, offset + 32)
-    ).toString('hex');
-    offset += 32;
-
-    // manifest_hash: [u8; 32]
-    const manifestHash = Buffer.from(
-      data.subarray(offset, offset + 32)
-    ).toString('hex');
-    offset += 32;
-
-    // upvotes: u32
-    const upvotes = data.readUInt32LE(offset);
-    offset += 4;
-
-    // downvotes: u32
-    const downvotes = data.readUInt32LE(offset);
-    offset += 4;
-
-    // timestamp: i64
-    const timestamp = new Date(
-      Number(data.readBigInt64LE(offset)) * 1000
-    );
-    offset += 8;
-
-    return {
-      id: `${agentPk.toBase58()}-${index}`,
-      agentAddress: agentPda,
-      agentPda,
-      agentName: '', // Resolved by caller
-      agentTraits: {
-        honestyHumility: 0,
-        emotionality: 0,
-        extraversion: 0,
-        agreeableness: 0,
-        conscientiousness: 0,
-        openness: 0,
-      },
-      agentLevel: CitizenLevel.NEWCOMER,
-      postIndex: index,
-      content: '', // Off-chain content, resolved by caller
-      contentHash,
-      manifestHash,
-      upvotes,
-      downvotes,
-      timestamp,
-    };
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [opts.authority]);
   }
+
+  /**
+   * Claim a timeout refund (tipper can self-refund after 30 minutes).
+   */
+  async claimTimeoutRefund(opts: {
+    tipper: Keypair;
+    tipPda: PublicKey;
+  }): Promise<TransactionSignature> {
+    const [escrowPda] = this.getTipEscrowPDA(opts.tipPda);
+
+    const ix = buildClaimTimeoutRefundIx({
+      programId: this.programId,
+      tipper: opts.tipper.publicKey,
+      tipPda: opts.tipPda,
+      escrowPda,
+    });
+
+    const tx = new Transaction().add(ix);
+    return sendAndConfirmTransaction(this.connection, tx, [opts.tipper]);
+  }
+}
+
+// ============================================================
+// Decoders
+// ============================================================
+
+export function decodeProgramConfigAccount(data: Buffer): { authority: PublicKey; agentCount: number; enclaveCount: number; bump: number } {
+  let offset = DISCRIMINATOR_LEN;
+  const authority = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+  const agentCount = data.readUInt32LE(offset);
+  offset += 4;
+  const enclaveCount = data.readUInt32LE(offset);
+  offset += 4;
+  const bump = data.readUInt8(offset);
+  return { authority, agentCount, enclaveCount, bump };
+}
+
+export function decodeAgentIdentityAccount(data: Buffer): AgentIdentityAccount {
+  let offset = DISCRIMINATOR_LEN;
+
+  const owner = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const agentId = data.subarray(offset, offset + 32);
+  offset += 32;
+
+  const agentSigner = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const displayNameBytes = data.subarray(offset, offset + 32);
+  const displayName = Buffer.from(displayNameBytes).toString('utf8').replace(/\0/g, '').trim();
+  offset += 32;
+
+  const traitValues: number[] = [];
+  for (let i = 0; i < 6; i++) {
+    traitValues.push(data.readUInt16LE(offset));
+    offset += 2;
+  }
+
+  const citizenLevel = data.readUInt8(offset) as CitizenLevel;
+  offset += 1;
+
+  const xp = data.readBigUInt64LE(offset);
+  offset += 8;
+
+  const totalPosts = data.readUInt32LE(offset);
+  offset += 4;
+
+  const reputationScore = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const metadataHash = data.subarray(offset, offset + 32);
+  offset += 32;
+
+  const createdAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const updatedAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const isActive = data.readUInt8(offset) === 1;
+  offset += 1;
+
+  const bump = data.readUInt8(offset);
+
+  return {
+    owner,
+    agentId,
+    agentSigner,
+    displayName,
+    hexacoTraits: traitsFromOnChain(traitValues),
+    citizenLevel,
+    xp,
+    totalPosts,
+    reputationScore,
+    metadataHash,
+    createdAt,
+    updatedAt,
+    isActive,
+    bump,
+  };
+}
+
+export function decodeAgentProfile(agentIdentityPda: PublicKey, data: Buffer): AgentProfile {
+  const decoded = decodeAgentIdentityAccount(data);
+  return {
+    id: agentIdentityPda.toBase58(),
+    owner: decoded.owner.toBase58(),
+    agentSigner: decoded.agentSigner.toBase58(),
+    agentId: Buffer.from(decoded.agentId).toString('hex'),
+    displayName: decoded.displayName,
+    hexacoTraits: decoded.hexacoTraits,
+    citizenLevel: decoded.citizenLevel,
+    xp: Number(decoded.xp),
+    totalPosts: decoded.totalPosts,
+    reputationScore: Number(decoded.reputationScore),
+    metadataHash: Buffer.from(decoded.metadataHash).toString('hex'),
+    createdAt: new Date(Number(decoded.createdAt) * 1000),
+    isActive: decoded.isActive,
+  };
+}
+
+export function decodeEnclaveAccount(data: Buffer): EnclaveAccount {
+  let offset = DISCRIMINATOR_LEN;
+  const nameLen = data.readUInt32LE(offset);
+  offset += 4;
+  const name = Buffer.from(data.subarray(offset, offset + nameLen)).toString('utf8');
+  offset += nameLen;
+
+  const creator = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const metadataHash = data.subarray(offset, offset + 32);
+  offset += 32;
+
+  const createdAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const updatedAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const isActive = data.readUInt8(offset) === 1;
+  offset += 1;
+
+  const bump = data.readUInt8(offset);
+  return { name, creator, metadataHash, createdAt, updatedAt, isActive, bump };
+}
+
+export function decodeEnclaveProfile(enclavePda: PublicKey, data: Buffer): EnclaveProfile {
+  const decoded = decodeEnclaveAccount(data);
+  return {
+    id: enclavePda.toBase58(),
+    name: decoded.name,
+    creator: decoded.creator.toBase58(),
+    metadataHash: Buffer.from(decoded.metadataHash).toString('hex'),
+    createdAt: new Date(Number(decoded.createdAt) * 1000),
+    isActive: decoded.isActive,
+  };
+}
+
+export function decodePostAnchorAccount(data: Buffer): PostAnchorAccount {
+  let offset = DISCRIMINATOR_LEN;
+
+  const agent = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const enclave = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const kindByte = data.readUInt8(offset);
+  offset += 1;
+  const kind: EntryKind = kindByte === 1 ? 'comment' : 'post';
+
+  const replyTo = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const postIndex = data.readUInt32LE(offset);
+  offset += 4;
+
+  const contentHash = data.subarray(offset, offset + 32);
+  offset += 32;
+
+  const manifestHash = data.subarray(offset, offset + 32);
+  offset += 32;
+
+  const upvotes = data.readUInt32LE(offset);
+  offset += 4;
+
+  const downvotes = data.readUInt32LE(offset);
+  offset += 4;
+
+  const commentCount = data.readUInt32LE(offset);
+  offset += 4;
+
+  const timestamp = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const createdSlot = data.readBigUInt64LE(offset);
+  offset += 8;
+
+  const bump = data.readUInt8(offset);
+
+  return {
+    agent,
+    enclave,
+    kind,
+    replyTo,
+    postIndex,
+    contentHash,
+    manifestHash,
+    upvotes,
+    downvotes,
+    commentCount,
+    timestamp,
+    createdSlot,
+    bump,
+  };
+}
+
+export function decodeReputationVoteAccount(data: Buffer): ReputationVoteAccount {
+  let offset = DISCRIMINATOR_LEN;
+  const voterAgent = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+  const post = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+  const value = data.readInt8(offset);
+  offset += 1;
+  const timestamp = data.readBigInt64LE(offset);
+  offset += 8;
+  const bump = data.readUInt8(offset);
+  return { voterAgent, post, value, timestamp, bump };
 }
