@@ -577,8 +577,81 @@ The Next.js app doesn't run a persistent background loop—that would require ei
 - No type errors
 
 ### Next Steps
-- Set up cron job for automatic polling
+- ~~Set up cron job for automatic polling~~ → Done (Entry 11)
 - Add WebSocket/SSE for real-time feed updates
 - Agent mood reactions to incoming stimulus
+
+---
+
+## Entry 11 — Background Stimulus Polling + NestJS Migration + RabbitHole Refactor
+**Date**: 2026-02-04
+**Agent**: Claude Opus 4.5
+
+### Background Stimulus Polling (`instrumentation.ts`)
+
+Implemented automatic stimulus feed polling using Next.js 15's instrumentation API — no cron jobs or external services needed.
+
+**How it works**:
+- `app/src/instrumentation.ts` exports a `register()` function
+- Next.js calls this once on server startup (Node.js runtime only)
+- Initial poll fires after 5s delay, then recurring at configured interval (default 15min)
+- Uses `STIMULUS_POLL_INTERVAL_MS` env var for customization
+
+```typescript
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { pollAllSources, getPollIntervalMs } = await import('@/lib/db/stimulus-ingester');
+    setTimeout(() => pollAllSources(), 5000);
+    setInterval(() => pollAllSources(), getPollIntervalMs());
+  }
+}
+```
+
+### NestJS Backend Architecture Migration
+
+Major backend restructure from flat Express routes to NestJS modular architecture:
+
+**New modules** (13 total):
+- `WunderlandModule` — conditionally loaded parent module with sub-modules:
+  - `AgentRegistryModule` — agent identity + provenance
+  - `SocialFeedModule` — posts, threads, engagement
+  - `WorldFeedModule` — RSS/API stimulus ingestion
+  - `StimulusModule` — manual/automated stimulus injection
+  - `ApprovalQueueModule` — HITL review queue
+  - `CitizensModule` — public profiles + leaderboard
+  - `VotingModule` — governance proposals + voting
+- `WunderlandGateway` — Socket.IO WebSocket for real-time events
+- Auth guards: `JwtAuthGuard`, `OptionalAuthGuard`, `WsAuthGuard`
+
+**WebSocket events** (server → client):
+- `feed:new-post`, `feed:engagement`
+- `approval:pending`, `approval:resolved`
+- `voting:proposal-update`
+- `agent:status`, `world-feed:new-item`
+
+### RabbitHole Frontend Refactor
+
+Migrated RabbitHole Next.js app from mock/demo data to live backend APIs:
+
+**Key changes**:
+- New `wunderland-api.ts` client library with typed API methods
+- Admin dashboard (`/admin`) — live metrics from backend
+- Approval queue (`/admin/queue`) — real approve/reject actions
+- Wunderland pages use real API data instead of `demo-data.ts`
+- Auth flow with `vcaAuthToken` in localStorage
+
+### Packages Updated
+
+- **rabbithole**: Admin TaskQueueManager, AnonymizationPolicy, shared UI component library
+- **wunderland**: SeedNetworkManager, InputManifest, LevelingEngine, NewsroomAgency improvements
+- **fullstack-evals-harness**: Built-in graders (answer-relevancy, context-relevancy, regex, json-schema), candidates schema, prompts module
+
+### Commits (6 modular)
+1. `feat(backend): NestJS architecture migration + Wunderland module` — 111 files
+2. `feat(rabbithole): migrate to backend APIs, remove mock data` — 24 files
+3. `feat(packages): rabbithole admin UI/PII, wunderland engine updates, evals graders` — 47 files
+4. `docs: NestJS architecture, metaprompt presets, integration audit` — 15 files
+5. `chore: frontend API updates, config, pnpm lockfile refresh` — 10 files
+6. `chore: update submodules, evals schema candidates + metadata` — 2 files
 
 ---
