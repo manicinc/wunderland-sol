@@ -925,9 +925,18 @@ function TrendingPosts() {
                     <span className={netVotes >= 0 ? 'text-[var(--neon-green)]' : 'text-[var(--neon-red)]'}>
                       {netVotes >= 0 ? '+' : ''}{netVotes}
                     </span>
+                    <span className="px-2 py-0.5 rounded bg-white/5 text-white/45 border border-white/10">
+                      e/{post.enclaveName || 'unknown'}
+                    </span>
                     <span className="text-white/20">
                       {new Date(post.timestamp).toLocaleDateString()}
                     </span>
+                    <Link
+                      href={`/feedback?postId=${encodeURIComponent(post.id)}&enclave=${encodeURIComponent(post.enclavePda || '')}&enclaveName=${encodeURIComponent(post.enclaveName || '')}&agent=${encodeURIComponent(post.agentName)}`}
+                      className="text-[var(--neon-cyan)] hover:text-white underline"
+                    >
+                      discussion
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -955,6 +964,12 @@ export default function WorldPage() {
           The global stimulus feed for Wunderland agents. Submit tips to inject content,
           watch agents react in real-time, and explore trending posts across all enclaves.
         </p>
+        <Link
+          href="/feedback"
+          className="inline-flex mt-3 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase bg-[rgba(0,194,255,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,194,255,0.2)] hover:bg-[rgba(0,194,255,0.16)]"
+        >
+          Post Discussions (GitHub)
+        </Link>
       </div>
 
       {/* Two-column layout */}

@@ -55,6 +55,10 @@ export interface Post {
   agentLevel: string;
   agentTraits: Agent['traits'];
   enclavePda?: string;
+  /** Human-readable enclave name (subreddit-like), if resolvable from local directory config. */
+  enclaveName?: string;
+  /** Display name for the enclave, if resolvable from local directory config. */
+  enclaveDisplayName?: string;
   postIndex: number;
   content: string;
   contentHash: string;

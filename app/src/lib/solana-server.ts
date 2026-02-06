@@ -6,6 +6,7 @@ import {
   PROGRAM_ID as DEFAULT_PROGRAM_ID,
   CLUSTER as DEFAULT_CLUSTER,
 } from './solana';
+import { getEnclaveDirectoryMapServer } from './enclave-directory-server';
 
 // ============================================================================
 // On-chain only (no demo / off-chain fallback)
@@ -175,7 +176,12 @@ function decodeAgentIdentityLegacy(_pda: PublicKey, data: Buffer): Agent {
   };
 }
 
-function decodePostAnchorCurrent(postPda: PublicKey, data: Buffer, agentByPda: Map<string, Agent>): Post {
+function decodePostAnchorCurrent(
+  postPda: PublicKey,
+  data: Buffer,
+  agentByPda: Map<string, Agent>,
+  enclaveDirectory: Map<string, { name: string; displayName: string }>,
+): Post {
   // Current layout:
   // discriminator(8) + agent(32) + enclave(32) + kind(1) + reply_to(32) +
   // post_index(4) + content_hash(32) + manifest_hash(32) + upvotes(4) + downvotes(4) +
@@ -188,6 +194,8 @@ function decodePostAnchorCurrent(postPda: PublicKey, data: Buffer, agentByPda: M
 
   const enclavePda = new PublicKey(data.subarray(offset, offset + 32)).toBase58();
   offset += 32;
+
+  const enclaveInfo = enclaveDirectory.get(enclavePda);
 
   const kindByte = data.readUInt8(offset);
   const kind: Post['kind'] = kindByte === 1 ? 'comment' : 'post';
@@ -240,6 +248,8 @@ function decodePostAnchorCurrent(postPda: PublicKey, data: Buffer, agentByPda: M
       openness: 0.5,
     },
     enclavePda,
+    enclaveName: enclaveInfo?.name,
+    enclaveDisplayName: enclaveInfo?.displayName,
     postIndex,
     content: '',
     contentHash,
@@ -252,7 +262,11 @@ function decodePostAnchorCurrent(postPda: PublicKey, data: Buffer, agentByPda: M
   };
 }
 
-function decodePostAnchorLegacy(postPda: PublicKey, data: Buffer, agentByPda: Map<string, Agent>): Post {
+function decodePostAnchorLegacy(
+  postPda: PublicKey,
+  data: Buffer,
+  agentByPda: Map<string, Agent>,
+): Post {
   // Legacy layout:
   // discriminator(8) + agent(32) + post_index(4) + content_hash(32) + manifest_hash(32) +
   // upvotes(4) + downvotes(4) + timestamp(8) + bump(1)
@@ -308,9 +322,14 @@ function decodePostAnchorLegacy(postPda: PublicKey, data: Buffer, agentByPda: Ma
   };
 }
 
-function decodePostAnchor(postPda: PublicKey, data: Buffer, agentByPda: Map<string, Agent>): Post {
+function decodePostAnchor(
+  postPda: PublicKey,
+  data: Buffer,
+  agentByPda: Map<string, Agent>,
+  enclaveDirectory: Map<string, { name: string; displayName: string }>,
+): Post {
   try {
-    return decodePostAnchorCurrent(postPda, data, agentByPda);
+    return decodePostAnchorCurrent(postPda, data, agentByPda, enclaveDirectory);
   } catch {
     return decodePostAnchorLegacy(postPda, data, agentByPda);
   }
@@ -382,6 +401,7 @@ export async function getAllPostsServer(opts?: {
   try {
     const connection = new Connection(cfg.rpcUrl, 'confirmed');
     const programId = new PublicKey(cfg.programId);
+    const enclaveDirectory = getEnclaveDirectoryMapServer(programId);
 
     // Fetch agents first so posts can be resolved to authority + display name.
     const agentAccounts = await getProgramAccountsBySize(connection, programId, [
@@ -408,7 +428,7 @@ export async function getAllPostsServer(opts?: {
     const posts = postAccounts
       .map((acc) => {
         try {
-          return decodePostAnchor(acc.pubkey, acc.account.data, agentByPda);
+          return decodePostAnchor(acc.pubkey, acc.account.data, agentByPda, enclaveDirectory);
         } catch {
           return null;
         }
@@ -513,6 +533,7 @@ export async function getNetworkGraphServer(opts?: {
 
   const connection = new Connection(cfg.rpcUrl, 'confirmed');
   const programId = new PublicKey(cfg.programId);
+  const enclaveDirectory = getEnclaveDirectoryMapServer(programId);
 
   const agentAccounts = await getProgramAccountsBySize(connection, programId, [
     ACCOUNT_SIZE_AGENT_IDENTITY_CURRENT,
@@ -541,7 +562,7 @@ export async function getNetworkGraphServer(opts?: {
   const postAuthorByPostPda = new Map<string, string>();
   for (const acc of postAccounts) {
     try {
-      const post = decodePostAnchor(acc.pubkey, acc.account.data, agentByPda);
+      const post = decodePostAnchor(acc.pubkey, acc.account.data, agentByPda, enclaveDirectory);
       const agent = agentByPda.get(post.agentPda || '');
       if (!agent) continue;
       postAuthorByPostPda.set(acc.pubkey.toBase58(), agent.address);

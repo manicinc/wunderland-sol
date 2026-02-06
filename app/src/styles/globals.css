@@ -179,6 +179,174 @@ body::before {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
+}
+
+/* Logo wordmark — robust gradient text clipping */
+.wl-logo-wordmark {
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+/* ---- Nav Dropdown ---- */
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -12px;
+  min-width: 220px;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: nav-dropdown-in 0.15s ease-out;
+  z-index: 100;
+}
+
+html.light .nav-dropdown {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes nav-dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.nav-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+html.light .nav-dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.nav-dropdown-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+html.light .nav-dropdown-icon {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ---- Nav Search ---- */
+.nav-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-search-btn:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
+}
+
+html.light .nav-search-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+html.light .nav-search-btn:hover {
+  border-color: var(--wl-blue);
+  color: var(--wl-blue);
+  background: rgba(14, 165, 233, 0.05);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.1);
+}
+
+.nav-search-expanded {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.08);
+  animation: search-expand 0.2s ease-out;
+}
+
+html.light .nav-search-expanded {
+  border-color: rgba(14, 165, 233, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.08);
+}
+
+@keyframes search-expand {
+  from { width: 32px; opacity: 0.5; }
+  to { width: 200px; opacity: 1; }
+}
+
+.nav-search-icon-inner {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.nav-search-input {
+  width: 140px;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--text-primary);
+}
+
+.nav-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.nav-search-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-tertiary);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nav-search-close:hover {
+  background: rgba(255, 59, 102, 0.15);
+  color: var(--neon-red);
 }
 
 /* ---- Scan Lines ---- */
@@ -655,6 +823,220 @@ body::before {
   transform: translateY(-1px);
 }
 
+/* ---- Wallet Button (Mystical Glass) ---- */
+.wallet-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+}
+
+.wallet-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.wallet-btn-border {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: conic-gradient(
+    from var(--btn-angle, 0deg),
+    var(--neon-cyan) 0%,
+    var(--sol-purple) 25%,
+    var(--neon-cyan) 50%,
+    var(--sol-purple) 75%,
+    var(--neon-cyan) 100%
+  );
+  opacity: 0.3;
+  animation: btn-rotate 6s linear infinite;
+  transition: opacity 0.3s ease;
+}
+
+.wallet-btn-border-green {
+  background: conic-gradient(
+    from var(--btn-angle, 0deg),
+    var(--neon-green) 0%,
+    var(--neon-cyan) 25%,
+    var(--neon-green) 50%,
+    var(--neon-cyan) 75%,
+    var(--neon-green) 100%
+  );
+}
+
+.wallet-btn-fill {
+  position: absolute;
+  inset: 1px;
+  border-radius: 13px;
+  background: rgba(10, 10, 15, 0.88);
+  backdrop-filter: blur(12px);
+  transition: background 0.3s ease;
+}
+
+.wallet-btn-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.65);
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.wallet-btn-label {
+  font-weight: 600;
+}
+
+.wallet-btn-phantom {
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 0px transparent);
+}
+
+.wallet-btn:hover .wallet-btn-border {
+  opacity: 0.7;
+}
+
+.wallet-btn:hover .wallet-btn-fill {
+  background: rgba(15, 15, 24, 0.92);
+}
+
+.wallet-btn:hover .wallet-btn-content {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.wallet-btn:hover .wallet-btn-phantom {
+  opacity: 1;
+}
+
+.wallet-btn:hover {
+  transform: translateY(-2px);
+}
+
+.wallet-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Connect state — cyan glow */
+.wallet-btn-connect:hover {
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.2), 0 0 48px rgba(0, 240, 255, 0.08);
+}
+
+.wallet-btn-connect:hover .wallet-btn-content {
+  color: var(--neon-cyan);
+}
+
+.wallet-btn-connect:hover .wallet-btn-phantom {
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.5));
+  color: var(--neon-cyan);
+}
+
+/* Connected state — green glow */
+.wallet-btn-connected:hover {
+  box-shadow: 0 0 24px rgba(20, 241, 149, 0.2), 0 0 48px rgba(20, 241, 149, 0.08);
+}
+
+.wallet-btn-connected .wallet-btn-content {
+  color: var(--neon-green);
+}
+
+/* Install state — purple glow */
+.wallet-btn-install:hover {
+  box-shadow: 0 0 24px rgba(153, 69, 255, 0.2), 0 0 48px rgba(153, 69, 255, 0.08);
+}
+
+.wallet-btn-install:hover .wallet-btn-content {
+  color: var(--sol-purple);
+}
+
+.wallet-btn-install:hover .wallet-btn-phantom {
+  filter: drop-shadow(0 0 6px rgba(153, 69, 255, 0.5));
+  color: var(--sol-purple);
+}
+
+.wallet-btn-install .wallet-btn-border {
+  background: conic-gradient(
+    from var(--btn-angle, 0deg),
+    var(--sol-purple) 0%,
+    var(--neon-magenta) 25%,
+    var(--sol-purple) 50%,
+    var(--neon-magenta) 75%,
+    var(--sol-purple) 100%
+  );
+}
+
+/* Live dot indicator */
+.wallet-btn-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  flex-shrink: 0;
+}
+
+.wallet-btn-dot-live {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  opacity: 0.4;
+  animation: wallet-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes wallet-dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Light mode */
+html.light .wallet-btn-fill {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+html.light .wallet-btn:hover .wallet-btn-fill {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+html.light .wallet-btn-content {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html.light .wallet-btn:hover .wallet-btn-content {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+html.light .wallet-btn-connected .wallet-btn-content {
+  color: #059669;
+}
+
+html.light .wallet-btn-connect:hover .wallet-btn-content {
+  color: var(--wl-blue-dark);
+}
+
+/* Wallet mobile — icon only */
+@media (max-width: 640px) {
+  .wallet-btn {
+    padding: 8px 10px;
+  }
+  .wallet-btn-label {
+    display: none;
+  }
+}
+
 /* ---- Comment Thread Lines ---- */
 .comment-thread-line {
   position: relative;
@@ -887,3 +1269,425 @@ html.light .aurora-orb-3 { opacity: 0.03; background: var(--wl-blue-light); }
 html.light .looking-glass-radar { mix-blend-mode: multiply; }
 html.light .looking-glass-reflection { opacity: 0.12; }
 html.light .hero-title-glow::after { opacity: 0.15; }
+
+/* ============================================================
+   MINT WIZARD
+   ============================================================ */
+
+/* Step indicator */
+.mint-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.mint-step-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.mint-step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-tertiary);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.mint-step-active {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.15);
+}
+
+.mint-step-done {
+  border-color: var(--neon-green);
+  background: rgba(20, 241, 149, 0.1);
+  color: var(--neon-green);
+}
+
+.mint-step-label {
+  display: none;
+}
+
+.mint-step-line {
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 8px;
+}
+
+@media (min-width: 640px) {
+  .mint-step-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-left: 6px;
+    margin-right: 6px;
+    text-transform: uppercase;
+  }
+  .mint-step-line { width: 48px; }
+}
+
+/* Pricing tiers */
+.mint-pricing-tier {
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.mint-pricing-active {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.08);
+}
+
+/* CTA button */
+.mint-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 28px;
+  border-radius: 14px;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  color: #0a0a0f;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--sol-green));
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.mint-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.3), 0 0 48px rgba(20, 241, 149, 0.1);
+}
+
+.mint-cta:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.mint-cta-big {
+  padding: 14px 40px;
+  font-size: 15px;
+}
+
+/* Inputs */
+.mint-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'Inter', system-ui, sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.mint-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
+}
+
+.mint-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.mint-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: 'Inter', system-ui, sans-serif;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s ease;
+}
+
+.mint-textarea:focus {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
+}
+
+.mint-textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Trait slider */
+.mint-trait-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mint-trait-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.mint-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+  cursor: pointer;
+}
+
+.mint-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--slider-color, var(--neon-cyan));
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--slider-color, var(--neon-cyan)) 40%, transparent);
+  transition: box-shadow 0.2s ease;
+}
+
+.mint-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--slider-color, var(--neon-cyan)) 60%, transparent);
+}
+
+.mint-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--slider-color, var(--neon-cyan));
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+/* Preset buttons */
+.mint-preset-btn {
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mint-preset-btn:hover {
+  border-color: var(--sol-purple);
+  background: rgba(153, 69, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* Nav button */
+.mint-nav-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mint-nav-btn:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+}
+
+.mint-nav-btn-warn {
+  border-color: rgba(255, 215, 0, 0.3);
+  color: var(--neon-gold);
+}
+
+.mint-nav-btn-done {
+  border-color: rgba(20, 241, 149, 0.3);
+  color: var(--neon-green);
+}
+
+/* Checkbox */
+.mint-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mint-checkbox:has(input:checked) {
+  border-color: var(--neon-green);
+  background: rgba(20, 241, 149, 0.06);
+  color: var(--neon-green);
+}
+
+.mint-checkbox input {
+  accent-color: var(--neon-green);
+}
+
+/* Summary card */
+.mint-summary {
+  position: relative;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+}
+
+.mint-summary::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, var(--sol-purple), var(--neon-cyan), var(--sol-green));
+  background-size: 300% 300%;
+  animation: gradient-rotate 6s linear infinite;
+  z-index: -1;
+  opacity: 0.2;
+}
+
+/* Success animation */
+.mint-success-glow {
+  display: inline-block;
+  animation: mint-success-pulse 2s ease-in-out infinite;
+}
+
+@keyframes mint-success-pulse {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(20, 241, 149, 0.3)); }
+  50% { filter: drop-shadow(0 0 32px rgba(20, 241, 149, 0.6)); }
+}
+
+/* Spinner */
+.mint-spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--neon-cyan);
+  animation: mint-spin 0.8s linear infinite;
+}
+
+@keyframes mint-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Light mode overrides */
+html.light .mint-step-dot {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.02);
+}
+html.light .mint-step-active {
+  border-color: var(--wl-blue);
+  background: rgba(14, 165, 233, 0.08);
+  color: var(--wl-blue);
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.1);
+}
+html.light .mint-step-done {
+  border-color: #059669;
+  background: rgba(5, 150, 105, 0.08);
+  color: #059669;
+}
+html.light .mint-step-line {
+  background: rgba(0, 0, 0, 0.08);
+}
+html.light .mint-pricing-tier {
+  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+}
+html.light .mint-pricing-active {
+  border-color: var(--wl-blue);
+  background: rgba(14, 165, 233, 0.05);
+}
+html.light .mint-cta {
+  color: #fff;
+  background: linear-gradient(135deg, var(--wl-blue), #059669);
+}
+html.light .mint-input,
+html.light .mint-textarea {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.02);
+}
+html.light .mint-input:focus,
+html.light .mint-textarea:focus {
+  border-color: var(--wl-blue);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.1);
+}
+html.light .mint-slider {
+  background: rgba(0, 0, 0, 0.08);
+}
+html.light .mint-preset-btn {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+html.light .mint-preset-btn:hover {
+  border-color: var(--wl-blue);
+  background: rgba(14, 165, 233, 0.05);
+}
+html.light .mint-nav-btn {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+html.light .mint-nav-btn:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.04);
+}
+html.light .mint-checkbox {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+html.light .mint-checkbox:has(input:checked) {
+  border-color: #059669;
+  background: rgba(5, 150, 105, 0.06);
+  color: #059669;
+}
+html.light .mint-summary {
+  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.8);
+}
