@@ -582,8 +582,8 @@ html.light .nav-search-expanded {
   animation: wl-shimmer 4s linear infinite;
 }
 
-/* ---- Looking Glass Hero ---- */
-.looking-glass-container {
+/* ---- HEXACO Hero ---- */
+.hexaco-hero-container {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -648,55 +648,130 @@ html.light .nav-search-expanded {
   100% { transform: translateX(-50%) translate(-15px, 10px) scale(0.9); opacity: 0.03; }
 }
 
-.looking-glass-visual {
+/* Central HEXACO visual area */
+.hexaco-hero-visual {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 400px;
+  height: 400px;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.looking-glass-frame {
+/* The radar itself — front and center */
+.hexaco-hero-radar {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   animation: float 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(153, 69, 255, 0.15));
+  transition: filter 500ms ease;
 }
 
-.looking-glass-radar {
+.hexaco-hero-radar:hover {
+  filter: drop-shadow(0 0 40px rgba(153, 69, 255, 0.25));
+}
+
+/* Orbit ring behind the avatars */
+.hexaco-hero-orbit-ring {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 340px;
+  height: 340px;
   transform: translate(-50%, -50%);
-  z-index: 2;
-  mix-blend-mode: screen;
-  transition: all 700ms ease;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  z-index: 0;
+  animation: orbit-ring-rotate 60s linear infinite;
 }
 
-.looking-glass-agent-badge {
+@keyframes orbit-ring-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Orbiting agent avatars */
+.hexaco-hero-orbit-avatar {
   position: absolute;
-  bottom: -12px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  z-index: 3;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  border-radius: 50%;
+  transition: all 400ms ease;
+  opacity: 0.5;
+}
+
+.hexaco-hero-orbit-avatar:hover {
+  opacity: 0.85;
+  transform: translate(var(--tx, 0), var(--ty, 0)) scale(1.2) !important;
+}
+
+.hexaco-hero-orbit-active {
+  opacity: 1;
+  transform: translate(var(--tx, 0), var(--ty, 0)) scale(1.15) !important;
+  filter: drop-shadow(0 0 12px rgba(153, 69, 255, 0.4));
+}
+
+/* Agent badge below the radar */
+.hexaco-hero-badge {
   text-align: center;
   z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  transition: opacity 500ms ease;
+  margin-top: 8px;
+  transition: all 500ms ease;
 }
 
-.looking-glass-reflection {
-  position: relative;
-  z-index: 0;
-  transform: scaleY(-1);
-  height: 100px;
+/* Compact trait breakdown bars */
+.hexaco-hero-traits {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  z-index: 3;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hexaco-hero-trait-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hexaco-hero-trait-key {
+  font-size: 10px;
+  font-weight: 800;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  width: 14px;
+  text-align: center;
+}
+
+.hexaco-hero-trait-bar {
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0));
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0));
-  opacity: 0.2;
-  margin-top: -32px;
-  pointer-events: none;
-  filter: blur(2px);
+}
+
+.hexaco-hero-trait-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 700ms ease;
+}
+
+.hexaco-hero-trait-val {
+  font-size: 9px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--text-tertiary);
+  width: 18px;
 }
 
 .crossfade-text-container {
@@ -763,18 +838,30 @@ html.light .nav-search-expanded {
 }
 
 @media (max-width: 640px) {
-  .looking-glass-visual {
-    width: 240px;
-    height: 240px;
+  .hexaco-hero-visual {
+    width: 300px;
+    height: 300px;
   }
 
-  .looking-glass-reflection {
-    height: 60px;
-    margin-top: -20px;
+  .hexaco-hero-orbit-ring {
+    width: 260px;
+    height: 260px;
+  }
+
+  .hexaco-hero-orbit-avatar {
+    display: none;
   }
 
   .crossfade-text-container {
     height: 3em;
+  }
+
+  .hexaco-hero-traits {
+    gap: 4px;
+  }
+
+  .hexaco-hero-trait-bar {
+    width: 24px;
   }
 }
 
@@ -1262,12 +1349,13 @@ html.light .social-icon-link:hover {
   background: rgba(201, 162, 39, 0.1);
 }
 
-/* Light mode: Looking glass hero */
+/* Light mode: HEXACO hero */
 html.light .aurora-orb-1 { opacity: 0.05; background: var(--wl-blue); }
 html.light .aurora-orb-2 { opacity: 0.04; background: var(--wl-gold); }
 html.light .aurora-orb-3 { opacity: 0.03; background: var(--wl-blue-light); }
-html.light .looking-glass-radar { mix-blend-mode: multiply; }
-html.light .looking-glass-reflection { opacity: 0.12; }
+html.light .hexaco-hero-radar { filter: drop-shadow(0 0 20px rgba(14, 165, 233, 0.1)); }
+html.light .hexaco-hero-orbit-ring { border-color: rgba(0, 0, 0, 0.06); }
+html.light .hexaco-hero-trait-bar { background: rgba(0, 0, 0, 0.06); }
 html.light .hero-title-glow::after { opacity: 0.15; }
 
 /* ============================================================
