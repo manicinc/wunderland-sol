@@ -414,6 +414,202 @@ body::before {
   animation: wl-shimmer 4s linear infinite;
 }
 
+/* ---- Looking Glass Hero ---- */
+.looking-glass-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.aurora-bg {
+  position: absolute;
+  inset: -200px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(150px);
+  will-change: transform, opacity;
+}
+
+.aurora-orb-1 {
+  width: 500px; height: 500px;
+  top: 10%; left: 15%;
+  background: var(--sol-purple);
+  opacity: 0.08;
+  animation: aurora-drift-1 12s ease-in-out infinite alternate;
+}
+
+.aurora-orb-2 {
+  width: 400px; height: 400px;
+  bottom: 15%; right: 10%;
+  background: var(--sol-green);
+  opacity: 0.06;
+  animation: aurora-drift-2 15s ease-in-out infinite alternate;
+}
+
+.aurora-orb-3 {
+  width: 350px; height: 350px;
+  top: 40%; left: 50%;
+  transform: translateX(-50%);
+  background: var(--neon-cyan);
+  opacity: 0.04;
+  animation: aurora-drift-3 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift-1 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.08; }
+  50% { transform: translate(40px, -30px) scale(1.1); opacity: 0.12; }
+  100% { transform: translate(-20px, 20px) scale(0.95); opacity: 0.06; }
+}
+
+@keyframes aurora-drift-2 {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.06; }
+  50% { transform: translate(-30px, 20px) scale(1.15); opacity: 0.09; }
+  100% { transform: translate(25px, -15px) scale(0.9); opacity: 0.05; }
+}
+
+@keyframes aurora-drift-3 {
+  0% { transform: translateX(-50%) translate(0, 0) scale(1); opacity: 0.04; }
+  50% { transform: translateX(-50%) translate(20px, -25px) scale(1.2); opacity: 0.07; }
+  100% { transform: translateX(-50%) translate(-15px, 10px) scale(0.9); opacity: 0.03; }
+}
+
+.looking-glass-visual {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  z-index: 1;
+}
+
+.looking-glass-frame {
+  position: relative;
+  z-index: 1;
+  animation: float 6s ease-in-out infinite;
+}
+
+.looking-glass-radar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  mix-blend-mode: screen;
+  transition: all 700ms ease;
+}
+
+.looking-glass-agent-badge {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: opacity 500ms ease;
+}
+
+.looking-glass-reflection {
+  position: relative;
+  z-index: 0;
+  transform: scaleY(-1);
+  height: 100px;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0));
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0));
+  opacity: 0.2;
+  margin-top: -32px;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.crossfade-text-container {
+  position: relative;
+  height: 2em;
+  overflow: hidden;
+}
+
+.crossfade-phrase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 800ms ease-in-out;
+}
+
+.crossfade-phrase.crossfade-active {
+  opacity: 1;
+}
+
+.hero-title-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--wl-blue) 0%,
+    var(--wl-shimmer) 20%,
+    #fff 40%,
+    var(--wl-gold-light) 60%,
+    var(--wl-gold) 80%,
+    var(--wl-blue) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: wl-shimmer 4s linear infinite;
+}
+
+.hero-title-glow {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title-glow::after {
+  content: '';
+  position: absolute;
+  inset: -8px -16px;
+  background: linear-gradient(
+    90deg,
+    var(--wl-blue) 0%,
+    var(--wl-shimmer) 25%,
+    var(--wl-gold-light) 75%,
+    var(--wl-gold) 100%
+  );
+  background-size: 200% 100%;
+  animation: wl-shimmer 4s linear infinite;
+  filter: blur(24px);
+  opacity: 0.25;
+  z-index: -1;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .looking-glass-visual {
+    width: 240px;
+    height: 240px;
+  }
+
+  .looking-glass-reflection {
+    height: 60px;
+    margin-top: -20px;
+  }
+
+  .crossfade-text-container {
+    height: 3em;
+  }
+}
+
 /* ---- Selection ---- */
 ::selection {
   background: rgba(153, 69, 255, 0.3);
@@ -683,3 +879,11 @@ html.light .social-icon-link:hover {
   color: #b8921f;
   background: rgba(201, 162, 39, 0.1);
 }
+
+/* Light mode: Looking glass hero */
+html.light .aurora-orb-1 { opacity: 0.05; background: var(--wl-blue); }
+html.light .aurora-orb-2 { opacity: 0.04; background: var(--wl-gold); }
+html.light .aurora-orb-3 { opacity: 0.03; background: var(--wl-blue-light); }
+html.light .looking-glass-radar { mix-blend-mode: multiply; }
+html.light .looking-glass-reflection { opacity: 0.12; }
+html.light .hero-title-glow::after { opacity: 0.15; }

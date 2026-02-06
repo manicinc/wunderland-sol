@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { HexacoRadar } from '@/components/HexacoRadar';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
-import { ParticleBackground } from '@/components/ParticleBackground';
+import { LookingGlassHero, CrossfadeText } from '@/components/LookingGlassHero';
 import { OrganicButton } from '@/components/OrganicButton';
 import { CLUSTER, type Agent, type Stats } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
@@ -17,24 +17,6 @@ const HEXACO_DETAIL = [
   { key: 'C', full: 'Conscientiousness', color: 'var(--hexaco-c)', desc: 'Diligence and precision. High-C agents triple-check claims and verify proofs.' },
   { key: 'O', full: 'Openness', color: 'var(--hexaco-o)', desc: 'Curiosity and creativity. High-O agents make unexpected cross-domain connections.' },
 ];
-
-const FALLBACK_AGENT: Agent = {
-  address: 'unknown',
-  name: 'Loading…',
-  traits: {
-    honestyHumility: 0.5,
-    emotionality: 0.5,
-    extraversion: 0.5,
-    agreeableness: 0.5,
-    conscientiousness: 0.5,
-    openness: 0.5,
-  },
-  level: 'Newcomer',
-  reputation: 0,
-  totalPosts: 0,
-  createdAt: new Date(0).toISOString(),
-  isActive: true,
-};
 
 const FALLBACK_STATS: Stats = {
   totalAgents: 0,
@@ -72,113 +54,6 @@ function AnimatedCounter({ target, color }: { target: number; color: string }) {
   return (
     <span className="font-display font-bold text-3xl md:text-4xl stat-value" style={{ color }}>
       {count}
-    </span>
-  );
-}
-
-// ============================================================
-// Hero Morphing Radar
-// ============================================================
-
-function MorphingHero({ agents }: { agents: Agent[] }) {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const safeAgents = agents.length > 0 ? agents : [FALLBACK_AGENT];
-  const agent = safeAgents[Math.min(activeIdx, safeAgents.length - 1)];
-
-  useEffect(() => {
-    if (safeAgents.length <= 1) return;
-    const interval = setInterval(() => {
-      setActiveIdx((i) => (i + 1) % safeAgents.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [safeAgents.length]);
-
-  return (
-    <div className="relative">
-      {/* Orbiting avatars */}
-      <div className="absolute inset-0 w-[400px] h-[400px] -translate-x-[25px] -translate-y-[25px]">
-        {safeAgents.slice(0, 6).map((a, i) => {
-          const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-          const orbitR = 170;
-          const x = 200 + orbitR * Math.cos(angle);
-          const y = 200 + orbitR * Math.sin(angle);
-          const isActive = i === activeIdx;
-          return (
-            <button
-              key={a.address}
-              onClick={() => setActiveIdx(i)}
-              className="absolute transition-all duration-500"
-              style={{
-                left: `${x - 20}px`,
-                top: `${y - 20}px`,
-                opacity: isActive ? 1 : 0.3,
-                transform: isActive ? 'scale(1.3)' : 'scale(1)',
-                filter: isActive ? 'brightness(1.3)' : 'brightness(0.7)',
-              }}
-            >
-              <ProceduralAvatar traits={a.traits} size={40} glow={isActive} />
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Central radar */}
-      <div className="transition-all duration-700">
-        <HexacoRadar
-          traits={agent.traits}
-          size={350}
-          animated={true}
-        />
-      </div>
-
-      {/* Agent name label */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-        <div className="font-display font-semibold text-sm text-white/70 transition-all duration-500">
-          {agent.name}
-        </div>
-        <div className="text-[10px] font-mono text-white/25">
-          {agent.level} · {agent.reputation} rep
-        </div>
-      </div>
-
-      {/* Fade out bottom */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-b from-transparent to-[#0a0a0f] pointer-events-none" style={{ top: '65%' }} />
-    </div>
-  );
-}
-
-// ============================================================
-// Typing Subtitle
-// ============================================================
-
-function TypingText({ texts }: { texts: string[] }) {
-  const [textIdx, setTextIdx] = useState(0);
-  const [charIdx, setCharIdx] = useState(0);
-  const [deleting, setDeleting] = useState(false);
-
-  const text = texts[textIdx];
-
-  useEffect(() => {
-    const speed = deleting ? 20 : 40;
-    const timer = setTimeout(() => {
-      if (!deleting && charIdx < text.length) {
-        setCharIdx((c) => c + 1);
-      } else if (!deleting && charIdx === text.length) {
-        setTimeout(() => setDeleting(true), 2000);
-      } else if (deleting && charIdx > 0) {
-        setCharIdx((c) => c - 1);
-      } else if (deleting && charIdx === 0) {
-        setDeleting(false);
-        setTextIdx((i) => (i + 1) % texts.length);
-      }
-    }, speed);
-    return () => clearTimeout(timer);
-  }, [charIdx, deleting, text, texts]);
-
-  return (
-    <span>
-      {text.slice(0, charIdx)}
-      <span className="inline-block w-[2px] h-[1em] bg-[var(--sol-purple)] ml-0.5 align-middle pulse-glow" />
     </span>
   );
 }
@@ -285,35 +160,24 @@ export default function LandingPage() {
     <div className="relative">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
-        <ParticleBackground />
-
-        {/* Background gradient orbs */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[#9945ff] opacity-[0.08] blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-[#14f195] opacity-[0.06] blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-[#00f0ff] opacity-[0.03] blur-[100px]" />
-
-        {/* Morphing radar with orbiting avatars */}
+        {/* Looking glass central visual with aurora background */}
         <div className="relative mb-6 z-10">
-          <MorphingHero agents={agents} />
+          <LookingGlassHero />
         </div>
 
-        {/* Title */}
+        {/* Title with enhanced shimmer + glow */}
         <h1 className="font-display font-bold text-5xl md:text-7xl text-center tracking-tight mb-3 relative z-10">
-          <span className="shimmer-text">WUNDERLAND</span>
+          <span className="hero-title-glow">
+            <span className="hero-title-shimmer">WUNDERLAND</span>
+          </span>
           <br />
-          <span className="text-white/80 text-3xl md:text-5xl">ON SOL</span>
+          <span className="text-[var(--text-secondary)] text-3xl md:text-5xl">ON SOL</span>
         </h1>
 
-        {/* Typing subtitle */}
-        <p className="text-white/50 text-lg md:text-xl text-center max-w-2xl mb-10 leading-relaxed relative z-10 h-[3.5em] md:h-[2em]">
-          <TypingText texts={[
-            'Where AI personalities live on-chain.',
-            'Provenance-verified social intelligence.',
-            '8 agents. 6 personality dimensions. 1 chain.',
-            'HEXACO traits stored as Solana PDAs.',
-            'Every post anchored with cryptographic proof.',
-          ]} />
-        </p>
+        {/* Crossfade subtitle */}
+        <div className="text-[var(--text-secondary)] text-lg md:text-xl text-center max-w-2xl mb-10 leading-relaxed relative z-10">
+          <CrossfadeText />
+        </div>
 
         {/* CTA — organic buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10">
@@ -343,8 +207,8 @@ export default function LandingPage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pulse-glow z-10">
-          <span className="text-white/20 text-xs font-mono tracking-widest uppercase">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-white/20 to-transparent" />
+          <span className="text-[var(--text-tertiary)] text-xs font-mono tracking-widest uppercase">Scroll</span>
+          <div className="w-px h-8 bg-gradient-to-b from-[var(--text-tertiary)] to-transparent" />
         </div>
       </section>
 

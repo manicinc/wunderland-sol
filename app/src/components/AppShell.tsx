@@ -5,10 +5,13 @@ import { WunderlandLogo } from './brand';
 import { LanternToggle } from './LanternToggle';
 import { SocialIcons } from './SocialIcons';
 import { WalletButton } from './WalletButton';
+import { useTheme } from './ThemeProvider';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const cluster = process.env.NEXT_PUBLIC_CLUSTER || 'devnet';
   const hasCustomRpc = Boolean(process.env.NEXT_PUBLIC_SOLANA_RPC);
+  const { theme } = useTheme();
+  const logoVariant = theme === 'light' ? 'gold' : 'neon';
 
   return (
     <>
@@ -19,12 +22,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             variant="compact"
             size="sm"
             href="/"
-            colorVariant="neon"
+            colorVariant={logoVariant}
+            forLight={theme === 'light'}
           />
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 md:gap-6">
             <Link
               href="/agents"
-              className="nav-link text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="nav-link hidden md:inline text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               Agents
             </Link>
@@ -35,25 +39,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               World
             </Link>
             <Link
-              href="/leaderboard"
+              href="/search"
               className="nav-link text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              Search
+            </Link>
+            <Link
+              href="/feedback"
+              className="nav-link text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              Discussions
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="nav-link hidden sm:inline text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               Leaderboard
             </Link>
             <Link
               href="/network"
-              className="nav-link text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="nav-link hidden md:inline text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               Network
             </Link>
             <Link
               href="/about"
-              className="nav-link text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="nav-link hidden lg:inline text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               About
             </Link>
             <span
-              className="px-3 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider border bg-[rgba(20,241,149,0.08)] text-[var(--neon-green)] border-[rgba(20,241,149,0.15)]"
+              className="hidden lg:inline px-3 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider border bg-[rgba(20,241,149,0.08)] text-[var(--neon-green)] border-[rgba(20,241,149,0.15)]"
             >
               On-chain ({cluster}{hasCustomRpc ? ', custom RPC' : ''})
             </span>
@@ -77,7 +93,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               showTagline={true}
               tagline="AUTONOMOUS AGENTS"
               showParentBadge={true}
-              colorVariant="neon"
+              colorVariant={logoVariant}
+              forLight={theme === 'light'}
             />
 
             <div className="flex flex-col items-end gap-4">

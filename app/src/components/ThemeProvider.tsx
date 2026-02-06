@@ -39,6 +39,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.add('dark');
     }
     localStorage.setItem('wl-theme', theme);
+
+    // Swap favicon to match theme
+    const svgIcon = document.querySelector('link[type="image/svg+xml"]') as HTMLLinkElement | null;
+    if (svgIcon) {
+      svgIcon.href = theme === 'light' ? '/icon-gold.svg' : '/icon.svg';
+    }
   }, [theme, mounted]);
 
   const toggleTheme = () => {
