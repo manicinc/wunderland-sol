@@ -758,8 +758,56 @@ Complete rewrite of `WalletButton.tsx`:
 
 ### Next Steps
 - End-to-end minting test on devnet with real wallet
-- Add "Create Agent" CTA to landing page and nav
 - Agent profile page — deep link from minting success
 - Deploy updated build to production
+
+---
+
+## Entry 13 — HEXACO Hero Centerpiece + High-Contrast Nav
+**Date**: 2026-02-05
+**Commits**: `6fdd4c2`, `096ad85`
+**Agent**: Claude Opus 4.6
+
+### Hero Section Overhaul (`6fdd4c2`)
+
+**Before**: WunderlandIcon (logo) dominated the hero with HexacoRadar as a small overlay.
+**After**: HexacoRadar is the star — 300px interactive visualization with orbiting agent avatars.
+
+**Architecture**:
+- `LookingGlassHero` completely rewritten — removed `WunderlandIcon` import entirely
+- Central `HexacoRadar` (size=300, showLabels=true) renders the active agent's personality
+- 8 `ProceduralAvatar` buttons orbit the radar, positioned via trigonometry (`cos`/`sin` at radius 170px)
+- Clicking an avatar selects that agent, pauses auto-cycle (4s interval), resumes after 8s
+- Agent badge below radar shows name, level, reputation, post count
+- Compact HEXACO trait bars (H/E/X/A/C/O) with fill widths matching trait values
+- Active avatar gets full opacity + cyan ring; inactive avatars are semi-transparent
+
+**CSS overhaul**:
+- All `.looking-glass-*` classes replaced with `.hexaco-hero-*`
+- `.hexaco-hero-radar` — float animation (3s ease-in-out), neon drop-shadow
+- `.hexaco-hero-orbit-ring` — 340px dashed circle rotating at 60s
+- `.hexaco-hero-orbit-avatar` — positioned absolutely, opacity transitions on active state
+- `.hexaco-hero-badge` — glass card with gradient left border
+- `.hexaco-hero-traits` — compact bars with trait-colored fills
+- Mobile: orbit avatars hidden below 640px, radar area shrinks to 300x300
+
+### Nav Contrast Fix (`096ad85`)
+
+**Before**: Nav links were `text-sm text-[var(--text-secondary)]` (white/50% opacity) — nearly invisible against dark backgrounds.
+**After**: All links use `font-semibold text-[var(--text-primary)]` (full white) with `hover:text-[var(--neon-cyan)]` glow.
+
+- `NetworkDropdown` button text updated to match
+- Added green-accented **"Create"** link to `/mint` (`text-[var(--neon-green)]`)
+- Increased link gap from `gap-3 md:gap-5` to `gap-4 md:gap-6`
+- Nav order: World | Feed | Network ▾ | **Create** | About | 🔍 | Connect | 🏮
+
+### Build Status
+- `pnpm build`: ✓ (27 routes, 0 errors)
+- Production server: localhost:3011, all routes 200
+
+### Next Steps
+- End-to-end minting test on devnet
+- Agent profile deep-link from mint success
+- Production deployment
 
 ---
