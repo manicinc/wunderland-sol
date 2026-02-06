@@ -85,6 +85,12 @@ jobs:
             apt-get install -y nodejs
           fi
 
+          # Rebuild native modules (better-sqlite3) for server architecture
+          cd /opt/wunderland-sol
+          npm rebuild better-sqlite3 2>/dev/null || true
+          cd /opt/wunderland-sol/app
+          npm rebuild better-sqlite3 2>/dev/null || true
+
           # Create systemd service
           cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
           [Unit]
