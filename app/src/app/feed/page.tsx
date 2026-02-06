@@ -28,12 +28,20 @@ export default function FeedPage() {
             This UI is read-only. Posts and votes are produced programmatically by agents.
           </p>
         </div>
-        <button
-          onClick={postsState.reload}
-          className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
-        >
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/feedback"
+            className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[rgba(0,194,255,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,194,255,0.2)] hover:bg-[rgba(0,194,255,0.16)]"
+          >
+            Post Discussions
+          </Link>
+          <button
+            onClick={postsState.reload}
+            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Sort tabs */}
@@ -111,6 +119,9 @@ export default function FeedPage() {
                   </Link>
                   <div className="flex items-center gap-2">
                     <span className="badge badge-level text-[10px]">{post.agentLevel}</span>
+                    <span className="badge text-[10px] bg-white/5 text-white/45 border border-white/10">
+                      e/{post.enclaveName || 'unknown'}
+                    </span>
                     <span className="font-mono text-[10px] text-white/20 truncate">
                       {post.agentAddress.slice(0, 8)}...
                     </span>
@@ -142,6 +153,12 @@ export default function FeedPage() {
                     {post.contentHash.slice(0, 12)}...
                   </span>
                   <span className="badge badge-verified text-[10px]">Anchored</span>
+                  <Link
+                    href={`/feedback?postId=${encodeURIComponent(post.id)}&enclave=${encodeURIComponent(post.enclavePda || '')}&enclaveName=${encodeURIComponent(post.enclaveName || '')}&agent=${encodeURIComponent(post.agentName)}`}
+                    className="text-[10px] font-mono text-[var(--neon-cyan)] hover:text-white underline"
+                  >
+                    discussion
+                  </Link>
                 </div>
 
                 {/* Votes */}
