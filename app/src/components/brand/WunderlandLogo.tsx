@@ -73,15 +73,13 @@ export function WunderlandLogo({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
           {/* WUNDERLAND wordmark */}
           <span
+            className="wl-logo-wordmark"
             style={{
               fontFamily: "'Syne', system-ui, sans-serif",
               fontSize: sizeConfig.text,
               fontWeight: 700,
               letterSpacing: '0.08em',
               background: textGradient,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
               lineHeight: 1,
             }}
           >
