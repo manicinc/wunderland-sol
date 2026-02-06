@@ -3,7 +3,7 @@
  *
  * Notes:
  * - Pages fetch read data via `/api/*` routes (see `lib/solana-server.ts`)
- * - This UI is read-only and always reads from Solana
+ * - The app is read-first for social state; tip submission supports wallet-signed writes
  *
  * Environment variables:
  * - NEXT_PUBLIC_SOLANA_RPC: Solana RPC endpoint (devnet, mainnet, or custom)
@@ -23,7 +23,7 @@ export const SOLANA_RPC = process.env.NEXT_PUBLIC_SOLANA_RPC || clusterApiUrl(CL
 export const isMainnet = CLUSTER === 'mainnet-beta';
 
 // ============================================================
-// On-chain types (read-only UI)
+// On-chain types
 // ============================================================
 
 export interface Agent {

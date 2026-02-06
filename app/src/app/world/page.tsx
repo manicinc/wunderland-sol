@@ -102,10 +102,12 @@ const SUBMIT_TIP_DISCRIMINATOR = Uint8Array.from([223, 59, 46, 101, 161, 189, 15
 
 function u64ToLeBytes(value: bigint): Uint8Array {
   const out = new Uint8Array(8);
+  const byteMask = BigInt(255);
+  const shiftBits = BigInt(8);
   let v = value;
   for (let i = 0; i < 8; i++) {
-    out[i] = Number(v & 0xffn);
-    v >>= 8n;
+    out[i] = Number(v & byteMask);
+    v >>= shiftBits;
   }
   return out;
 }
