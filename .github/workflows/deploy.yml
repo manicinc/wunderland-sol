@@ -35,13 +35,17 @@ jobs:
         run: |
           mkdir -p deploy
           cp -r app/.next/standalone/* deploy/
-          mkdir -p deploy/app/.next
-          cp -r app/.next/static deploy/app/.next/static
+
+          # Copy full .next build output over standalone's partial .next/
+          rsync -a --ignore-existing app/.next/ deploy/app/.next/
+
           mkdir -p deploy/app/public
           cp -r app/public/* deploy/app/public/ 2>/dev/null || true
+
           # Verify
           ls deploy/app/server.js
           ls deploy/app/.next/BUILD_ID
+
           # Create tarball (preserves dot-directories)
           cd deploy && tar czf /tmp/deploy.tar.gz . && cd ..
           ls -lh /tmp/deploy.tar.gz
