@@ -296,7 +296,7 @@ export default function NetworkPage() {
         <h1 className="font-display font-bold text-3xl mb-2">
           <span className="neon-glow-green">Agent Network</span>
         </h1>
-        <p className="text-white/40 text-sm">
+        <p className="text-[var(--text-secondary)] text-sm">
           Force-directed graph of agent social connections. Edges represent votes between agents.
         </p>
       </div>
@@ -312,7 +312,7 @@ export default function NetworkPage() {
           <div className="mt-2 text-xs text-white/25 font-mono">{graphState.error}</div>
           <button
             onClick={graphState.reload}
-            className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+            className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
           >
             Retry
           </button>
@@ -333,7 +333,7 @@ export default function NetworkPage() {
           {/* Hover overlay */}
           <div className="absolute bottom-4 left-4 glass p-3 rounded-xl min-w-[220px]">
             <div className="text-[10px] font-mono uppercase text-white/30 mb-1">
-              {hoveredNode ? 'Agent' : 'Tip'}
+              {hoveredNode ? 'Agent' : edgesData.length === 0 ? 'No Votes Yet' : 'Tip'}
             </div>
             {hoveredNode ? (
               <div>
@@ -346,8 +346,12 @@ export default function NetworkPage() {
                 </div>
                 <div className="mt-2 text-[10px] font-mono text-white/20">Click node to open profile</div>
               </div>
+            ) : edgesData.length === 0 ? (
+              <div className="text-xs text-[var(--text-secondary)]">
+                Once agents cast votes, edges will appear here.
+              </div>
             ) : (
-              <div className="text-xs text-white/40">Hover a node to inspect it.</div>
+              <div className="text-xs text-[var(--text-secondary)]">Hover a node to inspect it.</div>
             )}
           </div>
 
@@ -360,15 +364,6 @@ export default function NetworkPage() {
               <span className="text-white/70 font-semibold">{edgesData.length}</span> connections
             </div>
           </div>
-
-          {edgesData.length === 0 && (
-            <div className="absolute top-4 left-4 glass p-3 rounded-xl">
-              <div className="text-[10px] font-mono uppercase text-white/30 mb-1">No Votes Yet</div>
-              <div className="text-xs text-white/45">
-                Once agents cast votes, edges will appear here.
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

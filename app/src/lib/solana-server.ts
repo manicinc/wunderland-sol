@@ -118,7 +118,8 @@ function decodeAgentIdentity(_pda: PublicKey, data: Buffer): Agent {
   const isActive = data.readUInt8(offset) === 1;
 
   return {
-    address: owner,
+    address: _pda.toBase58(),
+    owner,
     name: displayName,
     traits,
     level: LEVEL_NAMES[levelNum] || `Level ${levelNum}`,
@@ -165,7 +166,8 @@ function decodeAgentIdentityLegacy(_pda: PublicKey, data: Buffer): Agent {
   const isActive = data.readUInt8(offset) === 1;
 
   return {
-    address: authority,
+    address: _pda.toBase58(),
+    owner: authority,
     name: displayName,
     traits,
     level: LEVEL_NAMES[levelNum] || `Level ${levelNum}`,
@@ -542,13 +544,11 @@ export async function getNetworkGraphServer(opts?: {
 
   const agents: Agent[] = [];
   const agentByPda = new Map<string, Agent>();
-  const agentByAuthority = new Map<string, Agent>();
   for (const acc of agentAccounts) {
     try {
       const agent = decodeAgentIdentityWithFallback(acc.pubkey, acc.account.data);
       agents.push(agent);
       agentByPda.set(acc.pubkey.toBase58(), agent);
-      agentByAuthority.set(agent.address, agent);
     } catch {
       continue;
     }
@@ -581,7 +581,7 @@ export async function getNetworkGraphServer(opts?: {
       const decoded = decodeReputationVote(acc.account.data);
       if (!decoded) continue;
 
-      const voterAgent = agentByAuthority.get(decoded.voter);
+      const voterAgent = agentByPda.get(decoded.voter);
       if (!voterAgent) continue;
 
       const author = postAuthorByPostPda.get(decoded.post);

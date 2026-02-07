@@ -490,3 +490,115 @@ interface SkillEligibilityContext {
   hasEnv?: (envVar: string) => boolean;
 }
 ```
+
+## Finding Skills
+
+Use the catalog helpers from `@framers/agentos-skills-registry/catalog` to browse, search, and filter available skills.
+
+### Browse by category
+
+```typescript
+import { getCategories, getSkillsByCategory } from '@framers/agentos-skills-registry/catalog';
+
+// List all categories
+const categories = getCategories();
+// ['communication', 'creative', 'developer-tools', 'devops', 'information', 'media', 'productivity', 'security']
+
+// Get skills in a specific category
+const productivitySkills = getSkillsByCategory('productivity');
+```
+
+### Search by keyword
+
+```typescript
+import { searchSkills } from '@framers/agentos-skills-registry/catalog';
+
+const results = searchSkills('docker');
+// Matches against name, description, and tags
+```
+
+### Check tool requirements
+
+```typescript
+import { getAvailableSkills } from '@framers/agentos-skills-registry/catalog';
+
+// Only return skills whose required tools are present
+const available = getAvailableSkills(['web-search', 'filesystem', 'gh']);
+```
+
+### Filter by tag
+
+```typescript
+import { getSkillsByTag } from '@framers/agentos-skills-registry/catalog';
+
+const automationSkills = getSkillsByTag('automation');
+```
+
+## Enabling a Skill in Your Agent
+
+Follow these steps to add skills to your agent's system prompt:
+
+### 1. Install the packages
+
+```bash
+npm install @framers/agentos-skills-registry @framers/agentos
+```
+
+### 2. Import the catalog and select skills
+
+```typescript
+import { SKILLS_CATALOG, getSkillsByCategory } from '@framers/agentos-skills-registry/catalog';
+import { createCuratedSkillSnapshot } from '@framers/agentos-skills-registry';
+
+// Option A: Pick specific skills by name
+const snapshot = await createCuratedSkillSnapshot({
+  skills: ['github', 'weather', 'notion'],
+  platform: 'darwin',
+});
+
+// Option B: Include all skills for the current platform
+const fullSnapshot = await createCuratedSkillSnapshot({
+  skills: 'all',
+  platform: process.platform,
+});
+```
+
+### 3. Inject the snapshot into the system prompt
+
+```typescript
+const systemPrompt = `You are a helpful assistant.\n\n${snapshot.prompt}`;
+```
+
+The `snapshot.prompt` string contains formatted markdown with each skill's instructions, ready for LLM consumption.
+
+## Community vs Curated Skills
+
+Skills are organized into two tiers, both shipped in the same NPM package:
+
+| Tier | Source | Maintained By | Verified |
+|------|--------|---------------|:--------:|
+| **Curated** | `registry/curated/` | AgentOS core team | Yes |
+| **Community** | `registry/community/` | External contributors | No |
+
+- **Curated** skills carry the `source: 'curated'` field. They are maintained by staff, tested in CI, and guaranteed to follow the latest SKILL.md schema.
+- **Community** skills carry the `source: 'community'` field. They are submitted via pull request and reviewed before merge, but are not staff-maintained after acceptance.
+
+You can filter by source at runtime:
+
+```typescript
+import { getCuratedSkills, getCommunitySkills } from '@framers/agentos-skills-registry/catalog';
+
+const curated = getCuratedSkills();
+const community = getCommunitySkills();
+```
+
+## Publishing a New Skill
+
+To contribute a skill to the catalog:
+
+1. **Fork** the [`agentos-skills`](https://github.com/framersai/agentos-skills) repository.
+2. **Create** a new directory under `registry/community/<your-skill>/` containing a `SKILL.md` file with valid YAML frontmatter and markdown instructions.
+3. **Validate** your skill locally by running the registry build and ensuring it appears in `registry.json`.
+4. **Open a PR** against the `main` branch. The CI pipeline will validate your SKILL.md format automatically.
+
+See the full [`CONTRIBUTING.md`](https://github.com/framersai/agentos-skills/blob/main/CONTRIBUTING.md) for the SKILL.md format spec, naming conventions, and review criteria.

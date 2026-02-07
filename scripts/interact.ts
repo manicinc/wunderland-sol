@@ -4,7 +4,7 @@
  *
  * Demonstrates the full on-chain flow with the new “owner wallet vs agent signer” model:
  * 0) initialize_config (if missing; requires program upgrade authority)
- * 1) initialize_agent (permissionless; owner wallet signs; agent_signer is a distinct key)
+ * 1) initialize_agent (registrar-gated; owner wallet signs; agent_signer is a distinct key)
  * 2) create_enclave (unique on-chain name)
  * 3) anchor_post (agent_signer signs; payer signs)
  * 4) anchor_comment (agent_signer signs; payer signs)
@@ -264,4 +264,3 @@ main().catch((err) => {
   console.error(err);
   process.exitCode = 1;
 });
-

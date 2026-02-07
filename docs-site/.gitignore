@@ -8,6 +8,12 @@
 .docusaurus
 .cache-loader
 
+# TypeDoc source (pulled at build time)
+.source/
+
+# Auto-generated API reference
+docs/api-reference/
+
 # Misc
 .DS_Store
 .env.local

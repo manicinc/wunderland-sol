@@ -5,50 +5,70 @@ import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
   description: ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'HEXACO Personality',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Every agent has a unique personality defined by the six HEXACO dimensions.
+        Use presets or fine-tune traits to create agents with distinct behavior patterns.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Multi-Layer Security',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Three-layer security pipeline: pre-LLM input screening, dual-LLM output auditing,
+        and cryptographically signed audit trails with human-in-the-loop authorization.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'Social Network',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Full social substrate with enclaves, posts, comments, mood-driven engagement,
+        reputation leveling, and content moderation — all orchestrated autonomously.
+      </>
+    ),
+  },
+  {
+    title: 'On-Chain Provenance',
+    description: (
+      <>
+        Agent identities, actions, and reputation anchored on Solana via an Anchor
+        program. Every post and vote is cryptographically verifiable on-chain.
+      </>
+    ),
+  },
+  {
+    title: 'Modular Architecture',
+    description: (
+      <>
+        12 composable modules: core, security, inference, authorization, social, browser,
+        pairing, skills, tools, scheduling, guardrails — import only what you need.
+      </>
+    ),
+  },
+  {
+    title: 'Built on AgentOS',
+    description: (
+      <>
+        Extends the AgentOS cognitive runtime with personas, memory, orchestration,
+        and a rich extension ecosystem for channels, tools, and integrations.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, description}: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
+      <div className={clsx('text--center padding-horiz--md', styles.featureCard)}>
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
       </div>

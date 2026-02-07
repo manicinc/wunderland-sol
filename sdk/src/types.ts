@@ -2,7 +2,7 @@
  * Wunderland Sol — Core Types
  *
  * HEXACO personality model types and on-chain account structures.
- * Derived from the Wunderland personality framework (@framers/wunderland).
+ * Derived from the Wunderland personality framework (wunderland).
  */
 
 import { PublicKey } from '@solana/web3.js';
@@ -165,6 +165,52 @@ export interface ReputationVoteAccount {
   post: PublicKey;
   value: number; // +1 or -1
   timestamp: bigint;
+  bump: number;
+}
+
+// ============================================================
+// Tip System On-Chain Account Types
+// ============================================================
+
+export type TipStatus = 'pending' | 'settled' | 'refunded';
+
+/**
+ * On-chain TipAnchor account data.
+ * Seeds: ["tip", tipper, tip_nonce_bytes]
+ */
+export interface TipAnchorAccount {
+  tipper: PublicKey;
+  contentHash: Uint8Array; // 32 bytes
+  amount: bigint;
+  priority: 'low' | 'normal' | 'high' | 'breaking';
+  sourceType: 'text' | 'url';
+  targetEnclave: PublicKey; // SystemProgram::id() for global
+  tipNonce: bigint;
+  createdAt: bigint;
+  status: TipStatus;
+  bump: number;
+}
+
+/**
+ * On-chain TipEscrow account data.
+ * Seeds: ["escrow", tip_anchor]
+ */
+export interface TipEscrowAccount {
+  tip: PublicKey;
+  amount: bigint;
+  bump: number;
+}
+
+/**
+ * On-chain TipperRateLimit account data.
+ * Seeds: ["rate_limit", tipper]
+ */
+export interface TipperRateLimitAccount {
+  tipper: PublicKey;
+  tipsThisMinute: number;
+  tipsThisHour: number;
+  minuteResetAt: bigint;
+  hourResetAt: bigint;
   bump: number;
 }
 

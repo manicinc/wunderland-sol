@@ -5,7 +5,7 @@
  * Seeds:
  * - ProgramConfig (if missing; requires program upgrade authority)
  * - A unique on-chain Enclave (e.g. "wunderland")
- * - Demo agents (permissionless, wallet-signed registration)
+ * - Demo agents (registrar-gated, wallet-signed registration)
  * - Anchored posts + optional comments + optional cross-votes
  *
  * Usage:
@@ -18,7 +18,7 @@
  * - PROGRAM_ID / NEXT_PUBLIC_PROGRAM_ID: Wunderland program id (default devnet id)
  * - SEED_KEYPAIR_DIR: where to store generated keypairs (default apps/wunderland-sh/.internal/seed-keypairs)
  * - SEED_CONFIG_AUTHORITY_KEYPAIR: keypair used to initialize config (default ~/.config/solana/id.json)
- * - SEED_AIRDROP_SOL: target SOL per owner wallet (default 0.05)
+ * - SEED_AIRDROP_SOL: target SOL for registrar wallet (default 0.05)
  * - SEED_WITH_VOTES: true|false (default true)
  * - SEED_WITH_COMMENTS: true|false (default true)
  * - SEED_NO_AIRDROP: true|false (default false)
@@ -318,7 +318,7 @@ async function main() {
   const configAuthority = loadKeypairFromPath(CONFIG_AUTHORITY_KEYPAIR_PATH);
 
   console.log(`  Keypairs: ${KEYPAIR_DIR}`);
-  console.log(`  Airdrop:  ${AIRDROP_SOL} SOL per owner wallet (if needed)`);
+  console.log(`  Airdrop:  ${AIRDROP_SOL} SOL to registrar wallet (if needed)`);
   console.log(`  Comments: ${WITH_COMMENTS ? 'enabled' : 'disabled'}`);
   console.log(`  Votes:    ${WITH_VOTES ? 'enabled' : 'disabled'}`);
   console.log(`  Funding:  ${NO_AIRDROP ? 'funder-only' : 'airdrop'}${funder ? ' + fallback funder' : ''}`);
@@ -390,7 +390,8 @@ async function main() {
   for (const preset of AGENTS) {
     console.log(`  Agent: ${preset.name}`);
 
-    const owner = loadOrCreateKeypair(`${preset.name}-owner`);
+    // Immutable-agent model: only the registrar (ProgramConfig.authority) can register agents.
+    const owner = configAuthority;
     const agentSigner = loadOrCreateKeypair(`${preset.name}-agent-signer`);
     const agentId = deterministicAgentId(preset.name);
 
@@ -404,7 +405,7 @@ async function main() {
     };
 
     const [agentPda] = client.getAgentPDA(owner.publicKey, agentId);
-    console.log(`    Owner:      ${owner.publicKey.toBase58()}`);
+    console.log(`    Owner:      ${owner.publicKey.toBase58()} (registrar)`);
     console.log(`    Agent PDA:  ${agentPda.toBase58()}`);
     console.log(`    Signer:     ${agentSigner.publicKey.toBase58()}`);
 

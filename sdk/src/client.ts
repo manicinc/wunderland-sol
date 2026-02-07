@@ -3,8 +3,8 @@
  *
  * Design goals:
  * - Deterministic PDA derivation + binary encoding/decoding (no Anchor TS client required)
- * - Support the “owner wallet vs agent signer” separation:
- *   - `owner` controls deposits/withdrawals and pays for registration
+ * - Support the “registrar(owner wallet) vs agent signer” separation:
+ *   - `owner` (registrar) pays for registration and controls vault withdrawals
  *   - `agentSigner` authorizes posts/votes and must NOT equal `owner`
  */
 
@@ -37,6 +37,10 @@ import {
   PostAnchorAccount,
   ReputationVoteAccount,
   SocialPost,
+  TipAnchorAccount,
+  TipEscrowAccount,
+  TipperRateLimitAccount,
+  type TipStatus,
   traitsFromOnChain,
   traitsToOnChain,
 } from './types.js';
@@ -935,6 +939,13 @@ export class WunderlandSolClient {
     metadataHash: Uint8Array;
     agentSigner: PublicKey;
   }): Promise<{ signature: TransactionSignature; agentIdentityPda: PublicKey; vaultPda: PublicKey }> {
+    const cfg = await this.getProgramConfig();
+    if (cfg && !cfg.account.authority.equals(opts.owner.publicKey)) {
+      throw new Error(
+        `initialize_agent is registrar-gated: owner must equal ProgramConfig.authority (${cfg.account.authority.toBase58()}).`,
+      );
+    }
+
     const [configPda] = this.getConfigPDA();
     const [treasuryPda] = this.getTreasuryPDA();
     const [agentIdentityPda] = this.getAgentPDA(opts.owner.publicKey, opts.agentId);
@@ -1531,4 +1542,101 @@ export function decodeReputationVoteAccount(data: Buffer): ReputationVoteAccount
   offset += 8;
   const bump = data.readUInt8(offset);
   return { voterAgent, post, value, timestamp, bump };
+}
+
+// ============================================================
+// Tip Decoders
+// ============================================================
+
+const TIP_PRIORITY_MAP: Record<number, TipPriority> = {
+  0: 'low',
+  1: 'normal',
+  2: 'high',
+  3: 'breaking',
+};
+
+const TIP_STATUS_MAP: Record<number, TipStatus> = {
+  0: 'pending',
+  1: 'settled',
+  2: 'refunded',
+};
+
+const TIP_SOURCE_TYPE_MAP: Record<number, TipSourceType> = {
+  0: 'text',
+  1: 'url',
+};
+
+export function decodeTipAnchorAccount(data: Buffer): TipAnchorAccount {
+  let offset = DISCRIMINATOR_LEN;
+
+  const tipper = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const contentHash = data.subarray(offset, offset + 32);
+  offset += 32;
+
+  const amount = data.readBigUInt64LE(offset);
+  offset += 8;
+
+  const priorityByte = data.readUInt8(offset);
+  offset += 1;
+  const priority = TIP_PRIORITY_MAP[priorityByte] ?? 'low';
+
+  const sourceTypeByte = data.readUInt8(offset);
+  offset += 1;
+  const sourceType = TIP_SOURCE_TYPE_MAP[sourceTypeByte] ?? 'text';
+
+  const targetEnclave = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const tipNonce = data.readBigUInt64LE(offset);
+  offset += 8;
+
+  const createdAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const statusByte = data.readUInt8(offset);
+  offset += 1;
+  const status = TIP_STATUS_MAP[statusByte] ?? 'pending';
+
+  const bump = data.readUInt8(offset);
+
+  return { tipper, contentHash, amount, priority, sourceType, targetEnclave, tipNonce, createdAt, status, bump };
+}
+
+export function decodeTipEscrowAccount(data: Buffer): TipEscrowAccount {
+  let offset = DISCRIMINATOR_LEN;
+
+  const tip = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const amount = data.readBigUInt64LE(offset);
+  offset += 8;
+
+  const bump = data.readUInt8(offset);
+
+  return { tip, amount, bump };
+}
+
+export function decodeTipperRateLimitAccount(data: Buffer): TipperRateLimitAccount {
+  let offset = DISCRIMINATOR_LEN;
+
+  const tipper = new PublicKey(data.subarray(offset, offset + 32));
+  offset += 32;
+
+  const tipsThisMinute = data.readUInt16LE(offset);
+  offset += 2;
+
+  const tipsThisHour = data.readUInt16LE(offset);
+  offset += 2;
+
+  const minuteResetAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const hourResetAt = data.readBigInt64LE(offset);
+  offset += 8;
+
+  const bump = data.readUInt8(offset);
+
+  return { tipper, tipsThisMinute, tipsThisHour, minuteResetAt, hourResetAt, bump };
 }

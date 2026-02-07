@@ -38,10 +38,8 @@ describe('API routes (on-chain only)', () => {
   it('GET /api/agents returns agents + total', async () => {
     vi.mocked(getAllAgentsServer).mockResolvedValueOnce([
       {
-        id: 'Agent111111111111111111111111111111111111111',
+        address: 'Agent111111111111111111111111111111111111111',
         owner: 'Owner111111111111111111111111111111111111111',
-        agentSigner: 'Signer1111111111111111111111111111111111111',
-        agentId: '00'.repeat(32),
         name: 'Alpha',
         traits: {
           honestyHumility: 0.5,
@@ -53,18 +51,67 @@ describe('API routes (on-chain only)', () => {
         },
         level: 'Newcomer',
         reputation: 0,
-        totalEntries: 0,
+        totalPosts: 0,
         createdAt: new Date(0).toISOString(),
         isActive: true,
       },
     ]);
 
-    const res = await getAgents();
+    const res = await getAgents(createRequest('http://localhost:3000/api/agents'));
     const { status, body } = await asJson<{ agents: unknown[]; total: number }>(res);
 
     expect(status).toBe(200);
     expect(body.total).toBe(1);
     expect(body.agents).toHaveLength(1);
+  });
+
+  it('GET /api/agents filters by owner', async () => {
+    vi.mocked(getAllAgentsServer).mockResolvedValueOnce([
+      {
+        address: 'AgentA',
+        owner: 'OwnerA',
+        name: 'Alpha',
+        traits: {
+          honestyHumility: 0.5,
+          emotionality: 0.5,
+          extraversion: 0.5,
+          agreeableness: 0.5,
+          conscientiousness: 0.5,
+          openness: 0.5,
+        },
+        level: 'Newcomer',
+        reputation: 0,
+        totalPosts: 0,
+        createdAt: new Date(0).toISOString(),
+        isActive: true,
+      },
+      {
+        address: 'AgentB',
+        owner: 'OwnerB',
+        name: 'Beta',
+        traits: {
+          honestyHumility: 0.5,
+          emotionality: 0.5,
+          extraversion: 0.5,
+          agreeableness: 0.5,
+          conscientiousness: 0.5,
+          openness: 0.5,
+        },
+        level: 'Newcomer',
+        reputation: 0,
+        totalPosts: 0,
+        createdAt: new Date(0).toISOString(),
+        isActive: true,
+      },
+    ]);
+
+    const res = await getAgents(createRequest('http://localhost:3000/api/agents?owner=OwnerB'));
+    const { status, body } = await asJson<{ agents: { address: string }[]; total: number }>(res);
+
+    expect(status).toBe(200);
+    expect(body.total).toBe(1);
+    expect(body.agents).toHaveLength(1);
+    expect(body.agents[0].address).toBe('AgentB');
   });
 
   it('GET /api/posts validates query params', async () => {
@@ -143,10 +190,8 @@ describe('API routes (on-chain only)', () => {
   it('GET /api/leaderboard returns leaderboard + total', async () => {
     vi.mocked(getLeaderboardServer).mockResolvedValueOnce([
       {
-        id: 'Agent111111111111111111111111111111111111111',
+        address: 'Agent111111111111111111111111111111111111111',
         owner: 'Owner111111111111111111111111111111111111111',
-        agentSigner: 'Signer1111111111111111111111111111111111111',
-        agentId: '00'.repeat(32),
         name: 'Alpha',
         traits: {
           honestyHumility: 0.5,
@@ -158,7 +203,7 @@ describe('API routes (on-chain only)', () => {
         },
         level: 'Newcomer',
         reputation: 0,
-        totalEntries: 0,
+        totalPosts: 0,
         createdAt: new Date(0).toISOString(),
         isActive: true,
         rank: 1,

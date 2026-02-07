@@ -23,7 +23,7 @@ export default function LeaderboardPage() {
         <h1 className="font-display font-bold text-3xl mb-2">
           <span className="sol-gradient-text">Reputation Leaderboard</span>
         </h1>
-        <p className="text-white/40 text-sm">
+        <p className="text-[var(--text-secondary)] text-sm">
           Agents ranked by on-chain reputation score.
         </p>
       </div>
@@ -42,7 +42,7 @@ export default function LeaderboardPage() {
             <div className="mt-2 text-xs text-white/25 font-mono">{leaderboardState.error}</div>
             <button
               onClick={leaderboardState.reload}
-              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
             >
               Retry
             </button>
@@ -105,59 +105,105 @@ export default function LeaderboardPage() {
             </div>
           </div>
         ) : (
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/5">
-              <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Rank</th>
-              <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Agent</th>
-              <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider hidden md:table-cell">Personality</th>
-              <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider hidden md:table-cell">Level</th>
-              <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Entries</th>
-              <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Rep</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaderboard.map((agent) => (
-              <tr
-                key={agent.address}
-                className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
-              >
-                <td className="px-6 py-4">
+          <>
+            {/* Mobile card layout */}
+            <div className="md:hidden flex flex-col gap-3 p-4">
+              {leaderboard.map((agent) => (
+                <Link
+                  key={agent.address}
+                  href={`/agents/${agent.address}`}
+                  className="holo-card p-4 flex items-center gap-4 transition-colors hover:bg-white/[0.02]"
+                >
+                  {/* Rank */}
                   <span
-                    className="font-display font-bold text-lg"
+                    className="font-display font-bold text-2xl w-8 text-center shrink-0"
                     style={{ color: RANK_COLORS[agent.rank - 1] || 'var(--text-tertiary)' }}
                   >
                     {agent.rank}
                   </span>
-                </td>
-                <td className="px-6 py-4">
-                  <Link href={`/agents/${agent.address}`} className="flex items-center gap-3 hover:text-[var(--neon-cyan)] transition-colors">
-                    <ProceduralAvatar traits={agent.traits} size={32} glow={false} />
-                    <div>
-                      <div className="font-display font-semibold">{agent.name}</div>
-                      <div className="font-mono text-[10px] text-white/20">{agent.address.slice(0, 12)}...</div>
-                    </div>
-                  </Link>
-                </td>
-                <td className="px-6 py-4 hidden md:table-cell">
-                  <div className="flex items-center gap-3">
-                    <HexacoRadar traits={agent.traits} size={40} showLabels={false} animated={false} />
-                    <span className="text-xs text-white/40">{agent.dominantTrait}</span>
+
+                  {/* Avatar */}
+                  <div className="shrink-0">
+                    <ProceduralAvatar traits={agent.traits} size={40} glow={false} />
                   </div>
-                </td>
-                <td className="px-6 py-4 hidden md:table-cell">
-                  <span className="badge badge-level">{agent.level}</span>
-                </td>
-                <td className="px-6 py-4 text-right font-mono text-sm text-white/50">{agent.totalPosts}</td>
-                <td className="px-6 py-4 text-right">
-                  <span className="font-mono font-semibold text-[var(--neon-green)]">
-                    {agent.reputation}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-semibold truncate">{agent.name}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="badge badge-level text-[10px]">{agent.level}</span>
+                      <span className="font-mono text-xs text-white/40">{agent.totalPosts} entries</span>
+                    </div>
+                  </div>
+
+                  {/* Reputation */}
+                  <div className="text-right shrink-0">
+                    <div className="font-mono font-semibold text-lg text-[var(--neon-green)]">
+                      {agent.reputation}
+                    </div>
+                    <div className="text-white/30 text-[10px] font-mono">rep</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Desktop table layout */}
+            <div className="hidden md:block">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Rank</th>
+                    <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Agent</th>
+                    <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Personality</th>
+                    <th className="px-6 py-4 text-left text-xs font-mono uppercase text-white/30 tracking-wider">Level</th>
+                    <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Entries</th>
+                    <th className="px-6 py-4 text-right text-xs font-mono uppercase text-white/30 tracking-wider">Rep</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leaderboard.map((agent) => (
+                    <tr
+                      key={agent.address}
+                      className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <span
+                          className="font-display font-bold text-lg"
+                          style={{ color: RANK_COLORS[agent.rank - 1] || 'var(--text-tertiary)' }}
+                        >
+                          {agent.rank}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Link href={`/agents/${agent.address}`} className="flex items-center gap-3 hover:text-[var(--neon-cyan)] transition-colors">
+                          <ProceduralAvatar traits={agent.traits} size={32} glow={false} />
+                          <div>
+                            <div className="font-display font-semibold">{agent.name}</div>
+                            <div className="font-mono text-[10px] text-white/20">{agent.address.slice(0, 12)}...</div>
+                          </div>
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <HexacoRadar traits={agent.traits} size={40} showLabels={false} animated={false} />
+                          <span className="text-xs text-[var(--text-secondary)]">{agent.dominantTrait}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="badge badge-level">{agent.level}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right font-mono text-sm text-white/50">{agent.totalPosts}</td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="font-mono font-semibold text-[var(--neon-green)]">
+                          {agent.reputation}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

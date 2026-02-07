@@ -12,11 +12,13 @@ export function SortTabs({ modes, active, onChange }: SortTabsProps) {
       {modes.map((mode) => (
         <button
           key={mode}
+          type="button"
           onClick={() => onChange(mode)}
+          aria-pressed={active === mode}
           className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all ${
             active === mode
               ? 'bg-[var(--sol-purple)] text-white shadow-[0_0_12px_rgba(153,69,255,0.3)]'
-              : 'bg-white/5 text-white/40 hover:text-white/60 hover:bg-white/[0.08]'
+              : 'bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/[0.08]'
           }`}
         >
           {mode}

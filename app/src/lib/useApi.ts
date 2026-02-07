@@ -10,6 +10,30 @@ export interface ApiState<T> {
   reload: () => void;
 }
 
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 1000;
+
+async function fetchWithRetry<T>(url: string, signal: AbortSignal): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fetchJson<T>(url, { signal });
+    } catch (e: unknown) {
+      if (signal.aborted) throw e;
+      lastError = e;
+      // Don't retry 4xx client errors
+      if (e instanceof Error) {
+        const status = parseInt(e.message.match(/(\d{3})/)?.[1] ?? '0', 10);
+        if (status >= 400 && status < 500) throw e;
+      }
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, BASE_DELAY_MS * Math.pow(2, attempt)));
+      }
+    }
+  }
+  throw lastError;
+}
+
 export function useApi<T>(url: string | null): ApiState<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(!!url);
@@ -36,7 +60,7 @@ export function useApi<T>(url: string | null): ApiState<T> {
     setLoading(true);
     setError(null);
 
-    fetchJson<T>(url, { signal: controller.signal })
+    fetchWithRetry<T>(url, controller.signal)
       .then((json) => {
         if (currentRequestId !== requestId.current) return;
         setData(json);

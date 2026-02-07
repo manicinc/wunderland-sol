@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 /* ============================================================
-   WUNDERLAND ON SOL — Holographic Cyberpunk Design System
+   WUNDERLAND — Through the Looking Glass
+   Art Deco · Retro-Futuristic · Alice in Wonderland
    ============================================================ */
 
 /* ---- Custom Properties ---- */
 :root {
   /* Void background */
-  --bg-void: #0a0a0f;
-  --bg-surface: #0f0f18;
-  --bg-elevated: #14142a;
+  --bg-void: #08070e;
+  --bg-surface: #0d0c16;
+  --bg-elevated: #12112a;
   --bg-glass: rgba(255, 255, 255, 0.03);
   --bg-glass-hover: rgba(255, 255, 255, 0.06);
 
@@ -36,6 +37,19 @@
   --wl-frame: #0f172a;
   --wl-frame-deep: #020617;
 
+  /* Art Deco / Looking Glass palette */
+  --deco-gold: #d4a844;
+  --deco-gold-dim: rgba(212, 168, 68, 0.2);
+  --deco-gold-glow: rgba(212, 168, 68, 0.35);
+  --deco-cream: #f5e6c8;
+  --deco-ivory: #faf3e6;
+  --looking-glass: rgba(125, 211, 252, 0.08);
+  --looking-glass-edge: rgba(125, 211, 252, 0.25);
+  --rabbit-hole-deep: #0a0520;
+  --rabbit-hole-mid: #160d30;
+  --checkered-light: rgba(255, 255, 255, 0.015);
+  --checkered-dark: rgba(0, 0, 0, 0.08);
+
   /* Neon accents */
   --neon-cyan: #00f0ff;
   --neon-magenta: #ff00e5;
@@ -45,8 +59,9 @@
 
   /* Text */
   --text-primary: #f0f0f0;
-  --text-secondary: rgba(255, 255, 255, 0.5);
-  --text-tertiary: rgba(255, 255, 255, 0.3);
+  /* Keep secondary/tertiary readable on dark backgrounds (WCAG-friendly). */
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --text-tertiary: rgba(255, 255, 255, 0.42);
 
   /* Glass border */
   --border-glass: rgba(255, 255, 255, 0.08);
@@ -80,6 +95,16 @@ body {
   min-height: 100vh;
   background: var(--bg-void);
   overflow-x: hidden;
+}
+
+/* Keyboard focus: visible and consistent. */
+:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 3px;
+}
+
+html.light :focus-visible {
+  outline-color: var(--wl-blue);
 }
 
 /* Noise texture overlay */
@@ -150,6 +175,220 @@ body::before {
 @keyframes holo-rotate {
   from { filter: hue-rotate(0deg); }
   to { filter: hue-rotate(360deg); }
+}
+
+/* ============================================================
+   ART DECO / LOOKING GLASS THEME SYSTEM
+   ============================================================ */
+
+/* ---- Looking Glass Card ---- */
+.looking-glass {
+  position: relative;
+  background: linear-gradient(135deg, var(--looking-glass), rgba(153, 69, 255, 0.03));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--looking-glass-edge);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.looking-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(125, 211, 252, 0.04) 45%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(125, 211, 252, 0.04) 55%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: looking-glass-shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes looking-glass-shimmer {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+}
+
+/* ---- Art Deco Ornate Frame ---- */
+.deco-frame {
+  position: relative;
+  border: 1px solid var(--deco-gold-dim);
+  padding: 2px;
+}
+
+.deco-frame::before,
+.deco-frame::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--deco-gold);
+  border-style: solid;
+}
+
+.deco-frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+
+.deco-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Inner corners (use on a child element with .deco-frame-inner) */
+.deco-frame-inner::before,
+.deco-frame-inner::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--deco-gold);
+  border-style: solid;
+}
+
+.deco-frame-inner::before {
+  top: -1px;
+  right: -1px;
+  border-width: 2px 2px 0 0;
+}
+
+.deco-frame-inner::after {
+  bottom: -1px;
+  left: -1px;
+  border-width: 0 0 2px 2px;
+}
+
+/* ---- Ornate Border (gold double-line) ---- */
+.ornate-border {
+  border: 1px solid var(--deco-gold-dim);
+  box-shadow: inset 0 0 0 3px var(--bg-void), inset 0 0 0 4px var(--deco-gold-dim);
+}
+
+/* ---- Art Deco Divider ---- */
+.deco-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--deco-gold);
+  opacity: 0.4;
+}
+
+.deco-divider::before,
+.deco-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--deco-gold), transparent);
+}
+
+/* Deco diamond ornament */
+.deco-diamond {
+  width: 8px;
+  height: 8px;
+  background: var(--deco-gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* ---- Rabbit Hole Animation ---- */
+@keyframes rabbit-hole-spiral {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: scale(0.3) rotate(720deg); opacity: 0; }
+}
+
+@keyframes rabbit-hole-enter {
+  0% { transform: scale(0.3) rotate(-720deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.rabbit-hole-exit {
+  animation: rabbit-hole-spiral 0.8s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+.rabbit-hole-enter {
+  animation: rabbit-hole-enter 0.8s cubic-bezier(0, 0.55, 0.45, 1) forwards;
+}
+
+/* ---- Checkered Pattern (Chess/Alice) ---- */
+.checkered-bg {
+  background-image:
+    linear-gradient(45deg, var(--checkered-light) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checkered-light) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checkered-light) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checkered-light) 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0;
+}
+
+/* ---- Art Deco Heading Ornaments ---- */
+.deco-heading {
+  position: relative;
+  display: inline-block;
+  padding: 0 32px;
+}
+
+.deco-heading::before,
+.deco-heading::after {
+  content: '\2726'; /* ✦ */
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--deco-gold);
+  font-size: 0.7em;
+  opacity: 0.5;
+}
+
+.deco-heading::before { left: 0; }
+.deco-heading::after { right: 0; }
+
+/* ---- Art Deco Gold Glow Text ---- */
+.neon-glow-gold,
+.deco-glow {
+  text-shadow: 0 0 10px var(--deco-gold-glow), 0 0 30px rgba(212, 168, 68, 0.15);
+}
+
+/* ---- Art Deco Card Enhancement ---- */
+.holo-card,
+.glass {
+  /* Add subtle gold inner top highlight for Art Deco feel */
+  background-image: linear-gradient(
+    180deg,
+    rgba(212, 168, 68, 0.02) 0%,
+    transparent 20%
+  );
+}
+
+/* ---- Keyhole / Looking Glass Portal ---- */
+.keyhole-portal {
+  position: relative;
+  width: 120px;
+  height: 180px;
+  border: 2px solid var(--deco-gold-dim);
+  border-radius: 60px 60px 4px 4px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center 30%, var(--looking-glass), var(--rabbit-hole-deep));
+}
+
+.keyhole-portal::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 50px;
+  background: var(--rabbit-hole-deep);
+  border-radius: 4px 4px 0 0;
+  border: 2px solid var(--deco-gold-dim);
+  border-bottom: none;
 }
 
 /* ---- Neon Glow ---- */
@@ -299,10 +538,20 @@ html.light .nav-search-btn:hover {
   animation: search-expand 0.2s ease-out;
 }
 
+.nav-search-expanded:focus-within {
+  border-color: rgba(0, 240, 255, 0.55);
+  box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.12), 0 0 16px rgba(0, 240, 255, 0.12);
+}
+
 html.light .nav-search-expanded {
   border-color: rgba(14, 165, 233, 0.3);
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 0 16px rgba(14, 165, 233, 0.08);
+}
+
+html.light .nav-search-expanded:focus-within {
+  border-color: rgba(14, 165, 233, 0.6);
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.12), 0 0 16px rgba(14, 165, 233, 0.12);
 }
 
 @keyframes search-expand {
@@ -323,6 +572,15 @@ html.light .nav-search-expanded {
   font-size: 12px;
   font-family: var(--font-mono, ui-monospace, monospace);
   color: var(--text-primary);
+}
+
+.nav-search-input:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 2px;
+}
+
+html.light .nav-search-input:focus-visible {
+  outline-color: var(--wl-blue);
 }
 
 .nav-search-input::placeholder {
@@ -428,11 +686,16 @@ html.light .hamburger-line {
   border-left: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: -8px 0 40px rgba(0, 0, 0, 0.4);
   transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.3s;
 }
 
 .mobile-menu-panel-open {
   transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
 }
 
 html.light .mobile-menu-panel {
@@ -2065,6 +2328,15 @@ html.light .hero-title-glow::after { opacity: 0.25; }
   cursor: pointer;
 }
 
+.mint-slider:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 3px;
+}
+
+html.light .mint-slider:focus-visible {
+  outline-color: var(--wl-blue);
+}
+
 .mint-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px;
@@ -2283,4 +2555,15 @@ html.light .mint-checkbox:has(input:checked) {
 html.light .mint-summary {
   border-color: rgba(0, 0, 0, 0.06);
   background: rgba(255, 255, 255, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

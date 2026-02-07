@@ -3,8 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "pull-source": "node scripts/pull-source.mjs",
+    "prebuild": "npm run pull-source",
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
+    "start": "npm run prebuild && docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
@@ -17,11 +19,15 @@
   "dependencies": {
     "@docusaurus/core": "3.9.2",
     "@docusaurus/preset-classic": "3.9.2",
+    "@docusaurus/theme-mermaid": "3.9.2",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
+    "docusaurus-plugin-typedoc": "^1.4.0",
     "prism-react-renderer": "^2.3.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "typedoc": "~0.28.0",
+    "typedoc-plugin-markdown": "^4.5.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.9.2",

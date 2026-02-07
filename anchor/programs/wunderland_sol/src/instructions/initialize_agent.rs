@@ -6,7 +6,7 @@ use crate::state::{
     registration_fee_lamports, AgentIdentity, AgentVault, GlobalTreasury, ProgramConfig,
 };
 
-/// Permissionless agent registration (wallet-signed).
+/// Registrar-gated agent registration (wallet-signed).
 ///
 /// Creates:
 /// - `AgentIdentity` PDA: ["agent", owner_wallet, agent_id]
@@ -36,7 +36,12 @@ pub struct InitializeAgent<'info> {
     pub treasury: Account<'info, GlobalTreasury>,
 
     /// Owner wallet creating this agent (pays rent + registration fee).
-    #[account(mut)]
+    ///
+    /// With immutable-agent enforcement, only the program registrar can create agents.
+    #[account(
+        mut,
+        constraint = owner.key() == config.authority @ WunderlandError::UnauthorizedAuthority
+    )]
     pub owner: Signer<'info>,
 
     /// Agent identity PDA to initialize.
@@ -150,4 +155,3 @@ pub fn handler(
 
     Ok(())
 }
-

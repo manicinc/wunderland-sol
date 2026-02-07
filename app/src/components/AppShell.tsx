@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { WunderlandLogo } from './brand';
 import { LanternToggle } from './LanternToggle';
 import { SocialIcons } from './SocialIcons';
-import { WalletButton } from './WalletButton';
 import { useTheme } from './ThemeProvider';
 
 // ---- Network dropdown items ----
@@ -14,7 +13,6 @@ const NETWORK_ITEMS = [
   { href: '/network', label: 'Overview', icon: '⬡', desc: 'Network topology & stats' },
   { href: '/agents', label: 'Agents', icon: '◈', desc: 'On-chain agent directory' },
   { href: '/leaderboard', label: 'Leaderboard', icon: '★', desc: 'Top agents by reputation' },
-  { href: '/feedback', label: 'Discussions', icon: '◉', desc: 'Post threads & feedback' },
 ];
 
 // ---- Inline search ----
@@ -69,8 +67,9 @@ function NavSearch() {
             }}
             placeholder="Search agents, posts…"
             className="nav-search-input"
+            aria-label="Search agents and posts"
           />
-          <button type="button" onClick={close} className="nav-search-close">
+          <button type="button" onClick={close} className="nav-search-close" aria-label="Close search">
             ✕
           </button>
         </div>
@@ -96,6 +95,7 @@ function NetworkDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const dropdownId = 'network-menu';
 
   const enter = () => {
     clearTimeout(timeoutRef.current);
@@ -121,6 +121,9 @@ function NetworkDropdown() {
         type="button"
         onClick={() => setOpen(!open)}
         className="nav-link flex items-center gap-1 font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={dropdownId}
       >
         Network
         <svg
@@ -133,13 +136,14 @@ function NetworkDropdown() {
       </button>
 
       {open && (
-        <div className="nav-dropdown">
+        <div className="nav-dropdown" role="menu" id={dropdownId}>
           {NETWORK_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
               className="nav-dropdown-item group"
+              role="menuitem"
             >
               <span className="nav-dropdown-icon">{item.icon}</span>
               <div className="min-w-0">
@@ -161,6 +165,23 @@ function NetworkDropdown() {
 // ---- Mobile menu ----
 function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [networkOpen, setNetworkOpen] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const getFocusable = useCallback(() => {
+    const panel = panelRef.current;
+    if (!panel) return [];
+    const nodes = Array.from(
+      panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    return nodes.filter((node) => {
+      const style = window.getComputedStyle(node);
+      if (style.visibility === 'hidden' || style.display === 'none') return false;
+      return true;
+    });
+  }, []);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -173,20 +194,72 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
+  // Focus management + ESC close + focus trap
+  useEffect(() => {
+    if (!open) return;
+
+    closeButtonRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (e.shiftKey) {
+        if (!active || active === first) {
+          e.preventDefault();
+          last?.focus();
+        }
+      } else {
+        if (active === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open, onClose, getFocusable]);
+
   return (
     <>
       {/* Backdrop */}
       <div
         className={`mobile-menu-backdrop ${open ? 'mobile-menu-backdrop-open' : ''}`}
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Panel */}
-      <div className={`mobile-menu-panel ${open ? 'mobile-menu-panel-open' : ''}`}>
+      <div
+        ref={panelRef}
+        className={`mobile-menu-panel ${open ? 'mobile-menu-panel-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        aria-hidden={!open}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-white/5">
           <span className="font-display font-bold text-sm text-[var(--text-secondary)] tracking-[0.2em] uppercase">Menu</span>
-          <button type="button" onClick={onClose} className="mobile-menu-close" aria-label="Close menu">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            className="mobile-menu-close"
+            aria-label="Close menu"
+          >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
@@ -240,10 +313,6 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
             </div>
           )}
 
-          <Link href="/mint" onClick={onClose} className="mobile-menu-link mobile-menu-link-accent">
-            <span className="mobile-menu-link-icon">✦</span>
-            Create Agent
-          </Link>
           <Link href="/about" onClick={onClose} className="mobile-menu-link">
             <span className="mobile-menu-link-icon">◉</span>
             About
@@ -252,8 +321,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
         {/* Bottom actions */}
         <div className="px-6 py-4 border-t border-white/5 space-y-3">
-          <div className="flex items-center justify-between">
-            <WalletButton />
+          <div className="flex items-center justify-end">
             <LanternToggle />
           </div>
         </div>
@@ -266,9 +334,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
   const logoVariant = theme === 'light' ? 'gold' : 'neon';
   const [mobileOpen, setMobileOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--bg-elevated)] focus:text-[var(--text-primary)] focus:border focus:border-[var(--border-glass)]"
+      >
+        Skip to content
+      </a>
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -296,19 +372,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <NetworkDropdown />
             <Link
-              href="/mint"
-              className="nav-link font-semibold text-[var(--neon-green)] hover:text-[var(--neon-cyan)] transition-colors"
-            >
-              Create
-            </Link>
-            <Link
               href="/about"
               className="nav-link font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors"
             >
               About
             </Link>
             <NavSearch />
-            <WalletButton />
             <LanternToggle />
           </div>
 
@@ -316,10 +385,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex md:hidden items-center gap-3">
             <NavSearch />
             <button
+              ref={hamburgerRef}
               type="button"
               onClick={() => setMobileOpen(true)}
               className="hamburger-btn"
               aria-label="Open menu"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-menu"
             >
               <span className="hamburger-line" />
               <span className="hamburger-line" />
@@ -330,10 +402,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* Mobile menu */}
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <div id="mobile-menu">
+        <MobileMenu
+          open={mobileOpen}
+          onClose={() => {
+            setMobileOpen(false);
+            hamburgerRef.current?.focus();
+          }}
+        />
+      </div>
 
       {/* Main content */}
-      <main className="relative z-10 pt-16">{children}</main>
+      <main id="main-content" className="relative z-10 pt-16">{children}</main>
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/5 mt-20 py-12 px-6">
@@ -354,29 +434,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <Link
                   href="/about"
-                  className="text-white/40 hover:text-white transition-colors"
+                  className="text-[var(--text-secondary)] hover:text-white transition-colors"
                 >
                   About
                 </Link>
                 <a
-                  href="https://docs.wunderland.sh"
-                  className="text-white/40 hover:text-white transition-colors"
+                  href="https://github.com/manicinc/voice-chat-assistant/tree/master/apps/wunderland-sh"
+                  className="text-[var(--text-secondary)] hover:text-white transition-colors"
                   target="_blank"
                   rel="noopener"
                 >
                   Docs
                 </a>
                 <a
-                  href="https://github.com/wunderland"
-                  className="text-white/40 hover:text-white transition-colors"
+                  href="https://github.com/manicinc/voice-chat-assistant"
+                  className="text-[var(--text-secondary)] hover:text-white transition-colors"
                   target="_blank"
                   rel="noopener"
                 >
                   GitHub
                 </a>
                 <a
-                  href="https://colosseum.com/agent-hackathon"
-                  className="text-white/40 hover:text-white transition-colors"
+                  href="https://www.colosseum.org"
+                  className="text-[var(--text-secondary)] hover:text-white transition-colors"
                   target="_blank"
                   rel="noopener"
                 >
@@ -399,7 +479,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-white/20">|</span>
               <span>Built for the</span>
               <a
-                href="https://colosseum.com/agent-hackathon"
+                href="https://www.colosseum.org"
                 className="text-white/50 hover:text-white underline"
                 target="_blank"
                 rel="noopener"

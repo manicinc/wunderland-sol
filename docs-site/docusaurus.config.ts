@@ -2,62 +2,62 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-
 const config: Config = {
   title: 'Wunderland',
-  tagline: 'AI-powered personal assistant framework with adaptive agents',
+  tagline: 'Adaptive AI agent framework with HEXACO personality, social networks, and on-chain provenance',
   favicon: 'img/favicon.ico',
 
-  // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
-    v4: true, // Improve compatibility with the upcoming Docusaurus v4
+    v4: true,
   },
 
-  // Set the production url of your site here
   url: 'https://docs.wunderland.sh',
-  // Set the /<baseUrl>/ pathname under which your site is served
   baseUrl: '/',
 
-  // GitHub pages deployment config.
-  organizationName: 'manicinc', // Your GitHub org/user name.
-  projectName: 'wunderland-sol', // Your repo name.
+  organizationName: 'manicinc',
+  projectName: 'wunderland-sol',
 
   onBrokenLinks: 'warn',
+  trailingSlash: false,
+
   markdown: {
-    hooks: {
-      onBrokenMarkdownLinks: 'warn',
-    },
+    format: 'detect',
+    mermaid: true,
   },
 
-  // Internationalization
+  themes: ['@docusaurus/theme-mermaid'],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  plugins: [
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        entryPoints: ['.source/wunderland/src/index.ts'],
+        tsconfig: '.source/wunderland/tsconfig.json',
+        out: 'docs/api-reference',
+        sidebar: {
+          autoConfiguration: true,
+          pretty: true,
+        },
+        skipErrorChecking: true,
+      },
+    ],
+  ],
 
   presets: [
     [
       'classic',
       {
         docs: {
-          sidebarPath: './sidebars.ts',
-          // Edit page links
+          sidebarPath: './sidebars.js',
           editUrl:
-            'https://github.com/manicinc/wunderland-sol/tree/main/docs-site/',
+            'https://github.com/manicinc/wunderland-sol/tree/master/docs-site/',
         },
-        blog: {
-          showReadingTime: true,
-          feedOptions: {
-            type: ['rss', 'atom'],
-            xslt: true,
-          },
-          editUrl:
-            'https://github.com/manicinc/wunderland-sol/tree/main/docs-site/',
-          onInlineTags: 'warn',
-          onInlineAuthors: 'warn',
-          onUntruncatedBlogPosts: 'warn',
-        },
+        blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -66,7 +66,6 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Social card
     image: 'img/wunderland-social-card.jpg',
     colorMode: {
       defaultMode: 'dark',
@@ -81,9 +80,9 @@ const config: Config = {
       items: [
         {
           type: 'docSidebar',
-          sidebarId: 'docsSidebar',
+          sidebarId: 'guideSidebar',
           position: 'left',
-          label: 'Documentation',
+          label: 'Guides',
         },
         {
           type: 'docSidebar',
@@ -91,14 +90,18 @@ const config: Config = {
           position: 'left',
           label: 'API Reference',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://wunderland.sh',
           label: 'App',
           position: 'right',
         },
         {
-          href: 'https://github.com/manicinc/wunderland-sol',
+          href: 'https://www.npmjs.com/package/wunderland',
+          label: 'npm',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/jddunn/wunderland',
           label: 'GitHub',
           position: 'right',
         },
@@ -110,61 +113,38 @@ const config: Config = {
         {
           title: 'Documentation',
           items: [
-            {
-              label: 'Getting Started',
-              to: '/docs',
-            },
-            {
-              label: 'Architecture',
-              to: '/docs/architecture/overview',
-            },
-            {
-              label: 'API Reference',
-              to: '/docs/api/overview',
-            },
+            {label: 'Getting Started', to: '/docs/'},
+            {label: 'Architecture', to: '/docs/architecture/overview'},
+            {label: 'Guides', to: '/docs/guides/creating-agents'},
+            {label: 'API Reference', to: '/docs/api/overview'},
           ],
         },
         {
           title: 'Community',
           items: [
-            {
-              label: 'GitHub Discussions',
-              href: 'https://github.com/manicinc/wunderland-sol/discussions',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discord.gg/wunderland',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/wunderlandsh',
-            },
+            {label: 'GitHub', href: 'https://github.com/jddunn/wunderland'},
+            {label: 'Discord', href: 'https://discord.gg/wunderland'},
+            {label: 'Twitter', href: 'https://twitter.com/wunderlandsh'},
           ],
         },
         {
-          title: 'Related Projects',
+          title: 'Related',
           items: [
-            {
-              label: 'AgentOS',
-              href: 'https://agentos.sh',
-            },
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/manicinc/wunderland-sol',
-            },
+            {label: 'Wunderland App', href: 'https://wunderland.sh'},
+            {label: 'AgentOS', href: 'https://agentos.sh'},
+            {label: 'AgentOS Docs', href: 'https://docs.agentos.sh'},
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Wunderland. Built with Docusaurus.`,
+      copyright: `Copyright \u00a9 ${new Date().getFullYear()} Wunderland. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
       additionalLanguages: ['typescript', 'json', 'bash', 'solidity'],
+    },
+    mermaid: {
+      theme: {light: 'neutral', dark: 'dark'},
     },
   } satisfies Preset.ThemeConfig,
 };

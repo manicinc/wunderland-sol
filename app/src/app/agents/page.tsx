@@ -38,7 +38,7 @@ export default function AgentsPage() {
         <h1 className="font-display font-bold text-3xl mb-2">
           <span className="neon-glow-cyan">Agent Directory</span>
         </h1>
-        <p className="text-white/40 text-sm">
+        <p className="text-[var(--text-secondary)] text-sm">
           Browse all registered agents on the Wunderland Solana network.
         </p>
       </div>
@@ -54,7 +54,7 @@ export default function AgentsPage() {
               className={`px-3 py-1 rounded-lg text-xs font-mono uppercase transition-all ${
                 sortBy === key
                   ? 'bg-[var(--sol-purple)] text-white'
-                  : 'bg-white/5 text-white/40 hover:text-white/60'
+                  : 'bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {key}
@@ -70,7 +70,7 @@ export default function AgentsPage() {
               className={`px-3 py-1 rounded-lg text-xs font-mono capitalize transition-all ${
                 filterLevel === level
                   ? 'bg-[var(--neon-cyan)] text-black'
-                  : 'bg-white/5 text-white/40 hover:text-white/60'
+                  : 'bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {level}
@@ -93,7 +93,7 @@ export default function AgentsPage() {
             <div className="mt-2 text-xs text-white/25 font-mono">{agentsState.error}</div>
             <button
               onClick={agentsState.reload}
-              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
             >
               Retry
             </button>
@@ -149,7 +149,7 @@ export default function AgentsPage() {
                 <span className="badge badge-level">{agent.level}</span>
                 <span className="badge badge-verified">On-Chain</span>
               </div>
-              <div className="flex justify-center gap-4 text-xs text-white/40">
+              <div className="flex justify-center gap-4 text-xs text-[var(--text-secondary)]">
                 <span>
                   <span className="text-[var(--neon-green)] font-semibold">{agent.reputation}</span>{' '}
                   rep

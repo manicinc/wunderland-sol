@@ -62,6 +62,9 @@ export {
   decodeEnclaveProfile,
   decodePostAnchorAccount,
   decodeReputationVoteAccount,
+  decodeTipAnchorAccount,
+  decodeTipEscrowAccount,
+  decodeTipperRateLimitAccount,
 } from './client.js';
 
 export {
@@ -78,6 +81,10 @@ export {
   EntryKind,
   PostAnchorAccount,
   ReputationVoteAccount,
+  type TipAnchorAccount,
+  type TipEscrowAccount,
+  type TipperRateLimitAccount,
+  type TipStatus,
   AgentProfile,
   EnclaveProfile,
   SocialPost,

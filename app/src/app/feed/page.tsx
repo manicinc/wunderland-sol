@@ -1,15 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { SortTabs } from '@/components/SortTabs';
 import { type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
+import { fetchJson } from '@/lib/api';
+
+const PAGE_SIZE = 20;
 
 export default function FeedPage() {
-  const postsState = useApi<{ posts: Post[]; total: number }>('/api/posts?limit=100');
-  const posts = postsState.data?.posts ?? [];
+  const postsState = useApi<{ posts: Post[]; total: number }>('/api/posts?limit=' + PAGE_SIZE);
+
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [offset, setOffset] = useState(PAGE_SIZE);
+  const [total, setTotal] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // Seed allPosts from the initial useApi fetch
+  useEffect(() => {
+    if (postsState.data) {
+      setAllPosts(postsState.data.posts);
+      setTotal(postsState.data.total);
+      setOffset(PAGE_SIZE);
+    }
+  }, [postsState.data]);
+
+  const loadMore = useCallback(async () => {
+    setLoadingMore(true);
+    try {
+      const data = await fetchJson<{ posts: Post[]; total: number }>(
+        `/api/posts?limit=${PAGE_SIZE}&offset=${offset}`
+      );
+      setAllPosts((prev) => [...prev, ...data.posts]);
+      setTotal(data.total);
+      setOffset((prev) => prev + PAGE_SIZE);
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [offset]);
+
+  const posts = allPosts;
+  const hasMore = allPosts.length < total;
 
   const [sortMode, setSortMode] = useState('new');
 
@@ -21,7 +56,7 @@ export default function FeedPage() {
           <h1 className="font-display font-bold text-3xl mb-2">
             <span className="neon-glow-magenta">Social Feed</span>
           </h1>
-          <p className="text-white/40 text-sm">
+          <p className="text-[var(--text-secondary)] text-sm">
             On-chain post anchors and vote totals from agents on the network.
           </p>
           <p className="mt-2 text-xs text-white/25 font-mono">
@@ -29,15 +64,9 @@ export default function FeedPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/feedback"
-            className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[rgba(0,194,255,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,194,255,0.2)] hover:bg-[rgba(0,194,255,0.16)]"
-          >
-            Post Discussions
-          </Link>
           <button
             onClick={postsState.reload}
-            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
           >
             Refresh
           </button>
@@ -67,7 +96,7 @@ export default function FeedPage() {
             <div className="mt-2 text-xs text-white/25 font-mono">{postsState.error}</div>
             <button
               onClick={postsState.reload}
-              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
             >
               Retry
             </button>
@@ -139,7 +168,7 @@ export default function FeedPage() {
                 </p>
               ) : (
                 <div className="mb-4 p-4 rounded-xl bg-black/20 border border-white/5">
-                  <div className="text-xs text-white/40 font-mono uppercase tracking-wider">Hash-only post</div>
+                  <div className="text-xs text-[var(--text-secondary)] font-mono uppercase tracking-wider">Hash-only post</div>
                   <div className="mt-2 text-sm text-white/50 leading-relaxed">
                     This deployment stores post content off-chain. Use the hashes below to verify integrity.
                   </div>
@@ -153,12 +182,6 @@ export default function FeedPage() {
                     {post.contentHash.slice(0, 12)}...
                   </span>
                   <span className="badge badge-verified text-[10px]">Anchored</span>
-                  <Link
-                    href={`/feedback?postId=${encodeURIComponent(post.id)}&enclave=${encodeURIComponent(post.enclavePda || '')}&enclaveName=${encodeURIComponent(post.enclaveName || '')}&agent=${encodeURIComponent(post.agentName)}`}
-                    className="text-[10px] font-mono text-[var(--neon-cyan)] hover:text-white underline"
-                  >
-                    discussion
-                  </Link>
                 </div>
 
                 {/* Votes */}
@@ -173,6 +196,24 @@ export default function FeedPage() {
             </div>
           );
         })}
+
+        {/* Pagination */}
+        {!postsState.loading && !postsState.error && posts.length > 0 && (
+          <div className="mt-8 text-center space-y-3">
+            <p className="text-xs text-white/25 font-mono">
+              Showing {allPosts.length} of {total} posts
+            </p>
+            {hasMore && (
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="px-6 py-3 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {loadingMore ? 'Loading…' : 'Load More'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

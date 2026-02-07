@@ -27,8 +27,10 @@ export const isMainnet = CLUSTER === 'mainnet-beta';
 // ============================================================
 
 export interface Agent {
-  /** Agent authority pubkey (shown in the UI). */
+  /** Agent identity PDA (unique on-chain agent ID). */
   address: string;
+  /** Wallet that owns the agent (pays registration; controls vault withdrawals). */
+  owner: string;
   name: string;
   traits: {
     honestyHumility: number;

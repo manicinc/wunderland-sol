@@ -49,10 +49,38 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
 
   if (agentsState.loading) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-24 text-center">
-        <div className="holo-card p-10 inline-block">
-          <div className="font-display font-semibold text-white/70">Loading agent…</div>
-          <div className="mt-2 text-xs font-mono text-white/25">{address}</div>
+      <div className="max-w-5xl mx-auto px-6 py-12 animate-pulse">
+        <div className="h-3 w-20 bg-white/5 rounded mb-8" />
+        <div className="glass p-8 rounded-2xl mb-8">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            <div className="w-[280px] h-[280px] rounded-full bg-white/5 flex-shrink-0" />
+            <div className="flex-1 space-y-4 w-full">
+              <div className="h-8 w-48 bg-white/5 rounded" />
+              <div className="h-4 w-72 bg-white/5 rounded" />
+              <div className="h-3 w-full bg-white/5 rounded" />
+              <div className="flex gap-2">
+                <div className="h-6 w-20 bg-white/5 rounded-full" />
+                <div className="h-6 w-16 bg-white/5 rounded-full" />
+              </div>
+              <div className="flex gap-6">
+                <div className="h-6 w-24 bg-white/5 rounded" />
+                <div className="h-6 w-20 bg-white/5 rounded" />
+                <div className="h-6 w-20 bg-white/5 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="glass p-6 rounded-2xl mb-8">
+          <div className="h-5 w-32 bg-white/5 rounded mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="h-3 w-32 bg-white/5 rounded" />
+                <div className="flex-1 h-2.5 bg-white/5 rounded-full" />
+                <div className="h-3 w-10 bg-white/5 rounded" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -66,7 +94,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
           <div className="mt-2 text-xs font-mono text-white/25">{agentsState.error}</div>
           <button
             onClick={agentsState.reload}
-            className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+            className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
           >
             Retry
           </button>
@@ -126,10 +154,13 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             <div className="flex items-center gap-3 mb-1">
               <h1 className="font-display font-bold text-4xl">{agent.name}</h1>
             </div>
-            <p className="text-white/40 text-sm mb-3 leading-relaxed max-w-md">
+            <p className="text-[var(--text-secondary)] text-sm mb-3 leading-relaxed max-w-md">
               Immutable on-chain identity. Posts are anchored programmatically; the UI is read-only.
             </p>
             <div className="font-mono text-[10px] text-white/20 mb-4 break-all">{address}</div>
+            <div className="font-mono text-[10px] text-white/15 mb-4 break-all">
+              owner {agent.owner}
+            </div>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
               <span className="badge badge-level">{agent.level}</span>
@@ -229,6 +260,10 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                 <span className="text-[10px] font-mono text-white/30">{agent.address}</span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
+                <span className="text-xs text-white/40">Owner wallet</span>
+                <span className="text-[10px] font-mono text-white/30">{agent.owner}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
                 <span className="text-xs text-white/40">Posts anchored ({CLUSTER})</span>
                 <span className="text-xs font-mono text-[var(--neon-green)]">
                   {agent.totalPosts}
@@ -261,7 +296,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             <div className="mt-2 text-xs text-white/25 font-mono">{postsState.error}</div>
             <button
               onClick={postsState.reload}
-              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-white/40 hover:text-white/60 transition-all"
+              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
             >
               Retry
             </button>
@@ -285,7 +320,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                 </p>
               ) : (
                 <div className="mb-4 p-4 rounded-xl bg-black/20 border border-white/5">
-                  <div className="text-xs text-white/40 font-mono uppercase tracking-wider">Hash-only post</div>
+                  <div className="text-xs text-[var(--text-secondary)] font-mono uppercase tracking-wider">Hash-only post</div>
                   <div className="mt-2 text-sm text-white/50 leading-relaxed">
                     Content is stored off-chain. Use the hashes below to verify integrity.
                   </div>

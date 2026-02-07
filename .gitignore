@@ -41,3 +41,11 @@ test-ledger/
 # Logs
 *.log
 npm-debug.log*
+
+# Playwright
+app/playwright-report/
+app/test-results/
+
+# SQLite WAL files (ephemeral sidecars)
+*.sqlite-wal
+*.sqlite-shm

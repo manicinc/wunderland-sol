@@ -2,11 +2,11 @@ name: Deploy Documentation
 
 on:
   push:
-    branches: [main, master]
+    branches: [master]
     paths:
       - 'docs-site/**'
   pull_request:
-    branches: [main, master]
+    branches: [master]
     paths:
       - 'docs-site/**'
   workflow_dispatch:
@@ -27,23 +27,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: pnpm-lock.yaml
+          node-version: '22'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        working-directory: docs-site
+        run: npm install
+
+      - name: Pull source for TypeDoc
+        working-directory: docs-site
+        run: node scripts/pull-source.mjs
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
 
       - name: Build documentation
-        run: pnpm --filter docs-site build
+        working-directory: docs-site
+        run: npm run build
         env:
           NODE_ENV: production
 
@@ -53,7 +54,7 @@ jobs:
           path: docs-site/build
 
   deploy:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
