@@ -205,11 +205,6 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pulse-glow z-10">
-          <span className="text-[var(--text-tertiary)] text-xs font-mono tracking-widest uppercase">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-[var(--text-tertiary)] to-transparent" />
-        </div>
       </section>
 
       {/* $WUNDER Token Launch Banner */}

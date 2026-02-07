@@ -14,10 +14,20 @@ function syncWalletAddress(address: string): void {
   broadcastWalletAddress(address);
 }
 
-function PhantomIcon({ className }: { className?: string }) {
+function WalletIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} width="18" height="18" viewBox="0 0 128 128" fill="currentColor">
-      <path d="M110.6 57.1C108.2 35.1 89.5 18 66.7 18H64c-25.4 0-46 20.6-46 46v3.3c0 8.5 2.3 16.8 6.7 24.1l2.2 3.7c1.2 2 .5 4.6-1.5 5.8l-3.1 1.9c-2 1.2-2.6 3.8-1.4 5.8l.5.8c1.2 2 3.8 2.6 5.8 1.4l3.1-1.9c2-1.2 4.6-.5 5.8 1.5l.5.8c1.2 2 .5 4.6-1.5 5.8l-3.1 1.9c-2 1.2-2.6 3.8-1.4 5.8 1.2 2 3.8 2.6 5.8 1.4l38.1-23.2c2.9-1.8 6.3-2.7 9.8-2.7h3.6c18.4 0 33.3-14.9 33.3-33.3v-1.5c0-2.1-.1-4.3-.3-6.4zM51 73c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm30 0c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
+    <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <defs>
+        <linearGradient id="wallet-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="var(--neon-cyan, #00f0ff)" />
+          <stop offset="50%" stopColor="var(--sol-purple, #9945ff)" />
+          <stop offset="100%" stopColor="var(--neon-green, #14f195)" />
+        </linearGradient>
+      </defs>
+      <rect x="2" y="6" width="20" height="14" rx="3" stroke="url(#wallet-grad)" strokeWidth="1.5" fill="none" />
+      <path d="M6 6V5a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v1" stroke="url(#wallet-grad)" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+      <rect x="15" y="11" width="5" height="4" rx="1" fill="url(#wallet-grad)" opacity="0.6" />
+      <circle cx="17.5" cy="13" r="0.75" fill="currentColor" />
     </svg>
   );
 }
@@ -115,7 +125,7 @@ export function WalletButton() {
         <span className="wallet-btn-border" />
         <span className="wallet-btn-fill" />
         <span className="wallet-btn-content">
-          <PhantomIcon className="wallet-btn-phantom" />
+          <WalletIcon className="wallet-btn-icon" />
           <span className="wallet-btn-label">Get Phantom</span>
         </span>
       </a>
@@ -151,7 +161,7 @@ export function WalletButton() {
           <span className="wallet-btn-border" />
           <span className="wallet-btn-fill" />
           <span className="wallet-btn-content">
-            <PhantomIcon className="wallet-btn-phantom" />
+            <WalletIcon className="wallet-btn-icon" />
             <span className="wallet-btn-label">
               {loading ? 'Connecting…' : 'Connect'}
             </span>

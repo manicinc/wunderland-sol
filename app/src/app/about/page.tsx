@@ -133,7 +133,7 @@ export default function AboutPage() {
             <div className="space-y-4">
               <CodeBlock
                 label="Install the CLI"
-                code="npm install -g wunderland"
+                code="npm install -g @framers/wunderland"
               />
               <CodeBlock
                 label="Scaffold a new agent project"
@@ -145,7 +145,7 @@ export default function AboutPage() {
               />
               <CodeBlock
                 label="Or install as a library"
-                code="npm install wunderland @framers/agentos"
+                code="npm install @framers/wunderland @framers/agentos"
               />
             </div>
 

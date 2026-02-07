@@ -1192,13 +1192,25 @@ html.light .mobile-menu-sublink:hover {
   inherits: false;
 }
 
+@property --shimmer-pos {
+  syntax: '<percentage>';
+  initial-value: -100%;
+  inherits: false;
+}
+
 @keyframes btn-rotate {
   from { --btn-angle: 0deg; }
   to { --btn-angle: 360deg; }
 }
 
+@keyframes btn-shimmer {
+  0% { --shimmer-pos: -100%; }
+  100% { --shimmer-pos: 200%; }
+}
+
 .organic-btn {
   cursor: pointer;
+  position: relative;
 }
 
 .organic-btn-border {
@@ -1210,18 +1222,46 @@ html.light .mobile-menu-sublink:hover {
     var(--btn-accent, #14f195) 75%,
     var(--btn-color, #9945ff) 100%
   );
-  opacity: 0.3;
-  animation: btn-rotate 6s linear infinite;
+  opacity: 0.45;
+  animation: btn-rotate 4s linear infinite;
   transition: opacity 0.3s ease;
 }
 
+/* Luminescent shimmer sweep */
+.organic-btn::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.05) 42%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 58%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-position: var(--shimmer-pos, -100%) 0;
+  animation: btn-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .organic-btn:hover .organic-btn-border {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .organic-btn:hover {
-  box-shadow: 0 0 24px color-mix(in srgb, var(--btn-color, #9945ff) 30%, transparent);
-  transform: translateY(-1px);
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--btn-color, #9945ff) 35%, transparent),
+    0 0 56px color-mix(in srgb, var(--btn-accent, #14f195) 15%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.organic-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* ---- Wallet Button (Mystical Glass) ---- */
@@ -1257,8 +1297,8 @@ html.light .mobile-menu-sublink:hover {
     var(--sol-purple) 75%,
     var(--neon-cyan) 100%
   );
-  opacity: 0.3;
-  animation: btn-rotate 6s linear infinite;
+  opacity: 0.4;
+  animation: btn-rotate 4s linear infinite;
   transition: opacity 0.3s ease;
 }
 
@@ -1301,8 +1341,8 @@ html.light .mobile-menu-sublink:hover {
   font-weight: 600;
 }
 
-.wallet-btn-phantom {
-  opacity: 0.6;
+.wallet-btn-icon {
+  opacity: 0.7;
   transition: all 0.3s ease;
   filter: drop-shadow(0 0 0px transparent);
 }
@@ -1319,7 +1359,7 @@ html.light .mobile-menu-sublink:hover {
   color: rgba(255, 255, 255, 0.95);
 }
 
-.wallet-btn:hover .wallet-btn-phantom {
+.wallet-btn:hover .wallet-btn-icon {
   opacity: 1;
 }
 
@@ -1340,7 +1380,7 @@ html.light .mobile-menu-sublink:hover {
   color: var(--neon-cyan);
 }
 
-.wallet-btn-connect:hover .wallet-btn-phantom {
+.wallet-btn-connect:hover .wallet-btn-icon {
   filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.5));
   color: var(--neon-cyan);
 }
@@ -1363,7 +1403,7 @@ html.light .mobile-menu-sublink:hover {
   color: var(--sol-purple);
 }
 
-.wallet-btn-install:hover .wallet-btn-phantom {
+.wallet-btn-install:hover .wallet-btn-icon {
   filter: drop-shadow(0 0 6px rgba(153, 69, 255, 0.5));
   color: var(--sol-purple);
 }
