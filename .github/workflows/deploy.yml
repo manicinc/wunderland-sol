@@ -75,9 +75,9 @@ jobs:
           ls deploy/node_modules/better-sqlite3/build/Release/better_sqlite3.node
           ls deploy/app/node_modules/better-sqlite3/build/Release/better_sqlite3.node
 
-          # Create tarball (preserves dot-directories)
-          cd deploy && tar czf /tmp/deploy.tar.gz . && cd ..
-          ls -lh /tmp/deploy.tar.gz
+          # Create tarball in workspace (scp-action can only see workspace)
+          cd deploy && tar czf ../deploy.tar.gz . && cd ..
+          ls -lh deploy.tar.gz
 
       - name: Deploy to Linode
         uses: appleboy/ssh-action@v1
@@ -99,9 +99,8 @@ jobs:
           host: ${{ secrets.LINODE_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: /tmp/deploy.tar.gz
+          source: deploy.tar.gz
           target: /tmp/
-          strip_components: 0
 
       - name: Extract and start
         uses: appleboy/ssh-action@v1
