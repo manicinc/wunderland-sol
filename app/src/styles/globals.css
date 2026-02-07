@@ -2557,6 +2557,401 @@ html.light .mint-summary {
   background: rgba(255, 255, 255, 0.8);
 }
 
+/* ============================================================
+   SCROLL-REVEAL & STAGGER ANIMATIONS
+   ============================================================ */
+
+.animate-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-in-scale {
+  opacity: 0;
+  transform: scale(0.92) translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-in-scale.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.stagger-1 { transition-delay: 0.05s; }
+.stagger-2 { transition-delay: 0.10s; }
+.stagger-3 { transition-delay: 0.15s; }
+.stagger-4 { transition-delay: 0.20s; }
+.stagger-5 { transition-delay: 0.25s; }
+.stagger-6 { transition-delay: 0.30s; }
+.stagger-7 { transition-delay: 0.35s; }
+.stagger-8 { transition-delay: 0.40s; }
+.stagger-9 { transition-delay: 0.45s; }
+.stagger-10 { transition-delay: 0.50s; }
+.stagger-11 { transition-delay: 0.55s; }
+.stagger-12 { transition-delay: 0.60s; }
+
+/* ============================================================
+   3D CARD TILT SYSTEM
+   ============================================================ */
+
+.tilt-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.tilt-card:hover {
+  transform: perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+}
+
+.tilt-card .tilt-card-inner {
+  transform: translateZ(20px);
+}
+
+/* ============================================================
+   ART DECO SECTION DIVIDERS
+   ============================================================ */
+
+.deco-section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.55;
+}
+
+.deco-section-divider svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.deco-section-divider .deco-center-diamond {
+  animation: deco-diamond-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes deco-diamond-shimmer {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 2px var(--deco-gold)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px var(--deco-gold)); }
+}
+
+html.light .deco-section-divider {
+  opacity: 0.45;
+}
+
+/* ============================================================
+   SECTION GLOW BACKGROUNDS
+   ============================================================ */
+
+.section-glow-purple {
+  position: relative;
+}
+.section-glow-purple::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(153, 69, 255, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.section-glow-cyan {
+  position: relative;
+}
+.section-glow-cyan::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0, 240, 255, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.section-glow-gold {
+  position: relative;
+}
+.section-glow-gold::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 68, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.section-glow-green {
+  position: relative;
+}
+.section-glow-green::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(20, 241, 149, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+html.light .section-glow-purple::before { background: radial-gradient(ellipse at 50% 0%, rgba(109, 40, 217, 0.05) 0%, transparent 70%); }
+html.light .section-glow-cyan::before { background: radial-gradient(ellipse at 50% 0%, rgba(14, 165, 233, 0.04) 0%, transparent 70%); }
+html.light .section-glow-gold::before { background: radial-gradient(ellipse at 50% 0%, rgba(146, 64, 14, 0.04) 0%, transparent 70%); }
+html.light .section-glow-green::before { background: radial-gradient(ellipse at 50% 0%, rgba(5, 150, 105, 0.04) 0%, transparent 70%); }
+
+/* ============================================================
+   GOLD SPARKLE PARTICLES
+   ============================================================ */
+
+@keyframes sparkle-float {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(-40px) scale(0.3); opacity: 0; }
+}
+
+.sparkle-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sparkle-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--neon-gold);
+  box-shadow: 0 0 6px var(--neon-gold);
+  animation: sparkle-float 3s ease-in-out infinite;
+}
+
+/* ============================================================
+   ANIMATED TRAIT BAR FILL
+   ============================================================ */
+
+.trait-bar-animated {
+  width: 0%;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trait-bar-animated.filled {
+  width: var(--trait-width, 0%);
+}
+
+/* ============================================================
+   ANIMATED STEP CONNECTOR
+   ============================================================ */
+
+@keyframes step-flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.step-connector-line {
+  stroke-dasharray: 6 4;
+  animation: step-flow 1.5s linear infinite;
+}
+
+/* ============================================================
+   ENHANCED SORT TABS
+   ============================================================ */
+
+.sort-tab-active-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--sol-purple), var(--neon-cyan));
+  border-radius: 1px;
+  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   PODIUM ENTRANCE ANIMATION
+   ============================================================ */
+
+.podium-enter {
+  opacity: 0;
+  transform: translateY(40px) scale(0.9);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.podium-enter.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.podium-rank-1 { transition-delay: 0.4s; }
+.podium-rank-2 { transition-delay: 0.15s; }
+.podium-rank-3 { transition-delay: 0.25s; }
+
+/* Rank glow rings */
+.rank-glow-gold {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2), 0 0 40px rgba(255, 215, 0, 0.1);
+  animation: rank-glow-pulse 3s ease-in-out infinite;
+}
+
+.rank-glow-purple {
+  box-shadow: 0 0 20px rgba(153, 69, 255, 0.2), 0 0 40px rgba(153, 69, 255, 0.1);
+  animation: rank-glow-pulse 3s ease-in-out infinite 0.5s;
+}
+
+.rank-glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2), 0 0 40px rgba(0, 240, 255, 0.1);
+  animation: rank-glow-pulse 3s ease-in-out infinite 1s;
+}
+
+@keyframes rank-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--glow-color, rgba(255, 215, 0, 0.2)), 0 0 40px var(--glow-color, rgba(255, 215, 0, 0.1)); }
+  50% { box-shadow: 0 0 30px var(--glow-color, rgba(255, 215, 0, 0.35)), 0 0 60px var(--glow-color, rgba(255, 215, 0, 0.15)); }
+}
+
+/* ============================================================
+   SEARCH INPUT GLOW
+   ============================================================ */
+
+.search-input-glow {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input-glow:focus-within {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.12), 0 0 40px rgba(0, 240, 255, 0.06), inset 0 0 12px rgba(0, 240, 255, 0.03);
+}
+
+html.light .search-input-glow:focus-within {
+  border-color: var(--wl-blue) !important;
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.1), 0 0 40px rgba(14, 165, 233, 0.05);
+}
+
+/* ============================================================
+   PRIORITY COLORS (World page stimulus feed)
+   ============================================================ */
+
+.priority-breaking {
+  background: rgba(255, 51, 102, 0.06);
+  border-left: 3px solid var(--neon-red);
+}
+
+.priority-high {
+  background: rgba(255, 215, 0, 0.05);
+  border-left: 3px solid var(--neon-gold);
+}
+
+.priority-normal {
+  border-left: 3px solid rgba(255, 255, 255, 0.08);
+}
+
+.priority-low {
+  border-left: 3px solid rgba(255, 255, 255, 0.04);
+  opacity: 0.8;
+}
+
+html.light .priority-breaking { background: rgba(185, 28, 28, 0.05); border-left-color: var(--neon-red); }
+html.light .priority-high { background: rgba(146, 64, 14, 0.05); border-left-color: var(--neon-gold); }
+html.light .priority-normal { border-left-color: rgba(0, 0, 0, 0.08); }
+html.light .priority-low { border-left-color: rgba(0, 0, 0, 0.04); }
+
+/* ============================================================
+   VOTE COLOR CODING
+   ============================================================ */
+
+.vote-positive { color: var(--neon-green); }
+.vote-negative { color: var(--neon-red); }
+.vote-neutral { color: var(--text-tertiary); }
+
+/* ============================================================
+   TRAIT ACCENT BORDER
+   ============================================================ */
+
+.trait-accent-border {
+  border-left: 3px solid var(--trait-color, var(--sol-purple));
+  transition: border-color 0.3s ease;
+}
+
+/* ============================================================
+   CONFETTI / SPARKLE FOR #1 RANK
+   ============================================================ */
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(120px) rotate(720deg); opacity: 0; }
+}
+
+.confetti-container {
+  position: absolute;
+  inset: -20px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  animation: confetti-fall 4s linear infinite;
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+
+@media print {
+  body::before,
+  .aurora-bg,
+  .sparkle-container,
+  .confetti-container,
+  .hexaco-hero-orbit-ring,
+  .hexaco-hero-orbit-avatar,
+  .deco-section-divider,
+  nav,
+  footer { display: none !important; }
+
+  .glass,
+  .holo-card {
+    backdrop-filter: none !important;
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -2566,7 +2961,18 @@ html.light .mint-summary {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+
+  .animate-in,
+  .animate-in-scale,
+  .podium-enter {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
+
+/* ============================================================
+   HIGH CONTRAST
+   ============================================================ */
 
 @media (prefers-contrast: more) {
   :root {

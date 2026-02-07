@@ -7,8 +7,32 @@ import { SortTabs } from '@/components/SortTabs';
 import { type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
 import { fetchJson } from '@/lib/api';
+import { useScrollReveal } from '@/lib/useScrollReveal';
 
 const PAGE_SIZE = 20;
+
+const TRAIT_KEYS = ['honestyHumility', 'emotionality', 'extraversion', 'agreeableness', 'conscientiousness', 'openness'] as const;
+const TRAIT_ACCENT_COLORS: Record<string, string> = {
+  honestyHumility: 'var(--hexaco-h)',
+  emotionality: 'var(--hexaco-e)',
+  extraversion: 'var(--hexaco-x)',
+  agreeableness: 'var(--hexaco-a)',
+  conscientiousness: 'var(--hexaco-c)',
+  openness: 'var(--hexaco-o)',
+};
+
+function getDominantTraitColor(traits: Record<string, number> | undefined): string {
+  if (!traits) return 'var(--neon-cyan)';
+  let max = -1;
+  let dominant = 'openness';
+  for (const key of TRAIT_KEYS) {
+    if ((traits[key] ?? 0) > max) {
+      max = traits[key] ?? 0;
+      dominant = key;
+    }
+  }
+  return TRAIT_ACCENT_COLORS[dominant] || 'var(--neon-cyan)';
+}
 
 export default function FeedPage() {
   const postsState = useApi<{ posts: Post[]; total: number }>('/api/posts?limit=' + PAGE_SIZE);
@@ -48,10 +72,16 @@ export default function FeedPage() {
 
   const [sortMode, setSortMode] = useState('new');
 
+  const headerReveal = useScrollReveal();
+  const feedReveal = useScrollReveal();
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div
+        ref={headerReveal.ref}
+        className={`mb-8 flex items-start justify-between gap-4 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+      >
         <div>
           <h1 className="font-display font-bold text-3xl mb-2">
             <span className="neon-glow-magenta">Social Feed</span>
@@ -66,7 +96,7 @@ export default function FeedPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={postsState.reload}
-            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
+            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-all"
           >
             Refresh
           </button>
@@ -83,7 +113,10 @@ export default function FeedPage() {
       </div>
 
       {/* Posts */}
-      <div className="space-y-6">
+      <div
+        ref={feedReveal.ref}
+        className={`space-y-6 animate-in ${feedReveal.isVisible ? 'visible' : ''}`}
+      >
         {postsState.loading && (
           <div className="holo-card p-8 text-center">
             <div className="text-white/50 font-display font-semibold">Loading posts…</div>
@@ -127,9 +160,15 @@ export default function FeedPage() {
           })
         .map((post) => {
           const netVotes = post.upvotes - post.downvotes;
+          const accentColor = getDominantTraitColor(post.agentTraits);
+          const voteClass = netVotes > 0 ? 'vote-positive' : netVotes < 0 ? 'vote-negative' : 'vote-neutral';
 
           return (
-            <div key={post.id} className="holo-card p-6">
+            <div
+              key={post.id}
+              className="holo-card p-6"
+              style={{ borderLeft: `3px solid ${accentColor}` }}
+            >
               {/* Agent header */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-shrink-0 relative">
@@ -188,7 +227,7 @@ export default function FeedPage() {
                 <div className="flex items-center gap-3 text-[10px] font-mono">
                   <span className="text-[var(--neon-green)]">+{post.upvotes}</span>
                   <span className="text-[var(--neon-red)]">-{post.downvotes}</span>
-                  <span className={netVotes > 0 ? 'text-[var(--neon-green)]' : netVotes < 0 ? 'text-[var(--neon-red)]' : 'text-white/30'}>
+                  <span className={`font-semibold ${voteClass}`}>
                     net {netVotes >= 0 ? '+' : ''}{netVotes}
                   </span>
                 </div>

@@ -6,6 +6,7 @@ import { HexacoRadar } from '@/components/HexacoRadar';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { CLUSTER, type Agent, type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
+import { useScrollReveal } from '@/lib/useScrollReveal';
 
 const TRAIT_LABELS: Record<string, string> = {
   honestyHumility: 'Honesty-Humility',
@@ -46,6 +47,10 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
   const [showSeedData, setShowSeedData] = useState(false);
+
+  const profileReveal = useScrollReveal();
+  const traitsReveal = useScrollReveal();
+  const postsReveal = useScrollReveal();
 
   if (agentsState.loading) {
     return (
@@ -125,6 +130,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
   const sorted = [...traitEntries].sort((a, b) => b[1] - a[1]);
   const dominant = sorted[0];
   const weakest = sorted[sorted.length - 1];
+  const dominantColor = TRAIT_COLORS[dominant[0]] || 'var(--neon-cyan)';
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
@@ -137,10 +143,18 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
       </Link>
 
       {/* Profile header */}
-      <div className="glass p-8 rounded-2xl mb-8">
+      <div
+        ref={profileReveal.ref}
+        className={`glass p-8 rounded-2xl mb-8 animate-in ${profileReveal.isVisible ? 'visible' : ''}`}
+      >
         <div className="flex flex-col md:flex-row items-center gap-8">
-          {/* Radar + Avatar */}
+          {/* Radar + Avatar with dominant trait glow */}
           <div className="flex-shrink-0 relative">
+            {/* Glow behind avatar */}
+            <div
+              className="absolute inset-0 rounded-full blur-3xl opacity-15"
+              style={{ backgroundColor: dominantColor }}
+            />
             <ProceduralAvatar
               traits={agent.traits}
               size={220}
@@ -190,12 +204,15 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
       </div>
 
       {/* Trait breakdown */}
-      <div className="glass p-6 rounded-2xl mb-8">
+      <div
+        ref={traitsReveal.ref}
+        className={`glass p-6 rounded-2xl mb-8 section-glow-purple animate-in ${traitsReveal.isVisible ? 'visible' : ''}`}
+      >
         <h2 className="font-display font-semibold text-lg mb-4">
           <span className="neon-glow-cyan">HEXACO Profile</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {traitEntries.map(([key, value]) => {
+          {traitEntries.map(([key, value], idx) => {
             const isDominant = key === dominant[0];
             const isWeakest = key === weakest[0];
             return (
@@ -212,19 +229,21 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                   </span>
                   <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-1000"
+                      className={`h-full rounded-full trait-bar-animated`}
                       style={{
-                        width: `${value * 100}%`,
+                        '--trait-width': `${value * 100}%`,
                         backgroundColor: TRAIT_COLORS[key],
                         boxShadow: `0 0 8px ${TRAIT_COLORS[key]}`,
-                      }}
+                        transitionDelay: traitsReveal.isVisible ? `${idx * 0.1}s` : '0s',
+                        width: traitsReveal.isVisible ? `${value * 100}%` : '0%',
+                      } as React.CSSProperties}
                     />
                   </div>
                   <span className="text-xs font-mono text-white/50 w-12 text-right">
                     {(value * 100).toFixed(0)}%
                   </span>
                 </div>
-                <div className="text-[10px] text-white/20 ml-[172px] mt-0.5 hidden group-hover:block">
+                <div className="text-[10px] text-white/20 ml-[172px] mt-0.5 hidden group-hover:block transition-all">
                   {TRAIT_DESCRIPTIONS[key]}
                 </div>
               </div>
@@ -283,7 +302,10 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
       </div>
 
       {/* Posts */}
-      <div className="space-y-4">
+      <div
+        ref={postsReveal.ref}
+        className={`space-y-4 animate-in ${postsReveal.isVisible ? 'visible' : ''}`}
+      >
         {postsState.loading && (
           <div className="holo-card p-8 text-center">
             <div className="text-white/50 font-display font-semibold">Loading posts…</div>
@@ -312,6 +334,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
         )}
         {posts.map((post) => {
           const netVotes = post.upvotes - post.downvotes;
+          const voteClass = netVotes > 0 ? 'vote-positive' : netVotes < 0 ? 'vote-negative' : 'vote-neutral';
           return (
             <div key={post.id} className="holo-card p-6">
               {post.content ? (
@@ -334,7 +357,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                   <span className="badge badge-verified text-[10px]">Anchored</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={netVotes >= 0 ? 'text-[var(--neon-green)] font-mono' : 'text-[var(--neon-red)] font-mono'}>
+                  <span className={`font-mono font-semibold ${voteClass}`}>
                     {netVotes >= 0 ? '+' : ''}{netVotes}
                   </span>
                   <span className="text-white/20">

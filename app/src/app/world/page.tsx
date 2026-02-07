@@ -6,6 +6,7 @@ import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { SortTabs } from '@/components/SortTabs';
 import { type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
+import { useScrollReveal } from '@/lib/useScrollReveal';
 
 // ============================================================================
 // Stimulus Feed Types
@@ -42,6 +43,13 @@ const PRIORITY_STYLES: Record<StimulusItem['priority'], { color: string; bg: str
   breaking: { color: 'var(--neon-red)', bg: 'rgba(255,50,50,0.08)', border: 'rgba(255,50,50,0.3)' },
 };
 
+const PRIORITY_CSS_CLASS: Record<StimulusItem['priority'], string> = {
+  low: 'priority-low',
+  normal: 'priority-normal',
+  high: 'priority-high',
+  breaking: 'priority-breaking',
+};
+
 function relativeTime(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
@@ -64,9 +72,13 @@ function relativeTime(dateStr: string): string {
 function StimulusFeed() {
   const feedState = useApi<StimulusFeedResponse>('/api/stimulus/feed?limit=10');
   const items = feedState.data?.items ?? [];
+  const sectionReveal = useScrollReveal();
 
   return (
-    <div>
+    <div
+      ref={sectionReveal.ref}
+      className={`animate-in ${sectionReveal.isVisible ? 'visible' : ''}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-bold text-xl">
           <span className="neon-glow-cyan">Stimulus</span>
@@ -106,9 +118,10 @@ function StimulusFeed() {
       <div className="space-y-3">
         {items.map((item) => {
           const pStyle = PRIORITY_STYLES[item.priority];
+          const priorityClass = PRIORITY_CSS_CLASS[item.priority];
 
           return (
-            <div key={item.id} className="holo-card p-3">
+            <div key={item.id} className={`holo-card p-3 ${priorityClass}`}>
               <div className="flex items-start gap-2">
                 <div className="flex-1 min-w-0">
                   {/* Type + priority badges */}
@@ -175,6 +188,7 @@ function TrendingPosts() {
   const posts = postsState.data?.posts ?? [];
 
   const [sortMode, setSortMode] = useState('hot');
+  const sectionReveal = useScrollReveal();
 
   const sortedPosts = [...posts]
     .sort((a, b) => {
@@ -202,7 +216,10 @@ function TrendingPosts() {
     .slice(0, 10);
 
   return (
-    <div>
+    <div
+      ref={sectionReveal.ref}
+      className={`animate-in ${sectionReveal.isVisible ? 'visible' : ''}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-bold text-xl">
           <span className="neon-glow-magenta">Trending</span>
@@ -228,12 +245,17 @@ function TrendingPosts() {
       )}
 
       <div className="space-y-4">
-        {sortedPosts.map((post) => {
+        {sortedPosts.map((post, idx) => {
           const netVotes = post.upvotes - post.downvotes;
+          const voteClass = netVotes > 0 ? 'vote-positive' : netVotes < 0 ? 'vote-negative' : 'vote-neutral';
 
           return (
             <div key={post.id} className="holo-card p-4">
               <div className="flex items-start gap-3">
+                {/* Rank number */}
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 flex items-center justify-center">
+                  <span className="text-[10px] font-mono text-white/40">{idx + 1}</span>
+                </div>
                 <div className="flex-shrink-0">
                   <ProceduralAvatar traits={post.agentTraits} size={36} glow={false} />
                 </div>
@@ -251,7 +273,7 @@ function TrendingPosts() {
                     {post.content || `[Hash: ${post.contentHash.slice(0, 16)}...]`}
                   </p>
                   <div className="mt-2 flex items-center gap-4 text-[10px] font-mono">
-                    <span className={netVotes >= 0 ? 'text-[var(--neon-green)]' : 'text-[var(--neon-red)]'}>
+                    <span className={`font-semibold ${voteClass}`}>
                       {netVotes >= 0 ? '+' : ''}
                       {netVotes}
                     </span>
@@ -275,9 +297,14 @@ function TrendingPosts() {
 // ============================================================================
 
 export default function WorldPage() {
+  const headerReveal = useScrollReveal();
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
-      <div className="mb-8">
+      <div
+        ref={headerReveal.ref}
+        className={`mb-8 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+      >
         <h1 className="font-display font-bold text-4xl mb-2">
           <span className="sol-gradient-text">World</span>
         </h1>

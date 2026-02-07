@@ -5,8 +5,45 @@ import { HexacoRadar } from '@/components/HexacoRadar';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { CLUSTER, type Agent } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
+import { useScrollReveal } from '@/lib/useScrollReveal';
+import { useMemo } from 'react';
 
 const RANK_COLORS = ['var(--neon-gold)', 'var(--sol-purple)', 'var(--neon-cyan)'];
+const RANK_GLOW_CLASSES = ['rank-glow-gold', 'rank-glow-purple', 'rank-glow-cyan'];
+
+function Confetti() {
+  const pieces = useMemo(() => {
+    const colors = ['#FFD700', '#FFA500', '#FF6B6B', '#00F0FF', '#9945FF', '#14F195'];
+    return Array.from({ length: 24 }, (_, i) => ({
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 2}s`,
+      duration: `${2 + Math.random() * 2}s`,
+      color: colors[i % colors.length],
+      size: `${4 + Math.random() * 4}px`,
+      rotation: `${Math.random() * 360}deg`,
+    }));
+  }, []);
+
+  return (
+    <div className="confetti-container" aria-hidden="true">
+      {pieces.map((p, i) => (
+        <div
+          key={i}
+          className="confetti-piece"
+          style={{
+            left: p.left,
+            animationDelay: p.delay,
+            animationDuration: p.duration,
+            backgroundColor: p.color,
+            width: p.size,
+            height: p.size,
+            transform: `rotate(${p.rotation})`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function LeaderboardPage() {
   type LeaderboardEntry = Agent & { rank: number; dominantTrait: string };
@@ -16,10 +53,17 @@ export default function LeaderboardPage() {
   const podiumOrder = leaderboard.length >= 3 ? [1, 0, 2] : [...Array(leaderboard.length).keys()];
   const podium = podiumOrder.map((idx) => leaderboard[idx]).filter((a): a is LeaderboardEntry => !!a);
 
+  const headerReveal = useScrollReveal();
+  const podiumReveal = useScrollReveal();
+  const tableReveal = useScrollReveal();
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
       {/* Header */}
-      <div className="mb-8">
+      <div
+        ref={headerReveal.ref}
+        className={`mb-8 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+      >
         <h1 className="font-display font-bold text-3xl mb-2">
           <span className="sol-gradient-text">Reputation Leaderboard</span>
         </h1>
@@ -29,15 +73,18 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Top 3 podium */}
-      <div className="grid grid-cols-3 gap-4 mb-12">
+      <div
+        ref={podiumReveal.ref}
+        className={`grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12 animate-in ${podiumReveal.isVisible ? 'visible' : ''}`}
+      >
         {leaderboardState.loading && (
-          <div className="holo-card p-8 col-span-3 text-center">
+          <div className="holo-card p-8 col-span-1 sm:col-span-3 text-center">
             <div className="text-white/50 font-display font-semibold">Loading leaderboard…</div>
             <div className="mt-2 text-xs text-white/25 font-mono">Computing ranks.</div>
           </div>
         )}
         {!leaderboardState.loading && leaderboardState.error && (
-          <div className="holo-card p-8 col-span-3 text-center">
+          <div className="holo-card p-8 col-span-1 sm:col-span-3 text-center">
             <div className="text-white/60 font-display font-semibold">Failed to load leaderboard</div>
             <div className="mt-2 text-xs text-white/25 font-mono">{leaderboardState.error}</div>
             <button
@@ -49,7 +96,7 @@ export default function LeaderboardPage() {
           </div>
         )}
         {!leaderboardState.loading && !leaderboardState.error && leaderboard.length === 0 && (
-          <div className="holo-card p-8 col-span-3 text-center">
+          <div className="holo-card p-8 col-span-1 sm:col-span-3 text-center">
             <div className="text-white/60 font-display font-semibold">No agents yet</div>
             <div className="mt-2 text-xs text-white/25 font-mono">
               No reputation data found on {CLUSTER}.
@@ -58,20 +105,26 @@ export default function LeaderboardPage() {
         )}
         {podium.map((podiumAgent) => {
           const isGold = podiumAgent.rank === 1;
+          const rankIdx = podiumAgent.rank - 1;
+          const podiumClass = `podium-rank-${podiumAgent.rank}`;
+          const glowClass = RANK_GLOW_CLASSES[rankIdx] || '';
 
           return (
             <Link
               key={podiumAgent.address}
               href={`/agents/${podiumAgent.address}`}
-              className={`holo-card p-6 text-center block ${isGold ? 'md:-mt-4' : ''}`}
+              className={`holo-card p-6 text-center block relative overflow-hidden podium-enter ${podiumClass} ${isGold ? 'sm:-mt-4' : ''} ${podiumReveal.isVisible ? 'visible' : ''}`}
             >
+              {/* Confetti for #1 */}
+              {isGold && podiumReveal.isVisible && <Confetti />}
+
               <div
                 className="font-display font-bold text-4xl mb-3"
-                style={{ color: RANK_COLORS[podiumAgent.rank - 1] || 'var(--text-secondary)' }}
+                style={{ color: RANK_COLORS[rankIdx] || 'var(--text-secondary)' }}
               >
                 #{podiumAgent.rank}
               </div>
-              <div className="flex justify-center mb-3 relative">
+              <div className={`flex justify-center mb-3 relative ${glowClass}`}>
                 <ProceduralAvatar
                   traits={podiumAgent.traits}
                   size={isGold ? 70 : 55}
@@ -86,7 +139,7 @@ export default function LeaderboardPage() {
               </div>
               <h3 className="font-display font-semibold text-lg">{podiumAgent.name}</h3>
               <div className="badge badge-level mt-2">{podiumAgent.level}</div>
-              <div className="mt-3 font-mono text-2xl font-bold" style={{ color: RANK_COLORS[podiumAgent.rank - 1] }}>
+              <div className="mt-3 font-mono text-2xl font-bold" style={{ color: RANK_COLORS[rankIdx] }}>
                 {podiumAgent.reputation}
               </div>
               <div className="text-white/30 text-xs font-mono">reputation</div>
@@ -96,7 +149,10 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Full table */}
-      <div className="glass rounded-2xl overflow-hidden">
+      <div
+        ref={tableReveal.ref}
+        className={`glass rounded-2xl overflow-hidden animate-in ${tableReveal.isVisible ? 'visible' : ''}`}
+      >
         {leaderboard.length === 0 ? (
           <div className="p-10 text-center">
             <div className="text-white/50 font-display font-semibold">Nothing to rank yet</div>
@@ -113,6 +169,7 @@ export default function LeaderboardPage() {
                   key={agent.address}
                   href={`/agents/${agent.address}`}
                   className="holo-card p-4 flex items-center gap-4 transition-colors hover:bg-white/[0.02]"
+                  style={{ borderLeft: `3px solid ${RANK_COLORS[agent.rank - 1] || 'transparent'}` }}
                 >
                   {/* Rank */}
                   <span
@@ -165,6 +222,7 @@ export default function LeaderboardPage() {
                     <tr
                       key={agent.address}
                       className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors"
+                      style={{ borderLeft: agent.rank <= 3 ? `3px solid ${RANK_COLORS[agent.rank - 1]}` : undefined }}
                     >
                       <td className="px-6 py-4">
                         <span

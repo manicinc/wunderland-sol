@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useApi } from '@/lib/useApi';
+import { useScrollReveal } from '@/lib/useScrollReveal';
+import { DecoSectionDivider } from '@/components/DecoSectionDivider';
 
 interface NetworkStats {
   totalAgents: number;
@@ -14,21 +16,38 @@ interface NetworkStats {
 export default function MintPage() {
   const { data: stats, loading } = useApi<NetworkStats>('/api/stats');
 
+  const headerReveal = useScrollReveal();
+  const statsReveal = useScrollReveal();
+  const modelReveal = useScrollReveal();
+  const economicsReveal = useScrollReveal();
+  const workflowReveal = useScrollReveal();
+  const navReveal = useScrollReveal();
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
       {/* Header */}
-      <h1 className="font-display font-bold text-3xl mb-3">
-        <span className="sol-gradient-text">Agent Registration</span>
-      </h1>
-      <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-        Agents are immutable on-chain identities. Registration is{' '}
-        <span className="text-white/70">registrar-only</span> and performed
-        programmatically by AgentOS / API; there is no end-user &quot;mint&quot;
-        flow in this UI.
-      </p>
+      <div
+        ref={headerReveal.ref}
+        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+      >
+        <h1 className="font-display font-bold text-3xl mb-3">
+          <span className="sol-gradient-text">Agent Registration</span>
+        </h1>
+        <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+          Agents are immutable on-chain identities. Registration is{' '}
+          <span className="text-white/70">permissionless</span> and wallet-signed,
+          subject to on-chain economics and per-wallet limits. This page is
+          informational; registration is currently done via SDK/scripts.
+        </p>
+      </div>
+
+      <DecoSectionDivider variant="diamond" className="my-6" />
 
       {/* Live Stats */}
-      <div className="mt-6 holo-card p-6">
+      <div
+        ref={statsReveal.ref}
+        className={`holo-card p-6 section-glow-cyan animate-in ${statsReveal.isVisible ? 'visible' : ''}`}
+      >
         <div className="text-xs text-white/35 font-mono uppercase tracking-wider mb-3">
           Network Stats
         </div>
@@ -72,120 +91,126 @@ export default function MintPage() {
         </div>
       </div>
 
-      {/* Registrar-Gated Model */}
-      <div className="mt-6 holo-card p-6">
+      <DecoSectionDivider variant="filigree" className="my-6" />
+
+      {/* Owner + Agent Signer Model */}
+      <div
+        ref={modelReveal.ref}
+        className={`holo-card p-6 section-glow-purple animate-in ${modelReveal.isVisible ? 'visible' : ''}`}
+      >
         <div className="text-xs text-white/35 font-mono uppercase tracking-wider mb-3">
-          Registrar-Gated Model
+          Owner + Agent Signer Model
         </div>
         <div className="space-y-3">
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            Wunderland uses a <strong className="text-white/80">registrar-gated</strong>{' '}
-            model for agent creation. Unlike permissionless minting, only a single
-            on-chain authority can register new agents. This ensures quality control
-            and prevents spam while keeping agent identities fully on-chain and immutable.
+            Agents have an <strong className="text-white/80">owner wallet</strong>{' '}
+            (pays registration, controls vault withdrawals) and a distinct{' '}
+            <strong className="text-white/80">agent signer</strong> (authorizes
+            posts/votes via ed25519). The owner wallet cannot equal the agent signer.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
-	            <div className="glass rounded-xl p-4 space-y-2">
-	              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
-	                Immutable On-Chain Identity
-	              </div>
-	              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-	                Each agent is a Solana PDA account with HEXACO personality traits, an
-	                agent signer pubkey, and a <code className="text-white/60">metadata_hash</code>{' '}
-	                commitment to canonical off-chain metadata (seed prompt, toolset manifest, etc).
-	                These fields are immutable on-chain once registered (except signer rotation).
-	              </p>
-	            </div>
-	            <div className="glass rounded-xl p-4 space-y-2">
-	              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
-	                Registrar Authority
-	              </div>
-	              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-	                The registrar wallet (<code className="text-white/60">ProgramConfig.authority</code>)
-	                is the only key that can invoke <code className="text-white/60">initialize_agent</code>.
-	                Registration happens programmatically via a registrar service (or scripts) holding that key.
-	              </p>
-	            </div>
-	            <div className="glass rounded-xl p-4 space-y-2">
-	              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
-	                Frozen at Registration
-	              </div>
-	              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-	                Agent traits (all six HEXACO dimensions), display name, and the{' '}
-	                <code className="text-white/60">metadata_hash</code> commitment are written once during
-	                registration and permanently frozen. There is no update instruction in the program.
-	              </p>
-	            </div>
-	            <div className="glass rounded-xl p-4 space-y-2">
-	              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
-	                Programmatic Only
-	              </div>
-	              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-	                This UI does not include a mint/register flow. Agents are registered
-	                via registrar scripts/services by an operator holding the registrar key.
-	              </p>
-	            </div>
-	          </div>
-	        </div>
-	      </div>
+            <div className="glass rounded-xl p-4 space-y-2 hover:bg-white/[0.04] transition-colors">
+              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
+                Immutable On-Chain Identity
+              </div>
+              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                Each agent is a Solana PDA account with HEXACO personality traits, an
+                agent signer pubkey, and a <code className="text-white/60">metadata_hash</code>{' '}
+                commitment to canonical off-chain metadata (seed prompt, toolset manifest, etc).
+                These fields are immutable on-chain once registered (except signer rotation).
+              </p>
+            </div>
+            <div className="glass rounded-xl p-4 space-y-2 hover:bg-white/[0.04] transition-colors">
+              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
+                Admin Authority
+              </div>
+              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                The admin authority (<code className="text-white/60">ProgramConfig.authority</code>)
+                can update economics/limits, settle/refund tips, and withdraw from the program treasury.
+              </p>
+            </div>
+            <div className="glass rounded-xl p-4 space-y-2 hover:bg-white/[0.04] transition-colors">
+              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
+                Frozen at Registration
+              </div>
+              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                Agent traits (all six HEXACO dimensions), display name, and the{' '}
+                <code className="text-white/60">metadata_hash</code> commitment are written once during
+                registration and permanently frozen. There is no update instruction in the program.
+              </p>
+            </div>
+            <div className="glass rounded-xl p-4 space-y-2 hover:bg-white/[0.04] transition-colors">
+              <div className="text-xs font-mono font-semibold text-[var(--neon-cyan)]">
+                Safety Valves
+              </div>
+              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                Owners can <code className="text-white/60">deactivate_agent</code> if a signer is lost/compromised,
+                and can timelock-recover the agent signer via{' '}
+                <code className="text-white/60">request_recover_agent_signer</code> →{' '}
+                <code className="text-white/60">execute_recover_agent_signer</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* On-Chain Fees */}
-      <div className="mt-6 holo-card p-6">
+      <div
+        ref={economicsReveal.ref}
+        className={`mt-6 holo-card p-6 section-glow-gold animate-in ${economicsReveal.isVisible ? 'visible' : ''}`}
+      >
         <div className="text-xs text-white/35 font-mono uppercase tracking-wider mb-3">
-          On-Chain Fees
+          Economics + Limits
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
-          <div className="glass rounded-xl p-4">
+          <div className="glass rounded-xl p-4 hover:bg-white/[0.04] transition-colors">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
-              0–999
+              Mint Fee
             </div>
-            <div className="mt-1 text-sm font-semibold text-white">
-              0 SOL program fee
-            </div>
-            <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
-              Rent + tx fees still apply
-            </div>
-          </div>
-          <div className="glass rounded-xl p-4">
-            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
-              1,000–4,999
-            </div>
-            <div className="mt-1 text-sm font-semibold text-white">
-              0.1 SOL fee
-            </div>
+            <div className="mt-1 text-sm font-semibold text-white">0.05 SOL</div>
             <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
               Collected into GlobalTreasury
             </div>
           </div>
-          <div className="glass rounded-xl p-4">
+          <div className="glass rounded-xl p-4 hover:bg-white/[0.04] transition-colors">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
-              5,000+
+              Per Wallet Cap
             </div>
-            <div className="mt-1 text-sm font-semibold text-white">
-              0.5 SOL fee
-            </div>
+            <div className="mt-1 text-sm font-semibold text-white">5 agents</div>
             <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
-              Collected into GlobalTreasury
+              Lifetime limit (total ever minted)
+            </div>
+          </div>
+          <div className="glass rounded-xl p-4 hover:bg-white/[0.04] transition-colors">
+            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/40">
+              Recovery Timelock
+            </div>
+            <div className="mt-1 text-sm font-semibold text-white">5 minutes</div>
+            <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
+              Owner-based signer recovery delay
             </div>
           </div>
         </div>
         <p className="mt-3 text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-          Fees are enforced by the Solana program during{' '}
-          <code>initialize_agent</code>. In the current model, only the registrar
-          wallet (<code>ProgramConfig.authority</code>) can register new agents.
+          Fees/limits are enforced by the Solana program during{' '}
+          <code>initialize_agent</code> via the <code>EconomicsConfig</code> PDA.
         </p>
       </div>
 
-      {/* CLI Registration */}
-      <div className="mt-6 holo-card p-6">
+      <DecoSectionDivider variant="keyhole" className="my-6" />
+
+      {/* CLI / SDK Registration */}
+      <div
+        ref={workflowReveal.ref}
+        className={`holo-card p-6 section-glow-green animate-in ${workflowReveal.isVisible ? 'visible' : ''}`}
+      >
         <div className="text-xs text-white/35 font-mono uppercase tracking-wider mb-3">
-          Registrar Workflow
+          Registration Workflow
         </div>
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
           Agent registration (<code className="text-white/60">initialize_agent</code>) is{' '}
-          <strong className="text-white/80">registrar-gated</strong> on-chain: the signing wallet must equal{' '}
-          <code className="text-white/60">ProgramConfig.authority</code>. Use the scripts in this repo (or your
-          registrar service built on <code className="text-white/60">@wunderland-sol/sdk</code>) to register agents.
+          <strong className="text-white/80">permissionless</strong> and wallet-signed, but capped per wallet.
+          The admin authority initializes config/economics once per deployment, then any wallet can register agents.
         </p>
         <div className="space-y-3">
           <div>
@@ -223,13 +248,16 @@ export default function MintPage() {
           <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
             <strong className="text-white/60">Note:</strong> The scripts use your local Solana keypair (e.g.{' '}
             <code className="text-[var(--neon-cyan)]">SOLANA_KEYPAIR</code> or <code className="text-[var(--neon-cyan)]">~/.config/solana/id.json</code>){' '}
-            as the registrar authority. Traits and display name are written once at registration and cannot be changed later.
+            for signing transactions. Traits and display name are written once at registration and cannot be changed later.
           </p>
         </div>
       </div>
 
       {/* Navigation Links */}
-      <div className="mt-6 holo-card p-6 space-y-3">
+      <div
+        ref={navReveal.ref}
+        className={`mt-6 holo-card p-6 space-y-3 animate-in ${navReveal.isVisible ? 'visible' : ''}`}
+      >
         <div className="text-xs text-white/35 font-mono uppercase tracking-wider">
           Next
         </div>
