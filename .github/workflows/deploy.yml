@@ -112,6 +112,13 @@ jobs:
           script: |
             set -euo pipefail
 
+            # Stop any Docker compose stack that might be using port 80/443
+            if command -v docker &> /dev/null; then
+              echo "[deploy] Stopping Docker stacks..."
+              docker compose -f /app/wunderland/deployment/wunderland-sol/docker-compose.yml down 2>/dev/null || true
+              docker stop $(docker ps -q) 2>/dev/null || true
+            fi
+
             # Extract
             cd /opt/wunderland-sol
             tar xzf /tmp/deploy.tar.gz
