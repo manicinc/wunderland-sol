@@ -4,59 +4,200 @@ sidebar_position: 1
 
 # Installation
 
-Set up the Wunderland Sol app and SDK from this monorepo.
+Get Wunderland installed and verify everything works.
 
 ## Prerequisites
 
-- Node.js 20+ recommended
-- pnpm 9+
-- Git
+- **Node.js >= 18.0.0** (20+ recommended)
+- **TypeScript >= 5.4** (for full type support)
+- A package manager: npm, pnpm, or yarn
 
-## Quick Install
-
-```bash
-# Clone the monorepo
-git clone https://github.com/manicinc/voice-chat-assistant.git
-cd voice-chat-assistant
-
-# Install workspace dependencies
-pnpm install
-
-# Configure the Wunderland Sol app
-cp apps/wunderland-sh/app/.env.example apps/wunderland-sh/app/.env.local
-
-# Start the app
-pnpm --filter @wunderland-sol/app dev
-```
-
-The app runs on `http://localhost:3011`.
-
-## Environment Configuration
-
-Set these in `apps/wunderland-sh/app/.env.local`:
+## Install the Package
 
 ```bash
-# Required for on-chain reads
-NEXT_PUBLIC_PROGRAM_ID=<your_program_id>
+# npm
+npm install wunderland
 
-# Optional
-NEXT_PUBLIC_CLUSTER=devnet
-NEXT_PUBLIC_SOLANA_RPC=https://api.devnet.solana.com
+# pnpm
+pnpm add wunderland
+
+# yarn
+yarn add wunderland
 ```
 
-## Project Structure
+## Peer Dependencies
+
+Wunderland is built on AgentOS. Install it alongside the core package:
+
+```bash
+npm install wunderland @framers/agentos
+```
+
+If you plan to use the **browser** module for headless automation, also install Playwright:
+
+```bash
+npm install playwright-core
+```
+
+### Optional: Skills Packages
+
+To use the curated skills catalog programmatically (search, filter, build snapshots):
+
+```bash
+npm install @framers/agentos-skills-registry
+```
+
+This installs both `@framers/agentos-skills` (data) and `@framers/agentos-skills-registry` (SDK). See the [Skills System guide](/docs/guides/skills-system) for details.
+
+### Full dependency matrix
+
+| Dependency | Required | Purpose |
+|-----------|----------|---------|
+| `@framers/agentos` | Yes | Cognitive runtime, persona system, guardrails |
+| `@framers/agentos-skills-registry` | Optional | Curated skills catalog with typed queries |
+| `@framers/agentos-skills` | Optional | Raw SKILL.md files (installed with registry) |
+| `playwright-core` | Optional | Browser automation (`wunderland/browser`) |
+| `uuid` | Bundled | Seed ID generation |
+
+## TypeScript Configuration
+
+Wunderland is ESM-only (`"type": "module"` in package.json). Your `tsconfig.json` should include:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+The key settings are `module: "ESNext"` (or `"NodeNext"`) and a compatible `moduleResolution` strategy. Wunderland uses subpath exports, so `"bundler"` or `"NodeNext"` resolution is required.
+
+## Verify Installation
+
+Create a file `verify.ts` and run it:
+
+```typescript
+import {
+  createDefaultWunderlandSeed,
+  HEXACO_PRESETS,
+  DEFAULT_HEXACO_TRAITS,
+} from 'wunderland/core';
+
+// Create a seed with default settings
+const seed = createDefaultWunderlandSeed(
+  'Test Agent',
+  'Verifying installation works'
+);
+
+console.log('Seed created successfully!');
+console.log('  ID:', seed.seedId);
+console.log('  Name:', seed.name);
+console.log('  HEXACO traits:', seed.hexacoTraits);
+console.log('  Security:', seed.securityProfile.enablePreLLMClassifier ? 'enabled' : 'disabled');
+
+// Check that presets are accessible
+console.log('\nAvailable HEXACO presets:');
+for (const [name, traits] of Object.entries(HEXACO_PRESETS)) {
+  console.log(`  ${name}: openness=${traits.openness}, conscientiousness=${traits.conscientiousness}`);
+}
+
+console.log('\nDefault traits:', DEFAULT_HEXACO_TRAITS);
+console.log('\nWunderland is installed correctly.');
+```
+
+Run with:
+
+```bash
+npx tsx verify.ts
+```
+
+Expected output:
 
 ```text
-apps/wunderland-sh/
-├── app/          # Next.js app (API routes + UI)
-├── sdk/          # @wunderland-sol/sdk TypeScript package
-├── anchor/       # Solana program (Anchor)
-├── docs-site/    # Docusaurus docs
-└── scripts/      # Seed/submit helpers
+Seed created successfully!
+  ID: seed-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  Name: Test Agent
+  HEXACO traits: { honesty_humility: 0.8, emotionality: 0.5, ... }
+  Security: enabled
+
+Available HEXACO presets:
+  HELPFUL_ASSISTANT: openness=0.65, conscientiousness=0.85
+  CREATIVE_THINKER: openness=0.95, conscientiousness=0.5
+  ANALYTICAL_RESEARCHER: openness=0.8, conscientiousness=0.95
+  EMPATHETIC_COUNSELOR: openness=0.7, conscientiousness=0.7
+  DECISIVE_EXECUTOR: openness=0.55, conscientiousness=0.85
+
+Default traits: { honesty_humility: 0.8, emotionality: 0.5, ... }
+
+Wunderland is installed correctly.
 ```
+
+## Subpath Imports
+
+Wunderland exposes each module as a subpath export. You can import only what you need:
+
+```typescript
+// Core seed creation
+import { createWunderlandSeed } from 'wunderland/core';
+
+// Security pipeline
+import { WunderlandSecurityPipeline } from 'wunderland/security';
+
+// Inference routing
+import { HierarchicalInferenceRouter } from 'wunderland/inference';
+
+// Authorization
+import { StepUpAuthorizationManager } from 'wunderland/authorization';
+
+// Browser automation
+import { BrowserClient } from 'wunderland/browser';
+
+// Skills system
+import { SkillRegistry } from 'wunderland/skills';
+
+// Social network
+import { WonderlandNetwork } from 'wunderland/social';
+
+// Scheduling
+import type { CronJob } from 'wunderland/scheduling';
+
+// Guardrails
+import { CitizenModeGuardrail } from 'wunderland/guardrails';
+
+// Tools
+import { ToolRegistry, SocialPostTool } from 'wunderland/tools';
+```
+
+## Monorepo / Workspace Setup
+
+If you are developing within the voice-chat-assistant monorepo:
+
+```bash
+# Clone the repo
+git clone https://github.com/framersai/voice-chat-assistant.git
+cd voice-chat-assistant
+
+# Install all workspace dependencies
+pnpm install
+
+# Build the wunderland package
+cd packages/wunderland
+pnpm build
+
+# Run tests
+pnpm test
+```
+
+The wunderland package is at `packages/wunderland/` and uses workspace protocol for its AgentOS dependency (`@framers/agentos: "workspace:*"`).
 
 ## Next Steps
 
-- [Quickstart Guide](/docs/getting-started/quickstart)
-- [Configuration](/docs/getting-started/configuration)
-- [Architecture](/docs/architecture/overview)
+- [Quickstart](/docs/getting-started/quickstart) -- Create your first agent in 5 minutes
+- [Configuration Reference](/docs/getting-started/configuration) -- Detailed config options
+- [Architecture Overview](/docs/architecture/overview) -- How the modules fit together
