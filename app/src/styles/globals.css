@@ -1773,7 +1773,7 @@ html.light .wallet-btn-connect:hover .wallet-btn-content {
   color: var(--wl-blue-dark);
 }
 
-/* Wallet mobile — icon only */
+/* Wallet mobile — icon only (navbar) */
 @media (max-width: 640px) {
   .wallet-btn {
     padding: 8px 10px;
@@ -1781,6 +1781,30 @@ html.light .wallet-btn-connect:hover .wallet-btn-content {
   .wallet-btn-label {
     display: none;
   }
+}
+
+/* Wallet inside mobile hamburger menu — full-width with label visible */
+.mobile-menu-wallet {
+  display: flex;
+  justify-content: center;
+}
+.mobile-menu-wallet .wallet-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 14px 24px;
+  border-radius: 16px;
+}
+.mobile-menu-wallet .wallet-btn-label {
+  display: inline !important;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+.mobile-menu-wallet .wallet-btn-content {
+  font-size: 14px;
+  gap: 10px;
+}
+.mobile-menu-wallet .wallet-btn-icon {
+  font-size: 18px;
 }
 
 /* ---- Comment Thread Lines ---- */
@@ -2944,6 +2968,200 @@ html.light .mint-checkbox:has(input:checked) {
 html.light .mint-summary {
   border-color: rgba(0, 0, 0, 0.06);
   background: rgba(255, 255, 255, 0.8);
+}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+
+.wl-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 280px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(10, 10, 15, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glow);
+  box-shadow: 0 0 20px rgba(153, 69, 255, 0.12), 0 4px 16px rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.5;
+  animation: tooltip-in 0.15s ease-out;
+  pointer-events: none;
+}
+
+.wl-tooltip-arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: rgba(10, 10, 15, 0.92);
+  border: 1px solid var(--border-glow);
+  transform: rotate(45deg);
+}
+
+.wl-tooltip-arrow--top {
+  bottom: -5px;
+  left: 50%;
+  margin-left: -4px;
+  border-top: none;
+  border-left: none;
+}
+
+.wl-tooltip-arrow--bottom {
+  top: -5px;
+  left: 50%;
+  margin-left: -4px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.wl-tooltip-arrow--left {
+  right: -5px;
+  top: 50%;
+  margin-top: -4px;
+  border-bottom: none;
+  border-left: none;
+}
+
+.wl-tooltip-arrow--right {
+  left: -5px;
+  top: 50%;
+  margin-top: -4px;
+  border-top: none;
+  border-right: none;
+}
+
+html.light .wl-tooltip {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(109, 40, 217, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), 0 0 12px rgba(109, 40, 217, 0.06);
+}
+
+html.light .wl-tooltip-arrow {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(109, 40, 217, 0.15);
+}
+
+@keyframes tooltip-in {
+  from { opacity: 0; transform: translateY(4px) translate(-50%, -100%); }
+  to { opacity: 1; }
+}
+
+/* ============================================================
+   COLLAPSIBLE
+   ============================================================ */
+
+.wl-collapsible {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.wl-collapsible-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.wl-collapsible-trigger:hover {
+  background: var(--bg-glass-hover);
+  color: var(--text-primary);
+  border-color: rgba(153, 69, 255, 0.15);
+}
+
+.wl-collapsible-chevron {
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  color: var(--text-tertiary);
+}
+
+.wl-collapsible-chevron--open {
+  transform: rotate(90deg);
+}
+
+.wl-collapsible-title {
+  flex: 1;
+}
+
+.wl-collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.25s ease;
+}
+
+.wl-collapsible-inner {
+  padding: 12px 14px 4px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+html.light .wl-collapsible-trigger {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html.light .wl-collapsible-trigger:hover {
+  border-color: var(--wl-blue);
+  background: rgba(14, 165, 233, 0.04);
+}
+
+/* ============================================================
+   WALLET BUTTON — HERO VARIANT
+   ============================================================ */
+
+.wallet-btn--hero {
+  padding: 12px 28px;
+}
+
+.wallet-btn--hero .wallet-btn-content {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  gap: 10px;
+}
+
+.wallet-btn--hero .wallet-btn-border {
+  opacity: 0.55;
+}
+
+.wallet-btn--hero .wallet-btn-dot {
+  width: 8px;
+  height: 8px;
+}
+
+html.light .wallet-btn--hero .wallet-btn-fill {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.08), -3px -3px 8px rgba(255, 255, 255, 0.9);
+}
+
+html.light .wallet-btn--hero .wallet-btn-content {
+  color: rgba(15, 15, 24, 0.7);
+}
+
+html.light .wallet-btn--hero:hover .wallet-btn-content {
+  color: rgba(15, 15, 24, 0.95);
+}
+
+@media (max-width: 640px) {
+  .wallet-btn--hero {
+    padding: 10px 20px;
+  }
+  .wallet-btn--hero .wallet-btn-content {
+    font-size: 11px;
+  }
+  .wallet-btn--hero .wallet-btn-label {
+    display: inline;
+  }
 }
 
 /* ============================================================

@@ -8,6 +8,42 @@ import { LanternToggle } from './LanternToggle';
 import { SocialIcons } from './SocialIcons';
 import { useTheme } from './ThemeProvider';
 import { WalletButton } from './WalletButton';
+import { CLUSTER } from '@/lib/solana';
+
+// ---- Devnet top banner ----
+function DevnetBanner() {
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('wunderland_devnet_banner_dismissed')) {
+      setDismissed(true);
+    }
+  }, []);
+
+  if (CLUSTER !== 'devnet' || dismissed) return null;
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[60] flex items-center justify-center gap-3 px-4 py-1.5 text-xs font-mono bg-gradient-to-r from-[var(--sol-purple)]/90 via-[var(--neon-cyan)]/20 to-[var(--sol-purple)]/90 backdrop-blur-md border-b border-[var(--neon-cyan)]/20 text-[var(--text-secondary)]">
+      <span className="inline-flex items-center gap-1.5">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--neon-cyan)] animate-pulse" />
+        <span className="text-[var(--neon-cyan)] font-bold tracking-wide">DEVNET ONLY</span>
+      </span>
+      <span className="hidden sm:inline text-white/60">|</span>
+      <span className="hidden sm:inline">Mainnet + <span className="text-[var(--neon-gold)]">$WUNDER</span> airdrop in March</span>
+      <button
+        type="button"
+        onClick={() => {
+          localStorage.setItem('wunderland_devnet_banner_dismissed', '1');
+          setDismissed(true);
+        }}
+        className="ml-2 text-white/40 hover:text-white/80 transition-colors"
+        aria-label="Dismiss devnet banner"
+      >
+        &times;
+      </button>
+    </div>
+  );
+}
 
 // ---- Network dropdown items ----
 const NETWORK_ITEMS = [
@@ -334,7 +370,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
         {/* Bottom actions */}
         <div className="px-6 py-4 border-t border-white/5">
-          <div className="flex items-center justify-center">
+          <div className="mobile-menu-wallet">
             <WalletButton />
           </div>
         </div>
@@ -360,6 +396,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <DevnetBanner />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--bg-elevated)] focus:text-[var(--text-primary)] focus:border focus:border-[var(--border-glass)]"
