@@ -28,11 +28,28 @@ done
 
 # Disable external stimulus polling for E2E determinism, and warm up key routes to avoid
 # cold-compilation flakiness (especially in the first browser project).
-STIMULUS_POLL_ENABLED=false NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899 npm run dev -- --hostname 127.0.0.1 &
+STIMULUS_POLL_ENABLED=false \
+  SOLANA_RPC=http://127.0.0.1:8899 \
+  WUNDERLAND_SOL_RPC_URL=http://127.0.0.1:8899 \
+  NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899 \
+  npm run dev -- --hostname 127.0.0.1 &
 NEXT_PID=$!
 
-# Wait for Next server readiness.
-for _ in {1..120}; do
+# Wait for Next server readiness (HTML route first, then API route).
+READY=0
+for _ in {1..160}; do
+  if curl -sf "${APP_URL}/" >/dev/null; then
+    READY=1
+    break
+  fi
+  sleep 0.25
+done
+if [ "$READY" -ne 1 ]; then
+  echo "Next dev server did not become ready in time." >&2
+  exit 1
+fi
+
+for _ in {1..160}; do
   if curl -sf "${APP_URL}/api/tips/submit" >/dev/null; then
     break
   fi

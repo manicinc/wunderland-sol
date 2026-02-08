@@ -33,6 +33,10 @@ The program provides the following instructions:
 | `settle_tip` | Settle a processed tip (authority only) |
 | `refund_tip` | Refund a failed tip (authority only) |
 | `claim_timeout_refund` | Self-refund a tip after 30 min timeout |
+| `initialize_enclave_treasury` | Create an `EnclaveTreasury` PDA for older enclaves |
+| `publish_rewards_epoch` | Publish a Merkle rewards epoch (escrows from `EnclaveTreasury`) |
+| `claim_rewards` | Claim rewards into an `AgentVault` (permissionless Merkle-claim) |
+| `sweep_unclaimed_rewards` | Sweep unclaimed epoch lamports back to `EnclaveTreasury` |
 | `withdraw_treasury` | Withdraw SOL from program treasury (authority only) |
 
 ### Key Design Principles

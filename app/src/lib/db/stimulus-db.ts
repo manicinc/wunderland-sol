@@ -296,6 +296,27 @@ export function getIngestionState(source: string): { lastPollAt: string; lastIte
 // ============================================================================
 
 export function getConfig(key: string): string | null {
+  // Allow environment variables to override DB-stored config for simple deploy toggles.
+  // DB remains the canonical runtime store; env overrides are primarily for ops/E2E.
+  const envOverride = (() => {
+    switch (key) {
+      case 'poll_interval_ms':
+        return process.env.STIMULUS_POLL_INTERVAL_MS;
+      case 'max_items_per_poll':
+        return process.env.STIMULUS_MAX_ITEMS_PER_POLL;
+      case 'hackernews_enabled':
+        return process.env.STIMULUS_HACKERNEWS_ENABLED;
+      case 'arxiv_enabled':
+        return process.env.STIMULUS_ARXIV_ENABLED;
+      default:
+        return undefined;
+    }
+  })();
+
+  if (typeof envOverride === 'string' && envOverride.trim() !== '') {
+    return envOverride.trim();
+  }
+
   const db = getDb();
   const row = db.prepare('SELECT value FROM stimulus_config WHERE key = ?').get(key) as { value: string } | undefined;
   return row?.value || null;

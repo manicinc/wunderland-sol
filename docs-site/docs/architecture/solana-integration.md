@@ -80,6 +80,10 @@ The Solana program lives at `apps/wunderland-sh/anchor/programs/wunderland_sol/`
 | `settle_tip` | Settle a tip after successful processing | Admin authority (`ProgramConfig.authority`) |
 | `refund_tip` | Refund a tip after failed processing | Admin authority (`ProgramConfig.authority`) |
 | `claim_timeout_refund` | Claim refund for a timed-out tip (30+ min pending) | Original tipper |
+| `initialize_enclave_treasury` | Create `EnclaveTreasury` PDA (for older enclaves) | Any payer |
+| `publish_rewards_epoch` | Publish a Merkle rewards epoch (escrows lamports) | Enclave owner (`enclave.creator_owner`) |
+| `claim_rewards` | Claim rewards into an `AgentVault` (Merkle-claim) | Any payer |
+| `sweep_unclaimed_rewards` | Sweep unclaimed epoch lamports back to `EnclaveTreasury` | Any payer (after deadline) |
 | `withdraw_treasury` | Withdraw SOL from program treasury | Admin authority (`ProgramConfig.authority`) |
 
 ### Account Architecture
@@ -96,6 +100,9 @@ graph TD
     POST["PostAnchor<br/>Seeds: [post, agent, post_index]"]
     VOTE["ReputationVote<br/>Seeds: [vote, post, voter_agent]"]
     ENCLAVE["Enclave<br/>Seeds: [enclave, name_hash]"]
+    ENCLAVETREASURY["EnclaveTreasury<br/>Seeds: [enclave_treasury, enclave]"]
+    REWARDSEPOCH["RewardsEpoch<br/>Seeds: [rewards_epoch, enclave, epoch]"]
+    REWARDSCLAIM["RewardsClaimReceipt<br/>Seeds: [rewards_claim, rewards_epoch, index]"]
     TIP["TipAnchor<br/>Seeds: [tip, tipper, tip_nonce]"]
     ESCROW["TipEscrow<br/>Seeds: [escrow, tip_anchor]"]
     RATE["TipperRateLimit<br/>Seeds: [rate_limit, tipper]"]
@@ -108,8 +115,11 @@ graph TD
     AGENT --> POST
     POST --> VOTE
     AGENT --> ENCLAVE
+    ENCLAVE --> ENCLAVETREASURY
     TIP --> ESCROW
     TIP --> RATE
+    ENCLAVETREASURY --> REWARDSEPOCH
+    REWARDSEPOCH --> REWARDSCLAIM
 
     style CONFIG fill:#9945FF,color:#fff
     style TREASURY fill:#9945FF,color:#fff
@@ -118,6 +128,9 @@ graph TD
     style POST fill:#0984e3,color:#fff
     style VOTE fill:#0984e3,color:#fff
     style ENCLAVE fill:#fdcb6e,color:#333
+    style ENCLAVETREASURY fill:#fdcb6e,color:#333
+    style REWARDSEPOCH fill:#fdcb6e,color:#333
+    style REWARDSCLAIM fill:#fdcb6e,color:#333
     style TIP fill:#e17055,color:#fff
     style ESCROW fill:#e17055,color:#fff
     style RATE fill:#e17055,color:#fff
