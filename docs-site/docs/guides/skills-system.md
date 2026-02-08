@@ -34,6 +34,72 @@ const registry = await createCuratedSkillRegistry();
 const snapshot = await createCuratedSkillSnapshot({ skills: 'all', platform: 'darwin' });
 ```
 
+## Curated Skills Reference
+
+All curated skills ship with [`@framers/agentos-skills`](https://www.npmjs.com/package/@framers/agentos-skills) and are maintained in the [agentos-skills](https://github.com/framersai/agentos-skills) GitHub repository.
+
+### Information
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **web-search** | Search the web for up-to-date information, news, documentation, and answers | `web-search` | — |
+| **weather** | Look up current weather conditions, forecasts, and severe weather alerts | `web-search` | — |
+| **summarize** | Summarize text content, web pages, and long-form articles | `web-search` | — |
+
+### Developer Tools
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **github** | Manage GitHub repositories, issues, pull requests, releases, and Actions workflows | — | `GITHUB_TOKEN` |
+| **coding-agent** | Write, review, debug, refactor, and explain code across multiple languages | `filesystem` | — |
+| **git** | Work with Git repositories — inspect history, create branches, commit changes | — | — |
+
+### Communication
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **slack-helper** | Manage Slack workspaces, channels, messages, and integrations | — | `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN` |
+| **discord-helper** | Manage Discord servers, channels, roles, and messages | — | `DISCORD_BOT_TOKEN` |
+
+### Productivity
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **notion** | Read, create, and manage pages, databases, and content blocks in Notion | — | `NOTION_API_KEY` |
+| **obsidian** | Read, create, and manage notes, links, and metadata in Obsidian vaults | `filesystem` | — |
+| **trello** | Manage Trello boards, lists, cards, checklists, and team workflows | — | `TRELLO_API_KEY`, `TRELLO_TOKEN` |
+| **apple-notes** | Create, read, search, and manage notes in Apple Notes (macOS only) | `filesystem` | — |
+| **apple-reminders** | Create, manage, and query reminders in Apple Reminders (macOS only) | `filesystem` | — |
+
+### DevOps
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **healthcheck** | Monitor health and availability of systems, services, APIs, and endpoints | `web-search` | — |
+
+### Media
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **spotify-player** | Control Spotify playback, manage playlists, search music | — | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN` |
+| **whisper-transcribe** | Transcribe audio and video files to text using OpenAI Whisper | `filesystem` | `OPENAI_API_KEY` |
+
+### Security
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **1password** | Query and retrieve items from 1Password vaults using the 1Password CLI | — | — |
+
+### Creative
+
+| Skill | Description | Required Tools | Required Secrets |
+|-------|-------------|----------------|------------------|
+| **image-gen** | Generate images from text prompts using DALL-E, Stable Diffusion, or Midjourney | — | `OPENAI_API_KEY` |
+
+:::tip
+Enable a skill via the CLI with `wunderland skills enable <name>`, or programmatically via the SDK. See [Enabling a Skill](#enabling-a-skill-in-your-agent) below.
+:::
+
 ## What Are Skills?
 
 A skill is a directory containing a `SKILL.md` file. The file has two parts:
