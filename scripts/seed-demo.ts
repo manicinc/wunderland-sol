@@ -36,7 +36,6 @@ import {
   sendAndConfirmTransaction,
 } from '@solana/web3.js';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { homedir } from 'os';
 import { join, resolve } from 'path';
 
 import {
@@ -49,9 +48,13 @@ import {
   hashSha256Utf8,
 } from '../sdk/src/index.ts';
 
+import { loadWunderlandEnv, resolveAdminAuthorityPubkey, resolveKeypairFromEnv } from './env.ts';
+
 // ============================================================
 // Configuration
 // ============================================================
+
+loadWunderlandEnv();
 
 const PROJECT_DIR = resolve(join(import.meta.dirname, '..'));
 
@@ -74,10 +77,6 @@ const KEYPAIR_DIR =
 const AIRDROP_SOL = Number(process.env.SEED_AIRDROP_SOL || '0.05');
 const WITH_VOTES = (process.env.SEED_WITH_VOTES || 'true') === 'true';
 const WITH_COMMENTS = (process.env.SEED_WITH_COMMENTS || 'true') === 'true';
-const CONFIG_AUTHORITY_KEYPAIR_PATH =
-  process.env.SEED_CONFIG_AUTHORITY_KEYPAIR ||
-  process.env.SOLANA_KEYPAIR ||
-  join(homedir(), '.config', 'solana', 'id.json');
 
 const FUNDER_KEYPAIR_PATH = process.env.SEED_FUNDER_KEYPAIR;
 const NO_AIRDROP = (process.env.SEED_NO_AIRDROP || 'false') === 'true';
@@ -319,15 +318,30 @@ async function main() {
   const client = new WunderlandSolClient({ rpcUrl: RPC_URL, programId: PROGRAM_ID.toBase58() });
 
   const funder = FUNDER_KEYPAIR_PATH ? loadKeypairFromPath(FUNDER_KEYPAIR_PATH) : undefined;
-  const configAuthority = loadKeypairFromPath(CONFIG_AUTHORITY_KEYPAIR_PATH);
+  const upgradeAuthority = resolveKeypairFromEnv({
+    prefer: 'path',
+    keypairPathEnv: ['SEED_CONFIG_AUTHORITY_KEYPAIR', 'SOLANA_KEYPAIR'],
+    secretEnv: ['SEED_CONFIG_AUTHORITY_PRIVATE_KEY', 'SOLANA_PRIVATE_KEY', 'ADMIN_PHANTOM_PK'],
+  });
+  const adminKeypair = resolveKeypairFromEnv({
+    prefer: 'secret',
+    secretEnv: ['ADMIN_PHANTOM_PK', 'SOLANA_PRIVATE_KEY'],
+    keypairPathEnv: ['WUNDERLAND_SOL_AUTHORITY_KEYPAIR_PATH', 'SOLANA_KEYPAIR'],
+  });
+  const adminAuthority = resolveAdminAuthorityPubkey(adminKeypair.keypair);
 
   console.log(`  Keypairs: ${KEYPAIR_DIR}`);
-  console.log(`  Airdrop:  ${AIRDROP_SOL} SOL to config authority wallet (if needed)`);
+  console.log(`  Airdrop:  ${AIRDROP_SOL} SOL to authority wallets (if needed)`);
   console.log(`  Comments: ${WITH_COMMENTS ? 'enabled' : 'disabled'}`);
   console.log(`  Votes:    ${WITH_VOTES ? 'enabled' : 'disabled'}`);
   console.log(`  Funding:  ${NO_AIRDROP ? 'funder-only' : 'airdrop'}${funder ? ' + fallback funder' : ''}`);
   if (funder) console.log(`  Funder:   ${funder.publicKey.toBase58()} (${FUNDER_KEYPAIR_PATH})`);
-  console.log(`  Config authority: ${configAuthority.publicKey.toBase58()} (${CONFIG_AUTHORITY_KEYPAIR_PATH})`);
+  console.log(`  Upgrade authority: ${upgradeAuthority.keypair.publicKey.toBase58()} (${upgradeAuthority.source})`);
+  console.log(`  Admin keypair:     ${adminKeypair.keypair.publicKey.toBase58()} (${adminKeypair.source})`);
+  console.log(`  Admin authority:   ${adminAuthority.pubkey.toBase58()} (${adminAuthority.source})`);
+  if (!upgradeAuthority.keypair.publicKey.equals(adminKeypair.keypair.publicKey)) {
+    console.log('  Note: upgrade authority and admin are different keys (expected on mainnet deployments).');
+  }
   console.log('');
 
   // Rent estimates
@@ -344,15 +358,18 @@ async function main() {
   const [configPda] = deriveConfigPDA(client.programId);
   const configInfo = await connection.getAccountInfo(configPda);
 
-  await ensureMinBalance(connection, configAuthority.publicKey, rentConfig + rentEconomics + TX_FEE_BUFFER_LAMPORTS, {
-    allowAirdrop: !NO_AIRDROP,
-    funder,
-  });
+  if (!configInfo) {
+    // initialize_config payer is the upgrade authority signer.
+    await ensureMinBalance(connection, upgradeAuthority.keypair.publicKey, rentConfig * 2 + TX_FEE_BUFFER_LAMPORTS, {
+      allowAirdrop: !NO_AIRDROP,
+      funder,
+    });
+  }
 
   if (!configInfo) {
     console.log('  Initializing ProgramConfig…');
     try {
-      const sig = await client.initializeConfig(configAuthority);
+      const sig = await client.initializeConfig(upgradeAuthority.keypair, adminAuthority.pubkey);
       console.log(`    TX: ${sig}`);
     } catch (e: unknown) {
       throw new Error(
@@ -360,7 +377,8 @@ async function main() {
           'Failed to initialize ProgramConfig.',
           'This instruction is restricted to the program upgrade authority to prevent config sniping.',
           '',
-          `Upgrade-authority keypair: ${CONFIG_AUTHORITY_KEYPAIR_PATH}`,
+          `Upgrade authority (${upgradeAuthority.source}): ${upgradeAuthority.keypair.publicKey.toBase58()}`,
+          `Admin authority (${adminAuthority.source}): ${adminAuthority.pubkey.toBase58()}`,
           `Error: ${e instanceof Error ? e.message : String(e)}`,
         ].join('\n'),
       );
@@ -381,7 +399,11 @@ async function main() {
   if (!econInfo) {
     console.log('  Initializing EconomicsConfig…');
     try {
-      const sig = await client.initializeEconomics(configAuthority);
+      await ensureMinBalance(connection, adminKeypair.keypair.publicKey, rentEconomics + TX_FEE_BUFFER_LAMPORTS, {
+        allowAirdrop: !NO_AIRDROP,
+        funder,
+      });
+      const sig = await client.initializeEconomics(adminKeypair.keypair);
       console.log(`    TX: ${sig}`);
     } catch (e: unknown) {
       throw new Error(
@@ -389,7 +411,7 @@ async function main() {
           'Failed to initialize EconomicsConfig.',
           'This instruction is restricted to ProgramConfig.authority.',
           '',
-          `Config authority keypair: ${CONFIG_AUTHORITY_KEYPAIR_PATH}`,
+          `Admin keypair (${adminKeypair.source}): ${adminKeypair.keypair.publicKey.toBase58()}`,
           `Error: ${e instanceof Error ? e.message : String(e)}`,
         ].join('\n'),
       );
@@ -422,8 +444,8 @@ async function main() {
   for (const preset of AGENTS) {
     console.log(`  Agent: ${preset.name}`);
 
-    // Demo: register all agents under the config-authority wallet (fits the 5-per-wallet cap).
-    const owner = configAuthority;
+    // Demo: register all agents under the admin wallet (fits the 5-per-wallet cap).
+    const owner = adminKeypair.keypair;
     const agentSigner = loadOrCreateKeypair(`${preset.name}-agent-signer`);
     const agentId = deterministicAgentId(preset.name);
 

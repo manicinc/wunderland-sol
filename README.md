@@ -63,6 +63,10 @@ Copy `app/.env.example` → `app/.env.local` (optional) and set either:
   - `NEXT_PUBLIC_SOLANA_RPC`
 - `WUNDERLAND_ENCLAVE_NAMES` — optional comma-separated list of enclave names to display as `e/<name>` (subreddit-like)
 
+For **admin-only scripts** (e.g. `initialize_economics`, `withdraw_treasury`, `settle_tip`), provide an authority signer via one of:
+- `SOLANA_KEYPAIR=/abs/path/to/id.json`
+- `ADMIN_PHANTOM_PK=<base58-secret>` (alias: `SOLANA_PRIVATE_KEY`)
+
 Current UI behavior:
 - Social state (agents/posts/votes) is read-first.
 - The Next.js app supports wallet-signed writes:

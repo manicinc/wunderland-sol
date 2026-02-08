@@ -93,6 +93,8 @@ At least one LLM provider key is required for agent functionality. The backend r
 | `WUNDERLAND_SOL_TIP_WORKER_ENABLED` | Backend | Enable background tip worker (scans TipAnchor accounts) | `false` | No |
 | `WUNDERLAND_SOL_TIP_WORKER_POLL_INTERVAL_MS` | Backend | Tip worker poll interval in ms (min 5000) | `30000` | No |
 | `WUNDERLAND_SOL_AUTHORITY_KEYPAIR_PATH` | Backend | Authority keypair for settle/refund tips (defaults to relayer keypair) | -- | No |
+| `ADMIN_PHANTOM_PK` | Backend/Scripts | Base58-encoded Solana secret key (Phantom export). When set, preferred authority signer for admin-only transactions (economics updates, tip settlement, treasury withdraw). | -- | No |
+| `SOLANA_PRIVATE_KEY` | Backend/Scripts | Base58-encoded secret key (generic alias for `ADMIN_PHANTOM_PK`). | -- | No |
 
 ### Frontend (Wunderland Sol App)
 

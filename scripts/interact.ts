@@ -18,14 +18,12 @@
  * Env:
  * - SOLANA_RPC: RPC endpoint (default devnet)
  * - PROGRAM_ID: program id (default devnet id)
- * - SOLANA_KEYPAIR: owner wallet keypair path (default ~/.config/solana/id.json)
+ * - SOLANA_KEYPAIR: keypair path (default ~/.config/solana/id.json)
+ * - SOLANA_PRIVATE_KEY / ADMIN_PHANTOM_PK: base58-encoded secret key (overrides path)
  * - ENCLAVE_NAME: enclave to use/create (default "wunderland")
  */
 
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-import { readFileSync } from 'fs';
-import { homedir } from 'os';
-import path from 'path';
 
 import {
   WunderlandSolClient,
@@ -35,6 +33,10 @@ import {
   hashSha256Utf8,
 } from '../sdk/src/index.ts';
 
+import { loadWunderlandEnv, resolveAdminAuthorityPubkey, resolveKeypairFromEnv } from './env.ts';
+
+loadWunderlandEnv();
+
 const PROGRAM_ID = new PublicKey(
   process.env.WUNDERLAND_SOL_PROGRAM_ID ||
     process.env.PROGRAM_ID ||
@@ -43,12 +45,6 @@ const PROGRAM_ID = new PublicKey(
 );
 const RPC_URL = process.env.WUNDERLAND_SOL_RPC_URL || process.env.SOLANA_RPC || clusterApiUrl('devnet');
 const ENCLAVE_NAME = process.env.ENCLAVE_NAME || 'wunderland';
-
-function loadOwnerKeypair(): Keypair {
-  const keypairPath = process.env.SOLANA_KEYPAIR || path.join(homedir(), '.config', 'solana', 'id.json');
-  const raw = JSON.parse(readFileSync(keypairPath, 'utf-8')) as number[];
-  return Keypair.fromSecretKey(Uint8Array.from(raw));
-}
 
 function hex(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString('hex');
@@ -64,16 +60,34 @@ async function main() {
   const connection = new Connection(RPC_URL, 'confirmed');
   const client = new WunderlandSolClient({ rpcUrl: RPC_URL, programId: PROGRAM_ID.toBase58() });
 
-  const owner = loadOwnerKeypair();
-  const ownerBal = await connection.getBalance(owner.publicKey);
-  console.log(`Owner wallet: ${owner.publicKey.toBase58()} (${(ownerBal / LAMPORTS_PER_SOL).toFixed(4)} SOL)`);
+  const upgradeAuthority = resolveKeypairFromEnv({
+    prefer: 'path',
+    keypairPathEnv: ['SOLANA_KEYPAIR'],
+    secretEnv: ['SOLANA_PRIVATE_KEY', 'ADMIN_PHANTOM_PK'],
+  });
+  const owner = resolveKeypairFromEnv({
+    prefer: 'secret',
+    secretEnv: ['ADMIN_PHANTOM_PK', 'SOLANA_PRIVATE_KEY'],
+    keypairPathEnv: ['SOLANA_KEYPAIR'],
+  });
+  const adminAuthority = resolveAdminAuthorityPubkey(owner.keypair);
+
+  if (!upgradeAuthority.keypair.publicKey.equals(owner.keypair.publicKey)) {
+    console.log(`Upgrade authority: ${upgradeAuthority.keypair.publicKey.toBase58()} (${upgradeAuthority.source})`);
+  }
+  console.log(`Owner wallet:      ${owner.keypair.publicKey.toBase58()} (${owner.source})`);
+  console.log(`Admin authority:   ${adminAuthority.pubkey.toBase58()} (${adminAuthority.source})`);
+
+  const ownerSigner = owner.keypair;
+  const ownerBal = await connection.getBalance(ownerSigner.publicKey);
+  console.log(`Owner balance:     ${(ownerBal / LAMPORTS_PER_SOL).toFixed(4)} SOL`);
 
   // 0) Initialize config if needed
   const cfg = await client.getProgramConfig();
   if (!cfg) {
     console.log('\n[0] initialize_config');
     console.log('ProgramConfig missing; attempting to initialize (requires program upgrade authority)…');
-    const sig = await client.initializeConfig(owner);
+    const sig = await client.initializeConfig(upgradeAuthority.keypair, adminAuthority.pubkey);
     console.log(`TX: ${sig}`);
   } else {
     console.log(`\nProgramConfig: ${cfg.pda.toBase58()} (agents=${cfg.account.agentCount}, enclaves=${cfg.account.enclaveCount})`);
@@ -84,7 +98,7 @@ async function main() {
   if (!econ) {
     console.log('\n[1] initialize_economics');
     console.log('EconomicsConfig missing; attempting to initialize (requires ProgramConfig.authority)…');
-    const sig = await client.initializeEconomics(owner);
+    const sig = await client.initializeEconomics(ownerSigner);
     console.log(`TX: ${sig}`);
   } else {
     console.log(
@@ -99,8 +113,8 @@ async function main() {
   const agentIdA = hashSha256Utf8('interact:agent-a');
   const agentIdB = hashSha256Utf8('interact:agent-b');
 
-  const [agentPdaA] = client.getAgentPDA(owner.publicKey, agentIdA);
-  const [agentPdaB] = client.getAgentPDA(owner.publicKey, agentIdB);
+  const [agentPdaA] = client.getAgentPDA(ownerSigner.publicKey, agentIdA);
+  const [agentPdaB] = client.getAgentPDA(ownerSigner.publicKey, agentIdB);
 
   // 2) Register agents (if missing)
   console.log('\n[2] initialize_agent');
@@ -132,7 +146,7 @@ async function main() {
     };
 
     const { signature } = await client.initializeAgent({
-      owner,
+      owner: ownerSigner,
       agentId: a.agentId,
       displayName: a.name,
       hexacoTraits: traits,
@@ -159,7 +173,7 @@ async function main() {
     const { signature } = await client.createEnclave({
       creatorAgentPda: agentPdaA,
       agentSigner: agentSignerA,
-      payer: owner,
+      payer: ownerSigner,
       name: ENCLAVE_NAME,
       metadataHash,
     });
@@ -197,7 +211,7 @@ async function main() {
   const { signature: postSig, postAnchorPda } = await client.anchorPost({
     agentIdentityPda: agentPdaA,
     agentSigner: agentSignerA,
-    payer: owner,
+    payer: ownerSigner,
     enclavePda,
     contentHash,
     manifestHash,
@@ -233,7 +247,7 @@ async function main() {
   const { signature: commentSig, commentAnchorPda } = await client.anchorComment({
     agentIdentityPda: agentPdaB,
     agentSigner: agentSignerB,
-    payer: owner,
+    payer: ownerSigner,
     enclavePda,
     parentPostPda: postAnchorPda,
     contentHash: commentContentHash,
