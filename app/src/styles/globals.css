@@ -1074,6 +1074,11 @@ html.light .mobile-menu-sublink:hover {
 .nav-link {
   position: relative;
   padding-bottom: 2px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .nav-link::after {
@@ -1862,7 +1867,7 @@ html.light {
   /* Dark readable text — boosted for warm parchment bg */
   --text-primary: #0f0f18;
   --text-secondary: rgba(15, 15, 24, 0.78);
-  --text-tertiary: rgba(15, 15, 24, 0.58);
+  --text-tertiary: rgba(15, 15, 24, 0.52);
 
   /* Art Deco gold — darker for light mode */
   --deco-gold: #92400e;
@@ -1907,29 +1912,33 @@ html.light body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
 }
 
-/* Glass panels — visible on warm background */
+/* Glass panels — neumorphic on warm background */
 html.light .glass {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow:
+    5px 5px 14px rgba(0, 0, 0, 0.07),
+    -3px -3px 10px rgba(255, 255, 255, 0.85),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.6);
 }
 
-html.light .glass:hover {
-  background: rgba(255, 255, 255, 0.75);
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* Holo cards — frosted glass on parchment */
+/* Holo cards — neumorphic on parchment */
 html.light .holo-card {
-  background: rgba(255, 255, 255, 0.65);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow:
+    6px 6px 16px rgba(0, 0, 0, 0.08),
+    -4px -4px 12px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.7),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.02);
 }
-
 html.light .holo-card:hover {
-  border-color: rgba(109, 40, 217, 0.3);
-  box-shadow: 0 8px 30px rgba(109, 40, 217, 0.1), 0 2px 10px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    8px 8px 20px rgba(0, 0, 0, 0.1),
+    -5px -5px 14px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.8),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.02);
+  transform: translateY(-2px);
 }
 
 /* Gradient text — vivid */
@@ -2159,9 +2168,16 @@ html.light .organic-btn::after {
   ) !important;
 }
 
-/* Gradient border box (HEXACO explainer) */
+/* Gradient border box (HEXACO explainer) — neumorphic warm */
 html.light .gradient-border {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(109, 40, 217, 0.15);
+  border-radius: 20px;
+  box-shadow:
+    8px 8px 24px rgba(0, 0, 0, 0.08),
+    -6px -6px 16px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.7),
+    inset -1px -1px 3px rgba(0, 0, 0, 0.02);
 }
 
 /* HEXACO hero — stronger aurora */
@@ -2173,10 +2189,14 @@ html.light .hexaco-hero-orbit-ring { border-color: rgba(0, 0, 0, 0.12); }
 html.light .hexaco-hero-trait-bar { background: rgba(0, 0, 0, 0.12); }
 html.light .hero-title-glow::after { opacity: 0.25; }
 
-/* Ornate border — visible on light */
+/* Ornate border — neumorphic depth */
 html.light .ornate-border {
-  border-color: rgba(146, 64, 14, 0.3);
-  box-shadow: inset 0 0 0 3px var(--bg-void), inset 0 0 0 4px rgba(146, 64, 14, 0.2);
+  border-color: rgba(146, 64, 14, 0.2);
+  box-shadow:
+    6px 6px 18px rgba(0, 0, 0, 0.07),
+    -4px -4px 12px rgba(255, 255, 255, 0.85),
+    inset 0 0 0 3px var(--bg-void),
+    inset 0 0 0 4px rgba(146, 64, 14, 0.15);
 }
 
 /* Footer text — ensure readable */
@@ -2205,6 +2225,180 @@ html.light .nav-link {
 }
 html.light .nav-link:hover {
   color: var(--wl-blue);
+}
+
+/* CatalogBrowser — light mode overhaul */
+html.light .holo-card code,
+html.light .holo-card pre {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html.light .text-gray-400 {
+  color: var(--text-secondary);
+}
+html.light .text-gray-500 {
+  color: var(--text-tertiary);
+}
+html.light pre,
+html.light .bg-white\/5 {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ============================================================
+   STONE TABLET CARDS (How It Works)
+   ============================================================ */
+.stone-tablet {
+  position: relative;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+.stone-tablet:hover {
+  transform: translateY(-4px);
+}
+.stone-tablet__numeral {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  font-family: 'Cormorant Garamond', 'Georgia', serif;
+  font-size: 7rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.4s ease;
+}
+.stone-tablet:hover .stone-tablet__numeral {
+  opacity: 0.08;
+}
+.stone-tablet__icon-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px;
+  height: 160px;
+  opacity: 0.03;
+  pointer-events: none;
+  color: currentColor;
+  transition: opacity 0.4s ease;
+}
+.stone-tablet:hover .stone-tablet__icon-bg {
+  opacity: 0.06;
+}
+.stone-tablet__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  transition: all 0.3s ease;
+}
+.stone-tablet:hover .stone-tablet__icon {
+  transform: scale(1.08);
+}
+.stone-tablet__title {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 0.625rem;
+  position: relative;
+  z-index: 1;
+}
+.stone-tablet__desc {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+html.light .stone-tablet {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    8px 8px 24px rgba(0, 0, 0, 0.07),
+    -6px -6px 16px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.8),
+    inset -1px -1px 3px rgba(0, 0, 0, 0.02);
+}
+html.light .stone-tablet:hover {
+  box-shadow:
+    12px 12px 32px rgba(0, 0, 0, 0.09),
+    -8px -8px 20px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.9),
+    inset -1px -1px 3px rgba(0, 0, 0, 0.02);
+}
+html.light .stone-tablet__numeral {
+  color: var(--text-primary);
+  opacity: 0.05;
+}
+html.light .stone-tablet:hover .stone-tablet__numeral {
+  opacity: 0.09;
+}
+
+/* ============================================================
+   COPY BUTTON (CLI commands)
+   ============================================================ */
+.cmd-row {
+  position: relative;
+}
+.copy-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+.cmd-row:hover .copy-btn {
+  opacity: 1;
+}
+.copy-btn:hover {
+  color: var(--neon-green);
+  border-color: var(--neon-green);
+  background: rgba(20, 241, 149, 0.08);
+  box-shadow: 0 0 12px rgba(20, 241, 149, 0.15);
+}
+.copy-btn:active {
+  transform: translateY(-50%) scale(0.92);
+}
+.copy-btn--copied {
+  opacity: 1 !important;
+  color: var(--neon-green) !important;
+  border-color: var(--neon-green) !important;
+}
+html.light .copy-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html.light .copy-btn:hover {
+  color: #047857;
+  border-color: #047857;
+  background: rgba(4, 120, 87, 0.08);
+  box-shadow: 0 0 12px rgba(4, 120, 87, 0.1);
 }
 
 /* ============================================================
