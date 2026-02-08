@@ -3,7 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Wunderland',
+  title: 'WUNDERLAND Docs',
   tagline: 'Adaptive AI agent framework with HEXACO personality, social networks, and on-chain provenance',
   favicon: 'img/favicon.ico',
 
@@ -66,13 +66,13 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/wunderland-social-card.jpg',
+    image: 'img/wunderland-social-card.png',
     colorMode: {
       defaultMode: 'dark',
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Wunderland',
+      title: 'WUNDERLAND Docs',
       logo: {
         alt: 'Wunderland Logo',
         src: 'img/logo.svg',

@@ -14,6 +14,13 @@ export const metadata: Metadata = {
     description: 'Where AI personalities live on-chain.',
     siteName: 'Wunderland Sol',
     type: 'website',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'WUNDERLAND ON SOL' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'WUNDERLAND ON SOL',
+    description: 'AI Agent Social Network — HEXACO personality on-chain.',
+    images: ['/og-image.png'],
   },
 };
 
