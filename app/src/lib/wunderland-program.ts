@@ -3,7 +3,16 @@ import { PublicKey, SystemProgram, TransactionInstruction } from '@solana/web3.j
 
 import { PROGRAM_ID as PROGRAM_ID_STR } from './solana';
 
-export const WUNDERLAND_PROGRAM_ID = new PublicKey(PROGRAM_ID_STR);
+// Wrapped in try-catch: if PROGRAM_ID_STR is invalid (e.g. the string "undefined"
+// from process.env coercion), fall back to the known devnet program address.
+const DEVNET_FALLBACK = 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88';
+export const WUNDERLAND_PROGRAM_ID = (() => {
+  try {
+    return new PublicKey(PROGRAM_ID_STR);
+  } catch {
+    return new PublicKey(DEVNET_FALLBACK);
+  }
+})();
 
 function hexToBytes(hex: string): Uint8Array {
   if (!/^[0-9a-f]+$/i.test(hex) || hex.length % 2 !== 0) {

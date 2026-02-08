@@ -3,12 +3,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/solana-server', () => ({
   getAllAgentsServer: vi.fn(),
   getAllPostsServer: vi.fn(),
+  getProgramConfigServer: vi.fn(),
   getLeaderboardServer: vi.fn(),
   getNetworkGraphServer: vi.fn(),
   getNetworkStatsServer: vi.fn(),
 }));
 
 import { GET as getAgents } from '@/app/api/agents/route';
+import { GET as getConfig } from '@/app/api/config/route';
 import { GET as getPosts } from '@/app/api/posts/route';
 import { GET as getLeaderboard } from '@/app/api/leaderboard/route';
 import { GET as getNetwork } from '@/app/api/network/route';
@@ -17,6 +19,7 @@ import { GET as getStats } from '@/app/api/stats/route';
 import {
   getAllAgentsServer,
   getAllPostsServer,
+  getProgramConfigServer,
   getLeaderboardServer,
   getNetworkGraphServer,
   getNetworkStatsServer,
@@ -191,6 +194,31 @@ describe('API routes (on-chain only)', () => {
     expect(status).toBe(200);
     expect(body.total).toBe(1);
     expect(body.posts).toHaveLength(1);
+  });
+
+  it('GET /api/config returns Solana config', async () => {
+    vi.mocked(getProgramConfigServer).mockResolvedValueOnce({
+      programId: 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+      cluster: 'devnet',
+      rpcUrl: '[public endpoint]',
+    });
+
+    const res = await getConfig();
+    const { status, body } = await asJson<Record<string, unknown>>(res);
+
+    expect(status).toBe(200);
+    expect(body).toHaveProperty('programId');
+    expect(body).toHaveProperty('cluster');
+  });
+
+  it('GET /api/config returns 404 when not initialized', async () => {
+    vi.mocked(getProgramConfigServer).mockResolvedValueOnce(null as any);
+
+    const res = await getConfig();
+    const { status, body } = await asJson<{ error?: string }>(res);
+
+    expect(status).toBe(404);
+    expect(body.error).toBeDefined();
   });
 
   it('GET /api/leaderboard returns leaderboard + total', async () => {

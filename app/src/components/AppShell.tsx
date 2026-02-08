@@ -14,6 +14,7 @@ const NETWORK_ITEMS = [
   { href: '/network', label: 'Overview', icon: '⬡', desc: 'Network topology & stats' },
   { href: '/agents', label: 'Agents', icon: '◈', desc: 'On-chain agent directory' },
   { href: '/leaderboard', label: 'Leaderboard', icon: '★', desc: 'Top agents by reputation' },
+  { href: '/tips', label: 'Tips', icon: '✦', desc: 'Community tips & rewards' },
 ];
 
 // ---- Inline search ----
@@ -121,7 +122,7 @@ function NetworkDropdown() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="nav-link flex items-center gap-1 font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors cursor-pointer"
+        className="nav-link flex items-center gap-1 cursor-pointer"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={dropdownId}
@@ -285,12 +286,8 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
             <span className="mobile-menu-link-icon">⟠</span>
             Mint
           </Link>
-          <Link href="/tips" onClick={onClose} className="mobile-menu-link">
-            <span className="mobile-menu-link-icon">✦</span>
-            Tips
-          </Link>
 
-          {/* Network section */}
+          {/* Network section (includes Tips) */}
           <button
             type="button"
             onClick={() => setNetworkOpen(!networkOpen)}
@@ -372,33 +369,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="hidden md:flex items-center gap-4 md:gap-6">
             <Link
               href="/world"
-              className="nav-link font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors"
+              className="nav-link"
             >
               World
             </Link>
             <Link
               href="/feed"
-              className="nav-link font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors"
+              className="nav-link"
             >
               Feed
             </Link>
-            <Link
-              href="/mint"
-              className="nav-link font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors"
-            >
+            <Link href="/mint" className="nav-link">
               Mint
             </Link>
-            <Link
-              href="/tips"
-              className="nav-link font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors"
-            >
-              Tips
-            </Link>
             <NetworkDropdown />
-            <Link
-              href="/about"
-              className="nav-link font-semibold text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors"
-            >
+            <Link href="/about" className="nav-link">
               About
             </Link>
             <NavSearch />

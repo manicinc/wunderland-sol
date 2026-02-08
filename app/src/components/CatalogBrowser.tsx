@@ -160,16 +160,16 @@ function UsagePanel({ type, item }: { type: TabId; item: CatalogSkill | CatalogC
   if (type === 'skills') {
     const skill = item as CatalogSkill;
     return (
-      <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+      <div className="mt-4 pt-4 border-t border-[var(--border-glass)] space-y-3">
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">CLI</span>
-          <code className="block font-mono text-xs text-[var(--neon-green)] bg-black/30 rounded px-3 py-2 border border-white/5">
+          <code className="block font-mono text-xs text-[var(--neon-green)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)]">
             wunderland skills enable {skill.name}
           </code>
         </div>
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">SDK</span>
-          <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+          <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {`import { getSkillByName } from '@framers/agentos-skills-registry/catalog'
 
 const skill = getSkillByName('${skill.name}')
@@ -179,7 +179,7 @@ const skill = getSkillByName('${skill.name}')
         {skill.requiredTools.length > 0 && (
           <div>
             <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Requires</span>
-            <span className="text-xs text-gray-500">Tools: {skill.requiredTools.join(', ')}</span>
+            <span className="text-xs text-[var(--text-tertiary)]">Tools: {skill.requiredTools.join(', ')}</span>
           </div>
         )}
       </div>
@@ -189,10 +189,10 @@ const skill = getSkillByName('${skill.name}')
   if (type === 'channels') {
     const channel = item as CatalogChannel;
     return (
-      <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+      <div className="mt-4 pt-4 border-t border-[var(--border-glass)] space-y-3">
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">SDK</span>
-          <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+          <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {`import { createCuratedManifest } from '@framers/agentos-extensions-registry'
 
 const manifest = await createCuratedManifest({
@@ -203,14 +203,14 @@ const manifest = await createCuratedManifest({
         </div>
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Install</span>
-          <code className="block font-mono text-xs text-[var(--neon-green)] bg-black/30 rounded px-3 py-2 border border-white/5">
+          <code className="block font-mono text-xs text-[var(--neon-green)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)]">
             npm install {channel.sdkPackage}
           </code>
         </div>
         {channel.requiredSecrets.length > 0 && (
           <div>
             <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Env</span>
-            <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+            <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {channel.requiredSecrets.map((s) => `${formatSecretEnv(s)}=your_value`).join('\n')}
             </pre>
           </div>
@@ -222,18 +222,18 @@ const manifest = await createCuratedManifest({
   if (type === 'providers') {
     const provider = item as CatalogProvider;
     return (
-      <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+      <div className="mt-4 pt-4 border-t border-[var(--border-glass)] space-y-3">
         {provider.requiredSecrets.length > 0 && (
           <div>
             <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Env</span>
-            <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+            <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {provider.requiredSecrets.map((s) => `${formatSecretEnv(s)}=your_value`).join('\n')}
             </pre>
           </div>
         )}
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Config</span>
-          <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+          <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {`// agent.config.json
 {
   "llm": {
@@ -245,7 +245,7 @@ const manifest = await createCuratedManifest({
         </div>
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Models</span>
-          <span className="text-xs text-gray-500">Default: {provider.defaultModel} | Small: {provider.smallModel}</span>
+          <span className="text-xs text-[var(--text-tertiary)]">Default: {provider.defaultModel} | Small: {provider.smallModel}</span>
         </div>
       </div>
     );
@@ -254,10 +254,10 @@ const manifest = await createCuratedManifest({
   // tools
   const tool = item as CatalogTool;
   return (
-    <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+    <div className="mt-4 pt-4 border-t border-[var(--border-glass)] space-y-3">
       <div>
         <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">SDK</span>
-        <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+        <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {`import { createCuratedManifest } from '@framers/agentos-extensions-registry'
 
 const manifest = await createCuratedManifest({
@@ -268,14 +268,14 @@ const manifest = await createCuratedManifest({
       </div>
       <div>
         <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Install</span>
-        <code className="block font-mono text-xs text-[var(--neon-green)] bg-black/30 rounded px-3 py-2 border border-white/5">
+        <code className="block font-mono text-xs text-[var(--neon-green)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)]">
           npm install {tool.packageName}
         </code>
       </div>
       {tool.requiredSecrets.length > 0 && (
         <div>
           <span className="block text-[0.6rem] uppercase tracking-widest text-[var(--neon-cyan)] font-mono mb-1">Env</span>
-          <pre className="font-mono text-[0.65rem] text-gray-400 bg-black/30 rounded px-3 py-2 border border-white/5 overflow-x-auto whitespace-pre leading-relaxed m-0">
+          <pre className="font-mono text-[0.65rem] text-[var(--text-secondary)] bg-[var(--bg-glass)] rounded px-3 py-2 border border-[var(--border-glass)] overflow-x-auto whitespace-pre leading-relaxed m-0">
 {tool.requiredSecrets.map((s) => `${formatSecretEnv(s)}=your_value`).join('\n')}
           </pre>
         </div>
@@ -368,12 +368,12 @@ export function CatalogBrowser() {
             onClick={() => handleTabChange(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-all cursor-pointer ${
               activeTab === tab.id
-                ? 'border-[var(--neon-cyan)] bg-[rgba(0,245,255,0.08)] text-white shadow-[0_0_12px_rgba(0,245,255,0.15)]'
-                : 'border-white/10 bg-white/[0.02] text-gray-400 hover:border-[rgba(0,245,255,0.3)] hover:text-white'
+                ? 'border-[var(--neon-cyan)] bg-[rgba(0,245,255,0.08)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(0,245,255,0.15)]'
+                : 'border-[var(--border-glass)] bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:border-[rgba(0,245,255,0.3)] hover:text-[var(--text-primary)]'
             }`}
           >
             {tab.label}
-            <span className="text-[0.65rem] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-gray-500">
+            <span className="text-[0.65rem] font-mono px-1.5 py-0.5 rounded bg-[var(--bg-glass)] text-[var(--text-tertiary)]">
               {tab.count}
             </span>
           </button>
@@ -387,7 +387,7 @@ export function CatalogBrowser() {
           placeholder={`Search ${activeTab}...`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg border border-white/10 bg-white/[0.02] text-white text-sm font-mono placeholder-gray-600 outline-none focus:border-[rgba(0,245,255,0.4)] transition-colors"
+          className="w-full px-4 py-2.5 rounded-lg border border-[var(--border-glass)] bg-[var(--bg-glass)] text-[var(--text-primary)] text-sm font-mono placeholder-[var(--text-tertiary)] outline-none focus:border-[rgba(0,245,255,0.4)] transition-colors"
         />
         {filterCategories.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -398,7 +398,7 @@ export function CatalogBrowser() {
                 className={`px-2.5 py-1 rounded-full border text-[0.65rem] uppercase tracking-wider cursor-pointer transition-all ${
                   categoryFilter === cat
                     ? 'border-[var(--neon-cyan)] bg-[rgba(0,245,255,0.1)] text-[var(--neon-cyan)]'
-                    : 'border-white/10 text-gray-500 hover:border-[rgba(0,245,255,0.3)] hover:text-gray-400'
+                    : 'border-[var(--border-glass)] text-[var(--text-tertiary)] hover:border-[rgba(0,245,255,0.3)] hover:text-[var(--text-secondary)]'
                 }`}
               >
                 {cat === 'all' ? 'All' : cat}
@@ -409,7 +409,7 @@ export function CatalogBrowser() {
       </div>
 
       {/* Results count */}
-      <div className="text-xs text-gray-500 font-mono mb-4">
+      <div className="text-xs text-[var(--text-tertiary)] font-mono mb-4">
         {filteredItems.length} {activeTab} found
       </div>
 
@@ -421,10 +421,10 @@ export function CatalogBrowser() {
           return (
             <div key={key} className="holo-card p-5 rounded-xl">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-sm text-white">{getItemName(item)}</span>
+                <span className="font-semibold text-sm text-[var(--text-primary)]">{getItemName(item)}</span>
                 <span className="badge badge-level text-[0.55rem]">{getItemCategory(item)}</span>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed mb-3 line-clamp-2">{getItemDesc(item)}</p>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-3 line-clamp-2">{getItemDesc(item)}</p>
 
               {getItemSecrets(item).length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
@@ -442,7 +442,7 @@ export function CatalogBrowser() {
                     href={getNpmUrl(item)!}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[0.65rem] font-mono px-2.5 py-1 rounded border border-white/10 bg-white/[0.03] text-gray-400 no-underline hover:border-[rgba(0,245,255,0.3)] hover:text-[var(--neon-cyan)] transition-all"
+                    className="text-[0.65rem] font-mono px-2.5 py-1 rounded border border-[var(--border-glass)] bg-[var(--bg-glass)] text-[var(--text-secondary)] no-underline hover:border-[rgba(0,245,255,0.3)] hover:text-[var(--neon-cyan)] transition-all"
                   >
                     NPM
                   </a>
@@ -451,7 +451,7 @@ export function CatalogBrowser() {
                   href={getGithubUrl(item)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[0.65rem] font-mono px-2.5 py-1 rounded border border-white/10 bg-white/[0.03] text-gray-400 no-underline hover:border-[rgba(0,245,255,0.3)] hover:text-[var(--neon-cyan)] transition-all"
+                  className="text-[0.65rem] font-mono px-2.5 py-1 rounded border border-[var(--border-glass)] bg-[var(--bg-glass)] text-[var(--text-secondary)] no-underline hover:border-[rgba(0,245,255,0.3)] hover:text-[var(--neon-cyan)] transition-all"
                 >
                   GitHub
                 </a>
@@ -474,7 +474,7 @@ export function CatalogBrowser() {
       </div>
 
       {filteredItems.length === 0 && (
-        <div className="text-center py-12 text-gray-500 text-sm">
+        <div className="text-center py-12 text-[var(--text-tertiary)] text-sm">
           No {activeTab} match your search. Try a different query or filter.
         </div>
       )}

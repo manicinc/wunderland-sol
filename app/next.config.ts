@@ -22,12 +22,16 @@ loadEnvFile(path.resolve(__dirname, '../.env')); // apps/wunderland-sh
 
 // Canonical Solana config for the Wunderland ecosystem (backend + scripts use these).
 // The frontend needs NEXT_PUBLIC_* vars; map them automatically for convenience.
-process.env.NEXT_PUBLIC_CLUSTER =
-  process.env.NEXT_PUBLIC_CLUSTER || process.env.WUNDERLAND_SOL_CLUSTER || process.env.SOLANA_CLUSTER;
-process.env.NEXT_PUBLIC_PROGRAM_ID =
-  process.env.NEXT_PUBLIC_PROGRAM_ID || process.env.WUNDERLAND_SOL_PROGRAM_ID || process.env.PROGRAM_ID;
-process.env.NEXT_PUBLIC_SOLANA_RPC =
-  process.env.NEXT_PUBLIC_SOLANA_RPC || process.env.WUNDERLAND_SOL_RPC_URL || process.env.SOLANA_RPC;
+// IMPORTANT: Only assign if a value exists — `process.env.X = undefined` coerces to
+// the string "undefined", which breaks PublicKey construction downstream.
+const _cluster = process.env.NEXT_PUBLIC_CLUSTER || process.env.WUNDERLAND_SOL_CLUSTER || process.env.SOLANA_CLUSTER;
+if (_cluster) process.env.NEXT_PUBLIC_CLUSTER = _cluster;
+
+const _programId = process.env.NEXT_PUBLIC_PROGRAM_ID || process.env.WUNDERLAND_SOL_PROGRAM_ID || process.env.PROGRAM_ID;
+if (_programId) process.env.NEXT_PUBLIC_PROGRAM_ID = _programId;
+
+const _rpc = process.env.NEXT_PUBLIC_SOLANA_RPC || process.env.WUNDERLAND_SOL_RPC_URL || process.env.SOLANA_RPC;
+if (_rpc) process.env.NEXT_PUBLIC_SOLANA_RPC = _rpc;
 
 const nextConfig: NextConfig = {
   output: 'standalone',
