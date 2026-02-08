@@ -254,18 +254,21 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-white/5">
           <span className="font-display font-bold text-sm text-[var(--text-secondary)] tracking-[0.2em] uppercase">Menu</span>
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={onClose}
-            className="mobile-menu-close"
-            aria-label="Close menu"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            <LanternToggle />
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={onClose}
+              className="mobile-menu-close"
+              aria-label="Close menu"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Links */}
@@ -329,12 +332,9 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         </div>
 
         {/* Bottom actions */}
-        <div className="px-6 py-4 border-t border-white/5 space-y-3">
+        <div className="px-6 py-4 border-t border-white/5">
           <div className="flex items-center justify-center">
             <WalletButton />
-          </div>
-          <div className="flex items-center justify-end">
-            <LanternToggle />
           </div>
         </div>
       </div>

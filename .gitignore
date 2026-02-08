@@ -12,6 +12,7 @@ dist/
 .next/
 target/
 anchor/target/
+*.tsbuildinfo
 
 # Environment & secrets
 .env

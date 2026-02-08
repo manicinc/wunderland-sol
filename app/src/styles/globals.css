@@ -649,7 +649,7 @@ html.light .hamburger-btn:hover {
 }
 
 html.light .hamburger-line {
-  background: var(--text-dark);
+  background: var(--text-primary);
 }
 
 /* ---- Mobile Menu ---- */
@@ -725,7 +725,7 @@ html.light .mobile-menu-panel {
 
 html.light .mobile-menu-close {
   background: rgba(0, 0, 0, 0.04);
-  color: var(--text-dark-secondary);
+  color: var(--text-secondary);
 }
 
 .mobile-menu-link {
@@ -751,7 +751,7 @@ html.light .mobile-menu-close {
 }
 
 html.light .mobile-menu-link {
-  color: var(--text-dark);
+  color: var(--text-primary);
 }
 
 html.light .mobile-menu-link:hover {
@@ -800,12 +800,12 @@ html.light .mobile-menu-link-icon {
 }
 
 html.light .mobile-menu-sublink {
-  color: var(--text-dark-secondary);
+  color: var(--text-secondary);
 }
 
 html.light .mobile-menu-sublink:hover {
   background: rgba(0, 0, 0, 0.03);
-  color: var(--text-dark);
+  color: var(--text-primary);
 }
 
 /* ---- Scan Lines ---- */
@@ -952,18 +952,21 @@ html.light .mobile-menu-sublink:hover {
 /* ---- $WUNDER Token Banner ---- */
 .wunder-banner {
   position: relative;
-  background: linear-gradient(135deg, rgba(153, 69, 255, 0.08), rgba(255, 215, 0, 0.06), rgba(20, 241, 149, 0.05));
-  border: 1px solid rgba(255, 215, 0, 0.15);
+  background: linear-gradient(135deg, rgba(153, 69, 255, 0.10), rgba(255, 215, 0, 0.08), rgba(20, 241, 149, 0.06));
+  border: 1px solid rgba(255, 215, 0, 0.20);
   border-radius: 16px;
   overflow: hidden;
   transition: border-color 0.3s, box-shadow 0.3s;
+  /* Ornate double-border effect */
+  box-shadow: inset 0 0 0 3px rgba(10, 10, 15, 0.8), inset 0 0 0 4px rgba(255, 215, 0, 0.12);
 }
 
 .wunder-banner:hover {
-  border-color: rgba(255, 215, 0, 0.3);
+  border-color: rgba(255, 215, 0, 0.35);
   box-shadow:
-    0 0 30px rgba(255, 215, 0, 0.08),
-    0 0 60px rgba(153, 69, 255, 0.05);
+    inset 0 0 0 3px rgba(10, 10, 15, 0.8), inset 0 0 0 4px rgba(255, 215, 0, 0.2),
+    0 0 30px rgba(255, 215, 0, 0.10),
+    0 0 60px rgba(153, 69, 255, 0.06);
 }
 
 .wunder-banner-glow {
@@ -1490,7 +1493,7 @@ html.light .mobile-menu-sublink:hover {
   transition: opacity 0.3s ease;
 }
 
-/* Luminescent shimmer sweep */
+/* Luminescent shimmer sweep — mirror-like sheen */
 .organic-btn::after {
   content: '';
   position: absolute;
@@ -1498,11 +1501,11 @@ html.light .mobile-menu-sublink:hover {
   border-radius: inherit;
   background: linear-gradient(
     105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.05) 42%,
-    rgba(255, 255, 255, 0.12) 50%,
-    rgba(255, 255, 255, 0.05) 58%,
-    transparent 70%
+    transparent 25%,
+    rgba(255, 255, 255, 0.06) 38%,
+    rgba(255, 255, 255, 0.20) 50%,
+    rgba(255, 255, 255, 0.06) 62%,
+    transparent 75%
   );
   background-size: 200% 100%;
   background-position: var(--shimmer-pos, -100%) 0;
@@ -1856,10 +1859,15 @@ html.light {
   --bg-glass: rgba(0, 0, 0, 0.05);
   --bg-glass-hover: rgba(0, 0, 0, 0.08);
 
-  /* Dark readable text */
+  /* Dark readable text — boosted for warm parchment bg */
   --text-primary: #0f0f18;
-  --text-secondary: rgba(15, 15, 24, 0.7);
-  --text-tertiary: rgba(15, 15, 24, 0.5);
+  --text-secondary: rgba(15, 15, 24, 0.78);
+  --text-tertiary: rgba(15, 15, 24, 0.58);
+
+  /* Art Deco gold — darker for light mode */
+  --deco-gold: #92400e;
+  --deco-gold-dim: rgba(146, 64, 14, 0.25);
+  --deco-gold-glow: rgba(146, 64, 14, 0.35);
 
   /* Visible borders */
   --border-glass: rgba(0, 0, 0, 0.14);
@@ -1995,13 +2003,17 @@ html.light .neon-glow-green {
 
 /* $WUNDER banner */
 html.light .wunder-banner {
-  background: linear-gradient(135deg, rgba(109, 40, 217, 0.08), rgba(146, 64, 14, 0.08), rgba(4, 120, 87, 0.06));
-  border-color: rgba(146, 64, 14, 0.25);
+  background: linear-gradient(135deg, rgba(109, 40, 217, 0.06), rgba(146, 64, 14, 0.10), rgba(4, 120, 87, 0.06));
+  border-color: rgba(146, 64, 14, 0.30);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.7), inset 0 0 0 4px rgba(146, 64, 14, 0.15);
 }
 
 html.light .wunder-banner:hover {
-  border-color: rgba(146, 64, 14, 0.4);
-  box-shadow: 0 0 30px rgba(146, 64, 14, 0.1);
+  border-color: rgba(146, 64, 14, 0.45);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.7), inset 0 0 0 4px rgba(146, 64, 14, 0.25),
+    0 0 30px rgba(146, 64, 14, 0.1),
+    0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 html.light .wunder-banner-glow {
@@ -2107,9 +2119,44 @@ html.light .wallet-btn:hover {
   box-shadow: 0 0 16px rgba(109, 40, 217, 0.1);
 }
 
-/* Organic button — keep dark fill, restore white text inside */
+/* Organic button — neumorphic glass in light mode */
 html.light .organic-btn {
   --color-white: #ffffff;
+}
+
+html.light .organic-btn > span:nth-child(2) {
+  /* Glass fill — warm parchment instead of dark */
+  background: rgba(247, 243, 237, 0.92) !important;
+  box-shadow:
+    4px 4px 12px rgba(0, 0, 0, 0.08),
+    -3px -3px 8px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.8),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.04);
+}
+
+html.light .organic-btn > span:nth-child(2) span {
+  color: var(--text-primary) !important;
+}
+
+html.light .organic-btn:hover > span:nth-child(2) {
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow:
+    6px 6px 16px rgba(0, 0, 0, 0.1),
+    -4px -4px 10px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.9),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Enhanced mirror sheen */
+html.light .organic-btn::after {
+  background: linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(146, 64, 14, 0.04) 38%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(146, 64, 14, 0.04) 62%,
+    transparent 75%
+  ) !important;
 }
 
 /* Gradient border box (HEXACO explainer) */
@@ -2125,6 +2172,40 @@ html.light .hexaco-hero-radar { filter: drop-shadow(0 0 24px rgba(109, 40, 217, 
 html.light .hexaco-hero-orbit-ring { border-color: rgba(0, 0, 0, 0.12); }
 html.light .hexaco-hero-trait-bar { background: rgba(0, 0, 0, 0.12); }
 html.light .hero-title-glow::after { opacity: 0.25; }
+
+/* Ornate border — visible on light */
+html.light .ornate-border {
+  border-color: rgba(146, 64, 14, 0.3);
+  box-shadow: inset 0 0 0 3px var(--bg-void), inset 0 0 0 4px rgba(146, 64, 14, 0.2);
+}
+
+/* Footer text — ensure readable */
+html.light footer {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Code snippets — better contrast */
+html.light code {
+  color: var(--text-primary);
+}
+
+/* Deco heading ornaments — visible */
+html.light .deco-heading::before,
+html.light .deco-heading::after {
+  color: #92400e;
+  opacity: 0.6;
+}
+
+/* Section-glow — slightly stronger in light */
+html.light .section-glow-purple::before { background: radial-gradient(ellipse at 50% 0%, rgba(109, 40, 217, 0.07) 0%, transparent 70%); }
+
+/* Nav links — ensure text-primary adapts */
+html.light .nav-link {
+  color: var(--text-primary);
+}
+html.light .nav-link:hover {
+  color: var(--wl-blue);
+}
 
 /* ============================================================
    MINT WIZARD
