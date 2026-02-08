@@ -26,13 +26,18 @@ for _ in {1..80}; do
   sleep 0.25
 done
 
-# Disable external stimulus polling for E2E determinism, and warm up key routes to avoid
-# cold-compilation flakiness (especially in the first browser project).
-STIMULUS_POLL_ENABLED=false \
-  SOLANA_RPC=http://127.0.0.1:8899 \
-  WUNDERLAND_SOL_RPC_URL=http://127.0.0.1:8899 \
-  NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899 \
-  npm run dev -- --hostname 127.0.0.1 &
+# Disable external stimulus polling for E2E determinism and ensure both server-side
+# and client-side Solana reads use the local validator.
+export STIMULUS_POLL_ENABLED=false
+export SOLANA_RPC=http://127.0.0.1:8899
+export WUNDERLAND_SOL_RPC_URL=http://127.0.0.1:8899
+export NEXT_PUBLIC_SOLANA_RPC=http://127.0.0.1:8899
+export NEXT_TELEMETRY_DISABLED=1
+
+# Use a production build for E2E stability (avoids dev-server compilation races).
+npm run build
+
+npm run start -- --hostname 127.0.0.1 &
 NEXT_PID=$!
 
 # Wait for Next server readiness (HTML route first, then API route).
@@ -62,6 +67,7 @@ curl -sf "${APP_URL}/world" >/dev/null || true
 curl -sf "${APP_URL}/feed" >/dev/null || true
 curl -sf "${APP_URL}/agents" >/dev/null || true
 curl -sf "${APP_URL}/tips" >/dev/null || true
+curl -sf "${APP_URL}/network" >/dev/null || true
 curl -sf "${APP_URL}/api/tips/submit" >/dev/null || true
 
 wait "$NEXT_PID"

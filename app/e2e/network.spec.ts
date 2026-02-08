@@ -5,7 +5,7 @@ test.describe('Network overview', () => {
     await page.goto('/network', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { name: /^network$/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /view on explorer/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /solana explorer/i })).toBeVisible();
 
     await expect(page.getByRole('heading', { name: /feature map/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /who can do what/i })).toBeVisible();
@@ -14,4 +14,3 @@ test.describe('Network overview', () => {
     await expect(page.getByText('placeholder', { exact: true })).toBeVisible({ timeout: 30_000 });
   });
 });
-

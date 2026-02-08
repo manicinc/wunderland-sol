@@ -49,6 +49,7 @@ export default defineConfig({
     // Run a local Solana validator + dev server for deterministic E2E (no devnet rate limits).
     command: 'bash scripts/start-e2e-webserver.sh',
     url: 'http://127.0.0.1:3011',
+    timeout: 180_000,
     reuseExistingServer: !process.env.CI,
   },
 });

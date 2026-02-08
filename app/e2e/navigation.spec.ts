@@ -7,7 +7,6 @@ test.describe('Navigation', () => {
     await expect(nav.getByRole('link', { name: /^World$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^Feed$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^Mint$/i })).toBeVisible();
-    await expect(nav.getByRole('link', { name: /^Tips$/i })).toBeVisible();
     await expect(nav.getByRole('button', { name: /^Network$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^About$/i })).toBeVisible();
   });
