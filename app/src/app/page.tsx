@@ -285,13 +285,13 @@ function HexacoExplainer() {
     <div ref={ref} className={`gradient-border p-8 md:p-12 relative overflow-hidden animate-in ${isVisible ? 'visible' : ''}`}>
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <div>
-          <h2 className="font-display font-bold text-2xl mb-4">
+          <h2 className="font-display font-bold text-3xl md:text-4xl mb-5">
             Personality as a <span className="sol-gradient-text">Primitive</span>
           </h2>
-          <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-6">
+          <p className="text-[var(--text-secondary)] text-base md:text-lg leading-relaxed mb-6">
             HEXACO is a six-factor model of personality validated by decades of
             cross-cultural research. We encode these traits on-chain as{' '}
-            <code className="text-[var(--neon-cyan)] text-xs">[u16; 6]</code>{' '}
+            <code className="text-[var(--neon-cyan)] text-sm">[u16; 6]</code>{' '}
             (0-1000) in each agent&apos;s Solana PDA. Hover a trait to see how
             it shapes the radar.
           </p>
@@ -308,7 +308,7 @@ function HexacoExplainer() {
                 onMouseLeave={() => setHoveredTrait(null)}
               >
                 <span
-                  className="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 transition-transform duration-300"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5 transition-transform duration-300"
                   style={{
                     background: `${t.color}20`,
                     color: t.color,
@@ -319,8 +319,8 @@ function HexacoExplainer() {
                   {t.key}
                 </span>
                 <div>
-                  <div className="text-xs font-semibold text-[var(--text-secondary)]">{t.full}</div>
-                  <div className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">{t.desc}</div>
+                  <div className="text-sm font-semibold text-[var(--text-primary)]">{t.full}</div>
+                  <div className="text-sm text-[var(--text-secondary)] leading-relaxed">{t.desc}</div>
                 </div>
               </div>
             ))}
@@ -330,7 +330,7 @@ function HexacoExplainer() {
           <div className="transition-all duration-500">
             <HexacoRadar
               traits={spotlightTraits}
-              size={280}
+              size={320}
               animated={true}
             />
           </div>
@@ -681,7 +681,7 @@ export default function LandingPage() {
       <DecoSectionDivider variant="diamond" />
 
       {/* ─── Extensions & Skills ─── */}
-      <section className="max-w-5xl mx-auto px-6 py-16 section-glow-cyan">
+      <section className="max-w-7xl mx-auto px-6 md:px-10 py-16 section-glow-cyan">
         <div className="text-center mb-12">
           <h2 className="font-display font-bold text-2xl mb-3">
             <span className="neon-glow-cyan">Extensions &amp; Skills</span>
@@ -760,7 +760,7 @@ const manifest = await createCuratedManifest({
       <DecoSectionDivider variant="filigree" />
 
       {/* ─── Interactive HEXACO Explainer ─── */}
-      <section className="max-w-5xl mx-auto px-6 py-16 section-glow-purple">
+      <section className="max-w-6xl mx-auto px-6 md:px-10 py-16 section-glow-purple">
         <HexacoExplainer />
       </section>
 

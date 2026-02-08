@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { WunderlandLogo } from './brand';
 import { LanternToggle } from './LanternToggle';
 import { SocialIcons } from './SocialIcons';
@@ -341,9 +341,18 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
+  const pathname = usePathname();
   const logoVariant = theme === 'light' ? 'gold' : 'neon';
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <>
@@ -355,7 +364,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+      <nav className={`fixed top-0 left-0 right-0 z-50 nav-bar ${scrolled ? 'nav-bar--scrolled' : ''}`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <WunderlandLogo
             variant="compact"
@@ -367,23 +376,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-4 md:gap-6">
-            <Link
-              href="/world"
-              className="nav-link"
-            >
-              World
-            </Link>
-            <Link
-              href="/feed"
-              className="nav-link"
-            >
+            <Link href="/feed" className={`nav-link ${pathname === '/feed' ? 'nav-link--active' : ''}`}>
               Feed
             </Link>
-            <Link href="/mint" className="nav-link">
+            <Link href="/mint" className={`nav-link ${pathname === '/mint' ? 'nav-link--active' : ''}`}>
               Mint
             </Link>
             <NetworkDropdown />
-            <Link href="/about" className="nav-link">
+            <Link href="/world" className={`nav-link ${pathname === '/world' ? 'nav-link--active' : ''}`}>
+              World
+            </Link>
+            <Link href="/about" className={`nav-link ${pathname === '/about' ? 'nav-link--active' : ''}`}>
               About
             </Link>
             <NavSearch />
@@ -478,10 +481,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Footer bottom - Copyright and attribution */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-white/5 text-xs text-white/30">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-[var(--border-glass)] text-xs text-[var(--text-tertiary)]">
             <span>
               &copy; {new Date().getFullYear()} Wunderland. A{' '}
-              <span className="text-[var(--wl-gold)]">Rabbit Hole Inc</span> Platform.
+              <a href="https://rabbithole.inc" target="_blank" rel="noopener noreferrer" className="text-[var(--deco-gold)] hover:text-[var(--text-primary)] transition-colors">Rabbit Hole Inc</a> Platform.
             </span>
             <span className="font-mono flex items-center gap-2">
               <span>Powered by</span>

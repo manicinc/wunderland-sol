@@ -1070,6 +1070,21 @@ html.light .mobile-menu-sublink:hover {
   color: #fff;
 }
 
+/* ---- Nav Bar ---- */
+.nav-bar {
+  background: rgba(10, 10, 15, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nav-bar--scrolled {
+  background: rgba(10, 10, 15, 0.92);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
 /* ---- Active Nav Link ---- */
 .nav-link {
   position: relative;
@@ -1079,6 +1094,14 @@ html.light .mobile-menu-sublink:hover {
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  outline: none;
+}
+
+/* Remove default browser focus box outline */
+.nav-link:focus,
+.nav-link:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .nav-link::after {
@@ -1096,6 +1119,17 @@ html.light .mobile-menu-sublink:hover {
 
 .nav-link:hover::after {
   width: 100%;
+}
+
+/* Active page underline */
+.nav-link--active::after {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--sol-purple));
+}
+
+.nav-link--active {
+  color: var(--text-primary);
 }
 
 /* ---- Scrollbar ---- */
@@ -1987,9 +2021,23 @@ html.light ::selection {
   color: var(--text-primary);
 }
 
-/* Nav — no hover underline effect in light mode */
+/* Nav bar — light mode */
+html.light .nav-bar {
+  background: rgba(240, 235, 227, 0.7);
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+html.light .nav-bar--scrolled {
+  background: rgba(240, 235, 227, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Nav underline — adapt for light mode */
 html.light .nav-link::after {
-  display: none;
+  background: linear-gradient(90deg, var(--wl-blue), var(--sol-purple));
+}
+html.light .nav-link--active::after {
+  background: linear-gradient(90deg, var(--wl-blue), var(--sol-purple));
 }
 
 html.light .badge-verified {
@@ -2400,6 +2448,71 @@ html.light .copy-btn:hover {
   border-color: #047857;
   background: rgba(4, 120, 87, 0.08);
   box-shadow: 0 0 12px rgba(4, 120, 87, 0.1);
+}
+
+/* ============================================================
+   CUSTOM RANGE SLIDER (Mint Page HEXACO Traits)
+   ============================================================ */
+.mint-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-glass);
+  outline: none;
+  cursor: pointer;
+}
+
+.mint-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--slider-color, var(--neon-cyan));
+  cursor: pointer;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--slider-color, var(--neon-cyan)) 50%, transparent),
+              0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mint-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--slider-color, var(--neon-cyan)) 60%, transparent),
+              0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.mint-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--slider-color, var(--neon-cyan));
+  cursor: pointer;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--slider-color, var(--neon-cyan)) 50%, transparent),
+              0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.mint-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+}
+
+.mint-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border-glass);
+}
+
+html.light .mint-slider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+html.light .mint-slider::-webkit-slider-thumb {
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
+              0 0 10px color-mix(in srgb, var(--slider-color, var(--neon-cyan)) 30%, transparent);
 }
 
 /* ============================================================
