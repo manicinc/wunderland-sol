@@ -130,7 +130,96 @@ Phase 2 enables:
 - **API-driven creation** - UIs can call `/api/voice/extract-config` for AI-powered agent builder
 
 ### Next Steps
-- Phase 3: CLI Enhancements (Interactive wizards, `wunderland create` command) — **STARTING NOW**
+- ~~Phase 3: CLI Enhancements (Interactive wizards, `wunderland create` command)~~ ✅ COMPLETE
+
+---
+
+## Entry [NEW] — Phase 3: CLI Enhancements for Extensions & Natural Language Agent Creation
+**Date**: 2026-02-09 (Current Session)
+**Agent**: Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)
+**Action**: Interactive wizards & natural language agent creation command
+
+### Completed (Phase 3 of 7-Phase Plan - Tasks 9, 10, 12, 13)
+
+1. **Extensions Wizard** (`packages/wunderland/src/cli/wizards/extensions-wizard.ts` — NEW)
+   - Categorized, paginated multi-select UI for tools, voice, productivity, skills
+   - `selectFromCatalog()` - Interactive selector with 10 items per page
+   - Category filters: All | Tools | Voice | Productivity | Skills
+   - Navigation: Previous Page / Next Page / Change Category / Done
+   - Support for required items (pre-selected, can't deselect) and blocked items (grayed out)
+   - Fetches from `@framers/agentos-extensions-registry` and `@framers/agentos-skills-registry`
+   - Graceful fallback if registries unavailable
+   - Updates `state.extensions` (tools, voice, productivity) + `state.skills`
+
+2. **Setup Wizard Enhanced** (`packages/wunderland/src/cli/wizards/setup-wizard.ts`)
+   - Added extensions wizard as step 4.5 in advanced mode (between channels and tool keys)
+   - Imports `runExtensionsWizard()` from extensions-wizard.ts
+   - Review summary now shows extensions count + skills list
+   - Config saving updated to persist `extensions` and `skills` fields
+
+3. **WizardState & CliConfig Types Updated** (`packages/wunderland/src/cli/types.ts`)
+   - Added `extensions?: {tools, voice, productivity}` to WizardState
+   - Added `skills?: string[]` to WizardState
+   - Added same fields to CliConfig for persistence
+
+4. **Init Command Enhanced** (`packages/wunderland/src/cli/commands/init.ts`)
+   - Auto-loads preset's `suggestedExtensions` into agent.config.json
+   - Auto-loads preset's `toolAccessProfile` into agent.config.json
+   - Auto-loads preset's `extensionOverrides` into agent.config.json
+   - Output section now displays extensions if present in preset
+
+5. **Create Command** (`packages/wunderland/src/cli/commands/create.ts` — NEW)
+   - **Natural language agent creation**: `wunderland create "I need a research bot that searches the web"`
+   - Validates LLM provider setup (OpenAI, Anthropic, Ollama)
+   - Calls `extractAgentConfig()` from NaturalLanguageAgentBuilder
+   - Shows preview with confidence scores (✓ ≥80%, ⚠ ≥50%, ✗ <50%)
+   - Confirms before creating
+   - Writes agent.config.json + .env.example + README.md + skills/
+   - Flags:
+     - `--managed` - Sets hosted mode restrictions (no filesystem tools)
+     - `--dir <path>` - Custom directory name
+     - `--yes` - Skip confirmation
+   - **TODO**: LLM service integration (placeholder throws error with helpful message)
+
+6. **Extensions Command** (`packages/wunderland/src/cli/commands/extensions.ts` — NEW)
+   - `wunderland extensions list` - Lists all available extensions by category
+   - `wunderland extensions info <name>` - Shows extension details
+   - Output formats: table (default) or json (`--format json`)
+   - Subcommands planned: enable, disable (TODO placeholders)
+   - Fetches from `@framers/agentos-extensions-registry`
+
+7. **CLI Router Updated** (`packages/wunderland/src/cli/index.ts`)
+   - Registered `create` and `extensions` commands in COMMANDS registry
+   - Updated help text with new commands:
+     - `create [description]` - Create agent from natural language
+     - `extensions` - Manage agent extensions
+     - `extensions list` - List available extensions
+     - `extensions info <name>` - Show extension details
+
+### Build Verification
+- ✅ `pnpm run build` succeeded with no errors
+- ✅ All TypeScript files compile successfully
+- ✅ No runtime dependencies on missing modules
+
+### Architecture Impact
+Phase 3 enables:
+- **Streamlined agent creation** - Interactive wizard selects extensions/skills
+- **Natural language CLI** - Create agents by describing them in plain English
+- **Extension discovery** - Browse and inspect all available extensions via CLI
+- **One-click setup** - Presets auto-load tools, no manual configuration needed
+
+### Pending (Task 11 - Update Start/Chat Commands)
+- Modify `wunderland start` to read `extensions` field from agent.config.json
+- Modify `wunderland chat` to read `extensions` field from agent.config.json
+- Call `resolveExtensionsByNames()` to build manifest dynamically
+- Replace hardcoded extension imports with dynamic loading
+
+### Next Steps
+- Task 11: Update Start/Chat Commands (Phase 3 final task)
+- Phase 4: Rabbithole UI Enhancements (preset suggestions, confidence scores)
+- Phase 5: Wunderland-sh Agent Builder Page
+- Phase 6: Static HTML/CSS/JS UI
+- Phase 7: Testing & Documentation
 
 ---
 
