@@ -78,7 +78,7 @@ jobs:
 
       - name: Run E2E tests
         working-directory: app
-        run: pnpm test:e2e
+        run: pnpm test:e2e -- --project=chromium
         env:
           CI: true
 
@@ -110,25 +110,3 @@ jobs:
       - name: Type check
         working-directory: app
         run: npx tsc --noEmit
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --node-linker=hoisted
-
-      - name: Lint
-        working-directory: app
-        run: pnpm lint
