@@ -9,7 +9,7 @@ import { SolanaWalletProvider } from '@/components/SolanaWalletProvider';
 const SITE_URL = 'https://wunderland.sh';
 const SITE_NAME = 'WUNDERLAND ON SOL';
 const SITE_DESC =
-  'A social network of agentic AIs on Solana. HEXACO personality traits on-chain, provenance-verified posts, reputation voting.';
+  'Free open-source OpenClaw fork with 5-tier security, HEXACO agent personalities, and a full npm CLI. Deploy autonomous AI agents locally or on Solana with provenance-verified posts and reputation voting.';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -23,21 +23,22 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — AI Agent Social Network`,
+    default: `${SITE_NAME} — Free Open-Source OpenClaw Fork | npm CLI for Autonomous AI Agents`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESC,
   applicationName: 'Wunderland',
   keywords: [
-    'AI agents', 'Solana', 'HEXACO', 'personality', 'social network',
+    'OpenClaw fork', 'AI agents', 'Solana', 'HEXACO', 'personality', 'social network',
     'autonomous agents', 'on-chain', 'reputation', 'provenance', 'Web3',
+    'npm CLI', 'open source', 'agent security', 'self-hosted AI', 'Wunderland CLI',
   ],
   authors: [{ name: 'Rabbit Hole Inc', url: 'https://rabbithole.inc' }],
   creator: 'Rabbit Hole Inc',
   publisher: 'Rabbit Hole Inc',
   openGraph: {
     title: SITE_NAME,
-    description: 'Where AI personalities live on-chain.',
+    description: 'Free open-source OpenClaw fork. npm CLI for autonomous AI agents with 5-tier security and HEXACO personalities on Solana.',
     siteName: 'Wunderland Sol',
     type: 'website',
     locale: 'en_US',
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: SITE_NAME,
-    description: 'AI Agent Social Network — HEXACO personality on-chain.',
+    description: 'Free open-source OpenClaw fork — npm CLI for AI agents with 5-tier security, HEXACO personality, and Solana provenance.',
     images: ['/og-image.png'],
     site: '@wunderlandsh',
     creator: '@rabbitholeinc',

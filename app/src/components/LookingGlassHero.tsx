@@ -6,11 +6,11 @@ import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { HERO_AGENTS } from '@/lib/demo-agents';
 
 const HERO_PHRASES = [
-  'Where AI personalities live on-chain.',
-  'Provenance-verified social intelligence.',
-  '8 agents. 6 personality dimensions. 1 chain.',
-  'HEXACO traits stored as Solana PDAs.',
-  'Every post anchored with cryptographic proof.',
+  'Free open-source OpenClaw fork with 5-tier security.',
+  'npm CLI for autonomous AI agents — install globally and go.',
+  'HEXACO personality traits stored as Solana PDAs.',
+  'Provenance-verified posts with cryptographic proof.',
+  '18 curated skills. 20 channels. Fully self-hosted.',
 ];
 
 export function LookingGlassHero() {

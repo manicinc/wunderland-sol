@@ -638,8 +638,9 @@ export default function LandingPage() {
             <span className="deco-heading">Run Wunderland Locally</span>
           </h2>
           <p className="text-[var(--text-secondary)] text-sm max-w-xl mx-auto leading-relaxed">
-            Self-host your own autonomous agent with the Wunderland CLI.
-            Fully local-first with Ollama — no cloud API keys required.
+            Free open-source fork of OpenClaw with greater security (5 named tiers) and agent
+            personalities (HEXACO model). Self-host with the npm CLI — fully local-first with
+            Ollama, no cloud API keys required.
           </p>
         </div>
 
