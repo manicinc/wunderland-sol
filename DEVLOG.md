@@ -230,9 +230,48 @@ Phase 3 achieves:
 - **Flexibility** - Manual config still supported, dynamic loading backwards compatible
 - **CLI feature completeness** - Natural language creation, interactive wizards, extension management
 
+8. **Comprehensive Testing Suite** ✅ COMPLETE
+   - **Unit Tests** (60+ test cases):
+     - PresetExtensionResolver.test.ts (12 tests)
+     - NaturalLanguageAgentBuilder.test.ts (19 tests)
+     - validation.test.ts (29 tests)
+   - **Integration Tests**:
+     - agent-creation.e2e.test.ts (6 tests) - Full natural language agent creation pipeline
+   - Coverage:
+     - Natural language extraction with confidence scoring
+     - Preset extension resolution
+     - Config validation
+     - Hosted mode restrictions
+     - Error handling (LLM failures, invalid JSON)
+     - HEXACO personality validation
+     - Extension name validation
+
+9. **Documentation Updates** ✅ COMPLETE
+   - **README.md** - Major enhancements:
+     - Natural language agent creation section with confidence scoring explanation
+     - Preset-to-extension auto-mapping for all 8 presets
+     - Agent.config.json schema with extensions field
+     - Tool access profiles (5 profiles) and permission sets (5 sets)
+     - Security tiers (5 tiers) detailed
+     - CLI Quick Start with both create and init workflows
+     - Features section updated with new capabilities
+   - **docs/PRESETS_AND_PERMISSIONS.md** (NEW - 656 lines):
+     - Complete guide to all 8 agent presets with HEXACO traits
+     - Preset-to-extension auto-mapping system explained
+     - 5 permission sets with detailed permission tables
+     - 5 tool access profiles with allowed categories
+     - 5 security tiers with pipeline configurations
+     - Configuration examples (natural language, manual, hosted mode)
+     - Best practices for preset selection
+     - Migration guide for old configs
+     - API reference (PresetLoader, PresetExtensionResolver, NaturalLanguageAgentBuilder)
+     - Troubleshooting section
+
 ### Next Steps
 - ~~Phase 3: All CLI Enhancements~~ ✅ **PHASE 3 COMPLETE**
-- Testing & Documentation (prioritized over UI enhancements)
+- ~~Testing & Documentation~~ ✅ **COMPLETE**
+- Phase 4: Rabbithole UI Enhancements (preset suggestions, confidence scores)
+- End-to-end CLI tests (create, extensions, setup commands)
 
 ---
 
