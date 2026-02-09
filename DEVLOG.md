@@ -58,12 +58,79 @@ This foundation enables:
 - **UI feature parity** across all platforms (Phases 4-6)
 
 ### Next Steps (Phases 2-7)
-- Phase 2: AI Extraction (Natural Language Agent Builder)
+- ~~Phase 2: AI Extraction (Natural Language Agent Builder)~~ ✅ COMPLETE
 - Phase 3: CLI Enhancements (Interactive wizards, `wunderland create` command)
 - Phase 4: Rabbithole UI Enhancements
 - Phase 5: Wunderland-sh Agent Builder
 - Phase 6: Static HTML/CSS/JS UI
 - Phase 7: Testing & Documentation
+
+---
+
+## Entry [NEW] — Phase 2: AI Extraction & Natural Language Agent Builder
+**Date**: 2026-02-09 (Current Session)
+**Agent**: Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)
+**Action**: LLM-powered agent configuration extraction
+
+### Completed (Phase 2 of 7-Phase Plan)
+
+1. **NaturalLanguageAgentBuilder** (`packages/wunderland/src/ai/NaturalLanguageAgentBuilder.ts` — NEW)
+   - `extractAgentConfig()` - LLM-powered extraction from natural language descriptions
+   - `validateApiKeySetup()` - Validates API key format for 9+ providers (OpenAI, Anthropic, Ollama, Google, Groq, Together, DeepSeek, Mistral, etc.)
+   - **EXTRACTION_PROMPT** - Comprehensive system prompt listing all available options:
+     - 8 agent presets (research-assistant, customer-support, creative-writer, etc.)
+     - 18 curated skills (web-search, weather, github, coding-agent, slack-helper, etc.)
+     - Tool extensions (web-search, web-browser, cli-executor, giphy, image-search, etc.)
+     - 20 channel platforms (telegram, whatsapp, discord, slack, webchat, etc.)
+     - 5 security tiers + 5 permission sets + 5 tool access profiles
+   - **Extracts**: displayName, bio, systemPrompt, personality (HEXACO 6 traits), preset, skills, extensions, channels, security settings, voice config
+   - **Returns confidence scores** (0-1) for each extracted field
+   - **Validates** all extracted values against known options
+   - Auto-generates `seedId` from `displayName`
+   - **Hosted mode restrictions** - Blocks filesystem/CLI tools when `hostingMode='managed'`
+
+2. **Backend API Routes** (NEW)
+   - **Agent Builder Routes** (`backend/src/integrations/agentos/agentos.agent-builder.routes.ts`):
+     - `POST /api/voice/extract-config` - Extracts structured config from natural language
+       - Request: `{text: string, existingConfig?: object, hostingMode?: 'managed'|'self_hosted'}`
+       - Response: `ExtractedAgentConfig` with confidence scores
+     - `POST /api/voice/validate-api-key` - Validates API key format
+       - Request: `{provider: string, apiKey: string}`
+       - Response: `{valid: boolean, message?: string}`
+     - TODO placeholder for LLM service integration
+
+   - **Catalog Routes** (`backend/src/integrations/agentos/agentos.catalog.routes.ts`):
+     - `GET /api/extensions/catalog` - Full catalog (tools, voice, productivity, channels, skills)
+     - `POST /api/presets/:presetId/resolve` - Resolves preset to skills + extensions manifests
+       - Request: `{includeExtensions?: boolean, includeSkills?: boolean, secrets?: object}`
+       - Response: `{preset, skills, extensions, missing: string[]}`
+     - `GET /api/presets` - Lists all available presets
+
+3. **Validation Utilities** (`packages/wunderland/src/utils/validation.ts` — NEW)
+   - `validatePreset()` - Validates preset names (8 presets)
+   - `validateSecurityTier()` - Validates security tiers (5 tiers)
+   - `validateToolAccessProfile()` - Validates tool access profiles (5 profiles)
+   - `validatePermissionSet()` - Validates permission sets (5 sets)
+   - `validateExecutionMode()` - Validates execution modes (3 modes)
+   - `validateExtensionName()` - Validates extension name format (kebab-case)
+   - `validateSkillName()` - Validates skill name format (kebab-case)
+   - `validateHexacoTraits()` - Validates personality traits (0-1 range for 6 traits)
+   - `validateAgentConfig()` - Full agent config validation with detailed error messages
+
+### Build Verification
+- ✅ `pnpm run build` succeeded for wunderland package
+- ✅ Backend type-checking passed (`npx tsc --noEmit`)
+- ✅ All new TypeScript files compile successfully
+
+### Architecture Impact
+Phase 2 enables:
+- **Natural language agent creation** - Describe agent in plain English → structured config
+- **One-click deploy** - Extract config → auto-load preset/skills/extensions → deploy
+- **Hosted mode safety** - Automatically blocks dangerous tools in managed environments
+- **API-driven creation** - UIs can call `/api/voice/extract-config` for AI-powered agent builder
+
+### Next Steps
+- Phase 3: CLI Enhancements (Interactive wizards, `wunderland create` command) — **STARTING NOW**
 
 ---
 
