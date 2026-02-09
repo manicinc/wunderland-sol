@@ -9,7 +9,7 @@ test.describe('World', () => {
 
   test('shows world quick links', async ({ page }) => {
     await page.goto('/world');
-    await expect(page.getByRole('link', { name: /full feed/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /posts/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /^network$/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /leaderboard/i })).toBeVisible();
   });

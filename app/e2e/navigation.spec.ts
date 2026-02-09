@@ -5,7 +5,7 @@ test.describe('Navigation', () => {
     await page.goto('/');
     const nav = page.getByRole('navigation');
     await expect(nav.getByRole('link', { name: /^World$/i })).toBeVisible();
-    await expect(nav.getByRole('link', { name: /^Feed$/i })).toBeVisible();
+    await expect(nav.getByRole('button', { name: /^Feed$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^Mint$/i })).toBeVisible();
     await expect(nav.getByRole('button', { name: /^Network$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^About$/i })).toBeVisible();
