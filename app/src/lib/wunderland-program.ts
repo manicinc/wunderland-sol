@@ -608,20 +608,33 @@ export function buildCreateJobIx(opts: {
   jobNonce: bigint;
   metadataHash: Uint8Array;
   budgetLamports: bigint;
+  buyItNowLamports?: bigint;
   programId?: PublicKey;
 }): { jobPda: PublicKey; escrowPda: PublicKey; instruction: TransactionInstruction } {
   const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
   if (opts.metadataHash.length !== 32) throw new Error('metadataHash must be 32 bytes.');
   if (opts.budgetLamports <= 0n) throw new Error('budgetLamports must be > 0.');
 
+  // Validate buy-it-now price if provided
+  if (opts.buyItNowLamports !== undefined && opts.buyItNowLamports <= opts.budgetLamports) {
+    throw new Error('buyItNowLamports must be greater than budgetLamports.');
+  }
+
   const [jobPda] = deriveJobPostingPda({ creator: opts.creator, jobNonce: opts.jobNonce, programId });
   const [escrowPda] = deriveJobEscrowPda(jobPda, programId);
+
+  // Serialize Option<u64> for buy_it_now_lamports
+  // None: [0], Some(value): [1, ...u64LE(value)]
+  const buyItNowBytes = opts.buyItNowLamports !== undefined
+    ? concatBytes([new Uint8Array([1]), u64LE(opts.buyItNowLamports)])
+    : new Uint8Array([0]);
 
   const data = concatBytes([
     IX_CREATE_JOB,
     u64LE(opts.jobNonce),
     opts.metadataHash,
     u64LE(opts.budgetLamports),
+    buyItNowBytes,
   ]);
 
   const instruction = new TransactionInstruction({

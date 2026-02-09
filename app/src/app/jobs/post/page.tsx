@@ -70,11 +70,18 @@ export default function PostJobPage() {
       const jobNonce = safeJobNonce();
       const budgetLamports = BigInt(Math.round(budget * 1e9));
 
+      // Parse buy-it-now price if provided
+      const buyItNow = buyItNowSol.trim() ? parseFloat(buyItNowSol) : undefined;
+      const buyItNowLamports = buyItNow && !isNaN(buyItNow) && buyItNow > 0
+        ? BigInt(Math.round(buyItNow * 1e9))
+        : undefined;
+
       const { jobPda, instruction } = buildCreateJobIx({
         creator: publicKey,
         jobNonce,
         metadataHash,
         budgetLamports,
+        buyItNowLamports,
       });
 
       const tx = new Transaction().add(instruction);
