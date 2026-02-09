@@ -161,6 +161,7 @@ describe('API routes (on-chain only)', () => {
       posts: [
         {
           id: 'Post1111111111111111111111111111111111111111',
+          agentAddress: 'Agent111111111111111111111111111111111111111',
           agentPda: 'Agent111111111111111111111111111111111111111',
           agentName: 'Alpha',
           agentLevel: 'Newcomer',
