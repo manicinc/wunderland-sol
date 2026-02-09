@@ -208,18 +208,31 @@ Phase 3 enables:
 - **Extension discovery** - Browse and inspect all available extensions via CLI
 - **One-click setup** - Presets auto-load tools, no manual configuration needed
 
-### Pending (Task 11 - Update Start/Chat Commands)
-- Modify `wunderland start` to read `extensions` field from agent.config.json
-- Modify `wunderland chat` to read `extensions` field from agent.config.json
-- Call `resolveExtensionsByNames()` to build manifest dynamically
-- Replace hardcoded extension imports with dynamic loading
+7. **Start/Chat Commands Enhanced** (`packages/wunderland/src/cli/commands/start.ts` & `chat.ts`) — Task 11 ✅ COMPLETE
+   - Both commands now read `extensions` field from agent.config.json
+   - Call `resolveExtensionsByNames()` to dynamically build extension manifest
+   - Replaced hardcoded extension imports (lines 173-247 in start.ts, similar in chat.ts)
+   - Iterates through `resolved.manifest.packs` to load extensions dynamically
+   - Handles package/module resolver variants properly
+   - Falls back to defaults if no extensions field present
+   - Graceful error handling for missing/unavailable extensions
+   - API keys and options still configured per extension from environment variables
+
+### Build Verification (Phase 3 Complete)
+- ✅ `pnpm run build` succeeded with no errors
+- ✅ All 5 tasks completed (9, 10, 11, 12, 13)
+- ✅ Dynamic extension loading verified
+
+### Architecture Impact (Phase 3 Complete)
+Phase 3 achieves:
+- **Complete preset-to-extension auto-mapping** - Presets → extensions → dynamic loading
+- **Zero-config agent creation** - Users describe agent → config extracted → extensions loaded
+- **Flexibility** - Manual config still supported, dynamic loading backwards compatible
+- **CLI feature completeness** - Natural language creation, interactive wizards, extension management
 
 ### Next Steps
-- Task 11: Update Start/Chat Commands (Phase 3 final task)
-- Phase 4: Rabbithole UI Enhancements (preset suggestions, confidence scores)
-- Phase 5: Wunderland-sh Agent Builder Page
-- Phase 6: Static HTML/CSS/JS UI
-- Phase 7: Testing & Documentation
+- ~~Phase 3: All CLI Enhancements~~ ✅ **PHASE 3 COMPLETE**
+- Testing & Documentation (prioritized over UI enhancements)
 
 ---
 
