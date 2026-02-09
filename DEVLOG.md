@@ -5,6 +5,68 @@
 
 ---
 
+## Entry [NEW] — Phase 1: Preset-to-Extension Auto-Mapping System
+**Date**: 2026-02-09 (Current Session)
+**Agent**: Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)
+**Action**: Foundation for natural language agent creation system
+
+### Completed (Phase 1 of 7-Phase Plan)
+
+1. **Enhanced Security Tiers** (`packages/wunderland/src/security/SecurityTiers.ts`)
+   - Added `EnhancedSecurityTierConfig` with granular permissions
+   - 5 declarative permission sets: unrestricted, autonomous, supervised, read-only, minimal
+   - Split file access into separate read/write permissions
+   - Added `allowFullAutonomous` flag for explicit autonomous mode
+   - Updated all 5 tiers (dangerous → paranoid) with new fields
+   - Added `migrateToEnhancedPermissions()` for backward compatibility
+
+2. **PresetExtensionResolver** (`packages/wunderland/src/core/PresetExtensionResolver.ts` — NEW)
+   - Mirrors `PresetSkillResolver` pattern for extensions
+   - `resolvePresetExtensions(presetId)` → auto-loads extensions from preset config
+   - `resolveExtensionsByNames()` → resolves tool/voice/productivity extensions
+   - `resolvePresetExtensionsCached()` → cached version for performance
+   - Graceful fallback if `@framers/agentos-extensions-registry` unavailable
+
+3. **All 8 Agent Presets Updated** (`packages/wunderland/presets/agents/*/agent.config.json`)
+   - Added `toolAccessProfile` field (social-citizen, social-creative, assistant)
+   - Added `suggestedExtensions` object (tools, voice, productivity arrays)
+   - Added `extensionOverrides` for per-extension configuration
+   - **Mappings created**:
+     - research-assistant: web-search, web-browser, news-search
+     - customer-support: web-search, giphy, voice-twilio
+     - creative-writer: giphy, image-search
+     - code-reviewer: cli-executor, web-browser
+     - data-analyst: web-browser, cli-executor
+     - security-auditor: cli-executor, web-browser
+     - devops-assistant: cli-executor, web-browser
+     - personal-assistant: web-search, web-browser, voice-twilio, calendar-google
+
+4. **Agent Config Schema** (`packages/wunderland/src/core/types.ts`)
+   - Added `suggestedExtensions` field to `WunderlandSeedConfig`
+   - Added `extensionOverrides` with enabled, priority, options structure
+
+### Build Verification
+- ✅ `pnpm run build` succeeded with no errors
+- ✅ TypeScript compilation passed
+- ✅ All type definitions valid
+
+### Architecture Impact
+This foundation enables:
+- **One-click agent deployment** with pre-configured tools
+- **Natural language agent creation** (Phase 2 — next)
+- **Interactive CLI wizards** for extension selection (Phase 3)
+- **UI feature parity** across all platforms (Phases 4-6)
+
+### Next Steps (Phases 2-7)
+- Phase 2: AI Extraction (Natural Language Agent Builder)
+- Phase 3: CLI Enhancements (Interactive wizards, `wunderland create` command)
+- Phase 4: Rabbithole UI Enhancements
+- Phase 5: Wunderland-sh Agent Builder
+- Phase 6: Static HTML/CSS/JS UI
+- Phase 7: Testing & Documentation
+
+---
+
 ## Entry 1 — Project Inception
 **Date**: 2026-02-04 05:41 UTC
 **Agent**: Claude Opus 4.5 (`claude-opus-4-5-20251101`)
