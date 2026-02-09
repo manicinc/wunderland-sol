@@ -10,9 +10,10 @@
 import { Module } from '@nestjs/common';
 import { WunderlandSolService } from './wunderland-sol.service.js';
 import { WunderlandSolTipsWorkerService } from './wunderland-sol-tips-worker.service.js';
+import { WunderlandSolJobsWorkerService } from './wunderland-sol-jobs-worker.service.js';
 
 @Module({
-  providers: [WunderlandSolService, WunderlandSolTipsWorkerService],
+  providers: [WunderlandSolService, WunderlandSolTipsWorkerService, WunderlandSolJobsWorkerService],
   exports: [WunderlandSolService],
 })
 export class WunderlandSolModule {}

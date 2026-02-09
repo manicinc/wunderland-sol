@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { Transaction } from '@solana/web3.js';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { fetchJson } from '@/lib/api';
+import { buildSubmitTipIx, parseHex32, safeTipNonce } from '@/lib/wunderland-program';
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { CLUSTER } from '@/lib/solana';
 
 const TIP_TIERS = [
   { key: 'low', label: '0.015 SOL', amount: 15_000_000, desc: 'Standard' },
@@ -23,10 +26,11 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
   const [selectedTier, setSelectedTier] = useState<number>(0);
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [result, setResult] = useState<{ ok: boolean; text: string; sig?: string } | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const { publicKey, connected } = useWallet();
+  const { connection } = useConnection();
+  const { publicKey, connected, sendTransaction } = useWallet();
   const { setVisible: setWalletModalVisible } = useWalletModal();
 
   // Close on outside click
@@ -67,56 +71,80 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
 
     try {
       const tier = TIP_TIERS[selectedTier];
-      // First preview to get content hash
-      const preview = await fetchJson<{ valid: boolean; contentHashHex?: string; error?: string }>(
-        '/api/tips/preview',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content: message || `Tip for post ${contentHash.slice(0, 12)}`,
-            sourceType: 'text',
-          }),
-        },
-      );
 
-      if (!preview.valid) {
+      // Preview to get content hash for the tip message
+      const previewRes = await fetch('/api/tips/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: message || `Tip for post ${contentHash.slice(0, 12)}`,
+          sourceType: 'text',
+        }),
+      });
+      const preview = await previewRes.json() as { valid: boolean; contentHashHex?: string; error?: string };
+
+      if (!preview.valid || !preview.contentHashHex) {
         setResult({ ok: false, text: preview.error || 'Preview failed' });
         return;
       }
 
-      // Submit tip params
-      const submit = await fetchJson<{
-        valid: boolean;
-        txParams?: { contentHash: number[]; amount: number; sourceType: number; tipNonce: string; targetEnclave: string };
-        error?: string;
-      }>('/api/tips/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contentHashHex: preview.contentHashHex,
-          amount: tier.amount,
-          sourceType: 'text',
-          targetEnclave: enclavePda || undefined,
-          tipper: publicKey.toBase58(),
-        }),
+      // Determine target enclave
+      let target: PublicKey;
+      try {
+        target = enclavePda ? new PublicKey(enclavePda) : SystemProgram.programId;
+      } catch {
+        target = SystemProgram.programId;
+      }
+
+      // Build and send the on-chain transaction
+      const tipNonce = safeTipNonce();
+      const { tip, instruction } = buildSubmitTipIx({
+        tipper: publicKey,
+        contentHash: parseHex32(preview.contentHashHex),
+        amountLamports: BigInt(tier.amount),
+        sourceType: 'text',
+        tipNonce,
+        targetEnclave: target,
       });
 
-      if (!submit.valid) {
-        setResult({ ok: false, text: submit.error || 'Submission failed' });
-        return;
+      const tx = new Transaction().add(instruction);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+
+      // Pin snapshot to IPFS (best-effort)
+      try {
+        await fetch('/api/tips/pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tipPda: tip.toBase58(),
+            snapshotJson: JSON.stringify({
+              v: 1,
+              sourceType: 'text',
+              url: null,
+              contentType: 'text/plain',
+              contentPreview: message || `Tip for post ${contentHash.slice(0, 12)}`,
+              contentLengthBytes: (message || `Tip for post ${contentHash.slice(0, 12)}`).length,
+            }),
+          }),
+        });
+      } catch {
+        // Non-critical: IPFS pinning failure
       }
 
       setResult({
         ok: true,
-        text: `Tip of ${tier.label} prepared. Sign the transaction in your wallet to complete.`,
+        text: `Tip of ${tier.label} sent on-chain!`,
+        sig,
       });
     } catch (err) {
       setResult({ ok: false, text: err instanceof Error ? err.message : 'Unknown error' });
     } finally {
       setSubmitting(false);
     }
-  }, [publicKey, submitting, selectedTier, message, contentHash, enclavePda]);
+  }, [publicKey, submitting, selectedTier, message, contentHash, enclavePda, connection, sendTransaction]);
+
+  const clusterParam = `?cluster=${encodeURIComponent(CLUSTER)}`;
 
   return (
     <>
@@ -236,6 +264,16 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
                     : 'bg-[rgba(255,50,50,0.08)] text-[var(--neon-red)] border border-[rgba(255,50,50,0.15)]'
                 }`}>
                   {result.text}
+                  {result.sig && (
+                    <a
+                      href={`https://explorer.solana.com/tx/${result.sig}${clusterParam}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 underline opacity-80 hover:opacity-100"
+                    >
+                      View TX
+                    </a>
+                  )}
                 </div>
               )}
 
@@ -249,11 +287,11 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
                   text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(201,162,39,0.3)]
                   transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Preparing…' : `Send ${TIP_TIERS[selectedTier].label} Tip`}
+                {submitting ? 'Signing…' : `Send ${TIP_TIERS[selectedTier].label} Tip`}
               </button>
 
               <p className="text-[10px] text-[var(--text-tertiary)] text-center font-mono">
-                70% platform · 10% enclave owner · 20% content creators
+                70% platform treasury · 30% enclave treasury (Merkle rewards)
               </p>
             </div>
           </div>

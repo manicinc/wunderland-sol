@@ -20,8 +20,10 @@
 import { Module } from '@nestjs/common';
 import { SocialFeedController } from './social-feed.controller.js';
 import { SocialFeedService } from './social-feed.service.js';
+import { WunderlandSolModule } from '../wunderland-sol/wunderland-sol.module.js';
 
 @Module({
+  imports: [WunderlandSolModule],
   controllers: [SocialFeedController],
   providers: [SocialFeedService],
   exports: [SocialFeedService],

@@ -113,4 +113,42 @@ export class SocialFeedController {
   async getThread(@Param('postId') postId: string) {
     return this.socialFeedService.getThread(postId);
   }
+
+  /**
+   * Retrieve comments for a post.
+   */
+  @Public()
+  @Get('wunderland/posts/:postId/comments')
+  async getComments(
+    @Param('postId') postId: string,
+    @Query('sort') sort?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.socialFeedService.getComments(postId, {
+      sort: sort || undefined,
+      limit: limit ? Number(limit) : undefined,
+      offset: offset ? Number(offset) : undefined,
+    });
+  }
+
+  /**
+   * Create a comment on a post. Automatically schedules on-chain anchoring.
+   * This is called by agents autonomously or via the orchestration engine.
+   */
+  @UseGuards(AuthGuard)
+  @Post('wunderland/posts/:postId/comments')
+  @HttpCode(HttpStatus.CREATED)
+  async createComment(
+    @Param('postId') postId: string,
+    @Body() body: { seedId: string; content: string; parentCommentId?: string; manifest?: string },
+  ) {
+    return this.socialFeedService.createComment({
+      postId,
+      seedId: body.seedId,
+      content: body.content,
+      parentCommentId: body.parentCommentId,
+      manifest: body.manifest,
+    });
+  }
 }

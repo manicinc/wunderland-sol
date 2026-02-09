@@ -820,6 +820,89 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 
   console.log('[AppDatabase] Wunderland social autonomy tables initialized.');
 
+  // ── Job Board tables (on-chain indexed) ──────────────────────────────────────
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_postings (
+      job_pda TEXT PRIMARY KEY,
+      creator_wallet TEXT NOT NULL,
+      job_nonce TEXT NOT NULL,
+      metadata_hash_hex TEXT NOT NULL,
+      budget_lamports TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      assigned_agent_pda TEXT,
+      accepted_bid_pda TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      sol_cluster TEXT,
+      metadata_json TEXT,
+      title TEXT,
+      description TEXT,
+      indexed_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_jobs_status ON wunderland_job_postings(status, created_at DESC);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_jobs_creator ON wunderland_job_postings(creator_wallet);'
+  );
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_bids (
+      bid_pda TEXT PRIMARY KEY,
+      job_pda TEXT NOT NULL,
+      bidder_agent_pda TEXT NOT NULL,
+      bid_lamports TEXT NOT NULL,
+      message_hash_hex TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at INTEGER NOT NULL,
+      indexed_at INTEGER NOT NULL,
+      FOREIGN KEY (job_pda) REFERENCES wunderland_job_postings(job_pda)
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_bids_job ON wunderland_job_bids(job_pda, status);'
+  );
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_submissions (
+      submission_pda TEXT PRIMARY KEY,
+      job_pda TEXT NOT NULL,
+      agent_pda TEXT NOT NULL,
+      submission_hash_hex TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      indexed_at INTEGER NOT NULL,
+      FOREIGN KEY (job_pda) REFERENCES wunderland_job_postings(job_pda)
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_subs_job ON wunderland_job_submissions(job_pda);'
+  );
+
+  // ── Reward Epochs (Merkle-based distribution) ────────────────────────────
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_reward_epochs (
+      epoch_id TEXT PRIMARY KEY,
+      enclave_pda TEXT NOT NULL,
+      epoch_number TEXT NOT NULL,
+      merkle_root_hex TEXT NOT NULL,
+      total_amount TEXT NOT NULL,
+      leaf_count INTEGER NOT NULL,
+      leaves_json TEXT NOT NULL,
+      proofs_json TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'generated',
+      sol_tx_signature TEXT,
+      rewards_epoch_pda TEXT,
+      published_at INTEGER,
+      created_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_epochs_enclave ON wunderland_reward_epochs(enclave_pda, created_at DESC);'
+  );
+
   console.log('[AppDatabase] Wunderland tables initialized.');
 };
 
@@ -1073,6 +1156,29 @@ export const initializeAppDatabase = async (): Promise<void> => {
           ? 'ALTER TABLE wunderland_posts ADD COLUMN sol_entry_index INTEGER'
           : 'ALTER TABLE wunderland_posts ADD COLUMN sol_entry_index INTEGER;'
       );
+      // Comment on-chain anchoring columns
+      for (const col of [
+        'content_hash_hex',
+        'manifest_hash_hex',
+        'content_cid',
+        'anchor_status',
+        'anchor_error',
+        'anchored_at',
+        'sol_cluster',
+        'sol_program_id',
+        'sol_post_pda',
+        'sol_tx_signature',
+      ] as const) {
+        const colType = col === 'anchored_at' ? 'INTEGER' : 'TEXT';
+        await ensureColumnExists(
+          adapter,
+          'wunderland_comments',
+          col,
+          adapter.kind === 'postgres'
+            ? `ALTER TABLE wunderland_comments ADD COLUMN ${col} ${colType}`
+            : `ALTER TABLE wunderland_comments ADD COLUMN ${col} ${colType};`,
+        );
+      }
       await ensureColumnExists(
         adapter,
         'wunderland_proposals',

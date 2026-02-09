@@ -8,14 +8,18 @@
  * and to a persistence layer for post storage.
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional, Inject } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service.js';
 import { PostNotFoundException } from '../wunderland.exceptions.js';
+import { WunderlandSolService } from '../wunderland-sol/wunderland-sol.service.js';
 import type { FeedQueryDto, EngagePostDto } from '../dto/index.js';
 
 @Injectable()
 export class SocialFeedService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    @Optional() @Inject(WunderlandSolService) private readonly sol?: WunderlandSolService,
+  ) {}
 
   async getFeed(query: FeedQueryDto = {}) {
     return this.getFeedInternal({ ...query });
@@ -278,6 +282,121 @@ export class SocialFeedService {
         avatarUrl: row.agent_avatar_url ?? null,
         level: row.agent_level ? Number(row.agent_level) : null,
         provenanceEnabled: Boolean(row.agent_provenance_enabled),
+      },
+    };
+  }
+
+  // ── Comment CRUD ───────────────────────────────────────────────────────────
+
+  async getComments(postId: string, opts?: { sort?: string; limit?: number; offset?: number }) {
+    const limit = Math.min(opts?.limit ?? 50, 200);
+    const offset = opts?.offset ?? 0;
+    const sort = opts?.sort ?? 'best';
+
+    const orderSql =
+      sort === 'new' ? 'ORDER BY c.created_at DESC'
+        : sort === 'old' ? 'ORDER BY c.created_at ASC'
+          : 'ORDER BY c.wilson_score DESC, c.created_at DESC';
+
+    const comments = await this.db.all<any>(
+      `SELECT c.*, a.display_name as agent_display_name, a.avatar_url as agent_avatar_url
+         FROM wunderland_comments c
+         LEFT JOIN wunderland_agents a ON a.seed_id = c.seed_id
+        WHERE c.post_id = ? AND c.status = 'active'
+        ${orderSql}
+        LIMIT ? OFFSET ?`,
+      [postId, limit, offset],
+    );
+
+    const total = await this.db.get<{ cnt: number }>(
+      `SELECT COUNT(*) as cnt FROM wunderland_comments WHERE post_id = ? AND status = 'active'`,
+      [postId],
+    );
+
+    return {
+      comments: comments.map((c: any) => this.mapComment(c)),
+      total: total?.cnt ?? 0,
+    };
+  }
+
+  async createComment(dto: {
+    postId: string;
+    seedId: string;
+    content: string;
+    parentCommentId?: string;
+    manifest?: string;
+  }) {
+    const commentId = this.db.generateId();
+
+    let depth = 0;
+    let path = commentId;
+    if (dto.parentCommentId) {
+      const parent = await this.db.get<{ depth: number; path: string }>(
+        'SELECT depth, path FROM wunderland_comments WHERE comment_id = ? LIMIT 1',
+        [dto.parentCommentId],
+      );
+      if (parent) {
+        depth = (parent.depth ?? 0) + 1;
+        path = `${parent.path}/${commentId}`;
+      }
+    }
+
+    await this.db.run(
+      `INSERT INTO wunderland_comments (
+        comment_id, post_id, parent_comment_id, seed_id, content, manifest,
+        depth, path, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
+      [
+        commentId,
+        dto.postId,
+        dto.parentCommentId || null,
+        dto.seedId,
+        dto.content,
+        dto.manifest || '{}',
+        depth,
+        path,
+      ],
+    );
+
+    // Increment child_count on parent comment
+    if (dto.parentCommentId) {
+      await this.db.run(
+        'UPDATE wunderland_comments SET child_count = child_count + 1 WHERE comment_id = ?',
+        [dto.parentCommentId],
+      );
+    }
+
+    // Schedule on-chain anchoring
+    this.sol?.scheduleAnchorForComment(commentId);
+
+    return { commentId, depth, path };
+  }
+
+  private mapComment(row: any) {
+    return {
+      commentId: row.comment_id,
+      postId: row.post_id,
+      parentCommentId: row.parent_comment_id ?? null,
+      seedId: row.seed_id,
+      content: row.content,
+      depth: row.depth ?? 0,
+      path: row.path ?? '',
+      upvotes: row.upvotes ?? 0,
+      downvotes: row.downvotes ?? 0,
+      score: row.score ?? 0,
+      childCount: row.child_count ?? 0,
+      status: row.status ?? 'active',
+      createdAt: row.created_at,
+      agent: {
+        seedId: row.seed_id,
+        displayName: row.agent_display_name ?? null,
+        avatarUrl: row.agent_avatar_url ?? null,
+      },
+      proof: {
+        anchorStatus: row.anchor_status ?? null,
+        contentHashHex: row.content_hash_hex ?? null,
+        solTxSignature: row.sol_tx_signature ?? null,
+        solPostPda: row.sol_post_pda ?? null,
       },
     };
   }

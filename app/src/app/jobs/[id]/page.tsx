@@ -1,12 +1,25 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { TipButton } from '@/components/TipButton';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
+import { CLUSTER } from '@/lib/solana';
+import {
+  buildAcceptJobBidIx,
+  buildApproveJobSubmissionIx,
+  buildCancelJobIx,
+  deriveVaultPda,
+  deriveJobSubmissionPda,
+} from '@/lib/wunderland-program';
 
 type JobBid = {
   id: string;
+  bidPda?: string;
   agentAddress: string;
   agentName: string;
   bidAmount: number;
@@ -17,6 +30,7 @@ type JobBid = {
 
 type JobSubmission = {
   id: string;
+  submissionPda?: string;
   agentAddress: string;
   submissionHash: string;
   status: 'submitted' | 'approved' | 'revision_requested';
@@ -25,6 +39,7 @@ type JobSubmission = {
 
 type JobDetail = {
   id: string;
+  jobPda?: string;
   title: string;
   description: string;
   budget: number;
@@ -87,17 +102,102 @@ const DEMO_JOB: JobDetail = {
   metadataHash: 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2',
 };
 
+function explorerClusterParam(cluster: string): string {
+  return `?cluster=${encodeURIComponent(cluster)}`;
+}
+
 export default function JobDetailPage() {
   const params = useParams();
   const jobId = params.id as string;
   const isDemo = jobId.startsWith('demo-');
 
+  const { connection } = useConnection();
+  const { publicKey, connected, sendTransaction } = useWallet();
+
   // API call (will use demo data if not found)
   const jobApi = useApi<{ job: JobDetail }>(`/api/jobs/${jobId}`);
   const job = jobApi.data?.job || (isDemo ? DEMO_JOB : null);
 
+  const [actionBusy, setActionBusy] = useState(false);
+  const [actionResult, setActionResult] = useState<{ ok: boolean; text: string; sig?: string } | null>(null);
+
   const headerReveal = useScrollReveal();
   const contentReveal = useScrollReveal();
+
+  const isCreator = connected && publicKey && job && job.creatorWallet === publicKey.toBase58();
+  const clusterParam = explorerClusterParam(CLUSTER);
+
+  const handleAcceptBid = async (bid: JobBid) => {
+    if (!publicKey || !job?.jobPda || !bid.bidPda || isDemo) return;
+    setActionBusy(true);
+    setActionResult(null);
+    try {
+      const ix = buildAcceptJobBidIx({
+        creator: publicKey,
+        jobPda: new PublicKey(job.jobPda),
+        bidPda: new PublicKey(bid.bidPda),
+      });
+      const tx = new Transaction().add(ix);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setActionResult({ ok: true, text: `Accepted bid from ${bid.agentName}. Agent is now assigned.`, sig });
+      jobApi.reload();
+    } catch (err) {
+      setActionResult({ ok: false, text: err instanceof Error ? err.message : 'Failed' });
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const handleApproveSubmission = async (sub: JobSubmission) => {
+    if (!publicKey || !job?.jobPda || !sub.submissionPda || !job.assignedAgent || isDemo) return;
+    setActionBusy(true);
+    setActionResult(null);
+    try {
+      const jobPda = new PublicKey(job.jobPda);
+      const agentIdentity = new PublicKey(job.assignedAgent);
+      const [vaultPda] = deriveVaultPda(agentIdentity);
+      const [submissionPda] = deriveJobSubmissionPda(jobPda);
+
+      const ix = buildApproveJobSubmissionIx({
+        creator: publicKey,
+        jobPda,
+        submissionPda,
+        vaultPda,
+      });
+      const tx = new Transaction().add(ix);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setActionResult({ ok: true, text: 'Submission approved! Escrow released to agent vault.', sig });
+      jobApi.reload();
+    } catch (err) {
+      setActionResult({ ok: false, text: err instanceof Error ? err.message : 'Failed' });
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const handleCancelJob = async () => {
+    if (!publicKey || !job?.jobPda || isDemo) return;
+    if (!confirm('Cancel this job and refund the escrowed budget?')) return;
+    setActionBusy(true);
+    setActionResult(null);
+    try {
+      const ix = buildCancelJobIx({
+        creator: publicKey,
+        jobPda: new PublicKey(job.jobPda),
+      });
+      const tx = new Transaction().add(ix);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setActionResult({ ok: true, text: 'Job cancelled. Budget refunded to your wallet.', sig });
+      jobApi.reload();
+    } catch (err) {
+      setActionResult({ ok: false, text: err instanceof Error ? err.message : 'Failed' });
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   if (jobApi.loading) {
     return (
@@ -183,6 +283,27 @@ export default function JobDetailPage() {
         </div>
       </div>
 
+      {/* Action result */}
+      {actionResult && (
+        <div className={`mb-6 p-3 rounded-lg text-xs ${
+          actionResult.ok
+            ? 'bg-[rgba(0,255,100,0.08)] text-[var(--neon-green)] border border-[rgba(0,255,100,0.15)]'
+            : 'bg-[rgba(255,50,50,0.08)] text-[var(--neon-red)] border border-[rgba(255,50,50,0.15)]'
+        }`}>
+          {actionResult.text}
+          {actionResult.sig && (
+            <a
+              href={`https://explorer.solana.com/tx/${actionResult.sig}${clusterParam}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 underline opacity-80 hover:opacity-100"
+            >
+              View TX
+            </a>
+          )}
+        </div>
+      )}
+
       <div
         ref={contentReveal.ref}
         className={`space-y-8 animate-in ${contentReveal.isVisible ? 'visible' : ''}`}
@@ -200,6 +321,36 @@ export default function JobDetailPage() {
             {job.metadataHash && <span>Hash: {job.metadataHash.slice(0, 12)}…</span>}
           </div>
         </div>
+
+        {/* Creator actions */}
+        {isCreator && !isDemo && (
+          <div className="holo-card p-6 section-glow-cyan">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)] mb-4">
+              Job Management
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {job.status === 'open' && (
+                <button
+                  type="button"
+                  onClick={handleCancelJob}
+                  disabled={actionBusy}
+                  className="px-4 py-2 rounded-lg text-xs font-mono
+                    bg-[rgba(255,50,50,0.08)] border border-[rgba(255,50,50,0.2)]
+                    text-[var(--neon-red)] hover:bg-[rgba(255,50,50,0.15)]
+                    transition-all disabled:opacity-40"
+                >
+                  Cancel Job & Refund
+                </button>
+              )}
+              {job.status === 'completed' && job.assignedAgent && (
+                <TipButton
+                  contentHash={job.metadataHash}
+                  className="px-4 py-2 text-xs"
+                />
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Status timeline */}
         <div className="holo-card p-6">
@@ -257,10 +408,23 @@ export default function JobDetailPage() {
                         {bid.agentAddress}
                       </span>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex items-center gap-3">
                       <div className="font-mono text-sm font-semibold text-[var(--deco-gold)]">
                         {(bid.bidAmount / 1e9).toFixed(2)} SOL
                       </div>
+                      {isCreator && !isDemo && bid.status === 'pending' && job.status === 'open' && (
+                        <button
+                          type="button"
+                          onClick={() => handleAcceptBid(bid)}
+                          disabled={actionBusy}
+                          className="px-3 py-1.5 rounded-lg text-[10px] font-mono
+                            bg-[rgba(0,255,100,0.08)] border border-[rgba(0,255,100,0.2)]
+                            text-[var(--neon-green)] hover:bg-[rgba(0,255,100,0.15)]
+                            transition-all disabled:opacity-40"
+                        >
+                          Accept Bid
+                        </button>
+                      )}
                     </div>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -298,13 +462,28 @@ export default function JobDetailPage() {
                     <span className="font-mono text-xs text-[var(--text-secondary)]">
                       {sub.agentAddress}
                     </span>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                      sub.status === 'approved' ? 'bg-[rgba(0,255,100,0.08)] text-[var(--neon-green)]' :
-                      sub.status === 'revision_requested' ? 'bg-[rgba(201,162,39,0.1)] text-[var(--deco-gold)]' :
-                      'bg-[var(--bg-glass)] text-[var(--text-tertiary)]'
-                    }`}>
-                      {sub.status.replace('_', ' ')}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                        sub.status === 'approved' ? 'bg-[rgba(0,255,100,0.08)] text-[var(--neon-green)]' :
+                        sub.status === 'revision_requested' ? 'bg-[rgba(201,162,39,0.1)] text-[var(--deco-gold)]' :
+                        'bg-[var(--bg-glass)] text-[var(--text-tertiary)]'
+                      }`}>
+                        {sub.status.replace('_', ' ')}
+                      </span>
+                      {isCreator && !isDemo && sub.status === 'submitted' && (
+                        <button
+                          type="button"
+                          onClick={() => handleApproveSubmission(sub)}
+                          disabled={actionBusy}
+                          className="px-3 py-1.5 rounded-lg text-[10px] font-mono
+                            bg-[rgba(0,255,100,0.08)] border border-[rgba(0,255,100,0.2)]
+                            text-[var(--neon-green)] hover:bg-[rgba(0,255,100,0.15)]
+                            transition-all disabled:opacity-40"
+                        >
+                          Approve & Release Escrow
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="mt-1 text-[10px] font-mono text-[var(--text-tertiary)]">
                     Hash: {sub.submissionHash.slice(0, 16)}… · {new Date(sub.createdAt).toLocaleDateString()}

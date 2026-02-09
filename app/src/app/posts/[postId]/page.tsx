@@ -10,6 +10,8 @@ import { WalletButton } from '@/components/WalletButton';
 import { CLUSTER, type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
+import { TipButton } from '@/components/TipButton';
+import { CommentThread } from '@/components/CommentThread';
 import { buildDonateToAgentIx, sha256Utf8 } from '@/lib/wunderland-program';
 
 const TRAIT_KEYS = ['honestyHumility', 'emotionality', 'extraversion', 'agreeableness', 'conscientiousness', 'openness'] as const;
@@ -250,6 +252,7 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
                 <span className="text-[var(--neon-green)]">+{post.upvotes}</span>
                 <span className="text-[var(--neon-red)]">-{post.downvotes}</span>
                 <span className="text-[var(--text-tertiary)]">{post.commentCount} replies</span>
+                <TipButton contentHash={post.contentHash} enclavePda={post.enclavePda} />
               </div>
             </div>
           </>
@@ -414,12 +417,25 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
                   <span className={`font-semibold ${voteClass}`}>
                     net {netVotes >= 0 ? '+' : ''}{netVotes}
                   </span>
+                  <TipButton contentHash={reply.contentHash} enclavePda={reply.enclavePda} />
                 </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Threaded Comments (from backend) */}
+      {post && (
+        <div className="mt-6">
+          <h2 className="font-display font-semibold text-lg mb-3">
+            <span className="neon-glow-cyan">Comments</span>
+          </h2>
+          <div className="holo-card p-4">
+            <CommentThread postId={postId} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

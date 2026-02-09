@@ -140,6 +140,31 @@ export class WunderlandSolService {
   }
 
   /**
+   * Schedules anchoring for a comment.
+   * Comments are anchored as posts with kind='comment' using the same
+   * anchor_post instruction — the on-chain program treats them identically.
+   *
+   * Safe to call even when disabled or not configured.
+   */
+  scheduleAnchorForComment(commentId: string): void {
+    if (!this.enabled) return;
+    if (!this.anchorOnApproval) return;
+    if (!commentId) return;
+    const key = `comment:${commentId}`;
+    if (this.inFlight.has(key)) return;
+
+    this.inFlight.add(key);
+    void this.anchorCommentById(commentId)
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : String(err);
+        this.logger.error(`Sol anchoring failed for comment ${commentId}: ${message}`);
+      })
+      .finally(() => {
+        this.inFlight.delete(key);
+      });
+  }
+
+  /**
    * Schedules anchoring for a published post.
    *
    * Safe to call even when disabled or not configured.
@@ -379,6 +404,112 @@ export class WunderlandSolService {
            WHERE post_id = ?
         `,
         ['failed' satisfies AnchorStatus, message, postId]
+      );
+    }
+  }
+
+  private async anchorCommentById(commentId: string): Promise<void> {
+    if (!this.enabled || !this.programId || !this.relayerKeypairPath) {
+      await this.db.run(
+        `UPDATE wunderland_comments SET anchor_status = ?, anchor_error = ? WHERE comment_id = ?`,
+        [this.enabled ? 'missing_config' : 'disabled', this.enabled ? 'Missing SOL config' : null, commentId],
+      );
+      return;
+    }
+
+    const row = await this.db.get<any>(
+      `SELECT comment_id, post_id, seed_id, content, manifest, status
+         FROM wunderland_comments
+        WHERE comment_id = ?
+        LIMIT 1`,
+      [commentId],
+    );
+    if (!row || String(row.status ?? '') !== 'active') return;
+
+    const seedId = safeString(row.seed_id);
+    const content = safeString(row.content);
+    let manifestObj: unknown = {};
+    if (typeof row.manifest === 'string' && row.manifest.trim()) {
+      try { manifestObj = JSON.parse(row.manifest); } catch { manifestObj = {}; }
+    }
+
+    const contentHashHex = sha256HexUtf8(content);
+    const manifestCanonical = canonicalizeJson(manifestObj);
+    const manifestHashHex = sha256HexUtf8(manifestCanonical);
+    const contentCid = cidFromSha256Hex(contentHashHex);
+
+    // Persist hashes early
+    await this.db.run(
+      `UPDATE wunderland_comments
+          SET content_hash_hex = ?, manifest_hash_hex = ?, content_cid = ?,
+              sol_cluster = ?, sol_program_id = ?, anchor_status = ?
+        WHERE comment_id = ?`,
+      [contentHashHex, manifestHashHex, contentCid, this.cluster || 'devnet', this.programId, 'pending', commentId],
+    );
+
+    const agentMap = this.loadAgentMap();
+    const agentEntry = agentMap?.agents?.[seedId];
+    if (!agentEntry) {
+      await this.db.run(
+        `UPDATE wunderland_comments SET anchor_status = ?, anchor_error = ? WHERE comment_id = ?`,
+        ['missing_config', `No Solana agent mapping for seedId "${seedId}".`, commentId],
+      );
+      return;
+    }
+
+    const sdk = await import('@wunderland-sol/sdk');
+    const web3 = await import('@solana/web3.js');
+
+    const client = new sdk.WunderlandSolClient({
+      programId: this.programId,
+      rpcUrl: this.rpcUrl || undefined,
+      cluster: (this.cluster as any) || undefined,
+    });
+
+    const payer = this.loadKeypair(web3, this.relayerKeypairPath);
+    const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
+    const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+
+    const enclavePda = await this.resolveDefaultEnclavePda({ sdk, web3 });
+    if (!enclavePda) {
+      await this.db.run(
+        `UPDATE wunderland_comments SET anchor_status = ?, anchor_error = ? WHERE comment_id = ?`,
+        ['missing_config', 'Missing enclave configuration.', commentId],
+      );
+      return;
+    }
+    const enclavePublicKey = new web3.PublicKey(enclavePda);
+
+    await this.db.run(
+      `UPDATE wunderland_comments SET anchor_status = ? WHERE comment_id = ?`,
+      ['anchoring', commentId],
+    );
+
+    const contentHashBytes = Buffer.from(contentHashHex, 'hex');
+    const manifestHashBytes = Buffer.from(manifestHashHex, 'hex');
+
+    try {
+      const res = await client.anchorPost({
+        agentIdentityPda,
+        agentSigner,
+        payer,
+        enclavePda: enclavePublicKey,
+        contentHash: contentHashBytes,
+        manifestHash: manifestHashBytes,
+      });
+
+      await this.db.run(
+        `UPDATE wunderland_comments
+            SET anchor_status = ?, anchored_at = ?, sol_tx_signature = ?,
+                sol_post_pda = ?, anchor_error = NULL
+          WHERE comment_id = ?`,
+        ['anchored', Date.now(), res.signature, res.postAnchorPda.toBase58(), commentId],
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      await this.db.run(
+        `UPDATE wunderland_comments SET anchor_status = ?, anchor_error = ? WHERE comment_id = ?`,
+        ['failed', message, commentId],
       );
     }
   }

@@ -3,33 +3,29 @@ import { NextResponse, type NextRequest } from 'next/server';
 const BACKEND_URL = process.env.WUNDERLAND_BACKEND_URL || 'http://localhost:4000';
 
 /**
- * GET /api/jobs/:id
- *
- * Proxy to NestJS backend for job detail with bids and submissions.
+ * DELETE /api/credentials/:credentialId
+ * Delete a credential.
  */
-export async function GET(
+export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ credentialId: string }> },
 ) {
-  const { id } = await params;
+  const { credentialId } = await params;
 
   try {
     const res = await fetch(
-      `${BACKEND_URL}/wunderland/jobs/${encodeURIComponent(id)}`,
+      `${BACKEND_URL}/wunderland/credentials/${encodeURIComponent(credentialId)}`,
       {
+        method: 'DELETE',
         headers: {
           authorization: req.headers.get('authorization') || '',
           cookie: req.headers.get('cookie') || '',
         },
       },
     );
-
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch {
-    return NextResponse.json(
-      { error: `Job ${id} not found. Backend may be unavailable.` },
-      { status: 503 },
-    );
+    return NextResponse.json({ error: 'Backend unavailable' }, { status: 503 });
   }
 }

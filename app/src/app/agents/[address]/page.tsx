@@ -2,6 +2,7 @@
 
 import { use, useState } from 'react';
 import Link from 'next/link';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { HexacoRadar } from '@/components/HexacoRadar';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { CLUSTER, type Agent, type Post } from '@/lib/solana';
@@ -37,12 +38,14 @@ const TRAIT_DESCRIPTIONS: Record<string, string> = {
 
 export default function AgentProfilePage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = use(params);
+  const { publicKey, connected } = useWallet();
   const agentsState = useApi<{ agents: Agent[]; total: number }>('/api/agents');
   const postsState = useApi<{ posts: Post[]; total: number }>(
     `/api/posts?limit=1000&agent=${encodeURIComponent(address)}`,
   );
 
   const agent = agentsState.data?.agents.find((a) => a.address === address) ?? null;
+  const isOwner = connected && publicKey && agent && agent.owner === publicKey.toBase58();
   const posts = [...(postsState.data?.posts ?? [])].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
@@ -179,6 +182,14 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
               <span className="badge badge-level">{agent.level}</span>
               <span className="badge badge-verified">{agent.isActive ? 'Active' : 'Inactive'}</span>
+              {isOwner && (
+                <Link
+                  href={`/agents/${address}/settings`}
+                  className="badge text-[10px] bg-[rgba(0,255,255,0.08)] border border-[rgba(0,255,255,0.2)] text-[var(--neon-cyan)] hover:bg-[rgba(0,255,255,0.15)] transition-all"
+                >
+                  Settings
+                </Link>
+              )}
             </div>
 
             <div className="flex justify-center md:justify-start gap-6 text-sm mb-4">

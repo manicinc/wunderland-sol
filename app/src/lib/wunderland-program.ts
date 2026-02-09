@@ -68,6 +68,10 @@ const IX_CANCEL_RECOVER_SIGNER = hexToBytes('eeccb4606d06e240');
 const IX_SUBMIT_TIP = hexToBytes('df3b2e65a1bd9a25');
 const IX_CLAIM_TIMEOUT_REFUND = hexToBytes('df071e30230d0f4b');
 const IX_DONATE_TO_AGENT = hexToBytes('33de8f81d1180ddf');
+const IX_CREATE_JOB = hexToBytes('b282d96e641b5277');
+const IX_CANCEL_JOB = hexToBytes('7ef19bf132ec5376');
+const IX_ACCEPT_JOB_BID = hexToBytes('af26631dbda160eb');
+const IX_APPROVE_JOB_SUBMISSION = hexToBytes('99f32b75db2c498d');
 
 // ============================================================================
 // PDA helpers (must match on-chain seeds)
@@ -138,6 +142,42 @@ export function deriveDonationReceiptPda(opts: {
     ],
     programId,
   );
+}
+
+// ============================================================================
+// Job PDA helpers
+// ============================================================================
+
+export function deriveJobPostingPda(opts: {
+  creator: PublicKey;
+  jobNonce: bigint;
+  programId?: PublicKey;
+}): [PublicKey, number] {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('job'), opts.creator.toBuffer(), Buffer.from(u64LE(opts.jobNonce))],
+    programId,
+  );
+}
+
+export function deriveJobEscrowPda(jobPda: PublicKey, programId: PublicKey = WUNDERLAND_PROGRAM_ID): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('job_escrow'), jobPda.toBuffer()], programId);
+}
+
+export function deriveJobBidPda(opts: {
+  jobPda: PublicKey;
+  bidderAgentIdentity: PublicKey;
+  programId?: PublicKey;
+}): [PublicKey, number] {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('job_bid'), opts.jobPda.toBuffer(), opts.bidderAgentIdentity.toBuffer()],
+    programId,
+  );
+}
+
+export function deriveJobSubmissionPda(jobPda: PublicKey, programId: PublicKey = WUNDERLAND_PROGRAM_ID): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync([Buffer.from('job_submission'), jobPda.toBuffer()], programId);
 }
 
 // ============================================================================
@@ -557,4 +597,184 @@ export function downloadJson(filename: string, json: unknown): void {
 
 export function keypairToSecretKeyJson(secretKey: Uint8Array): number[] {
   return Array.from(secretKey);
+}
+
+// ============================================================================
+// Job instruction builders
+// ============================================================================
+
+export function buildCreateJobIx(opts: {
+  creator: PublicKey;
+  jobNonce: bigint;
+  metadataHash: Uint8Array;
+  budgetLamports: bigint;
+  programId?: PublicKey;
+}): { jobPda: PublicKey; escrowPda: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.metadataHash.length !== 32) throw new Error('metadataHash must be 32 bytes.');
+  if (opts.budgetLamports <= 0n) throw new Error('budgetLamports must be > 0.');
+
+  const [jobPda] = deriveJobPostingPda({ creator: opts.creator, jobNonce: opts.jobNonce, programId });
+  const [escrowPda] = deriveJobEscrowPda(jobPda, programId);
+
+  const data = concatBytes([
+    IX_CREATE_JOB,
+    u64LE(opts.jobNonce),
+    opts.metadataHash,
+    u64LE(opts.budgetLamports),
+  ]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: jobPda, isSigner: false, isWritable: true },
+      { pubkey: escrowPda, isSigner: false, isWritable: true },
+      { pubkey: opts.creator, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { jobPda, escrowPda, instruction };
+}
+
+export function buildCancelJobIx(opts: {
+  creator: PublicKey;
+  jobPda: PublicKey;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  const [escrowPda] = deriveJobEscrowPda(opts.jobPda, programId);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.jobPda, isSigner: false, isWritable: true },
+      { pubkey: escrowPda, isSigner: false, isWritable: true },
+      { pubkey: opts.creator, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_CANCEL_JOB),
+  });
+}
+
+export function buildAcceptJobBidIx(opts: {
+  creator: PublicKey;
+  jobPda: PublicKey;
+  bidPda: PublicKey;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.jobPda, isSigner: false, isWritable: true },
+      { pubkey: opts.bidPda, isSigner: false, isWritable: true },
+      { pubkey: opts.creator, isSigner: true, isWritable: true },
+    ],
+    data: Buffer.from(IX_ACCEPT_JOB_BID),
+  });
+}
+
+export function buildApproveJobSubmissionIx(opts: {
+  creator: PublicKey;
+  jobPda: PublicKey;
+  submissionPda: PublicKey;
+  vaultPda: PublicKey;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  const [escrowPda] = deriveJobEscrowPda(opts.jobPda, programId);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.jobPda, isSigner: false, isWritable: true },
+      { pubkey: escrowPda, isSigner: false, isWritable: true },
+      { pubkey: opts.submissionPda, isSigner: false, isWritable: false },
+      { pubkey: opts.vaultPda, isSigner: false, isWritable: true },
+      { pubkey: opts.creator, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_APPROVE_JOB_SUBMISSION),
+  });
+}
+
+export function safeJobNonce(): bigint {
+  return BigInt(Date.now());
+}
+
+// ── Rewards ─────────────────────────────────────────────────────────────────
+
+const IX_CLAIM_REWARDS = hexToBytes('0490844774179750');
+
+export function deriveRewardsEpochPda(
+  enclavePda: PublicKey,
+  epoch: bigint,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  const epochBuf = Buffer.alloc(8);
+  epochBuf.writeBigUInt64LE(epoch);
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('rewards_epoch'), enclavePda.toBuffer(), epochBuf],
+    programId,
+  );
+}
+
+export function deriveRewardsClaimPda(
+  rewardsEpochPda: PublicKey,
+  index: number,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  const indexBuf = Buffer.alloc(4);
+  indexBuf.writeUInt32LE(index);
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('rewards_claim'), rewardsEpochPda.toBuffer(), indexBuf],
+    programId,
+  );
+}
+
+export function buildClaimRewardsIx(opts: {
+  rewardsEpochPda: PublicKey;
+  agentIdentityPda: PublicKey;
+  payer: PublicKey;
+  index: number;
+  amount: bigint;
+  proof: Uint8Array[];
+  programId?: PublicKey;
+}): { instruction: TransactionInstruction; claimReceiptPda: PublicKey; vaultPda: PublicKey } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [claimReceiptPda] = deriveRewardsClaimPda(opts.rewardsEpochPda, opts.index, programId);
+  const [vaultPda] = deriveVaultPda(opts.agentIdentityPda, programId);
+
+  // Encode data: discriminator + index(u32) + amount(u64) + proof_len(u32) + proof_nodes([u8;32]...)
+  const indexBuf = Buffer.alloc(4);
+  indexBuf.writeUInt32LE(opts.index);
+  const amountBuf = Buffer.alloc(8);
+  amountBuf.writeBigUInt64LE(opts.amount);
+  const proofLenBuf = Buffer.alloc(4);
+  proofLenBuf.writeUInt32LE(opts.proof.length);
+
+  const proofBufs = opts.proof.map((p) => Buffer.from(p));
+  const data = Buffer.concat([
+    Buffer.from(IX_CLAIM_REWARDS),
+    indexBuf,
+    amountBuf,
+    proofLenBuf,
+    ...proofBufs,
+  ]);
+
+  const keys = [
+    { pubkey: opts.rewardsEpochPda, isSigner: false, isWritable: true },
+    { pubkey: claimReceiptPda, isSigner: false, isWritable: true },
+    { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: false },
+    { pubkey: vaultPda, isSigner: false, isWritable: true },
+    { pubkey: opts.payer, isSigner: true, isWritable: true },
+    { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+  ];
+
+  const instruction = new TransactionInstruction({ keys, programId, data });
+  return { instruction, claimReceiptPda, vaultPda };
 }
