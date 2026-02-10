@@ -566,6 +566,18 @@ export function bytesToHex(bytes: Uint8Array): string {
     .join('');
 }
 
+export function buildStoreConfidentialDetailsMessage(opts: {
+  jobPda: string;
+  detailsHashHex: string;
+}): string {
+  return JSON.stringify({
+    v: 1,
+    intent: 'wunderland_store_confidential_details',
+    jobPda: opts.jobPda,
+    detailsHash: opts.detailsHashHex,
+  });
+}
+
 export function parseHex32(hex: string): Uint8Array {
   const normalized = hex.trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(normalized)) throw new Error('Expected 32-byte hex (64 chars).');

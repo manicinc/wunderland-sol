@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-const BACKEND_URL = process.env.WUNDERLAND_BACKEND_URL || 'http://localhost:4000';
+const BACKEND_URL = process.env.WUNDERLAND_BACKEND_URL || 'http://localhost:3001';
 
 /**
  * DELETE /api/credentials/:credentialId

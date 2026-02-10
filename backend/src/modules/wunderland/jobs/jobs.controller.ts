@@ -3,24 +3,32 @@
  * @description HTTP controller for the Wunderland Job Board.
  *
  * Exposes endpoints for listing indexed job postings, viewing individual
- * jobs with their bids and submissions, and updating job metadata.
+ * jobs with their bids and submissions, updating job metadata, and
+ * managing job execution.
  *
  * ## Route Summary
  *
- * | Method | Path                              | Auth   | Description                       |
- * |--------|-----------------------------------|--------|-----------------------------------|
- * | GET    | /wunderland/jobs                  | Public | Paginated job listings            |
- * | GET    | /wunderland/jobs/:jobPda          | Public | Job detail with bids/submissions  |
- * | PATCH  | /wunderland/jobs/:jobPda/metadata | Public | Update cached metadata for a job  |
+ * | Method | Path                                    | Auth   | Description                       |
+ * |--------|-----------------------------------------|--------|-----------------------------------|
+ * | GET    | /wunderland/jobs                        | Public | Paginated job listings            |
+ * | GET    | /wunderland/jobs/execution/status        | Public | Job execution service status      |
+ * | GET    | /wunderland/jobs/:jobPda                | Public | Job detail with bids/submissions  |
+ * | POST   | /wunderland/jobs/confidential            | Public | Store confidential job details    |
+ * | POST   | /wunderland/jobs/:jobPda/execute         | Public | Manually trigger job execution    |
+ * | PATCH  | /wunderland/jobs/:jobPda/metadata       | Public | Update cached metadata for a job  |
  */
 
-import { Controller, Get, Patch, Param, Query, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Query, Body, HttpStatus, HttpCode } from '@nestjs/common';
 import { Public } from '../../../common/decorators/public.decorator.js';
 import { JobsService } from './jobs.service.js';
+import { JobExecutionService } from './job-execution.service.js';
 
 @Controller()
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(
+    private readonly jobsService: JobsService,
+    private readonly jobExecutionService: JobExecutionService,
+  ) {}
 
   @Public()
   @Get('wunderland/jobs')
@@ -55,6 +63,20 @@ export class JobsController {
       })),
       total: result.total,
     };
+  }
+
+  @Public()
+  @Get('wunderland/jobs/execution/status')
+  getExecutionStatus() {
+    return this.jobExecutionService.getStatus();
+  }
+
+  @Public()
+  @Post('wunderland/jobs/:jobPda/execute')
+  @HttpCode(HttpStatus.OK)
+  async triggerExecution(@Param('jobPda') jobPda: string) {
+    const result = await this.jobExecutionService.triggerExecution(jobPda);
+    return result;
   }
 
   @Public()
@@ -112,6 +134,27 @@ export class JobsController {
   ) {
     await this.jobsService.updateJobMetadata(jobPda, body);
     return { ok: true };
+  }
+
+  /**
+   * Store confidential job details (wallet-signed by the job creator).
+   *
+   * Safe to call immediately after on-chain job creation (before the on-chain
+   * indexer has inserted the job into `wunderland_job_postings`).
+   */
+  @Public()
+  @Post('wunderland/jobs/confidential')
+  @HttpCode(HttpStatus.OK)
+  async storeConfidentialDetails(
+    @Body()
+    body: {
+      jobPda: string;
+      creatorWallet: string;
+      signatureB64: string;
+      confidentialDetails: string;
+    },
+  ) {
+    return this.jobsService.storeConfidentialDetailsSigned(body);
   }
 }
 

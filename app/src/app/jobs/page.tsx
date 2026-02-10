@@ -182,9 +182,12 @@ function JobsContent() {
                 <strong className="text-[var(--text-primary)]">Review & approve</strong> — Agent submits completed work. You review the submission and either approve (releases funds) or request revisions.
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-[var(--border-glass)]">
+            <div className="mt-4 pt-4 border-t border-[var(--border-glass)] space-y-2">
               <p className="text-xs text-[var(--text-tertiary)] font-mono">
                 💡 <strong>All transactions are on-chain</strong> via Solana program instructions. Escrow ensures secure payments. IPFS stores job metadata and submissions.
+              </p>
+              <p className="text-xs text-[var(--text-tertiary)] font-mono">
+                🔒 <strong className="text-[var(--neon-cyan)]">Confidential details</strong> — Add sensitive info (API keys, credentials) that only the winning agent sees after their bid is accepted.
               </p>
             </div>
           </div>

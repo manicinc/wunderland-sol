@@ -615,6 +615,135 @@ export class WunderlandSolService {
     }
   }
 
+  /**
+   * Submit job deliverable to Solana (agent submits work).
+   *
+   * @returns Submission PDA address and signature if successful, null if failed
+   */
+  async submitJob(opts: {
+    seedId: string;
+    jobPdaAddress: string;
+    submissionHash: Buffer;
+  }): Promise<{ success: boolean; signature?: string; submissionPda?: string; error?: string }> {
+    if (!this.enabled) {
+      return { success: false, error: 'Solana integration disabled' };
+    }
+
+    if (!this.programId || !this.relayerKeypairPath) {
+      return { success: false, error: 'Missing Solana configuration (PROGRAM_ID or RELAYER_KEYPAIR)' };
+    }
+
+    const agentMap = this.loadAgentMap();
+    const agentEntry = agentMap?.agents?.[opts.seedId];
+    if (!agentEntry) {
+      return { success: false, error: `Agent ${opts.seedId} not found in agent map` };
+    }
+
+    try {
+      // Lazy-load SDK + web3
+      const sdk = await import('@wunderland-sol/sdk');
+      const web3 = await import('@solana/web3.js');
+
+      const client = new sdk.WunderlandSolClient({
+        programId: this.programId,
+        rpcUrl: this.rpcUrl || undefined,
+        cluster: (this.cluster as any) || undefined,
+      });
+
+      const payer = this.loadKeypair(web3, this.relayerKeypairPath);
+      const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
+      const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+      const jobPda = new web3.PublicKey(opts.jobPdaAddress);
+
+      // Ensure submissionHash is Uint8Array (32 bytes)
+      const submissionHash = Uint8Array.from(opts.submissionHash);
+
+      const res = await client.submitJob({
+        jobPda,
+        agentIdentityPda,
+        agentSigner,
+        payer,
+        submissionHash,
+      });
+
+      this.logger.log(
+        `Job submitted: agent=${opts.seedId} job=${opts.jobPdaAddress} (sig: ${res.signature})`
+      );
+
+      return {
+        success: true,
+        signature: res.signature,
+        submissionPda: res.submissionPda.toBase58(),
+      };
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err);
+      this.logger.error(`Failed to submit job for ${opts.seedId}: ${error}`);
+      return { success: false, error };
+    }
+  }
+
+  /**
+   * Withdraw a job bid (losing bid cleanup).
+   *
+   * @returns Transaction signature if successful, null if failed
+   */
+  async withdrawJobBid(opts: {
+    seedId: string;
+    jobPdaAddress: string;
+    bidPdaAddress: string;
+  }): Promise<{ success: boolean; signature?: string; error?: string }> {
+    if (!this.enabled) {
+      return { success: false, error: 'Solana integration disabled' };
+    }
+
+    if (!this.programId || !this.relayerKeypairPath) {
+      return { success: false, error: 'Missing Solana configuration (PROGRAM_ID or RELAYER_KEYPAIR)' };
+    }
+
+    const agentMap = this.loadAgentMap();
+    const agentEntry = agentMap?.agents?.[opts.seedId];
+    if (!agentEntry) {
+      return { success: false, error: `Agent ${opts.seedId} not found in agent map` };
+    }
+
+    try {
+      // Lazy-load SDK + web3
+      const sdk = await import('@wunderland-sol/sdk');
+      const web3 = await import('@solana/web3.js');
+
+      const client = new sdk.WunderlandSolClient({
+        programId: this.programId,
+        rpcUrl: this.rpcUrl || undefined,
+        cluster: (this.cluster as any) || undefined,
+      });
+
+      const payer = this.loadKeypair(web3, this.relayerKeypairPath);
+      const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
+      const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+      const jobPda = new web3.PublicKey(opts.jobPdaAddress);
+
+      const signature = await client.withdrawJobBid({
+        jobPda,
+        agentIdentityPda,
+        agentSigner,
+        payer,
+      });
+
+      this.logger.log(
+        `Job bid withdrawn: agent=${opts.seedId} job=${opts.jobPdaAddress} (sig: ${signature})`
+      );
+
+      return {
+        success: true,
+        signature,
+      };
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err);
+      this.logger.error(`Failed to withdraw job bid for ${opts.seedId}: ${error}`);
+      return { success: false, error };
+    }
+  }
+
   private loadKeypair(web3: any, keypairPath: string): any {
     const raw = JSON.parse(readFileSync(keypairPath, 'utf8')) as number[];
     if (!Array.isArray(raw) || raw.length < 32) {

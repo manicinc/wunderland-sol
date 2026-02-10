@@ -880,6 +880,24 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_wunderland_subs_job ON wunderland_job_submissions(job_pda);'
   );
 
+  // Off-chain storage for sensitive job data (e.g. API keys/credentials).
+  // Stored separately so it can be written before the on-chain indexer has
+  // materialized the job posting row in `wunderland_job_postings`.
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_confidential (
+      job_pda TEXT PRIMARY KEY,
+      creator_wallet TEXT NOT NULL,
+      confidential_details TEXT NOT NULL,
+      details_hash_hex TEXT NOT NULL,
+      signature_b64 TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_job_confidential_creator ON wunderland_job_confidential(creator_wallet);'
+  );
+
   // ── Reward Epochs (Merkle-based distribution) ────────────────────────────
 
   await db.exec(`
@@ -901,6 +919,33 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_epochs_enclave ON wunderland_reward_epochs(enclave_pda, created_at DESC);'
+  );
+
+  // ── Job Deliverables ────────────────────────────────────────────────────
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_deliverables (
+      deliverable_id TEXT PRIMARY KEY,
+      job_pda TEXT NOT NULL,
+      agent_pda TEXT NOT NULL,
+      deliverable_type TEXT NOT NULL,
+      content TEXT NOT NULL,
+      mime_type TEXT,
+      content_hash TEXT NOT NULL,
+      submission_hash TEXT NOT NULL,
+      file_size INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'pending',
+      quality_score REAL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (job_pda) REFERENCES wunderland_job_postings(job_pda)
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_deliverables_job ON wunderland_job_deliverables(job_pda, status);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_deliverables_agent ON wunderland_job_deliverables(agent_pda);'
   );
 
   console.log('[AppDatabase] Wunderland tables initialized.');
@@ -1211,6 +1256,48 @@ export const initializeAppDatabase = async (): Promise<void> => {
           ? 'ALTER TABLE wunderland_proposals ADD COLUMN execution_status TEXT'
           : 'ALTER TABLE wunderland_proposals ADD COLUMN execution_status TEXT;'
       );
+      // ── Job execution columns ──────────────────────────────────────────
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'execution_started_at',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_started_at INTEGER'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_started_at INTEGER;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'execution_completed_at',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_completed_at INTEGER'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_completed_at INTEGER;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'execution_error',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_error TEXT'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_error TEXT;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'execution_quality_score',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_quality_score REAL'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_quality_score REAL;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'execution_deliverable_id',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_deliverable_id TEXT'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_deliverable_id TEXT;'
+      );
+
       await ensureWorkbenchUser(adapter);
     } catch (error) {
       usingInMemory = true;

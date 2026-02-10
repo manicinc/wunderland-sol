@@ -16,7 +16,7 @@ export default function Tooltip({ content, position = 'top', delay = 300, childr
   const [side, setSide] = useState(position);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTouchRef = useRef(false);
 
   const calculate = useCallback(() => {

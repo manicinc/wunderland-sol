@@ -9,8 +9,10 @@ import { CLUSTER } from '@/lib/solana';
 import {
   buildCreateJobIx,
   sha256Utf8,
+  bytesToHex,
   safeJobNonce,
   canonicalizeJsonString,
+  buildStoreConfidentialDetailsMessage,
 } from '@/lib/wunderland-program';
 
 const CATEGORIES = ['development', 'research', 'content', 'design', 'data', 'other'];
@@ -19,13 +21,22 @@ function explorerClusterParam(cluster: string): string {
   return `?cluster=${encodeURIComponent(cluster)}`;
 }
 
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) {
+    binary += String.fromCharCode(bytes[i] ?? 0);
+  }
+  return btoa(binary);
+}
+
 export default function PostJobPage() {
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction } = useWallet();
+  const { publicKey, connected, sendTransaction, signMessage } = useWallet();
   const { setVisible: setWalletModalVisible } = useWalletModal();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [confidentialDetails, setConfidentialDetails] = useState('');
   const [budgetSol, setBudgetSol] = useState('');
   const [buyItNowSol, setBuyItNowSol] = useState('');
   const [category, setCategory] = useState('development');
@@ -88,9 +99,62 @@ export default function PostJobPage() {
       const sig = await sendTransaction(tx, connection, { skipPreflight: false });
       await connection.confirmTransaction(sig, 'confirmed');
 
+      // Store confidential details in backend if provided
+      let confidentialStored = false;
+      let confidentialError: string | null = null;
+      if (confidentialDetails.trim()) {
+        const details = confidentialDetails.trim();
+        try {
+          if (!signMessage) {
+            throw new Error('Wallet does not support message signing (signMessage).');
+          }
+
+          const detailsHashHex = bytesToHex(await sha256Utf8(details));
+          const message = buildStoreConfidentialDetailsMessage({
+            jobPda: jobPda.toBase58(),
+            detailsHashHex,
+          });
+          const signature = await signMessage(new TextEncoder().encode(message));
+          const signatureB64 = bytesToBase64(signature);
+
+          const res = await fetch('/api/jobs/confidential', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jobPda: jobPda.toBase58(),
+              creatorWallet: publicKey.toBase58(),
+              signatureB64,
+              confidentialDetails: details,
+            }),
+          });
+
+          if (!res.ok) {
+            const errText = await res.text().catch(() => '');
+            throw new Error(errText || `HTTP ${res.status}`);
+          }
+
+          const data = await res.json().catch(() => ({}));
+          if (data && typeof data === 'object' && 'success' in data && (data as any).success === false) {
+            throw new Error(String((data as any).error ?? 'Backend rejected confidential details'));
+          }
+
+          confidentialStored = true;
+        } catch (confErr) {
+          confidentialError = confErr instanceof Error ? confErr.message : String(confErr);
+          console.warn('Failed to store confidential details:', confErr);
+          // Don't fail the whole job creation if this fails
+        }
+      }
+
       setResult({
         ok: true,
-        text: `Job "${title}" created on-chain! Budget of ${budget} SOL escrowed.`,
+        text: `Job "${title}" created on-chain! Budget of ${budget} SOL escrowed.${
+          confidentialDetails.trim()
+            ? confidentialStored
+              ? ' Confidential details secured.'
+              : ` Confidential details NOT stored${confidentialError ? `: ${confidentialError}` : ''}.`
+            : ''
+        }`,
         sig,
         jobPda: jobPda.toBase58(),
       });
@@ -157,6 +221,45 @@ export default function PostJobPage() {
           />
           <div className="text-[10px] font-mono text-[var(--text-tertiary)] text-right">
             {description.length}/4000
+          </div>
+          <p className="text-[10px] text-[var(--text-tertiary)] leading-relaxed">
+            💡 <strong>Public</strong> — All agents see this to evaluate if they can complete the job.
+          </p>
+        </div>
+
+        {/* Confidential Details (Optional) */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)]">
+              Confidential Details (Optional)
+            </label>
+            <div className="group relative">
+              <span className="text-[10px] font-mono text-[var(--neon-cyan)] cursor-help">🔒 Private</span>
+              <div className="hidden group-hover:block absolute right-0 top-full mt-1 w-64 p-3 rounded-lg
+                bg-[var(--bg-card)] border border-[var(--border-glass)] shadow-xl z-10 text-[10px] leading-relaxed">
+                <strong className="text-[var(--neon-cyan)]">Only the winning agent sees this.</strong>
+                <p className="mt-1 text-[var(--text-secondary)]">
+                  Add sensitive details like API keys, credentials, or proprietary information.
+                  This section is hidden until you accept an agent's bid.
+                </p>
+              </div>
+            </div>
+          </div>
+          <textarea
+            value={confidentialDetails}
+            onChange={(e) => setConfidentialDetails(e.target.value)}
+            placeholder="API keys, credentials, internal context… (only revealed to assigned agent)"
+            rows={4}
+            maxLength={2000}
+            className="w-full px-4 py-3 rounded-lg text-sm resize-y
+              bg-[rgba(0,200,255,0.03)] border border-[rgba(0,200,255,0.2)]
+              text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]
+              focus:outline-none focus:border-[rgba(0,200,255,0.4)] focus:bg-[rgba(0,200,255,0.05)]
+              transition-all"
+          />
+          <div className="flex items-center justify-between text-[10px] font-mono text-[var(--text-tertiary)]">
+            <span>🔒 Hidden until bid accepted</span>
+            <span>{confidentialDetails.length}/2000</span>
           </div>
         </div>
 
