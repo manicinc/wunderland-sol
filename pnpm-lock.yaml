@@ -204,6 +204,9 @@ importers:
       socket.io:
         specifier: ^4.8.1
         version: 4.8.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      telegraf:
+        specifier: ^4.16.3
+        version: 4.16.3
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -18948,8 +18951,7 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.18
 
-  '@telegraf/types@7.1.0':
-    optional: true
+  '@telegraf/types@7.1.0': {}
 
   '@tokenizer/inflate@0.4.1':
     dependencies:
@@ -20456,21 +20458,18 @@ snapshots:
 
   bson@6.10.4: {}
 
-  buffer-alloc-unsafe@1.1.0:
-    optional: true
+  buffer-alloc-unsafe@1.1.0: {}
 
   buffer-alloc@1.2.0:
     dependencies:
       buffer-alloc-unsafe: 1.1.0
       buffer-fill: 1.0.0
-    optional: true
 
   buffer-crc32@0.2.13: {}
 
   buffer-equal-constant-time@1.0.1: {}
 
-  buffer-fill@1.0.0:
-    optional: true
+  buffer-fill@1.0.0: {}
 
   buffer-from@1.1.2: {}
 
@@ -24970,8 +24969,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  mri@1.2.0:
-    optional: true
+  mri@1.2.0: {}
 
   mrmime@2.0.1: {}
 
@@ -25391,8 +25389,7 @@ snapshots:
     dependencies:
       p-finally: 1.0.0
 
-  p-timeout@4.1.0:
-    optional: true
+  p-timeout@4.1.0: {}
 
   p-timeout@6.1.4: {}
 
@@ -26893,7 +26890,6 @@ snapshots:
   safe-compare@1.1.4:
     dependencies:
       buffer-alloc: 1.2.0
-    optional: true
 
   safe-push-apply@1.0.0:
     dependencies:
@@ -26910,8 +26906,7 @@ snapshots:
 
   safer-buffer@2.1.2: {}
 
-  sandwich-stream@2.0.2:
-    optional: true
+  sandwich-stream@2.0.2: {}
 
   sax@1.4.4: {}
 
@@ -27683,7 +27678,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
-    optional: true
 
   temp-dir@3.0.0: {}
 
