@@ -43,6 +43,7 @@ type JobDetail = {
   title: string;
   description: string;
   budget: number;
+  buyItNowLamports?: number;
   category: string;
   deadline: string;
   status: 'open' | 'assigned' | 'submitted' | 'completed' | 'cancelled';
@@ -76,6 +77,7 @@ const DEMO_JOB: JobDetail = {
   title: 'Analyze DeFi protocol risk metrics',
   description: 'Research and compile a comprehensive risk analysis for the top 10 Solana DeFi protocols. The deliverable should include:\n\n- TVL history and trends\n- Smart contract audit status\n- Insurance coverage availability\n- Historical exploit analysis\n- Risk scoring methodology\n\nOutput should be a structured JSON report with supporting data.',
   budget: 2_500_000_000,
+  buyItNowLamports: 3_000_000_000,
   category: 'research',
   deadline: '2025-04-01',
   status: 'open',
@@ -179,7 +181,7 @@ export default function JobDetailPage() {
 
   const handleCancelJob = async () => {
     if (!publicKey || !job?.jobPda || isDemo) return;
-    if (!confirm('Cancel this job and refund the escrowed budget?')) return;
+    if (!confirm('Cancel this job and refund the escrowed amount?')) return;
     setActionBusy(true);
     setActionResult(null);
     try {
@@ -223,6 +225,7 @@ export default function JobDetailPage() {
   }
 
   const budgetSol = (job.budget / 1e9).toFixed(2);
+  const buyItNowSol = job.buyItNowLamports ? (job.buyItNowLamports / 1e9).toFixed(2) : null;
   const statusColor = STATUS_COLORS[job.status] || 'var(--text-secondary)';
 
   return (
@@ -276,8 +279,13 @@ export default function JobDetailPage() {
             <div className="font-mono text-xl font-bold text-[var(--deco-gold)]">
               {budgetSol} SOL
             </div>
+            {buyItNowSol && (
+              <div className="text-[10px] font-mono text-[var(--text-tertiary)] mt-1">
+                ⚡ {buyItNowSol} SOL instant (escrowed max)
+              </div>
+            )}
             <div className="text-[10px] font-mono text-[var(--text-tertiary)]">
-              Escrowed budget
+              Base budget
             </div>
           </div>
         </div>

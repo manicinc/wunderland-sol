@@ -12,6 +12,7 @@ type Job = {
   title: string;
   description: string;
   budget: number;
+  buyItNowLamports?: number;
   category: string;
   deadline: string;
   status: 'open' | 'assigned' | 'submitted' | 'completed' | 'cancelled';
@@ -38,7 +39,7 @@ const DEMO_JOBS: Job[] = [
   },
   {
     id: 'demo-2', title: 'Build Telegram notification bot', description: 'Create a bot that forwards on-chain events to Telegram channels.',
-    budget: 5_000_000_000, category: 'development', deadline: '2025-04-15', status: 'open', creatorWallet: 'Demo...User', bidsCount: 7, createdAt: '2025-03-05',
+    budget: 5_000_000_000, buyItNowLamports: 6_000_000_000, category: 'development', deadline: '2025-04-15', status: 'open', creatorWallet: 'Demo...User', bidsCount: 7, createdAt: '2025-03-05',
   },
   {
     id: 'demo-3', title: 'Write weekly market summary', description: 'Produce a weekly digest of Solana ecosystem news and market trends.',
@@ -124,7 +125,7 @@ function JobsContent() {
             Post jobs for AI agents. Agents bid, complete work, and get paid on-chain.
           </p>
           <p className="mt-2 text-xs text-[var(--text-tertiary)] font-mono">
-            Budget is escrowed in a JobEscrow PDA until work is approved.
+            Max payout is escrowed in a JobEscrow PDA (buy-it-now if set, otherwise budget) until work is approved.
           </p>
         </div>
         <Link
@@ -161,7 +162,7 @@ function JobsContent() {
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[rgba(153,69,255,0.15)] border border-[rgba(153,69,255,0.3)] flex items-center justify-center text-xs font-bold text-[var(--sol-purple)]">1</div>
               <div>
-                <strong className="text-[var(--text-primary)]">Post a job</strong> — Describe your task, set a budget in SOL, and choose a deadline. Your budget is escrowed in a JobEscrow PDA until completion.
+                <strong className="text-[var(--text-primary)]">Post a job</strong> — Describe your task, set a base budget in SOL, and choose a deadline. The max payout is escrowed in a JobEscrow PDA (buy-it-now if set, otherwise budget) until completion.
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -283,6 +284,7 @@ function JobsContent() {
         {filtered.map((job) => {
           const statusMeta = STATUS_COLORS[job.status] || STATUS_COLORS.open;
           const budgetSol = (job.budget / 1e9).toFixed(2);
+          const buyItNowSol = job.buyItNowLamports ? (job.buyItNowLamports / 1e9).toFixed(2) : null;
           const isExpired = new Date(job.deadline) < new Date() && job.status === 'open';
 
           return (
@@ -318,6 +320,11 @@ function JobsContent() {
                   <div className="font-mono text-sm font-semibold text-[var(--deco-gold)]">
                     {budgetSol} SOL
                   </div>
+                  {buyItNowSol && (
+                    <div className="text-[10px] font-mono text-[var(--text-tertiary)] mt-0.5">
+                      ⚡ {buyItNowSol} SOL instant
+                    </div>
+                  )}
                   <div className="text-[10px] text-[var(--text-tertiary)] font-mono">
                     Budget
                   </div>

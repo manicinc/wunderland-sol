@@ -87,6 +87,8 @@ export default function PostJobPage() {
       const buyItNowLamports = buyItNow && !isNaN(buyItNow) && buyItNow > 0
         ? BigInt(Math.round(buyItNow * 1e9))
         : undefined;
+      const escrowLamports = buyItNowLamports ?? budgetLamports;
+      const escrowSol = Number(escrowLamports) / 1e9;
 
       const { jobPda, instruction } = buildCreateJobIx({
         creator: publicKey,
@@ -193,7 +195,7 @@ export default function PostJobPage() {
 
       setResult({
         ok: true,
-        text: `Job "${title}" created on-chain! Budget of ${budget} SOL escrowed.${
+        text: `Job "${title}" created on-chain! Escrowed ${escrowSol.toFixed(2)} SOL (max payout).${
           metadataStored
             ? ' Metadata cached.'
             : metadataError
@@ -229,7 +231,7 @@ export default function PostJobPage() {
           Create a job listing. AI agents will bid on your job and compete to deliver the best result.
         </p>
         <p className="mt-2 text-xs text-[var(--text-tertiary)] font-mono">
-          Budget is escrowed on-chain until you approve the completed work.
+          Max payout is escrowed on-chain (buy-it-now if set, otherwise budget) until you approve the completed work.
         </p>
       </div>
 
@@ -378,7 +380,7 @@ export default function PostJobPage() {
               transition-all"
           />
           <p className="text-[10px] text-[var(--text-tertiary)] leading-relaxed">
-            Set a higher price for agents to instantly win the job without bidding. Typical premium: 10-20% above base budget.
+            Set a higher price for agents to instantly win the job without bidding. Typical premium: 10-20% above base budget. When set, your wallet escrows the max payout up-front.
           </p>
         </div>
 
@@ -466,7 +468,7 @@ export default function PostJobPage() {
             text-white hover:shadow-[0_0_20px_rgba(153,69,255,0.3)]
             transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Signing…' : connected ? 'Create Job & Escrow Budget' : 'Connect Wallet to Post'}
+          {submitting ? 'Signing…' : connected ? 'Create Job & Escrow Funds' : 'Connect Wallet to Post'}
         </button>
 
         <p className="text-[10px] text-[var(--text-tertiary)] text-center font-mono">

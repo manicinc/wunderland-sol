@@ -19,10 +19,10 @@ test.describe('Jobs Marketplace', () => {
     // Collapsible starts with defaultOpen={true}, so content is already visible
 
     // Verify 4 steps are shown
-    await expect(page.locator('text=Post a job')).toBeVisible();
-    await expect(page.locator('text=Agents bid')).toBeVisible();
-    await expect(page.locator('text=Accept & assign')).toBeVisible();
-    await expect(page.locator('text=Review & approve')).toBeVisible();
+    await expect(page.locator('strong:has-text("Post a job")')).toBeVisible();
+    await expect(page.locator('strong:has-text("Agents bid")')).toBeVisible();
+    await expect(page.locator('strong:has-text("Accept & assign")')).toBeVisible();
+    await expect(page.locator('strong:has-text("Review & approve")')).toBeVisible();
 
     // Verify confidential details note
     await expect(page.locator('text=Confidential details')).toBeVisible();
@@ -83,6 +83,7 @@ test.describe('Post a Job Form', () => {
     await expect(page.locator('label:has-text("Confidential Details")')).toBeVisible();
     await expect(page.locator('label:has-text("Budget (SOL)")')).toBeVisible();
     await expect(page.locator('label:has-text("Category")')).toBeVisible();
+    await expect(page.locator('label:has-text("Buy It Now Price")')).toBeVisible();
     await expect(page.locator('label:has-text("Deadline")')).toBeVisible();
   });
 
@@ -138,14 +139,25 @@ test.describe('Post a Job Form', () => {
   });
 
   test('should validate budget is positive number', async ({ page }) => {
-    await page.fill('input[placeholder="1.0"]', '-5');
+    const budgetInput = page.locator('input[placeholder="1.0"]');
+    await expect(budgetInput).toHaveAttribute('min', '0.01');
+    await expect(budgetInput).toHaveAttribute('step', '0.01');
+  });
+
+  test('should show buy-it-now "Instant Win" hint and preview badge', async ({ page }) => {
+    await expect(page.locator('text=⚡ Instant Win')).toBeVisible();
+
+    // Fill required preview fields
     await page.fill('input[placeholder*="Build"]', 'Test Job');
-    await page.fill('textarea[placeholder*="Describe"]', 'Test Description');
-    await page.fill('input[type="date"]', '2025-12-31');
+    await page.fill('input[placeholder="1.0"]', '1');
 
-    await page.click('button[type="submit"]');
+    const buyItNowInput = page.locator('input[placeholder*="1.2 (10-20% above budget)"]');
+    await expect(buyItNowInput).toHaveAttribute('min', '1.05');
 
-    await expect(page.locator('text=Budget must be a positive number')).toBeVisible({ timeout: 1000 });
+    await buyItNowInput.fill('1.2');
+
+    // Preview should show buy-it-now badge when provided
+    await expect(page.locator('text=⚡ 1.2 SOL instant')).toBeVisible();
   });
 });
 
@@ -157,16 +169,16 @@ test.describe('Job Detail Page', () => {
 
   test('should display job details', async ({ page }) => {
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('text=/\\d+\\.\\d+ SOL/')).toBeVisible(); // Budget
+    await expect(page.locator('div.font-mono.text-xl')).toContainText(/SOL/); // Budget
     await expect(page.locator('text=Description')).toBeVisible();
   });
 
   test('should show status timeline', async ({ page }) => {
-    await expect(page.locator('text=Status')).toBeVisible();
-    await expect(page.locator('text=Open')).toBeVisible();
-    await expect(page.locator('text=In Progress')).toBeVisible();
-    await expect(page.locator('text=Submitted')).toBeVisible();
-    await expect(page.locator('text=Completed')).toBeVisible();
+    const statusCard = page.getByRole('heading', { name: 'Status' }).locator('..');
+    await expect(statusCard.getByText('Open', { exact: true })).toBeVisible();
+    await expect(statusCard.getByText('In Progress', { exact: true })).toBeVisible();
+    await expect(statusCard.getByText('Submitted', { exact: true })).toBeVisible();
+    await expect(statusCard.getByText('Completed', { exact: true })).toBeVisible();
   });
 
   test('should show agent bids section', async ({ page }) => {
