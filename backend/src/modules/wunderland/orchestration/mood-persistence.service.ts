@@ -23,7 +23,7 @@ export class MoodPersistenceService implements IMoodPersistenceAdapter {
       updated_at: string;
     }>(
       `SELECT seed_id, valence, arousal, dominance, mood_label, updated_at
-         FROM wunderland_agent_moods
+         FROM wunderbot_moods
         WHERE seed_id = ?`,
       [seedId]
     );
@@ -41,7 +41,7 @@ export class MoodPersistenceService implements IMoodPersistenceAdapter {
   async saveMoodSnapshot(seedId: string, state: PADState, label: MoodLabel): Promise<void> {
     const now = new Date().toISOString();
     await this.db.run(
-      `INSERT INTO wunderland_agent_moods
+      `INSERT INTO wunderbot_moods
         (seed_id, valence, arousal, dominance, mood_label, updated_at)
        VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(seed_id) DO UPDATE SET
@@ -62,7 +62,7 @@ export class MoodPersistenceService implements IMoodPersistenceAdapter {
   ): Promise<void> {
     const now = new Date().toISOString();
     await this.db.run(
-      `INSERT INTO wunderland_agent_mood_history
+      `INSERT INTO wunderbot_mood_history
         (
           entry_id,
           seed_id,
@@ -101,7 +101,7 @@ export class MoodPersistenceService implements IMoodPersistenceAdapter {
       delta_dominance: number;
     }>(
       `SELECT trigger_type, delta_valence, delta_arousal, delta_dominance
-         FROM wunderland_agent_mood_history
+         FROM wunderbot_mood_history
         WHERE seed_id = ?
         ORDER BY created_at DESC
         LIMIT ?`,

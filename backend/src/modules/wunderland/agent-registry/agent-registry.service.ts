@@ -313,7 +313,7 @@ export class AgentRegistryService {
     try {
       await this.db.transaction(async (trx: StorageAdapter) => {
         const existing = await trx.get<{ seed_id: string }>(
-          'SELECT seed_id FROM wunderland_agents WHERE seed_id = ? LIMIT 1',
+          'SELECT seed_id FROM wunderbots WHERE seed_id = ? LIMIT 1',
           [seedId]
         );
         if (existing) {
@@ -335,10 +335,10 @@ export class AgentRegistryService {
 
         await trx.run(
           `
-	            INSERT INTO wunderland_agents (
-	              seed_id,
-	              owner_user_id,
-	              display_name,
+		            INSERT INTO wunderbots (
+		              seed_id,
+		              owner_user_id,
+		              display_name,
 	              bio,
 	              avatar_url,
 	              hexaco_traits,
@@ -469,7 +469,7 @@ export class AgentRegistryService {
     const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
 
     const totalRow = await this.db.get<{ count: number }>(
-      `SELECT COUNT(1) as count FROM wunderland_agents a ${whereSql}`,
+      `SELECT COUNT(1) as count FROM wunderbots a ${whereSql}`,
       params
     );
     const total = totalRow?.count ?? 0;
@@ -486,7 +486,7 @@ export class AgentRegistryService {
           c.total_posts as total_posts,
           c.joined_at as joined_at,
           c.is_active as is_active
-        FROM wunderland_agents a
+        FROM wunderbots a
         LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
         ${whereSql}
         ORDER BY a.created_at DESC
@@ -537,7 +537,7 @@ export class AgentRegistryService {
     const whereSql = `WHERE ${where.join(' AND ')}`;
 
     const totalRow = await this.db.get<{ count: number }>(
-      `SELECT COUNT(1) as count FROM wunderland_agents a ${whereSql}`,
+      `SELECT COUNT(1) as count FROM wunderbots a ${whereSql}`,
       params
     );
     const total = totalRow?.count ?? 0;
@@ -554,7 +554,7 @@ export class AgentRegistryService {
           c.total_posts as total_posts,
           c.joined_at as joined_at,
           c.is_active as is_active
-        FROM wunderland_agents a
+        FROM wunderbots a
         LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
         ${whereSql}
         ORDER BY a.created_at DESC
@@ -593,7 +593,7 @@ export class AgentRegistryService {
 
     await this.db.transaction(async (trx) => {
       const existing = await trx.get<WunderlandAgentRow>(
-        'SELECT * FROM wunderland_agents WHERE seed_id = ? LIMIT 1',
+        'SELECT * FROM wunderbots WHERE seed_id = ? LIMIT 1',
         [seedId]
       );
       if (!existing) throw new AgentNotFoundException(seedId);
@@ -665,10 +665,10 @@ export class AgentRegistryService {
 
       await trx.run(
         `
-	          UPDATE wunderland_agents
-	             SET display_name = COALESCE(@display_name, display_name),
-	                 bio = COALESCE(@bio, bio),
-	                 base_system_prompt = COALESCE(@base_system_prompt, base_system_prompt),
+		          UPDATE wunderbots
+		             SET display_name = COALESCE(@display_name, display_name),
+		                 bio = COALESCE(@bio, bio),
+		                 base_system_prompt = COALESCE(@base_system_prompt, base_system_prompt),
 	                 hexaco_traits = @hexaco_traits,
 	                 security_profile = @security_profile,
 	                 storage_policy = @storage_policy,
@@ -706,7 +706,7 @@ export class AgentRegistryService {
 
     await this.db.transaction(async (trx: StorageAdapter) => {
       const existing = await trx.get<WunderlandAgentRow>(
-        'SELECT * FROM wunderland_agents WHERE seed_id = ? LIMIT 1',
+        'SELECT * FROM wunderbots WHERE seed_id = ? LIMIT 1',
         [seedId]
       );
       if (!existing) throw new AgentNotFoundException(seedId);
@@ -732,10 +732,10 @@ export class AgentRegistryService {
         if (!toolsetHashExisting && toolsetComputed) {
           await trx.run(
             `
-              UPDATE wunderland_agents
-                 SET toolset_manifest_json = @toolset_manifest_json,
-                     toolset_hash = @toolset_hash,
-                     updated_at = @updated_at
+	              UPDATE wunderbots
+	                 SET toolset_manifest_json = @toolset_manifest_json,
+	                     toolset_hash = @toolset_hash,
+	                     updated_at = @updated_at
                WHERE seed_id = @seed_id
             `,
             {
@@ -758,7 +758,7 @@ export class AgentRegistryService {
 
       await trx.run(
         `
-          UPDATE wunderland_agents
+          UPDATE wunderbots
              SET security_profile = @security_profile,
                  storage_policy = @storage_policy,
                  sealed_at = @sealed_at,
@@ -794,13 +794,13 @@ export class AgentRegistryService {
     const now = Date.now();
     await this.db.transaction(async (trx) => {
       const existing = await trx.get<WunderlandAgentRow>(
-        'SELECT * FROM wunderland_agents WHERE seed_id = ? LIMIT 1',
+        'SELECT * FROM wunderbots WHERE seed_id = ? LIMIT 1',
         [seedId]
       );
       if (!existing) throw new AgentNotFoundException(seedId);
       if (existing.owner_user_id !== userId) throw new AgentOwnershipException(seedId);
 
-      await trx.run('UPDATE wunderland_agents SET status = ?, updated_at = ? WHERE seed_id = ?', [
+      await trx.run('UPDATE wunderbots SET status = ?, updated_at = ? WHERE seed_id = ?', [
         'archived',
         now,
         seedId,
@@ -851,7 +851,7 @@ export class AgentRegistryService {
     citizen: WunderlandCitizenRow;
   }> {
     const agent = await this.db.get<WunderlandAgentRow>(
-      'SELECT * FROM wunderland_agents WHERE seed_id = ? LIMIT 1',
+      'SELECT * FROM wunderbots WHERE seed_id = ? LIMIT 1',
       [seedId]
     );
     if (!agent) throw new AgentNotFoundException(seedId);

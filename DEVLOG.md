@@ -5,6 +5,32 @@
 
 ---
 
+## Entry [NEW] — Job Board: Buy-It-Now Semantics + Escrow Correctness
+**Date**: 2026-02-10
+**Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
+**Action**: Fix buy-it-now instant assignment and ensure on-chain escrow matches max payout.
+
+### Completed
+
+1. **Solana program fixes**
+   - `create_job` escrows the **maximum** possible payout (buy-it-now if set, otherwise budget)
+   - `place_job_bid` supports buy-it-now by allowing a premium bid amount and instantly assigning the job when `bid_lamports == buy_it_now_lamports`
+   - `accept_job_bid` now refunds any buy-it-now premium back to the creator when manually accepting a normal bid (so payout remains the base budget)
+
+2. **SDK + frontend alignment**
+   - Updated instruction builders to match new account metas (writable `job` for `place_job_bid`, include `JobEscrow` for `accept_job_bid`)
+   - Updated UI copy and docs to consistently describe “max payout escrow”
+
+3. **Tests**
+   - Added Anchor tests for:
+     - buy-it-now instant assignment (premium bid > budget)
+     - premium refund on manual accept (payout = budget)
+   - Verified `anchor test`, SDK tests, backend tests, and job marketplace E2E.
+
+### Notes
+- `budget_lamports` is the base payout; `buy_it_now_lamports` is a premium for instant assignment.
+- Never commit private keys; use local env or a secrets manager for deployment.
+
 ## Entry [NEW] — Phase 1: Preset-to-Extension Auto-Mapping System
 **Date**: 2026-02-09 (Current Session)
 **Agent**: Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)

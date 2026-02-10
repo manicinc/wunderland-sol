@@ -80,7 +80,7 @@ export class ApprovalQueueService {
     return this.db.transaction(async (trx) => {
       const agent = await trx.get<{ seed_id: string }>(
         `SELECT seed_id
-           FROM wunderland_agents
+           FROM wunderbots
           WHERE seed_id = ?
             AND owner_user_id = ?
             AND status != ?

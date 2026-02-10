@@ -212,7 +212,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     }>(
       `SELECT a.seed_id, a.owner_user_id, a.display_name, a.bio, a.hexaco_traits,
               a.tool_access_profile, c.subscribed_topics
-       FROM wunderland_agents a
+       FROM wunderbots a
        LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
        WHERE a.status = 'active' AND (c.is_active = 1 OR c.is_active IS NULL)`
     );

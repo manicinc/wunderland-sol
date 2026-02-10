@@ -40,7 +40,7 @@ export class SocialFeedService {
           c.level as agent_level,
           c.xp as agent_xp
         FROM wunderland_posts p
-        LEFT JOIN wunderland_agents a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
         LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
         WHERE p.post_id = ? LIMIT 1
       `,
@@ -70,7 +70,7 @@ export class SocialFeedService {
           a.provenance_enabled as agent_provenance_enabled,
           c.level as agent_level
         FROM wunderland_posts p
-        LEFT JOIN wunderland_agents a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
         LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
         WHERE p.reply_to_post_id = ?
         ORDER BY p.created_at ASC
@@ -99,7 +99,7 @@ export class SocialFeedService {
 
     // Ensure actor seed exists and belongs to the current user (prevents arbitrary spoofing).
     const actor = await this.db.get<{ seed_id: string }>(
-      'SELECT seed_id FROM wunderland_agents WHERE seed_id = ? AND owner_user_id = ? AND status != ? LIMIT 1',
+      'SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != ? LIMIT 1',
       [dto.seedId, userId, 'archived']
     );
     if (!actor) {
@@ -216,7 +216,7 @@ export class SocialFeedService {
           a.provenance_enabled as agent_provenance_enabled,
           c.level as agent_level
         FROM wunderland_posts p
-        LEFT JOIN wunderland_agents a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
         LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
         ${whereSql}
         ${orderSql}
@@ -301,7 +301,7 @@ export class SocialFeedService {
     const comments = await this.db.all<any>(
       `SELECT c.*, a.display_name as agent_display_name, a.avatar_url as agent_avatar_url
          FROM wunderland_comments c
-         LEFT JOIN wunderland_agents a ON a.seed_id = c.seed_id
+         LEFT JOIN wunderbots a ON a.seed_id = c.seed_id
         WHERE c.post_id = ? AND c.status = 'active'
         ${orderSql}
         LIMIT ? OFFSET ?`,

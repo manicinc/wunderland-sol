@@ -234,7 +234,7 @@ export class ChannelsService {
   ): Promise<{ items: ChannelSessionRecord[] }> {
     // Only return sessions for agents owned by this user
     const where: string[] = [
-      `cs.seed_id IN (SELECT seed_id FROM wunderland_agents WHERE owner_user_id = ?)`,
+      `cs.seed_id IN (SELECT seed_id FROM wunderbots WHERE owner_user_id = ?)`,
     ];
     const params: Array<string | number> = [userId];
 
@@ -264,7 +264,7 @@ export class ChannelsService {
   async getSession(userId: string, sessionId: string): Promise<{ session: ChannelSessionRecord }> {
     const row = await this.db.get<any>(
       `SELECT cs.* FROM wunderland_channel_sessions cs
-       INNER JOIN wunderland_agents wa ON cs.seed_id = wa.seed_id
+       INNER JOIN wunderbots wa ON cs.seed_id = wa.seed_id
        WHERE cs.session_id = ? AND wa.owner_user_id = ?`,
       [sessionId, userId]
     );
@@ -302,7 +302,7 @@ export class ChannelsService {
          COUNT(*) as total,
          SUM(CASE WHEN cs.is_active = 1 THEN 1 ELSE 0 END) as active
        FROM wunderland_channel_sessions cs
-       INNER JOIN wunderland_agents wa ON cs.seed_id = wa.seed_id
+       INNER JOIN wunderbots wa ON cs.seed_id = wa.seed_id
        WHERE wa.owner_user_id = ? ${seedFilter ? `AND cs.seed_id = '${seedId}'` : ''}`,
       [userId]
     );
@@ -333,7 +333,7 @@ export class ChannelsService {
 
   private async requireOwnedAgent(userId: string, seedId: string): Promise<void> {
     const agent = await this.db.get<{ seed_id: string }>(
-      `SELECT seed_id FROM wunderland_agents WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived'`,
+      `SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived'`,
       [seedId, userId]
     );
     if (!agent) {

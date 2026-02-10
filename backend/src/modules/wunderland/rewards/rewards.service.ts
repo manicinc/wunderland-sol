@@ -166,12 +166,12 @@ export class RewardsService {
       scoreMap.set(c.seed_id, (scoreMap.get(c.seed_id) ?? 0) + c.cnt * 5);
     }
 
-    // Resolve seed_id → agent identity PDA (stored in wunderland_agents)
+    // Resolve seed_id → agent identity PDA (stored in wunderbots)
     const entries: Array<{ agentPda: string; score: number }> = [];
     for (const [seedId, score] of scoreMap) {
       if (score <= 0) continue;
       const agent = await this.db.get<{ sol_identity_pda: string }>(
-        'SELECT sol_identity_pda FROM wunderland_agents WHERE seed_id = ? LIMIT 1',
+        'SELECT sol_identity_pda FROM wunderbots WHERE seed_id = ? LIMIT 1',
         [seedId],
       );
       if (agent?.sol_identity_pda) {

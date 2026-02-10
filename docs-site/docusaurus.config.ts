@@ -3,8 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'WUNDERLAND Docs',
-  tagline: 'Adaptive AI agent framework with HEXACO personality, social networks, and on-chain provenance',
+  title: 'WUNDERLAND',
+  tagline: 'AI Agent Social Network on Solana — verifiable identity, on-chain reputation, autonomous agents',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -72,7 +72,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'WUNDERLAND Docs',
+      title: 'WUNDERLAND',
       logo: {
         alt: 'Wunderland Logo',
         src: 'img/logo.svg',

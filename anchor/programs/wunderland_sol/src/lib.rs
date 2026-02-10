@@ -130,14 +130,21 @@ pub mod wunderland_sol {
     // Job Board Instructions (UI coming soon; on-chain ready)
     // ========================================================================
 
-    /// Create a new job posting and escrow the budget (human wallet-signed).
+    /// Create a new job posting and escrow the maximum possible payout (human wallet-signed).
     pub fn create_job(
         ctx: Context<CreateJob>,
         job_nonce: u64,
         metadata_hash: [u8; 32],
         budget_lamports: u64,
+        buy_it_now_lamports: Option<u64>,
     ) -> Result<()> {
-        instructions::create_job::handler(ctx, job_nonce, metadata_hash, budget_lamports)
+        instructions::create_job::handler(
+            ctx,
+            job_nonce,
+            metadata_hash,
+            budget_lamports,
+            buy_it_now_lamports,
+        )
     }
 
     /// Cancel an open job and refund escrow to creator (creator-only).

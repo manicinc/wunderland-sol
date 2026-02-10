@@ -149,14 +149,14 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_wunderland_proposals_proposer ON wunderland_proposals(proposer_seed_id);'
   );
 
-  // Agent registry — linked to AgentOS provenance (genesis events, Ed25519 keys)
-  await db.exec(`
-	    CREATE TABLE IF NOT EXISTS wunderland_agents (
-	      seed_id TEXT PRIMARY KEY,
-	      owner_user_id TEXT NOT NULL,
-	      display_name TEXT NOT NULL,
-	      bio TEXT,
-	      avatar_url TEXT,
+	  // Agent registry — linked to AgentOS provenance (genesis events, Ed25519 keys)
+	  await db.exec(`
+		    CREATE TABLE IF NOT EXISTS wunderbots (
+		      seed_id TEXT PRIMARY KEY,
+		      owner_user_id TEXT NOT NULL,
+		      display_name TEXT NOT NULL,
+		      bio TEXT,
+		      avatar_url TEXT,
 	      hexaco_traits TEXT NOT NULL,
 	      security_profile TEXT NOT NULL,
 	      inference_hierarchy TEXT NOT NULL,
@@ -170,87 +170,87 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 		      storage_policy TEXT DEFAULT 'sealed',
 		      sealed_at INTEGER,
 		      provenance_enabled INTEGER DEFAULT 1,
-	      status TEXT DEFAULT 'active',
+		      status TEXT DEFAULT 'active',
+		      created_at INTEGER NOT NULL,
+		      updated_at INTEGER NOT NULL,
+		      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
+		    );
+		  `);
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderbots_owner ON wunderbots(owner_user_id);'
+	  );
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderbots_status ON wunderbots(status);'
+	  );
+
+	  // Managed runtime status and hosting mode per agent.
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderbot_runtime (
+	      seed_id TEXT PRIMARY KEY,
+	      owner_user_id TEXT NOT NULL,
+	      hosting_mode TEXT NOT NULL DEFAULT 'managed',
+	      status TEXT NOT NULL DEFAULT 'stopped',
+      started_at INTEGER,
+	      stopped_at INTEGER,
+	      last_error TEXT,
+	      metadata TEXT,
 	      created_at INTEGER NOT NULL,
 	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE,
 	      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
 	    );
 	  `);
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_agents_owner ON wunderland_agents(owner_user_id);'
-  );
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_agents_status ON wunderland_agents(status);'
-  );
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderbot_runtime_owner ON wunderbot_runtime(owner_user_id);'
+	  );
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderbot_runtime_status ON wunderbot_runtime(status);'
+	  );
 
-  // Managed runtime status and hosting mode per agent.
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_agent_runtime (
-      seed_id TEXT PRIMARY KEY,
-      owner_user_id TEXT NOT NULL,
-      hosting_mode TEXT NOT NULL DEFAULT 'managed',
-      status TEXT NOT NULL DEFAULT 'stopped',
-      started_at INTEGER,
-      stopped_at INTEGER,
-      last_error TEXT,
-      metadata TEXT,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE,
-      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
-    );
-  `);
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_runtime_owner ON wunderland_agent_runtime(owner_user_id);'
-  );
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_runtime_status ON wunderland_agent_runtime(status);'
-  );
-
-  // Stored integration credentials per agent (encrypted server-side, masked in API responses).
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_agent_credentials (
-      credential_id TEXT PRIMARY KEY,
-      seed_id TEXT NOT NULL,
-      owner_user_id TEXT NOT NULL,
-      credential_type TEXT NOT NULL,
+	  // Stored integration credentials per agent (encrypted server-side, masked in API responses).
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderbot_credentials (
+	      credential_id TEXT PRIMARY KEY,
+	      seed_id TEXT NOT NULL,
+	      owner_user_id TEXT NOT NULL,
+	      credential_type TEXT NOT NULL,
       label TEXT,
       encrypted_value TEXT NOT NULL,
-      masked_value TEXT NOT NULL,
-      last_used_at INTEGER,
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE,
-      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
-    );
-  `);
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_credentials_owner ON wunderland_agent_credentials(owner_user_id, seed_id);'
-  );
+	      masked_value TEXT NOT NULL,
+	      last_used_at INTEGER,
+	      created_at INTEGER NOT NULL,
+	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE,
+	      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
+	    );
+	  `);
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderbot_credentials_owner ON wunderbot_credentials(owner_user_id, seed_id);'
+	  );
 
   // Citizen profiles — public identity + XP leveling system
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_citizens (
-      seed_id TEXT PRIMARY KEY,
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_citizens (
+	      seed_id TEXT PRIMARY KEY,
       level INTEGER NOT NULL DEFAULT 1,
       xp INTEGER NOT NULL DEFAULT 0,
       total_posts INTEGER NOT NULL DEFAULT 0,
       post_rate_limit INTEGER DEFAULT 10,
-      subscribed_topics TEXT,
-      is_active INTEGER DEFAULT 1,
-      joined_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE
-    );
-  `);
+	      subscribed_topics TEXT,
+	      is_active INTEGER DEFAULT 1,
+	      joined_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE
+	    );
+	  `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_citizens_level ON wunderland_citizens(level DESC, xp DESC);'
   );
 
   // Posts with InputManifest cryptographic provenance proofs
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_posts (
-      post_id TEXT PRIMARY KEY,
-      seed_id TEXT NOT NULL,
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_posts (
+	      post_id TEXT PRIMARY KEY,
+	      seed_id TEXT NOT NULL,
       content TEXT NOT NULL,
       manifest TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'drafting',
@@ -258,14 +258,14 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       agent_level_at_post INTEGER,
       likes INTEGER DEFAULT 0,
       boosts INTEGER DEFAULT 0,
-      replies INTEGER DEFAULT 0,
-      views INTEGER DEFAULT 0,
-      created_at INTEGER NOT NULL,
-      published_at INTEGER,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE,
-      FOREIGN KEY (reply_to_post_id) REFERENCES wunderland_posts(post_id) ON DELETE SET NULL
-    );
-  `);
+	      replies INTEGER DEFAULT 0,
+	      views INTEGER DEFAULT 0,
+	      created_at INTEGER NOT NULL,
+	      published_at INTEGER,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE,
+	      FOREIGN KEY (reply_to_post_id) REFERENCES wunderland_posts(post_id) ON DELETE SET NULL
+	    );
+	  `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_posts_seed ON wunderland_posts(seed_id, created_at DESC);'
   );
@@ -296,8 +296,8 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   );
 
   // Human owner approval queue for agent posts
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_approval_queue (
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_approval_queue (
       queue_id TEXT PRIMARY KEY,
       post_id TEXT NOT NULL,
       seed_id TEXT NOT NULL,
@@ -404,9 +404,9 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 
   // ── Wunderland Channel System Tables ─────────────────────────────────
 
-  // Channel bindings — link agents to external messaging platforms
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_channel_bindings (
+	  // Channel bindings — link agents to external messaging platforms
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_channel_bindings (
       binding_id TEXT PRIMARY KEY,
       seed_id TEXT NOT NULL,
       owner_user_id TEXT NOT NULL,
@@ -416,14 +416,14 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       credential_id TEXT,
       is_active INTEGER DEFAULT 1,
       auto_broadcast INTEGER DEFAULT 0,
-      platform_config TEXT DEFAULT '{}',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE,
-      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE,
-      UNIQUE(seed_id, platform, channel_id)
-    );
-  `);
+	      platform_config TEXT DEFAULT '{}',
+	      created_at INTEGER NOT NULL,
+	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE,
+	      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE,
+	      UNIQUE(seed_id, platform, channel_id)
+	    );
+	  `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_cb_seed ON wunderland_channel_bindings(seed_id);'
   );
@@ -435,8 +435,8 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   );
 
   // Channel sessions — track conversations between agents and remote users
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_channel_sessions (
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_channel_sessions (
       session_id TEXT PRIMARY KEY,
       seed_id TEXT NOT NULL,
       platform TEXT NOT NULL,
@@ -447,12 +447,12 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       last_message_at INTEGER NOT NULL,
       message_count INTEGER DEFAULT 0,
       is_active INTEGER DEFAULT 1,
-      context_json TEXT DEFAULT '{}',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE
-    );
-  `);
+	      context_json TEXT DEFAULT '{}',
+	      created_at INTEGER NOT NULL,
+	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE
+	    );
+	  `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_cs_seed ON wunderland_channel_sessions(seed_id);'
   );
@@ -466,8 +466,8 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   // ── Wunderland Voice Calls ──────────────────────────────────────────
 
   // Voice calls — track phone call state and transcripts
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_voice_calls (
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_voice_calls (
       call_id TEXT PRIMARY KEY,
       seed_id TEXT NOT NULL,
       owner_user_id TEXT NOT NULL,
@@ -480,14 +480,14 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       mode TEXT NOT NULL DEFAULT 'notify',
       start_time INTEGER,
       end_time INTEGER,
-      transcript_json TEXT DEFAULT '[]',
-      metadata TEXT DEFAULT '{}',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE,
-      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
-    );
-  `);
+	      transcript_json TEXT DEFAULT '[]',
+	      metadata TEXT DEFAULT '{}',
+	      created_at INTEGER NOT NULL,
+	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE,
+	      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
+	    );
+	  `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_vc_seed ON wunderland_voice_calls(seed_id);'
   );
@@ -594,13 +594,13 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_wunderland_news_source ON wunderland_news_articles(source_type, published_at DESC);'
   );
 
-  // Agent mood snapshots (current state)
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_agent_moods (
-      seed_id TEXT PRIMARY KEY,
-      valence REAL DEFAULT 0.0,
-      arousal REAL DEFAULT 0.0,
-      dominance REAL DEFAULT 0.0,
+	  // Agent mood snapshots (current state)
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderbot_moods (
+	      seed_id TEXT PRIMARY KEY,
+	      valence REAL DEFAULT 0.0,
+	      arousal REAL DEFAULT 0.0,
+	      dominance REAL DEFAULT 0.0,
       curiosity REAL DEFAULT 0.0,
       frustration REAL DEFAULT 0.0,
       mood_label TEXT DEFAULT 'neutral',
@@ -608,12 +608,12 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     );
   `);
 
-  // Agent mood history (time-series for analytics)
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_agent_mood_history (
-      entry_id TEXT PRIMARY KEY,
-      seed_id TEXT NOT NULL,
-      valence REAL,
+	  // Agent mood history (time-series for analytics)
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderbot_mood_history (
+	      entry_id TEXT PRIMARY KEY,
+	      seed_id TEXT NOT NULL,
+	      valence REAL,
       arousal REAL,
       dominance REAL,
       trigger_type TEXT,
@@ -623,17 +623,17 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       delta_dominance REAL,
       created_at TEXT DEFAULT (datetime('now'))
     );
-  `);
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_mood_history_seed ON wunderland_agent_mood_history(seed_id, created_at DESC);'
-  );
+	  `);
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderland_mood_history_seed ON wunderbot_mood_history(seed_id, created_at DESC);'
+	  );
 
   console.log('[AppDatabase] Wunderland subreddit system tables initialized.');
 
   // ── Wunderland Cron Jobs ────────────────────────────────────────────
 
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_cron_jobs (
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_cron_jobs (
       job_id TEXT PRIMARY KEY,
       seed_id TEXT NOT NULL,
       owner_user_id TEXT NOT NULL,
@@ -643,14 +643,14 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       schedule_kind TEXT NOT NULL DEFAULT 'every',
       schedule_config TEXT NOT NULL DEFAULT '{}',
       payload_kind TEXT NOT NULL DEFAULT 'stimulus',
-      payload_config TEXT NOT NULL DEFAULT '{}',
-      state_json TEXT DEFAULT '{}',
-      created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (seed_id) REFERENCES wunderland_agents(seed_id) ON DELETE CASCADE,
-      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
-    );
-  `);
+	      payload_config TEXT NOT NULL DEFAULT '{}',
+	      state_json TEXT DEFAULT '{}',
+	      created_at INTEGER NOT NULL,
+	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE,
+	      FOREIGN KEY (owner_user_id) REFERENCES app_users(id) ON DELETE CASCADE
+	    );
+	  `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_cron_seed ON wunderland_cron_jobs(seed_id);'
   );
@@ -784,12 +784,12 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_wunderland_ap_status ON wunderland_alliance_proposals(status);'
   );
 
-  // Agent safety states — pause/stop/DM controls per agent
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS wunderland_agent_safety (
-      seed_id TEXT PRIMARY KEY,
-      paused INTEGER DEFAULT 0,
-      stopped INTEGER DEFAULT 0,
+	  // Agent safety states — pause/stop/DM controls per agent
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderbot_safety (
+	      seed_id TEXT PRIMARY KEY,
+	      paused INTEGER DEFAULT 0,
+	      stopped INTEGER DEFAULT 0,
       dms_enabled INTEGER DEFAULT 1,
       reason TEXT DEFAULT '',
       updated_at INTEGER NOT NULL
@@ -822,6 +822,26 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 
   // ── Job Board tables (on-chain indexed) ──────────────────────────────────────
 
+  // Per-agent job scanning state (persistent learning state; optional).
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderbot_job_states (
+      seed_id TEXT PRIMARY KEY,
+      active_job_count INTEGER NOT NULL DEFAULT 0,
+      bandwidth REAL NOT NULL DEFAULT 1.0,
+      min_acceptable_rate_per_hour REAL NOT NULL DEFAULT 0.02,
+      preferred_categories TEXT,
+      recent_outcomes TEXT,
+      risk_tolerance REAL NOT NULL DEFAULT 0.5,
+      total_jobs_evaluated INTEGER NOT NULL DEFAULT 0,
+      total_jobs_bid_on INTEGER NOT NULL DEFAULT 0,
+      total_jobs_completed INTEGER NOT NULL DEFAULT 0,
+      success_rate REAL NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE
+    );
+  `);
+
   await db.exec(`
     CREATE TABLE IF NOT EXISTS wunderland_job_postings (
       job_pda TEXT PRIMARY KEY,
@@ -829,6 +849,7 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       job_nonce TEXT NOT NULL,
       metadata_hash_hex TEXT NOT NULL,
       budget_lamports TEXT NOT NULL,
+      buy_it_now_lamports TEXT,
       status TEXT NOT NULL DEFAULT 'open',
       assigned_agent_pda TEXT,
       accepted_bid_pda TEXT,
@@ -846,6 +867,27 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   );
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_jobs_creator ON wunderland_job_postings(creator_wallet);'
+  );
+
+  // Append-only audit trail for job metadata caching (creator-signed).
+  // Intentionally no foreign key to allow writes before the job has been indexed.
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_metadata_events (
+      event_id TEXT PRIMARY KEY,
+      job_pda TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      creator_wallet TEXT NOT NULL,
+      metadata_json TEXT NOT NULL,
+      metadata_hash_hex TEXT NOT NULL,
+      signature_b64 TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_job_metadata_events_job ON wunderland_job_metadata_events(job_pda, created_at DESC);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_job_metadata_events_creator ON wunderland_job_metadata_events(creator_wallet, created_at DESC);'
   );
 
   await db.exec(`
@@ -890,12 +932,35 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       confidential_details TEXT NOT NULL,
       details_hash_hex TEXT NOT NULL,
       signature_b64 TEXT NOT NULL,
+      archived_at INTEGER,
+      archived_reason TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
   `);
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_job_confidential_creator ON wunderland_job_confidential(creator_wallet);'
+  );
+
+  // Append-only audit trail for confidential details writes and sealing.
+  // Intentionally no foreign key to allow writes before the job has been indexed.
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_job_confidential_events (
+      event_id TEXT PRIMARY KEY,
+      job_pda TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      creator_wallet TEXT NOT NULL,
+      confidential_details TEXT NOT NULL,
+      details_hash_hex TEXT NOT NULL,
+      signature_b64 TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_job_confidential_events_job ON wunderland_job_confidential_events(job_pda, created_at DESC);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_job_confidential_events_creator ON wunderland_job_confidential_events(creator_wallet, created_at DESC);'
   );
 
   // ── Reward Epochs (Merkle-based distribution) ────────────────────────────
@@ -974,6 +1039,80 @@ const ensureColumnExists = async (
   }
 };
 
+const tableExists = async (db: StorageAdapter, table: string): Promise<boolean> => {
+  if (db.kind === 'postgres') {
+    const row = await db.get<{ exists: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1
+           FROM information_schema.tables
+          WHERE table_schema = current_schema()
+            AND table_name = '${table.toLowerCase()}'
+       ) AS exists`,
+    );
+    return Boolean(row?.exists);
+  }
+
+  const row = await db.get<{ name: string }>(
+    `SELECT name
+       FROM sqlite_master
+      WHERE type = 'table'
+        AND name = '${table}'
+      LIMIT 1`,
+  );
+  return Boolean(row?.name);
+};
+
+const renameTableIfNeeded = async (
+  db: StorageAdapter,
+  oldName: string,
+  newName: string,
+): Promise<void> => {
+  const oldExists = await tableExists(db, oldName);
+  const newExists = await tableExists(db, newName);
+
+  if (!oldExists || newExists) {
+    if (oldExists && newExists) {
+      throw new Error(
+        `Both "${oldName}" and "${newName}" exist. Refusing to migrate automatically.`,
+      );
+    }
+    return;
+  }
+
+  await db.exec(
+    db.kind === 'postgres'
+      ? `ALTER TABLE "${oldName}" RENAME TO "${newName}"`
+      : `ALTER TABLE "${oldName}" RENAME TO "${newName}";`,
+  );
+  console.log(`[AppDatabase] Renamed table "${oldName}" → "${newName}".`);
+};
+
+const dropIndexIfExists = async (db: StorageAdapter, indexName: string): Promise<void> => {
+  await db.exec(
+    db.kind === 'postgres'
+      ? `DROP INDEX IF EXISTS "${indexName}"`
+      : `DROP INDEX IF EXISTS ${indexName};`,
+  );
+};
+
+const migrateWunderlandAgentTablesToWunderbots = async (db: StorageAdapter): Promise<void> => {
+  await renameTableIfNeeded(db, 'wunderland_agents', 'wunderbots');
+  await renameTableIfNeeded(db, 'wunderland_agent_runtime', 'wunderbot_runtime');
+  await renameTableIfNeeded(db, 'wunderland_agent_credentials', 'wunderbot_credentials');
+  await renameTableIfNeeded(db, 'wunderland_agent_moods', 'wunderbot_moods');
+  await renameTableIfNeeded(db, 'wunderland_agent_mood_history', 'wunderbot_mood_history');
+  await renameTableIfNeeded(db, 'wunderland_agent_safety', 'wunderbot_safety');
+  await renameTableIfNeeded(db, 'wunderland_agent_job_states', 'wunderbot_job_states');
+};
+
+const dropLegacyWunderlandAgentIndexes = async (db: StorageAdapter): Promise<void> => {
+  await dropIndexIfExists(db, 'idx_wunderland_agents_owner');
+  await dropIndexIfExists(db, 'idx_wunderland_agents_status');
+  await dropIndexIfExists(db, 'idx_wunderland_runtime_owner');
+  await dropIndexIfExists(db, 'idx_wunderland_runtime_status');
+  await dropIndexIfExists(db, 'idx_wunderland_credentials_owner');
+};
+
 const ensureWorkbenchUser = async (db: StorageAdapter): Promise<void> => {
   const userId = process.env.AGENTOS_WORKBENCH_USER_ID ?? 'agentos-workbench-user';
   const email = process.env.AGENTOS_WORKBENCH_USER_EMAIL ?? `${userId}@local.dev`;
@@ -1016,6 +1155,13 @@ export const initializeAppDatabase = async (): Promise<void> => {
       console.log(
         `[AppDatabase] Connected using adapter "${adapter.kind}". Persistence=${!usingInMemory}.`
       );
+
+      // ── DB rename migration: wunderland_agents → wunderbots ───────────────
+      // Must run before the schema bootstrap so we don't accidentally create
+      // a new empty table alongside an existing legacy one.
+      await migrateWunderlandAgentTablesToWunderbots(adapter);
+      await dropLegacyWunderlandAgentIndexes(adapter);
+
       await runInitialSchema(adapter);
       await ensureColumnExists(
         adapter,
@@ -1051,35 +1197,35 @@ export const initializeAppDatabase = async (): Promise<void> => {
       );
       await ensureColumnExists(
         adapter,
-        'wunderland_agents',
+        'wunderbots',
         'sealed_at',
         adapter.kind === 'postgres'
-          ? 'ALTER TABLE wunderland_agents ADD COLUMN sealed_at INTEGER'
-          : 'ALTER TABLE wunderland_agents ADD COLUMN sealed_at INTEGER;'
+          ? 'ALTER TABLE wunderbots ADD COLUMN sealed_at INTEGER'
+          : 'ALTER TABLE wunderbots ADD COLUMN sealed_at INTEGER;'
       );
       await ensureColumnExists(
         adapter,
-        'wunderland_agents',
+        'wunderbots',
         'toolset_manifest_json',
         adapter.kind === 'postgres'
-          ? 'ALTER TABLE wunderland_agents ADD COLUMN toolset_manifest_json TEXT'
-          : 'ALTER TABLE wunderland_agents ADD COLUMN toolset_manifest_json TEXT;'
+          ? 'ALTER TABLE wunderbots ADD COLUMN toolset_manifest_json TEXT'
+          : 'ALTER TABLE wunderbots ADD COLUMN toolset_manifest_json TEXT;'
       );
       await ensureColumnExists(
         adapter,
-        'wunderland_agents',
+        'wunderbots',
         'toolset_hash',
         adapter.kind === 'postgres'
-          ? 'ALTER TABLE wunderland_agents ADD COLUMN toolset_hash TEXT'
-          : 'ALTER TABLE wunderland_agents ADD COLUMN toolset_hash TEXT;'
+          ? 'ALTER TABLE wunderbots ADD COLUMN toolset_hash TEXT'
+          : 'ALTER TABLE wunderbots ADD COLUMN toolset_hash TEXT;'
       );
       await ensureColumnExists(
         adapter,
-        'wunderland_agents',
+        'wunderbots',
         'tool_access_profile',
         adapter.kind === 'postgres'
-          ? "ALTER TABLE wunderland_agents ADD COLUMN tool_access_profile TEXT DEFAULT 'social-citizen'"
-          : "ALTER TABLE wunderland_agents ADD COLUMN tool_access_profile TEXT DEFAULT 'social-citizen';"
+          ? "ALTER TABLE wunderbots ADD COLUMN tool_access_profile TEXT DEFAULT 'social-citizen'"
+          : "ALTER TABLE wunderbots ADD COLUMN tool_access_profile TEXT DEFAULT 'social-citizen';"
       );
       await ensureColumnExists(
         adapter,
@@ -1296,6 +1442,60 @@ export const initializeAppDatabase = async (): Promise<void> => {
         adapter.kind === 'postgres'
           ? 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_deliverable_id TEXT'
           : 'ALTER TABLE wunderland_job_postings ADD COLUMN execution_deliverable_id TEXT;'
+      );
+
+      // ── JobPosting economic fields ─────────────────────────────────────
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'buy_it_now_lamports',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN buy_it_now_lamports TEXT'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN buy_it_now_lamports TEXT;'
+      );
+
+      // ── Job metadata cache columns ─────────────────────────────────────
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'metadata_json',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN metadata_json TEXT'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN metadata_json TEXT;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'title',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN title TEXT'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN title TEXT;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_postings',
+        'description',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_postings ADD COLUMN description TEXT'
+          : 'ALTER TABLE wunderland_job_postings ADD COLUMN description TEXT;'
+      );
+
+      // ── Job confidential archive columns ───────────────────────────────
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_confidential',
+        'archived_at',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_confidential ADD COLUMN archived_at INTEGER'
+          : 'ALTER TABLE wunderland_job_confidential ADD COLUMN archived_at INTEGER;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_job_confidential',
+        'archived_reason',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_job_confidential ADD COLUMN archived_reason TEXT'
+          : 'ALTER TABLE wunderland_job_confidential ADD COLUMN archived_reason TEXT;'
       );
 
       await ensureWorkbenchUser(adapter);

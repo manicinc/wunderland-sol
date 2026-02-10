@@ -76,6 +76,7 @@ type DecodedJobPosting = {
   jobNonce: bigint;
   metadataHashHex: string;
   budgetLamports: bigint;
+  buyItNowLamports: bigint | null;
   status: JobStatus;
   assignedAgent: string;
   acceptedBid: string;
@@ -113,6 +114,11 @@ function decodeJobPosting(data: Buffer, web3: any, jobPda: string): DecodedJobPo
   offset += 32;
   const budgetLamports = data.readBigUInt64LE(offset);
   offset += 8;
+  const buyItNowTag = data.readUInt8(offset);
+  offset += 1;
+  const buyItNowLamports =
+    buyItNowTag === 1 ? data.readBigUInt64LE(offset) : null;
+  if (buyItNowTag === 1) offset += 8;
   const status = data.readUInt8(offset);
   offset += 1;
   const assignedAgent = new web3.PublicKey(data.subarray(offset, offset + 32));
@@ -129,6 +135,7 @@ function decodeJobPosting(data: Buffer, web3: any, jobPda: string): DecodedJobPo
     jobNonce,
     metadataHashHex: Buffer.from(metadataHash).toString('hex'),
     budgetLamports,
+    buyItNowLamports,
     status: jobStatusFromU8(status),
     assignedAgent: assignedAgent.toBase58(),
     acceptedBid: acceptedBid.toBase58(),
@@ -264,10 +271,11 @@ export class WunderlandSolJobsWorkerService implements OnModuleInit, OnModuleDes
         await this.db.run(
           `INSERT INTO wunderland_job_postings (
             job_pda, creator_wallet, job_nonce, metadata_hash_hex,
-            budget_lamports, status, assigned_agent_pda, accepted_bid_pda,
+            budget_lamports, buy_it_now_lamports, status, assigned_agent_pda, accepted_bid_pda,
             created_at, updated_at, sol_cluster, indexed_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(job_pda) DO UPDATE SET
+            buy_it_now_lamports = excluded.buy_it_now_lamports,
             status = excluded.status,
             assigned_agent_pda = excluded.assigned_agent_pda,
             accepted_bid_pda = excluded.accepted_bid_pda,
@@ -279,6 +287,7 @@ export class WunderlandSolJobsWorkerService implements OnModuleInit, OnModuleDes
             decoded.jobNonce.toString(),
             decoded.metadataHashHex,
             decoded.budgetLamports.toString(),
+            decoded.buyItNowLamports === null ? null : decoded.buyItNowLamports.toString(),
             decoded.status,
             decoded.assignedAgent,
             decoded.acceptedBid,
@@ -288,6 +297,11 @@ export class WunderlandSolJobsWorkerService implements OnModuleInit, OnModuleDes
             now,
           ],
         );
+
+        // Freeze/retain confidential details once a bid has been accepted (status != open).
+        if (decoded.status !== 'open') {
+          await this.archiveConfidentialIfNeeded(pda, decoded.status);
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         this.logger.warn(`Failed to index JobPosting ${pda}: ${msg}`);
@@ -381,6 +395,60 @@ export class WunderlandSolJobsWorkerService implements OnModuleInit, OnModuleDes
 
     if (accounts.length > 0) {
       this.logger.debug(`Indexed ${accounts.length} JobSubmission accounts.`);
+    }
+  }
+
+  private async archiveConfidentialIfNeeded(jobPda: string, status: JobStatus): Promise<void> {
+    const now = Date.now();
+    const reason = status === 'assigned' ? 'bid_accepted' : `job_status_${status}`;
+
+    try {
+      await this.db.transaction(async (trx) => {
+        const row = await trx.get<{
+          archived_at: number | null;
+          creator_wallet: string;
+          confidential_details: string;
+          details_hash_hex: string;
+          signature_b64: string;
+        }>(
+          `SELECT archived_at, creator_wallet, confidential_details, details_hash_hex, signature_b64
+             FROM wunderland_job_confidential
+            WHERE job_pda = ?
+            LIMIT 1`,
+          [jobPda],
+        );
+
+        if (!row || row.archived_at) return;
+
+        const update = await trx.run(
+          `UPDATE wunderland_job_confidential
+              SET archived_at = ?, archived_reason = ?
+            WHERE job_pda = ?
+              AND archived_at IS NULL`,
+          [now, reason, jobPda],
+        );
+
+        if (update.changes > 0) {
+          await trx.run(
+            `INSERT INTO wunderland_job_confidential_events
+              (event_id, job_pda, event_type, creator_wallet, confidential_details, details_hash_hex, signature_b64, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              this.db.generateId(),
+              jobPda,
+              'archive',
+              row.creator_wallet,
+              row.confidential_details,
+              row.details_hash_hex,
+              row.signature_b64,
+              now,
+            ],
+          );
+        }
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Failed to archive confidential details for job ${jobPda}: ${msg}`);
     }
   }
 }

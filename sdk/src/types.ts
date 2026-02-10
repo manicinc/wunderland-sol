@@ -148,6 +148,7 @@ export interface JobPostingAccount {
   jobNonce: bigint;
   metadataHash: Uint8Array; // 32 bytes
   budgetLamports: bigint;
+  buyItNowLamports: bigint | null;
   status: JobStatus;
   assignedAgent: PublicKey;
   acceptedBid: PublicKey;

@@ -1010,15 +1010,27 @@ export function buildCreateJobIx(opts: {
   jobNonce: bigint;
   metadataHash: Uint8Array;
   budgetLamports: bigint;
+  buyItNowLamports?: bigint | null;
 }): TransactionInstruction {
   const metadataHashBytes = encodeFixedBytes(opts.metadataHash, 32, 'metadataHash');
   if (opts.budgetLamports <= 0n) throw new Error('budgetLamports must be > 0.');
 
-  const data = Buffer.alloc(8 + 8 + 32 + 8);
+  const hasBuyItNow =
+    opts.buyItNowLamports !== undefined &&
+    opts.buyItNowLamports !== null;
+  if (hasBuyItNow && (opts.buyItNowLamports as bigint) <= opts.budgetLamports) {
+    throw new Error('buyItNowLamports must be greater than budgetLamports.');
+  }
+
+  const data = Buffer.alloc(8 + 8 + 32 + 8 + 1 + (hasBuyItNow ? 8 : 0));
   anchorDiscriminator('create_job').copy(data, 0);
   data.writeBigUInt64LE(opts.jobNonce, 8);
   Buffer.from(metadataHashBytes).copy(data, 16);
   data.writeBigUInt64LE(opts.budgetLamports, 48);
+  data.writeUInt8(hasBuyItNow ? 1 : 0, 56);
+  if (hasBuyItNow) {
+    data.writeBigUInt64LE(opts.buyItNowLamports as bigint, 57);
+  }
 
   return new TransactionInstruction({
     programId: opts.programId,
@@ -1071,7 +1083,7 @@ export function buildPlaceJobBidIx(opts: {
   return new TransactionInstruction({
     programId: opts.programId,
     keys: [
-      { pubkey: opts.jobPda, isSigner: false, isWritable: false },
+      { pubkey: opts.jobPda, isSigner: false, isWritable: true },
       { pubkey: opts.bidPda, isSigner: false, isWritable: true },
       { pubkey: opts.agentIdentityPda, isSigner: false, isWritable: false },
       { pubkey: opts.payer, isSigner: true, isWritable: true },
@@ -1105,6 +1117,7 @@ export function buildAcceptJobBidIx(opts: {
   programId: PublicKey;
   jobPda: PublicKey;
   bidPda: PublicKey;
+  escrowPda: PublicKey;
   creator: PublicKey;
 }): TransactionInstruction {
   const data = Buffer.from(anchorDiscriminator('accept_job_bid'));
@@ -1113,6 +1126,7 @@ export function buildAcceptJobBidIx(opts: {
     keys: [
       { pubkey: opts.jobPda, isSigner: false, isWritable: true },
       { pubkey: opts.bidPda, isSigner: false, isWritable: true },
+      { pubkey: opts.escrowPda, isSigner: false, isWritable: true },
       { pubkey: opts.creator, isSigner: true, isWritable: true },
     ],
     data,
@@ -2077,6 +2091,7 @@ export class WunderlandSolClient {
     jobNonce: bigint;
     metadataHash: Uint8Array;
     budgetLamports: bigint;
+    buyItNowLamports?: bigint | null;
   }): Promise<{ signature: TransactionSignature; jobPda: PublicKey; escrowPda: PublicKey }> {
     const [jobPda] = this.getJobPDA(opts.creator.publicKey, opts.jobNonce);
     const [escrowPda] = this.getJobEscrowPDA(jobPda);
@@ -2089,6 +2104,7 @@ export class WunderlandSolClient {
       jobNonce: opts.jobNonce,
       metadataHash: opts.metadataHash,
       budgetLamports: opts.budgetLamports,
+      buyItNowLamports: opts.buyItNowLamports,
     });
 
     const tx = new Transaction().add(ix);
@@ -2184,10 +2200,12 @@ export class WunderlandSolClient {
     jobPda: PublicKey;
     bidPda: PublicKey;
   }): Promise<TransactionSignature> {
+    const [escrowPda] = this.getJobEscrowPDA(opts.jobPda);
     const ix = buildAcceptJobBidIx({
       programId: this.programId,
       jobPda: opts.jobPda,
       bidPda: opts.bidPda,
+      escrowPda,
       creator: opts.creator.publicKey,
     });
     const tx = new Transaction().add(ix);
@@ -2574,6 +2592,11 @@ export function decodeJobPostingAccount(data: Buffer): JobPostingAccount {
   offset += 32;
   const budgetLamports = data.readBigUInt64LE(offset);
   offset += 8;
+  const buyItNowTag = data.readUInt8(offset);
+  offset += 1;
+  const buyItNowLamports =
+    buyItNowTag === 1 ? data.readBigUInt64LE(offset) : null;
+  if (buyItNowTag === 1) offset += 8;
   const statusByte = data.readUInt8(offset);
   offset += 1;
   const assignedAgent = new PublicKey(data.subarray(offset, offset + 32));
@@ -2598,6 +2621,7 @@ export function decodeJobPostingAccount(data: Buffer): JobPostingAccount {
     jobNonce,
     metadataHash,
     budgetLamports,
+    buyItNowLamports,
     status,
     assignedAgent,
     acceptedBid,

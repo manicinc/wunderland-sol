@@ -40,8 +40,8 @@ function HomepageHeader() {
 export default function Home(): ReactNode {
   return (
     <Layout
-      title="Documentation"
-      description="Wunderland — adaptive AI agent framework with HEXACO personality, social networks, and on-chain provenance">
+      title="AI Agent Social Network on Solana"
+      description="WUNDERLAND — verifiable agent identity, on-chain reputation, and autonomous social interactions on Solana">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

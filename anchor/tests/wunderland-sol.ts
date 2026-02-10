@@ -850,9 +850,10 @@ describe("wunderland-sol", () => {
 
     const metadataHash = hashContent("job-metadata-v1");
     const budget = new BN(10_000_000); // 0.01 SOL
+    const buyItNow = new BN(12_000_000); // must be > budget (Option<u64>)
 
     await program.methods
-      .createJob(new BN(jobNonce), metadataHash, budget)
+      .createJob(new BN(jobNonce), metadataHash, budget, buyItNow)
       .accounts({
         job: jobPda,
         escrow: jobEscrowPda,
@@ -861,8 +862,13 @@ describe("wunderland-sol", () => {
       })
       .rpc();
 
+    const jobBeforeCancel = await (program.account as any).jobPosting.fetch(jobPda);
+    expect(jobBeforeCancel.buyItNowLamports).to.not.equal(null);
+    expect(jobBeforeCancel.buyItNowLamports.toNumber()).to.equal(buyItNow.toNumber());
+
     const escrowBefore = await (program.account as any).jobEscrow.fetch(jobEscrowPda);
-    expect(escrowBefore.amount.toNumber()).to.equal(budget.toNumber());
+    // With buy-it-now enabled, escrow holds the maximum payout (buy-it-now premium).
+    expect(escrowBefore.amount.toNumber()).to.equal(buyItNow.toNumber());
 
     await program.methods
       .cancelJob()
@@ -891,7 +897,7 @@ describe("wunderland-sol", () => {
     const budget = new BN(budgetLamports);
 
     await program.methods
-      .createJob(new BN(jobNonce), metadataHash, budget)
+      .createJob(new BN(jobNonce), metadataHash, budget, null)
       .accounts({
         job: jobPda,
         escrow: jobEscrowPda,
@@ -933,6 +939,7 @@ describe("wunderland-sol", () => {
       .accounts({
         job: jobPda,
         bid: bidPda,
+        escrow: jobEscrowPda,
         creator: authority.publicKey,
       })
       .rpc();
@@ -988,6 +995,207 @@ describe("wunderland-sol", () => {
 
     const escrowAfter = await (program.account as any).jobEscrow.fetch(jobEscrowPda);
     expect(escrowAfter.amount.toNumber()).to.equal(0);
+
+    const vaultAfter = await provider.connection.getBalance(vault1Pda);
+    expect(vaultAfter - vaultBefore).to.equal(budgetLamports);
+  });
+
+  it("supports buy-it-now instant assignment (bid > budget)", async () => {
+    const jobNonce = 2;
+    const [jobPda] = deriveJobPDA(authority.publicKey, jobNonce);
+    const [jobEscrowPda] = deriveJobEscrowPDA(jobPda);
+
+    const metadataHash = hashContent("job-metadata-bin");
+    const budgetLamports = 10_000_000; // 0.01 SOL
+    const buyItNowLamports = 12_000_000; // premium above budget
+    const budget = new BN(budgetLamports);
+    const buyItNow = new BN(buyItNowLamports);
+
+    await program.methods
+      .createJob(new BN(jobNonce), metadataHash, budget, buyItNow)
+      .accounts({
+        job: jobPda,
+        escrow: jobEscrowPda,
+        creator: authority.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    // Agent1 triggers buy-it-now by bidding exactly buyItNowLamports (can exceed budget).
+    const messageHash = hashContent("bid-message-bin");
+    const [bidPda] = deriveJobBidPDA(jobPda, agent1Pda);
+
+    const bidPayload = Buffer.concat([
+      jobPda.toBuffer(),
+      u64LE(buyItNowLamports),
+      Buffer.from(messageHash),
+    ]);
+    const bidMessage = buildAgentMessage(ACTION_PLACE_JOB_BID, agent1Pda, bidPayload);
+    const bidEdIx = createEd25519Ix(agentSigner1, bidMessage);
+
+    await program.methods
+      .placeJobBid(new BN(buyItNowLamports), messageHash)
+      .accounts({
+        job: jobPda,
+        bid: bidPda,
+        agentIdentity: agent1Pda,
+        payer: authority.publicKey,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        systemProgram: SystemProgram.programId,
+      })
+      .preInstructions([bidEdIx])
+      .rpc();
+
+    const jobAssigned = await (program.account as any).jobPosting.fetch(jobPda);
+    expect(JSON.stringify(jobAssigned.status)).to.include("assigned");
+    expect(jobAssigned.assignedAgent.toBase58()).to.equal(agent1Pda.toBase58());
+    expect(jobAssigned.acceptedBid.toBase58()).to.equal(bidPda.toBase58());
+
+    const bidAfter = await (program.account as any).jobBid.fetch(bidPda);
+    expect(JSON.stringify(bidAfter.status)).to.include("accepted");
+
+    // Agent submits work
+    const submissionHash = hashContent("job-submission-bin");
+    const [submissionPda] = deriveJobSubmissionPDA(jobPda);
+
+    const submitPayload = Buffer.concat([
+      jobPda.toBuffer(),
+      Buffer.from(submissionHash),
+    ]);
+    const submitMessage = buildAgentMessage(ACTION_SUBMIT_JOB, agent1Pda, submitPayload);
+    const submitEdIx = createEd25519Ix(agentSigner1, submitMessage);
+
+    await program.methods
+      .submitJob(submissionHash)
+      .accounts({
+        job: jobPda,
+        submission: submissionPda,
+        agentIdentity: agent1Pda,
+        payer: authority.publicKey,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        systemProgram: SystemProgram.programId,
+      })
+      .preInstructions([submitEdIx])
+      .rpc();
+
+    // Approve and payout to agent vault (premium)
+    const vaultBefore = await provider.connection.getBalance(vault1Pda);
+
+    await program.methods
+      .approveJobSubmission()
+      .accounts({
+        job: jobPda,
+        escrow: jobEscrowPda,
+        submission: submissionPda,
+        vault: vault1Pda,
+        creator: authority.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    const vaultAfter = await provider.connection.getBalance(vault1Pda);
+    expect(vaultAfter - vaultBefore).to.equal(buyItNowLamports);
+  });
+
+  it("refunds buy-it-now premium on manual accept (payout = budget)", async () => {
+    const jobNonce = 3;
+    const [jobPda] = deriveJobPDA(authority.publicKey, jobNonce);
+    const [jobEscrowPda] = deriveJobEscrowPDA(jobPda);
+
+    const metadataHash = hashContent("job-metadata-premium-refund");
+    const budgetLamports = 10_000_000; // base payout
+    const buyItNowLamports = 12_000_000; // max escrow
+    const budget = new BN(budgetLamports);
+    const buyItNow = new BN(buyItNowLamports);
+
+    await program.methods
+      .createJob(new BN(jobNonce), metadataHash, budget, buyItNow)
+      .accounts({
+        job: jobPda,
+        escrow: jobEscrowPda,
+        creator: authority.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    // Agent1 places a normal bid <= budget (does NOT trigger buy-it-now).
+    const bidLamports = 9_000_000;
+    const messageHash = hashContent("bid-message-premium-refund");
+    const [bidPda] = deriveJobBidPDA(jobPda, agent1Pda);
+
+    const bidPayload = Buffer.concat([
+      jobPda.toBuffer(),
+      u64LE(bidLamports),
+      Buffer.from(messageHash),
+    ]);
+    const bidMessage = buildAgentMessage(ACTION_PLACE_JOB_BID, agent1Pda, bidPayload);
+    const bidEdIx = createEd25519Ix(agentSigner1, bidMessage);
+
+    await program.methods
+      .placeJobBid(new BN(bidLamports), messageHash)
+      .accounts({
+        job: jobPda,
+        bid: bidPda,
+        agentIdentity: agent1Pda,
+        payer: authority.publicKey,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        systemProgram: SystemProgram.programId,
+      })
+      .preInstructions([bidEdIx])
+      .rpc();
+
+    // Creator accepts bid (refunds premium and downgrades escrow amount to budget).
+    await program.methods
+      .acceptJobBid()
+      .accounts({
+        job: jobPda,
+        bid: bidPda,
+        escrow: jobEscrowPda,
+        creator: authority.publicKey,
+      })
+      .rpc();
+
+    const escrowAfterAccept = await (program.account as any).jobEscrow.fetch(jobEscrowPda);
+    expect(escrowAfterAccept.amount.toNumber()).to.equal(budgetLamports);
+
+    // Agent submits work
+    const submissionHash = hashContent("job-submission-premium-refund");
+    const [submissionPda] = deriveJobSubmissionPDA(jobPda);
+
+    const submitPayload = Buffer.concat([
+      jobPda.toBuffer(),
+      Buffer.from(submissionHash),
+    ]);
+    const submitMessage = buildAgentMessage(ACTION_SUBMIT_JOB, agent1Pda, submitPayload);
+    const submitEdIx = createEd25519Ix(agentSigner1, submitMessage);
+
+    await program.methods
+      .submitJob(submissionHash)
+      .accounts({
+        job: jobPda,
+        submission: submissionPda,
+        agentIdentity: agent1Pda,
+        payer: authority.publicKey,
+        instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        systemProgram: SystemProgram.programId,
+      })
+      .preInstructions([submitEdIx])
+      .rpc();
+
+    // Approve and payout to agent vault (base budget only)
+    const vaultBefore = await provider.connection.getBalance(vault1Pda);
+
+    await program.methods
+      .approveJobSubmission()
+      .accounts({
+        job: jobPda,
+        escrow: jobEscrowPda,
+        submission: submissionPda,
+        vault: vault1Pda,
+        creator: authority.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
 
     const vaultAfter = await provider.connection.getBalance(vault1Pda);
     expect(vaultAfter - vaultBefore).to.equal(budgetLamports);

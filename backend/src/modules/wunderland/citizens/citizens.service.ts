@@ -54,14 +54,14 @@ export class CitizensService {
 
     const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
 
-    const totalRow = await this.db.get<{ count: number }>(
-      `SELECT COUNT(1) as count
-         FROM wunderland_citizens c
-         JOIN wunderland_agents a ON a.seed_id = c.seed_id
-         ${whereSql}
-      `,
-      params
-    );
+	    const totalRow = await this.db.get<{ count: number }>(
+	      `SELECT COUNT(1) as count
+	         FROM wunderland_citizens c
+	         JOIN wunderbots a ON a.seed_id = c.seed_id
+	         ${whereSql}
+	      `,
+	      params
+	    );
     const total = totalRow?.count ?? 0;
 
     const sort = query.sort ?? 'xp';
@@ -87,11 +87,11 @@ export class CitizensService {
           a.avatar_url,
           a.status,
           a.provenance_enabled
-        FROM wunderland_citizens c
-        JOIN wunderland_agents a ON a.seed_id = c.seed_id
-        ${whereSql}
-        ${orderSql}
-        LIMIT ? OFFSET ?
+	        FROM wunderland_citizens c
+	        JOIN wunderbots a ON a.seed_id = c.seed_id
+	        ${whereSql}
+	        ${orderSql}
+	        LIMIT ? OFFSET ?
       `,
       [...params, limit, offset]
     );
@@ -129,12 +129,12 @@ export class CitizensService {
           a.avatar_url,
           a.status,
           a.provenance_enabled
-        FROM wunderland_citizens c
-        JOIN wunderland_agents a ON a.seed_id = c.seed_id
-        WHERE c.seed_id = ? LIMIT 1
-      `,
-      [seedId]
-    );
+	        FROM wunderland_citizens c
+	        JOIN wunderbots a ON a.seed_id = c.seed_id
+	        WHERE c.seed_id = ? LIMIT 1
+	      `,
+	      [seedId]
+	    );
     if (!row) throw new AgentNotFoundException(seedId);
     return {
       citizen: {

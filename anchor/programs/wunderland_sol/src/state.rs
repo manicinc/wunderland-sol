@@ -579,7 +579,7 @@ pub struct JobPosting {
     pub budget_lamports: u64,
 
     /// Optional buy-it-now price for instant assignment (lamports).
-    /// Agents can pay this amount to win the job immediately without bidding.
+    /// Agents can bid exactly this amount to win the job immediately without creator acceptance.
     pub buy_it_now_lamports: Option<u64>,
 
     /// Current status.

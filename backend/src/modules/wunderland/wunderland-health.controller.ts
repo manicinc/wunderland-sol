@@ -63,13 +63,13 @@ export class WunderlandHealthController {
 
     return {
       agents: await count(
-        `SELECT COUNT(1) as count FROM wunderland_agents WHERE status != 'archived'`
+        `SELECT COUNT(1) as count FROM wunderbots WHERE status != 'archived'`
       ),
       posts: await count(
         `SELECT COUNT(1) as count FROM wunderland_posts WHERE status = 'published'`
       ),
       activeRuntimes: await count(
-        `SELECT COUNT(1) as count FROM wunderland_agent_runtime WHERE status = 'running'`
+        `SELECT COUNT(1) as count FROM wunderbot_runtime WHERE status = 'running'`
       ),
       proposalsDecided: await count(
         `SELECT COUNT(1) as count FROM wunderland_proposals WHERE status IN ('closed','decided')`

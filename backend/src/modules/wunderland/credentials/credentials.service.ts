@@ -53,7 +53,7 @@ export class CredentialsService {
   private async assertOwnedAgent(userId: string, seedId: string): Promise<void> {
     const agent = await this.db.get<{ seed_id: string }>(
       `SELECT seed_id
-         FROM wunderland_agents
+         FROM wunderbots
         WHERE owner_user_id = ?
           AND seed_id = ?
           AND status != ?
@@ -146,7 +146,7 @@ export class CredentialsService {
           last_used_at,
           created_at,
           updated_at
-        FROM wunderland_agent_credentials
+        FROM wunderbot_credentials
         WHERE ${where.join(' AND ')}
         ORDER BY created_at DESC
       `,
@@ -179,7 +179,7 @@ export class CredentialsService {
     const rows = await this.db.all<{ credential_type: string; encrypted_value: string }>(
       `
         SELECT credential_type, encrypted_value
-          FROM wunderland_agent_credentials
+          FROM wunderbot_credentials
          WHERE owner_user_id = ?
            AND seed_id = ?
            AND credential_type IN (${placeholders})
@@ -214,7 +214,7 @@ export class CredentialsService {
 
     await this.db.run(
       `
-        INSERT INTO wunderland_agent_credentials (
+        INSERT INTO wunderbot_credentials (
           credential_id,
           seed_id,
           owner_user_id,
@@ -252,7 +252,7 @@ export class CredentialsService {
           last_used_at,
           created_at,
           updated_at
-        FROM wunderland_agent_credentials
+        FROM wunderbot_credentials
         WHERE credential_id = ?
           AND owner_user_id = ?
         LIMIT 1
@@ -278,7 +278,7 @@ export class CredentialsService {
     const existing = await this.db.get<any>(
       `
         SELECT credential_id, seed_id, owner_user_id
-          FROM wunderland_agent_credentials
+          FROM wunderbot_credentials
          WHERE credential_id = ?
            AND owner_user_id = ?
          LIMIT 1
@@ -294,7 +294,7 @@ export class CredentialsService {
 
     await this.db.run(
       `
-        UPDATE wunderland_agent_credentials
+        UPDATE wunderbot_credentials
            SET encrypted_value = ?,
                masked_value = ?,
                updated_at = ?
@@ -316,7 +316,7 @@ export class CredentialsService {
           last_used_at,
           created_at,
           updated_at
-        FROM wunderland_agent_credentials
+        FROM wunderbot_credentials
         WHERE credential_id = ?
           AND owner_user_id = ?
         LIMIT 1
@@ -338,7 +338,7 @@ export class CredentialsService {
     const existing = await this.db.get<{ credential_id: string; seed_id: string }>(
       `
         SELECT credential_id, seed_id
-          FROM wunderland_agent_credentials
+          FROM wunderbot_credentials
          WHERE credential_id = ?
            AND owner_user_id = ?
          LIMIT 1
@@ -351,7 +351,7 @@ export class CredentialsService {
     await this.assertAgentNotSealed(String(existing.seed_id), ['credentials']);
 
     await this.db.run(
-      'DELETE FROM wunderland_agent_credentials WHERE credential_id = ? AND owner_user_id = ?',
+      'DELETE FROM wunderbot_credentials WHERE credential_id = ? AND owner_user_id = ?',
       [credentialId, userId]
     );
 

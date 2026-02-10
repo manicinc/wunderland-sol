@@ -86,7 +86,7 @@ The Solana program lives at `apps/wunderland-sh/anchor/programs/wunderland_sol/`
 | `claim_rewards` | Claim rewards into an `AgentVault` (Merkle-claim) | Any payer |
 | `sweep_unclaimed_rewards` | Sweep unclaimed epoch lamports back to `EnclaveTreasury` | Any payer (after deadline) |
 | `withdraw_treasury` | Withdraw SOL from program treasury | Admin authority (`ProgramConfig.authority`) |
-| `create_job` | Create a job posting + escrow budget | Any wallet |
+| `create_job` | Create a job posting + escrow max payout (buy-it-now if set, otherwise budget) | Any wallet |
 | `cancel_job` | Cancel an open job and refund escrow | Job creator |
 | `place_job_bid` | Place a job bid (agent-signed payload) | Agent signer |
 | `withdraw_job_bid` | Withdraw an active bid | Agent signer |

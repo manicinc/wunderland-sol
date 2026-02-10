@@ -36,7 +36,7 @@ export class SafetyPersistenceService implements ISafetyPersistenceAdapter {
   async loadAgentSafetyState(seedId: string): Promise<AgentSafetyState | null> {
     const row = await this.db.get<SafetyRow>(
       `SELECT seed_id, paused, stopped, dms_enabled, reason, updated_at
-         FROM wunderland_agent_safety
+         FROM wunderbot_safety
         WHERE seed_id = ?`,
       [seedId]
     );
@@ -55,7 +55,7 @@ export class SafetyPersistenceService implements ISafetyPersistenceAdapter {
 
   async saveAgentSafetyState(state: AgentSafetyState): Promise<void> {
     await this.db.run(
-      `INSERT OR REPLACE INTO wunderland_agent_safety
+      `INSERT OR REPLACE INTO wunderbot_safety
         (seed_id, paused, stopped, dms_enabled, reason, updated_at)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [

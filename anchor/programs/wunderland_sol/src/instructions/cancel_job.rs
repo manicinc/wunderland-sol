@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 use crate::errors::WunderlandError;
 use crate::state::{JobEscrow, JobPosting, JobStatus};
 
-/// Cancel an open job and refund the escrowed budget back to the creator.
+/// Cancel an open job and refund the escrowed amount back to the creator.
 #[derive(Accounts)]
 pub struct CancelJob<'info> {
     /// Job posting PDA.
@@ -70,4 +70,3 @@ pub fn handler(ctx: Context<CancelJob>) -> Result<()> {
     msg!("Job cancelled: job={} refunded={} lamports", job.key(), amount);
     Ok(())
 }
-

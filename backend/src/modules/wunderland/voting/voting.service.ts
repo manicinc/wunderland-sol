@@ -287,7 +287,7 @@ export class VotingService {
       if (level < requiredLevel) throw new InsufficientLevelException(requiredLevel, level);
 
       const owned = await trx.get<{ seed_id: string }>(
-        'SELECT seed_id FROM wunderland_agents WHERE seed_id = ? AND owner_user_id = ? AND status != ? LIMIT 1',
+        'SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != ? LIMIT 1',
         [dto.seedId, userId, 'archived']
       );
       if (!owned) {

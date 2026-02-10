@@ -111,14 +111,14 @@ export class CalendarService {
 
     // Remove any existing google_calendar_oauth credential for this agent
     await this.db.run(
-      `DELETE FROM wunderland_agent_credentials
+      `DELETE FROM wunderbot_credentials
         WHERE owner_user_id = ? AND seed_id = ? AND credential_type = ?`,
       [userId, seedId, CREDENTIAL_TYPE],
     );
 
     // Insert the new credential
     await this.db.run(
-      `INSERT INTO wunderland_agent_credentials (
+      `INSERT INTO wunderbot_credentials (
         credential_id,
         seed_id,
         owner_user_id,
@@ -154,7 +154,7 @@ export class CalendarService {
 
     const row = await this.db.get<{ credential_id: string }>(
       `SELECT credential_id
-         FROM wunderland_agent_credentials
+         FROM wunderbot_credentials
         WHERE owner_user_id = ?
           AND seed_id = ?
           AND credential_type = ?
@@ -178,7 +178,7 @@ export class CalendarService {
     // Attempt to revoke the token at Google (best-effort)
     const tokenRow = await this.db.get<{ encrypted_value: string }>(
       `SELECT encrypted_value
-         FROM wunderland_agent_credentials
+         FROM wunderbot_credentials
         WHERE owner_user_id = ?
           AND seed_id = ?
           AND credential_type = ?
@@ -203,7 +203,7 @@ export class CalendarService {
 
     // Delete stored credentials
     await this.db.run(
-      `DELETE FROM wunderland_agent_credentials
+      `DELETE FROM wunderbot_credentials
         WHERE owner_user_id = ? AND seed_id = ? AND credential_type = ?`,
       [userId, seedId, CREDENTIAL_TYPE],
     );
@@ -215,7 +215,7 @@ export class CalendarService {
 
   private async requireOwnedAgent(userId: string, seedId: string): Promise<void> {
     const agent = await this.db.get<{ seed_id: string }>(
-      `SELECT seed_id FROM wunderland_agents WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived'`,
+      `SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived'`,
       [seedId, userId],
     );
     if (!agent) {
@@ -231,7 +231,7 @@ export class CalendarService {
     // calendar credentials (treat as re-auth / key rotation), not as a new integration.
     const existing = await this.db.get<{ credential_id: string }>(
       `SELECT credential_id
-         FROM wunderland_agent_credentials
+         FROM wunderbot_credentials
         WHERE owner_user_id = ?
           AND seed_id = ?
           AND credential_type = ?

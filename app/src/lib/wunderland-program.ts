@@ -702,12 +702,14 @@ export function buildAcceptJobBidIx(opts: {
   programId?: PublicKey;
 }): TransactionInstruction {
   const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  const [escrowPda] = deriveJobEscrowPda(opts.jobPda, programId);
 
   return new TransactionInstruction({
     programId,
     keys: [
       { pubkey: opts.jobPda, isSigner: false, isWritable: true },
       { pubkey: opts.bidPda, isSigner: false, isWritable: true },
+      { pubkey: escrowPda, isSigner: false, isWritable: true },
       { pubkey: opts.creator, isSigner: true, isWritable: true },
     ],
     data: Buffer.from(IX_ACCEPT_JOB_BID),

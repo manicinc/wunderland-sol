@@ -51,6 +51,7 @@ export class JobsController {
         creatorWallet: j.creator_wallet,
         metadataHash: j.metadata_hash_hex,
         budgetLamports: j.budget_lamports,
+        buyItNowLamports: j.buy_it_now_lamports,
         status: j.status,
         assignedAgent: j.assigned_agent_pda,
         acceptedBid: j.accepted_bid_pda,
@@ -98,6 +99,7 @@ export class JobsController {
         creatorWallet: job.creator_wallet,
         metadataHash: job.metadata_hash_hex,
         budgetLamports: job.budget_lamports,
+        buyItNowLamports: job.buy_it_now_lamports,
         status: job.status,
         assignedAgent: job.assigned_agent_pda,
         acceptedBid: job.accepted_bid_pda,
@@ -130,10 +132,20 @@ export class JobsController {
   @HttpCode(HttpStatus.OK)
   async updateMetadata(
     @Param('jobPda') jobPda: string,
-    @Body() body: { title?: string; description?: string; metadataJson?: string },
+    @Body()
+    body: {
+      creatorWallet: string;
+      signatureB64: string;
+      metadataJson: string;
+    },
   ) {
-    await this.jobsService.updateJobMetadata(jobPda, body);
-    return { ok: true };
+    const result = await this.jobsService.updateJobMetadataSigned({
+      jobPda,
+      creatorWallet: body.creatorWallet,
+      signatureB64: body.signatureB64,
+      metadataJson: body.metadataJson,
+    });
+    return result;
   }
 
   /**

@@ -63,6 +63,7 @@ SEALED
   |── Cron schedule CRUD ........... BLOCKED
   |── Extension changes ............ BLOCKED
   |── System prompt changes ........ BLOCKED
+  |── Credential create/delete ..... BLOCKED
   |
   |── Credential rotation .......... ALLOWED
   |── Runtime start / stop ......... ALLOWED
@@ -84,6 +85,7 @@ The following mutations are rejected with a `403 AgentSealedException` once an a
 | **Extensions** | Enabling new extensions, disabling existing extensions, changing extension config |
 | **Inference** | Changing the provider, model assignments, or hierarchy structure |
 | **Security** | Modifying guardrail rules, step-up authorization thresholds |
+| **Credentials** | Creating new credentials, deleting existing credentials |
 
 ## What Remains Allowed
 
@@ -91,7 +93,7 @@ Certain operations must remain available even after sealing to ensure the agent 
 
 | Category | Allowed Operations | Rationale |
 |----------|-------------------|-----------|
-| **Credentials** | Rotate API keys, refresh tokens | Keys expire; rotation is operational, not behavioral |
+| **Credentials** | Rotate existing API keys, refresh tokens | Keys expire; rotation is operational, not behavioral |
 | **Runtime** | Start, stop, restart the agent process | Operational control must remain available |
 | **Conversations** | New messages, context window updates | The agent must continue to converse |
 | **Tool execution** | Run tools per existing configuration | Tools are part of sealed behavior |

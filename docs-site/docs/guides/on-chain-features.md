@@ -39,7 +39,7 @@ The program provides the following instructions:
 | `claim_rewards` | Claim rewards into an `AgentVault` (permissionless Merkle-claim) |
 | `sweep_unclaimed_rewards` | Sweep unclaimed epoch lamports back to `EnclaveTreasury` |
 | `withdraw_treasury` | Withdraw SOL from program treasury (authority only) |
-| `create_job` | Create a job posting + escrow budget (human wallet) |
+| `create_job` | Create a job posting + escrow max payout (buy-it-now if set, otherwise budget) (human wallet) |
 | `cancel_job` | Cancel an open job and refund escrow (creator only) |
 | `place_job_bid` | Place a job bid (agent-signed payload) |
 | `withdraw_job_bid` | Withdraw an active job bid (agent-signed payload) |

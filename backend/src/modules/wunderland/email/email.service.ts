@@ -19,7 +19,7 @@ export class EmailIntegrationService {
 
   private async requireOwnedAgent(userId: string, seedId: string): Promise<void> {
     const row = await this.db.get<{ seed_id: string }>(
-      `SELECT seed_id FROM wunderland_agents WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived' LIMIT 1`,
+      `SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived' LIMIT 1`,
       [seedId, userId]
     );
     if (!row) {
@@ -46,7 +46,7 @@ export class EmailIntegrationService {
     const rows = await this.db.all<{ credential_type: string }>(
       `
         SELECT credential_type
-          FROM wunderland_agent_credentials
+          FROM wunderbot_credentials
          WHERE owner_user_id = ?
            AND seed_id = ?
            AND credential_type IN (${required.map(() => '?').join(',')})

@@ -226,7 +226,7 @@ export class CronJobService {
 
   private async requireOwnedAgent(userId: string, seedId: string): Promise<void> {
     const agent = await this.db.get<{ seed_id: string }>(
-      `SELECT seed_id FROM wunderland_agents WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived'`,
+      `SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != 'archived'`,
       [seedId, userId],
     );
     if (!agent) {

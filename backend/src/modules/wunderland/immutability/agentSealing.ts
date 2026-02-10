@@ -34,7 +34,7 @@ export async function getAgentSealState(db: DbLike, seedId: string): Promise<Age
     sealed_at?: number | null;
   }>(
     `SELECT storage_policy, security_profile, sealed_at
-       FROM wunderland_agents
+       FROM wunderbots
       WHERE seed_id = ?
       LIMIT 1`,
     [seedId],
@@ -58,4 +58,3 @@ export async function getAgentSealState(db: DbLike, seedId: string): Promise<Age
     isSealed: storagePolicy === 'sealed' && sealedAt !== null,
   };
 }
-

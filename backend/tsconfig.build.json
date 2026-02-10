@@ -20,6 +20,7 @@
     "dist",
     "tests/**",
     "**/__tests__/**",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "legacy/**"
   ]
 }

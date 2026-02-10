@@ -59,7 +59,7 @@ export class RuntimeService {
   ): Promise<void> {
     const agent = await trx.get<{ seed_id: string }>(
       `SELECT seed_id
-         FROM wunderland_agents
+         FROM wunderbots
         WHERE seed_id = ?
           AND owner_user_id = ?
           AND status != ?
@@ -92,7 +92,7 @@ export class RuntimeService {
     seedId: string
   ): Promise<void> {
     const existing = await trx.get<{ seed_id: string }>(
-      'SELECT seed_id FROM wunderland_agent_runtime WHERE seed_id = ? LIMIT 1',
+      'SELECT seed_id FROM wunderbot_runtime WHERE seed_id = ? LIMIT 1',
       [seedId]
     );
     if (existing) return;
@@ -100,7 +100,7 @@ export class RuntimeService {
     const now = Date.now();
     await trx.run(
       `
-        INSERT INTO wunderland_agent_runtime (
+        INSERT INTO wunderbot_runtime (
           seed_id,
           owner_user_id,
           hosting_mode,
@@ -131,8 +131,8 @@ export class RuntimeService {
           r.metadata,
           COALESCE(r.created_at, a.created_at) AS created_at,
           COALESCE(r.updated_at, a.updated_at) AS updated_at
-        FROM wunderland_agents a
-        LEFT JOIN wunderland_agent_runtime r
+        FROM wunderbots a
+        LEFT JOIN wunderbot_runtime r
           ON r.seed_id = a.seed_id
         WHERE a.owner_user_id = ?
           AND a.seed_id = ?
@@ -168,8 +168,8 @@ export class RuntimeService {
           r.metadata,
           COALESCE(r.created_at, a.created_at) AS created_at,
           COALESCE(r.updated_at, a.updated_at) AS updated_at
-        FROM wunderland_agents a
-        LEFT JOIN wunderland_agent_runtime r
+        FROM wunderbots a
+        LEFT JOIN wunderbot_runtime r
           ON r.seed_id = a.seed_id
         WHERE ${where.join(' AND ')}
         ORDER BY COALESCE(r.updated_at, a.updated_at) DESC
@@ -196,8 +196,8 @@ export class RuntimeService {
           r.metadata,
           COALESCE(r.created_at, a.created_at) AS created_at,
           COALESCE(r.updated_at, a.updated_at) AS updated_at
-        FROM wunderland_agents a
-        LEFT JOIN wunderland_agent_runtime r
+        FROM wunderbots a
+        LEFT JOIN wunderbot_runtime r
           ON r.seed_id = a.seed_id
         WHERE a.owner_user_id = ?
           AND a.seed_id = ?
@@ -229,7 +229,7 @@ export class RuntimeService {
 
       await trx.run(
         `
-          UPDATE wunderland_agent_runtime
+          UPDATE wunderbot_runtime
              SET hosting_mode = ?,
                  updated_at = ?
            WHERE seed_id = ?
@@ -253,7 +253,7 @@ export class RuntimeService {
       await this.ensureRuntimeRow(trx, userId, seedId);
 
       const current = await trx.get<{ hosting_mode: string }>(
-        'SELECT hosting_mode FROM wunderland_agent_runtime WHERE seed_id = ? LIMIT 1',
+        'SELECT hosting_mode FROM wunderbot_runtime WHERE seed_id = ? LIMIT 1',
         [seedId]
       );
       if (current?.hosting_mode === 'self_hosted') {
@@ -263,7 +263,7 @@ export class RuntimeService {
       const now = Date.now();
       await trx.run(
         `
-          UPDATE wunderland_agent_runtime
+          UPDATE wunderbot_runtime
              SET status = ?,
                  started_at = ?,
                  last_error = NULL,
@@ -289,7 +289,7 @@ export class RuntimeService {
       await this.ensureRuntimeRow(trx, userId, seedId);
 
       const current = await trx.get<{ hosting_mode: string }>(
-        'SELECT hosting_mode FROM wunderland_agent_runtime WHERE seed_id = ? LIMIT 1',
+        'SELECT hosting_mode FROM wunderbot_runtime WHERE seed_id = ? LIMIT 1',
         [seedId]
       );
       if (current?.hosting_mode === 'self_hosted') {
@@ -299,7 +299,7 @@ export class RuntimeService {
       const now = Date.now();
       await trx.run(
         `
-          UPDATE wunderland_agent_runtime
+          UPDATE wunderbot_runtime
              SET status = ?,
                  stopped_at = ?,
                  updated_at = ?

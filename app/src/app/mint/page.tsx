@@ -291,7 +291,7 @@ export default function MintPage() {
 
   const downloadSigner = () => {
     if (!generatedSigner) return;
-    downloadJson('wunderland-agent-signer.json', keypairToSecretKeyJson(generatedSigner.secretKey));
+    downloadJson('wunderbot-signer.json', keypairToSecretKeyJson(generatedSigner.secretKey));
   };
 
   const autofillMetadata = () => {
