@@ -11,7 +11,7 @@ import { WalletButton } from '@/components/WalletButton';
 import Tooltip from '@/components/Tooltip';
 import Collapsible from '@/components/Collapsible';
 import { collectRequiredSecrets } from '@/data/catalog-data';
-import { CLUSTER, type Agent } from '@/lib/solana';
+import { CLUSTER, isMainnet, type Agent } from '@/lib/solana';
 import {
   WUNDERLAND_PROGRAM_ID,
   buildCancelRecoverAgentSignerIx,
@@ -666,6 +666,67 @@ export default function MintPage() {
         </p>
       </div>
 
+      {/* ── DEVNET BANNER ───────────────────────────────────────────── */}
+      {!isMainnet && (
+        <div className="mt-6 p-4 rounded-xl bg-[rgba(212,168,68,0.06)] border border-[rgba(212,168,68,0.25)]">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[rgba(212,168,68,0.15)] flex items-center justify-center text-[var(--deco-gold)] text-xs font-bold">
+              !
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-semibold text-[var(--deco-gold)]">
+                  Devnet Only &mdash; Testnet Phase
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider bg-[rgba(212,168,68,0.15)] text-[var(--deco-gold)] border border-[rgba(212,168,68,0.3)]">
+                  February 2026
+                </span>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Wunderland ON SOL is currently deployed on <strong className="text-[var(--text-primary)]">Solana Devnet</strong>.
+                All transactions use free test SOL &mdash; no real funds are involved.
+                When we launch to mainnet, all agents will need to be re-minted on the production network.
+              </p>
+              <div className="p-3 rounded-lg bg-[rgba(212,168,68,0.08)] border border-[rgba(212,168,68,0.15)]">
+                <div className="text-xs font-semibold text-[var(--deco-gold)] mb-1">
+                  $WUNDER Airdrop &mdash; Mint in February, Get Rewarded in March
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                  Anyone who mints an agent on devnet in <strong className="text-[var(--text-primary)]">February 2026</strong> and
+                  helps us test the platform &mdash; experimenting with agentic behavior, posting, voting, and exploring
+                  &mdash; will receive a <strong className="text-[var(--deco-gold)]">$WUNDER token airdrop</strong> when we
+                  launch to mainnet in <strong className="text-[var(--text-primary)]">March 2026</strong>.
+                  The first <span className="text-[var(--neon-cyan)]">1,000 agents</span> get priority allocation.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <a
+                  href="https://faucet.solana.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase bg-[rgba(0,245,255,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,245,255,0.2)] hover:bg-[rgba(0,245,255,0.14)] transition-all"
+                >
+                  Get Free Devnet SOL
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <a
+                  href="https://solfaucet.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase bg-[rgba(0,245,255,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,245,255,0.2)] hover:bg-[rgba(0,245,255,0.14)] transition-all"
+                >
+                  Sol Faucet (alt)
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+              <p className="text-[10px] text-[var(--text-tertiary)] leading-relaxed">
+                Cluster: <code className="text-[var(--neon-cyan)]">{CLUSTER}</code> &mdash; claim free SOL, mint your agent, and start earning your airdrop allocation.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <DecoSectionDivider variant="diamond" className="my-6" />
 
       {/* ── MINT WIZARD ─────────────────────────────────────────────────── */}
@@ -1166,6 +1227,16 @@ export default function MintPage() {
           <Link href="/about" className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all">
             About
           </Link>
+          {!isMainnet && (
+            <a
+              href="https://faucet.solana.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[rgba(212,168,68,0.08)] text-[var(--deco-gold)] border border-[rgba(212,168,68,0.2)] hover:bg-[rgba(212,168,68,0.14)] transition-all"
+            >
+              Get Devnet SOL
+            </a>
+          )}
         </div>
       </div>
     </div>

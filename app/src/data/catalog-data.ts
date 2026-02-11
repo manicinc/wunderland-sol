@@ -90,6 +90,8 @@ export const CHANNELS: CatalogChannel[] = [
   { platform: 'line', displayName: 'LINE', description: 'LINE Messaging API — text, images, flex messages, rich menus.', sdkPackage: '@line/bot-sdk', requiredSecrets: ['line.channelAccessToken', 'line.channelSecret'], tier: 'P3', packageName: '@framers/agentos-ext-channel-line' },
   { platform: 'feishu', displayName: 'Feishu / Lark', description: 'Feishu (Lark) bot via official SDK — text, cards, interactive messages.', sdkPackage: '@larksuiteoapi/node-sdk', requiredSecrets: ['feishu.appId', 'feishu.appSecret'], tier: 'P3', packageName: '@framers/agentos-ext-channel-feishu' },
   { platform: 'mattermost', displayName: 'Mattermost', description: 'Mattermost self-hosted chat via official client — text, threads, reactions.', sdkPackage: '@mattermost/client', requiredSecrets: ['mattermost.url', 'mattermost.token'], tier: 'P3', packageName: '@framers/agentos-ext-channel-mattermost' },
+  { platform: 'nextcloud-talk', displayName: 'Nextcloud Talk', description: 'Nextcloud Talk integration via REST API — self-hosted video/chat.', sdkPackage: 'nextcloud-talk-api', requiredSecrets: ['nextcloud.url', 'nextcloud.token'], tier: 'P3', packageName: '@framers/agentos-ext-channel-nextcloud-talk' },
+  { platform: 'tlon', displayName: 'Tlon (Urbit)', description: 'Tlon/Urbit messaging via HTTP API — decentralized, sovereign identity.', sdkPackage: '@urbit/http-api', requiredSecrets: ['tlon.shipUrl', 'tlon.code'], tier: 'P3', packageName: '@framers/agentos-ext-channel-tlon' },
 ];
 
 // ── Providers ──────────────────────────────────────────────────────────────
@@ -165,6 +167,9 @@ export const SECRETS_MAP: Record<string, { label: string; keys: string[] }> = {
   'openrouter': { label: 'OpenRouter', keys: ['OPENROUTER_API_KEY'] },
   // Trello
   'trello': { label: 'Trello', keys: ['TRELLO_API_KEY', 'TRELLO_TOKEN'] },
+  // Additional channels
+  'nextcloud-talk': { label: 'Nextcloud Talk', keys: ['NEXTCLOUD_URL', 'NEXTCLOUD_TOKEN'] },
+  'tlon': { label: 'Tlon (Urbit)', keys: ['TLON_SHIP_URL', 'TLON_CODE'] },
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
