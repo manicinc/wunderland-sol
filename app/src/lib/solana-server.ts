@@ -164,22 +164,57 @@ const LEVEL_NAMES: Record<number, string> = {
   6: 'Founder',
 };
 
-function getOnChainConfig(): { enabled: boolean; rpcUrl: string; programId: string; cluster: string } {
+function getOnChainConfig(): { enabled: boolean; rpcUrl: string; rpcUrls: string[]; programId: string; cluster: string } {
   const cluster = (process.env.WUNDERLAND_SOL_CLUSTER ||
     process.env.SOLANA_CLUSTER ||
     process.env.NEXT_PUBLIC_CLUSTER ||
     DEFAULT_CLUSTER) as typeof DEFAULT_CLUSTER;
+
+  // Build ordered RPC list: Chainstack → configured → public fallback
+  const rpcCandidates: string[] = [];
+  const chainstack1 = process.env.CHAINSTACK_RPC_ENDPOINT;
+  const chainstack2 = process.env.CHAINSTACK_RPC_ENDPOINT_2;
+  if (chainstack1) rpcCandidates.push(chainstack1.trim());
+  if (chainstack2) rpcCandidates.push(chainstack2.trim());
+
   const rpcEnv =
     process.env.WUNDERLAND_SOL_RPC_URL ||
     process.env.SOLANA_RPC ||
     process.env.NEXT_PUBLIC_SOLANA_RPC;
-  const rpcUrl = rpcEnv && /^https?:\/\//i.test(rpcEnv.trim()) ? rpcEnv.trim() : clusterApiUrl(cluster);
+  if (rpcEnv && /^https?:\/\//i.test(rpcEnv.trim())) rpcCandidates.push(rpcEnv.trim());
+
+  // Always have public RPC as last fallback
+  const publicRpc = clusterApiUrl(cluster);
+  if (!rpcCandidates.includes(publicRpc)) rpcCandidates.push(publicRpc);
+
+  const rpcUrl = rpcCandidates[0] || publicRpc;
+
   const programId =
     process.env.WUNDERLAND_SOL_PROGRAM_ID ||
     process.env.PROGRAM_ID ||
     process.env.NEXT_PUBLIC_PROGRAM_ID ||
     DEFAULT_PROGRAM_ID;
-  return { enabled: true, rpcUrl, programId, cluster };
+  return { enabled: true, rpcUrl, rpcUrls: rpcCandidates, programId, cluster };
+}
+
+/** Try an async operation across multiple RPC endpoints. */
+async function withRpcFallback<T>(
+  fn: (connection: Connection, programId: PublicKey) => Promise<T>,
+): Promise<T> {
+  const cfg = getOnChainConfig();
+  const programId = new PublicKey(cfg.programId);
+  let lastError: unknown;
+
+  for (const url of cfg.rpcUrls) {
+    try {
+      const connection = new Connection(url, 'confirmed');
+      return await fn(connection, programId);
+    } catch (err) {
+      lastError = err;
+      console.warn(`[solana-server] RPC failed (${url.slice(0, 50)}…):`, err instanceof Error ? err.message : err);
+    }
+  }
+  throw lastError;
 }
 
 export async function getProgramConfigServer(): Promise<{
@@ -582,27 +617,25 @@ async function getProgramAccountsBySize(
 }
 
 export async function getAllAgentsServer(): Promise<Agent[]> {
-  const cfg = getOnChainConfig();
-
   try {
-    const connection = new Connection(cfg.rpcUrl, 'confirmed');
-    const programId = new PublicKey(cfg.programId);
-    const accounts = await getProgramAccountsBySize(connection, programId, [
-      ACCOUNT_SIZE_AGENT_IDENTITY_CURRENT,
-      ACCOUNT_SIZE_AGENT_IDENTITY_LEGACY,
-    ]);
+    return await withRpcFallback(async (connection, programId) => {
+      const accounts = await getProgramAccountsBySize(connection, programId, [
+        ACCOUNT_SIZE_AGENT_IDENTITY_CURRENT,
+        ACCOUNT_SIZE_AGENT_IDENTITY_LEGACY,
+      ]);
 
-    return accounts
-      .map((acc) => {
-        try {
-          return decodeAgentIdentityWithFallback(acc.pubkey, acc.account.data);
-        } catch {
-          return null;
-        }
-      })
-      .filter((a): a is Agent => a !== null);
+      return accounts
+        .map((acc) => {
+          try {
+            return decodeAgentIdentityWithFallback(acc.pubkey, acc.account.data);
+          } catch {
+            return null;
+          }
+        })
+        .filter((a): a is Agent => a !== null);
+    });
   } catch (error) {
-    console.warn('[solana-server] Failed to fetch on-chain agents:', error);
+    console.warn('[solana-server] Failed to fetch on-chain agents (all RPCs exhausted):', error);
     return [];
   }
 }
@@ -615,37 +648,36 @@ export async function getAllTipsServer(opts?: {
   priority?: Tip['priority'];
   status?: Tip['status'];
 }): Promise<{ tips: Tip[]; total: number }> {
-  const cfg = getOnChainConfig();
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
 
   try {
-    const connection = new Connection(cfg.rpcUrl, 'confirmed');
-    const programId = new PublicKey(cfg.programId);
-    const accounts = await getProgramAccountsBySize(connection, programId, [ACCOUNT_SIZE_TIP_ANCHOR]);
+    return await withRpcFallback(async (connection, programId) => {
+      const accounts = await getProgramAccountsBySize(connection, programId, [ACCOUNT_SIZE_TIP_ANCHOR]);
 
-    const decoded = accounts
-      .map((acc) => {
-        try {
-          return decodeTipAnchor(acc.pubkey, acc.account.data);
-        } catch {
-          return null;
-        }
-      })
-      .filter((t): t is Tip => t !== null);
+      const decoded = accounts
+        .map((acc) => {
+          try {
+            return decodeTipAnchor(acc.pubkey, acc.account.data);
+          } catch {
+            return null;
+          }
+        })
+        .filter((t): t is Tip => t !== null);
 
-    const filtered = decoded
-      .filter((t) => (opts?.tipper ? t.tipper === opts.tipper : true))
-      .filter((t) => (opts?.targetEnclave !== undefined ? t.targetEnclave === opts.targetEnclave : true))
-      .filter((t) => (opts?.priority ? t.priority === opts.priority : true))
-      .filter((t) => (opts?.status ? t.status === opts.status : true));
+      const filtered = decoded
+        .filter((t) => (opts?.tipper ? t.tipper === opts.tipper : true))
+        .filter((t) => (opts?.targetEnclave !== undefined ? t.targetEnclave === opts.targetEnclave : true))
+        .filter((t) => (opts?.priority ? t.priority === opts.priority : true))
+        .filter((t) => (opts?.status ? t.status === opts.status : true));
 
-    filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    const total = filtered.length;
-    return { tips: filtered.slice(offset, offset + limit), total };
+      const total = filtered.length;
+      return { tips: filtered.slice(offset, offset + limit), total };
+    });
   } catch (error) {
-    console.warn('[solana-server] Failed to fetch on-chain tips:', error);
+    console.warn('[solana-server] Failed to fetch on-chain tips (all RPCs exhausted):', error);
     return { tips: [], total: 0 };
   }
 }
@@ -661,7 +693,6 @@ export async function getAllPostsServer(opts?: {
   since?: string;
   q?: string;
 }): Promise<{ posts: Post[]; total: number }> {
-  const cfg = getOnChainConfig();
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
   const agentAddress = opts?.agentAddress;
@@ -673,8 +704,7 @@ export async function getAllPostsServer(opts?: {
   const q = opts?.q?.toLowerCase();
 
   try {
-    const connection = new Connection(cfg.rpcUrl, 'confirmed');
-    const programId = new PublicKey(cfg.programId);
+    return await withRpcFallback(async (connection, programId) => {
     const enclaveDirectory = getEnclaveDirectoryMapServer(programId);
 
     // Fetch agents first so posts can be resolved to authority + display name.
@@ -794,18 +824,16 @@ export async function getAllPostsServer(opts?: {
     );
 
     return { posts: window, total };
+    }); // end withRpcFallback
   } catch (error) {
-    console.warn('[solana-server] Failed to fetch on-chain posts:', error);
+    console.warn('[solana-server] Failed to fetch on-chain posts (all RPCs exhausted):', error);
     return { posts: [], total: 0 };
   }
 }
 
 export async function getPostByIdServer(postId: string): Promise<Post | null> {
-  const cfg = getOnChainConfig();
-
   try {
-    const connection = new Connection(cfg.rpcUrl, 'confirmed');
-    const programId = new PublicKey(cfg.programId);
+    return await withRpcFallback(async (connection, programId) => {
     const enclaveDirectory = getEnclaveDirectoryMapServer(programId);
 
     const postPda = new PublicKey(postId);
@@ -832,8 +860,9 @@ export async function getPostByIdServer(postId: string): Promise<Post | null> {
       if (content) decoded.content = content;
     }
     return decoded;
+    }); // end withRpcFallback
   } catch (error) {
-    console.warn('[solana-server] Failed to fetch post by id:', error);
+    console.warn('[solana-server] Failed to fetch post by id (all RPCs exhausted):', error);
     return null;
   }
 }
@@ -915,12 +944,10 @@ export async function getNetworkGraphServer(opts?: {
   maxNodes?: number;
   maxEdges?: number;
 }): Promise<{ nodes: NetworkNode[]; edges: NetworkEdge[] }> {
-  const cfg = getOnChainConfig();
   const maxNodes = opts?.maxNodes ?? 60;
   const maxEdges = opts?.maxEdges ?? 200;
 
-  const connection = new Connection(cfg.rpcUrl, 'confirmed');
-  const programId = new PublicKey(cfg.programId);
+  return withRpcFallback(async (connection, programId) => {
   const enclaveDirectory = getEnclaveDirectoryMapServer(programId);
 
   const agentAccounts = await getProgramAccountsBySize(connection, programId, [
@@ -1013,4 +1040,5 @@ export async function getNetworkGraphServer(opts?: {
   }));
 
   return { nodes, edges };
+  }); // end withRpcFallback
 }

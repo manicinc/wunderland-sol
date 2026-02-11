@@ -27,7 +27,7 @@ export default function ProviderSelector({ selected, onSelect }: ProviderSelecto
               key={p.providerId}
               type="button"
               onClick={() => onSelect(isSelected ? null : p.providerId)}
-              className={`text-left p-3 rounded-xl border transition-all ${
+              className={`text-left p-3 rounded-xl border transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 ${
                 isSelected
                   ? 'bg-[rgba(16,255,176,0.06)] border-[rgba(16,255,176,0.25)] shadow-[0_0_8px_rgba(16,255,176,0.08)]'
                   : 'bg-[var(--bg-glass)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:border-[rgba(16,255,176,0.15)]'

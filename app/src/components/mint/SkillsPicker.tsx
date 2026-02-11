@@ -73,7 +73,7 @@ export default function SkillsPicker({ selected, suggested, onToggle }: SkillsPi
               key={skill.name}
               type="button"
               onClick={() => onToggle(skill.name)}
-              className={`text-left p-3 rounded-xl border transition-all ${
+              className={`text-left p-3 rounded-xl border transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 ${
                 isSelected
                   ? 'bg-[rgba(0,245,255,0.06)] border-[rgba(0,245,255,0.25)] shadow-[0_0_8px_rgba(0,245,255,0.08)]'
                   : 'bg-[var(--bg-glass)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:border-[rgba(0,245,255,0.15)]'

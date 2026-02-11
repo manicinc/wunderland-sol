@@ -1,8 +1,10 @@
 'use client';
 
+import { useCallback } from 'react';
 import PresetSelector from '@/components/PresetSelector';
 import NLDescribePanel from './NLDescribePanel';
 import type { AgentPreset, WizardAction, WizardState } from './wizard-types';
+import { generateRandomAgentName } from './random-names';
 
 interface StepIdentityProps {
   state: WizardState;
@@ -14,6 +16,10 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
   const handlePresetSelect = (preset: AgentPreset) => {
     dispatch({ type: 'SELECT_PRESET', preset });
   };
+
+  const handleRandomize = useCallback(() => {
+    dispatch({ type: 'SET_DISPLAY_NAME', name: generateRandomAgentName() });
+  }, [dispatch]);
 
   const nameBytes = new TextEncoder().encode(state.displayName.trim()).length;
   const nameTooLong = nameBytes > 32;
@@ -27,18 +33,38 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
         <label htmlFor="displayName" className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
           Display Name
         </label>
-        <input
-          id="displayName"
-          value={state.displayName}
-          onChange={(e) => dispatch({ type: 'SET_DISPLAY_NAME', name: e.target.value })}
-          className={`search-input-glow mt-2 w-full px-4 py-3 rounded-lg bg-[var(--bg-glass)] border text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-sm focus:outline-none transition-all duration-300 ${
-            nameTooLong
-              ? 'border-[rgba(255,50,50,0.4)] focus:border-[rgba(255,50,50,0.6)]'
-              : 'border-[var(--border-glass)] focus:border-[var(--neon-cyan)]/50'
-          }`}
-          placeholder="My Agent"
-          maxLength={64}
-        />
+        <div className="flex gap-2 mt-2">
+          <input
+            id="displayName"
+            value={state.displayName}
+            onChange={(e) => dispatch({ type: 'SET_DISPLAY_NAME', name: e.target.value })}
+            className={`search-input-glow w-full px-4 py-3 rounded-lg bg-[var(--bg-glass)] border text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-sm focus:outline-none transition-all duration-300 ${
+              nameTooLong
+                ? 'border-[rgba(255,50,50,0.4)] focus:border-[rgba(255,50,50,0.6)]'
+                : 'border-[var(--border-glass)] focus:border-[var(--neon-cyan)]/50'
+            }`}
+            placeholder="My Agent"
+            maxLength={64}
+          />
+          <button
+            type="button"
+            onClick={handleRandomize}
+            className="shrink-0 px-3 py-3 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:border-[var(--neon-cyan)]/40 transition-all duration-200"
+            title="Randomize name"
+            aria-label="Generate random agent name"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.2" />
+              <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.2" />
+              <circle cx="4" cy="4" r="0.8" fill="currentColor" />
+              <circle cx="10.5" cy="10.5" r="0.8" fill="currentColor" />
+              <circle cx="13.5" cy="10.5" r="0.8" fill="currentColor" />
+              <circle cx="10.5" cy="13.5" r="0.8" fill="currentColor" />
+              <circle cx="13.5" cy="13.5" r="0.8" fill="currentColor" />
+              <circle cx="12" cy="12" r="0.8" fill="currentColor" />
+            </svg>
+          </button>
+        </div>
         <div className={`mt-1 text-[10px] font-mono ${nameTooLong ? 'text-[var(--neon-red)]' : 'text-[var(--text-tertiary)]'}`}>
           {nameBytes}/32 UTF-8 bytes{nameTooLong ? ' (too long!)' : ''}
         </div>
