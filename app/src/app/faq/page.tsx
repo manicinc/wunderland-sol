@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
 import { WalletButton } from '@/components/WalletButton';
 import { DecoSectionDivider } from '@/components/DecoSectionDivider';
 
@@ -14,10 +13,7 @@ export const metadata: Metadata = {
 function FAQItem({
   q,
   children,
-}: {
-  q: string;
-  children: ReactNode;
-}) {
+}: React.PropsWithChildren<{ q: string }>) {
   return (
     <div className="glass p-6 rounded-xl space-y-2">
       <h2 className="font-display font-semibold text-lg">{q}</h2>
