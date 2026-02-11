@@ -5,6 +5,44 @@
 
 ---
 
+## Entry [NEW] — CI Pipeline Repair + AgentOS 0.1.23 + Peer Dependency Resolution
+**Date**: 2026-02-11
+**Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
+**Action**: Fix wunderland CI pipeline — resolve 7 TypeScript errors, publish AgentOS 0.1.23 with workspace exports, add missing peer dependencies.
+
+### Completed
+
+1. **AgentOS 0.1.23 — Workspace Exports**
+   - Published `@framers/agentos@0.1.23` with `core/workspace/` directory exports
+   - `resolveAgentWorkspaceDir()` and `resolveAgentWorkspaceBaseDir()` now available from barrel
+   - Fixed missing `dist/core/workspace/` files that were absent in 0.1.22
+
+2. **Ollama Setup Command — Proper Usage of Unused Variables**
+   - `ModelRecommendation` type: added explicit annotation on recommendation variable
+   - `loadConfig`: now displays current Ollama config state before update
+   - `args`: first positional arg now overrides primary model (e.g. `wunderland ollama-setup mistral`)
+
+3. **CI Peer Dependency Chain Fix**
+   - Added `@framers/sql-storage-adapter` as dependency — required by agentos SqlStorageAdapter
+   - Added `graphology`, `graphology-communities-louvain`, `graphology-types`, `hnswlib-node` as devDependencies
+   - AgentOS barrel-exports trigger module load for all optional peer deps; CI `npm install` with `workspace:*` → `*` conversion needs these present
+   - Previously blocked: OpenRouterFallback.test.ts, WonderlandNetwork.test.ts, cli-commands.e2e.test.ts
+
+4. **Cross-Repo Coordination**
+   - Pushed fixes to 3 repos: framersai/agentos, jddunn/wunderland, manicinc/voice-chat-assistant
+   - Resolved git rebase conflicts (agentos 0.1.22 → 0.1.23 version bump)
+   - Updated all submodule pointers in parent monorepo
+
+### Technical Root Cause
+The wunderland CI workflow converts `workspace:*` to `*` via a node script, then runs `npm install` which fetches `@framers/agentos` from npm. The published package's barrel export (`dist/index.ts`) re-exports all modules including `SqlStorageAdapter` and `GraphRAGEngine`, which import `@framers/sql-storage-adapter` and `graphology` at module load time. Since these are marked as optional peer deps in agentos, npm doesn't install them automatically, causing `ERR_MODULE_NOT_FOUND` crashes in any test that imports from agentos.
+
+### Notes
+- 993/995 tests were passing before this fix; only 2 test cases + 3 suites were blocked
+- All TypeScript compilation errors (TS6133, TS2305) resolved
+- Future consideration: agentos should use dynamic imports for optional modules to avoid load-time failures
+
+---
+
 ## Entry [NEW] — Fresh Devnet Deployment + Multi-LLM + 15 API Integrations
 **Date**: 2026-02-11
 **Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
