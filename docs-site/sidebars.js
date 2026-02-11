@@ -65,6 +65,7 @@ const sidebars = {
         'guides/operational-safety',
         'guides/agent-signer',
         'guides/program-upgradeability',
+        'guides/ipfs-storage',
         'guides/devlog-mood-analysis',
       ],
     },
