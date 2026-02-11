@@ -5,6 +5,57 @@
 
 ---
 
+## Entry [NEW] — Chainstack Devnet RPC + Production Deploy Fix
+
+**Date**: 2026-02-11
+**Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
+**Action**: Switch Solana RPC from public devnet to Chainstack premium devnet node. Fix production build (Next.js 16 standalone) and deploy to Linode.
+
+### Completed
+
+1. **Chainstack Devnet Node**
+   - Provisioned Chainstack Solana devnet node (ND-866-679-338, elastic, 250 req/s)
+   - HTTPS: `solana-devnet.core.chainstack.com/ad7c7d...`
+   - WSS: `wss://solana-devnet.core.chainstack.com/ad7c7d...`
+   - Previous mainnet endpoints preserved as commented backup for future mainnet deploy
+   - All `.env` and `.env.example` files updated with devnet/mainnet switch pattern
+
+2. **Backend Chainstack Fallback**
+   - Added Chainstack → configured → public RPC fallback chain to `wunderland-sol-onboarding.service.ts`
+   - Now matches the pattern in `solana-server.ts` (frontend API routes)
+   - Order: Chainstack devnet → `WUNDERLAND_SOL_RPC_URL` → `clusterApiUrl(devnet)`
+
+3. **Production Build Fixes (Linode)**
+   - Fixed Next.js version mismatch: `pnpm install` resolved Next.js 14 → 16.1.6
+   - Fixed 3 TypeScript errors: `agent` null checks in dashboard page, missing `HexacoAvatarTraits` type
+   - Updated systemd service: `start.js` → `server.js` (Next.js 16 standalone convention)
+   - Cleaned stale `.next` cache, rebuilt with Turbopack
+   - Copied static assets to standalone directory
+
+4. **Server Environment**
+   - Added Solana + Chainstack config to `/etc/rabbithole/env`
+   - SCP'd wunderland-sh `.env` files to `/app/rabbithole/apps/wunderland-sh/`
+   - Service running: `rabbithole.service` active, Discord bot connected
+
+### RPC Fallback Chain (server-side)
+```
+Chainstack devnet → WUNDERLAND_SOL_RPC_URL → api.devnet.solana.com
+```
+
+### Mainnet Switch Checklist
+When ready to deploy to mainnet:
+1. Set `WUNDERLAND_SOL_CLUSTER=mainnet-beta` / `NEXT_PUBLIC_CLUSTER=mainnet-beta`
+2. Swap `CHAINSTACK_RPC_ENDPOINT` from devnet to mainnet URL
+3. Deploy program to mainnet, update `WUNDERLAND_SOL_PROGRAM_ID`
+4. Rebuild and restart
+
+### Notes
+- Chainstack Growth plan: 250 req/s rate limit, 66% quota remaining
+- Program ID verified: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo` (devnet)
+- Mainnet Chainstack endpoints kept as `CHAINSTACK_RPC_ENDPOINT_2` / commented backup
+
+---
+
 ## Entry [NEW] — CI Pipeline Repair + AgentOS 0.1.23 + Peer Dependency Resolution
 **Date**: 2026-02-11
 **Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
