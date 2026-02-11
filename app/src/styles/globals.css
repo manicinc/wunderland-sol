@@ -2202,28 +2202,28 @@ html.light .wallet-btn:hover {
 }
 
 /* Organic button — neumorphic glass in light mode */
-html.light .organic-btn {
-  --color-white: #ffffff;
-}
-
 html.light .organic-btn > span:nth-child(2) {
   /* Glass fill — warm parchment instead of dark */
-  background: rgba(247, 243, 237, 0.92) !important;
+  background: rgba(247, 243, 237, 0.95) !important;
   box-shadow:
-    4px 4px 12px rgba(0, 0, 0, 0.08),
+    4px 4px 12px rgba(0, 0, 0, 0.10),
     -3px -3px 8px rgba(255, 255, 255, 0.9),
     inset 1px 1px 2px rgba(255, 255, 255, 0.8),
     inset -1px -1px 2px rgba(0, 0, 0, 0.04);
 }
 
-html.light .organic-btn > span:nth-child(2) span {
+/* Force dark text on light-mode button content (child 3 = z-10 content wrapper) */
+html.light .organic-btn > span:nth-child(3) span {
   color: var(--text-primary) !important;
+}
+html.light .organic-btn > span:nth-child(3) svg {
+  color: var(--text-secondary) !important;
 }
 
 html.light .organic-btn:hover > span:nth-child(2) {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
   box-shadow:
-    6px 6px 16px rgba(0, 0, 0, 0.1),
+    6px 6px 16px rgba(0, 0, 0, 0.12),
     -4px -4px 10px rgba(255, 255, 255, 0.95),
     inset 1px 1px 2px rgba(255, 255, 255, 0.9),
     inset -1px -1px 2px rgba(0, 0, 0, 0.04);
@@ -2241,16 +2241,20 @@ html.light .organic-btn::after {
   ) !important;
 }
 
-/* Gradient border box (HEXACO explainer) — neumorphic warm */
+/* Gradient border box (HEXACO explainer, Built Autonomously) — warm parchment */
 html.light .gradient-border {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(109, 40, 217, 0.15);
+  background: #ece5d8;
+  border: 1px solid rgba(146, 64, 14, 0.18);
   border-radius: 20px;
   box-shadow:
-    8px 8px 24px rgba(0, 0, 0, 0.08),
-    -6px -6px 16px rgba(255, 255, 255, 0.9),
-    inset 1px 1px 3px rgba(255, 255, 255, 0.7),
+    8px 8px 24px rgba(0, 0, 0, 0.06),
+    -6px -6px 16px rgba(255, 255, 255, 0.7),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.5),
     inset -1px -1px 3px rgba(0, 0, 0, 0.02);
+}
+/* Tone down gradient glow behind card in light mode */
+html.light .gradient-border::before {
+  opacity: 0.15;
 }
 
 /* HEXACO hero — stronger aurora */

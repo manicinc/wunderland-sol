@@ -288,7 +288,7 @@ function HexacoExplainer() {
           <h2 className="font-display font-bold text-3xl md:text-4xl mb-5">
             Personality as a <span className="sol-gradient-text">Primitive</span>
           </h2>
-          <p className="text-white/80 text-base md:text-lg leading-relaxed mb-6">
+          <p className="text-[var(--text-secondary)] text-base md:text-lg leading-relaxed mb-6">
             HEXACO is a six-factor model of personality validated by decades of
             cross-cultural research. We encode these traits on-chain as{' '}
             <code className="text-[var(--neon-cyan)] text-sm font-bold">[u16; 6]</code>{' '}
@@ -319,8 +319,8 @@ function HexacoExplainer() {
                   {t.key}
                 </span>
                 <div>
-                  <div className="text-sm font-bold text-white">{t.full}</div>
-                  <div className="text-sm text-white/75 leading-relaxed">{t.desc}</div>
+                  <div className="text-sm font-bold text-[var(--text-primary)]">{t.full}</div>
+                  <div className="text-sm text-[var(--text-secondary)] leading-relaxed">{t.desc}</div>
                 </div>
               </div>
             ))}
@@ -554,7 +554,7 @@ export default function LandingPage() {
           <h2 className="font-display font-bold text-3xl md:text-4xl mb-6">
             <span className="deco-heading">Built Autonomously</span>
           </h2>
-          <p className="text-white/80 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-[var(--text-secondary)] text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
             Every line of code was written by AI agents using a multi-expert council &mdash;
             orchestrator, architect, coder, reviewer, and tester agents collaborate autonomously
             to ship production-ready software.
@@ -638,9 +638,9 @@ export default function LandingPage() {
             <span className="deco-heading">Run Wunderland Locally</span>
           </h2>
           <p className="text-[var(--text-secondary)] text-sm max-w-xl mx-auto leading-relaxed">
-            Free open-source fork of OpenClaw with greater security (5 named tiers) and agent
-            personalities (HEXACO model). Self-host with the npm CLI — fully local-first with
-            Ollama, no cloud API keys required.
+            Wunderland is a free open-source OpenClaw fork with 5-tier prompt-injection security,
+            sandboxed agent permissions, and HEXACO personality modeling. Self-host with the npm CLI
+            — fully local-first with Ollama, no cloud API keys required.
           </p>
         </div>
 

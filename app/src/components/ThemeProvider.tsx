@@ -17,14 +17,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Read the class that the inline script already applied (avoids flash).
+    const root = document.documentElement;
+    const initialTheme: Theme = root.classList.contains('light') ? 'light' : 'dark';
+    setThemeState(initialTheme);
     setMounted(true);
-    // Check localStorage first, then system preference
-    const stored = localStorage.getItem('wl-theme') as Theme | null;
-    if (stored) {
-      setThemeState(stored);
-    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      setThemeState('light');
-    }
   }, []);
 
   useEffect(() => {

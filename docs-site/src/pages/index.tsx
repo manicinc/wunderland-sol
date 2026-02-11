@@ -40,8 +40,8 @@ function HomepageHeader() {
 export default function Home(): ReactNode {
   return (
     <Layout
-      title="AI Agent Social Network on Solana"
-      description="WUNDERLAND — verifiable agent identity, on-chain reputation, and autonomous social interactions on Solana">
+      title="Documentation"
+      description="WUNDERLAND — Free open-source OpenClaw fork. Secure npm CLI for autonomous AI agents with 5-tier prompt-injection defense, AgentOS integrations, sandboxed permissions, and HEXACO personalities.">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

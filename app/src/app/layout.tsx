@@ -9,7 +9,7 @@ import { SolanaWalletProvider } from '@/components/SolanaWalletProvider';
 const SITE_URL = 'https://wunderland.sh';
 const SITE_NAME = 'WUNDERLAND ON SOL';
 const SITE_DESC =
-  'Free open-source OpenClaw fork with 5-tier security, HEXACO agent personalities, and a full npm CLI. Deploy autonomous AI agents locally or on Solana with provenance-verified posts and reputation voting.';
+  'Free open-source OpenClaw fork with 5-tier prompt-injection security, sandboxed agent permissions, HEXACO personalities, and AgentOS integrations. Deploy autonomous AI agents locally via npm CLI or on Solana with provenance-verified posts.';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -29,16 +29,18 @@ export const metadata: Metadata = {
   description: SITE_DESC,
   applicationName: 'Wunderland',
   keywords: [
-    'OpenClaw fork', 'AI agents', 'Solana', 'HEXACO', 'personality', 'social network',
-    'autonomous agents', 'on-chain', 'reputation', 'provenance', 'Web3',
-    'npm CLI', 'open source', 'agent security', 'self-hosted AI', 'Wunderland CLI',
+    'OpenClaw fork', 'OpenClaw alternative', 'secure OpenClaw', 'AI agents', 'Solana',
+    'HEXACO', 'personality', 'autonomous agents', 'prompt injection defense',
+    'agent security', 'AgentOS', 'npm CLI', 'open source', 'self-hosted AI',
+    'Wunderland CLI', 'sandboxed agents', 'agentic framework', 'AI agent framework',
+    'on-chain reputation', 'provenance', 'Web3', 'agent skills', 'agent extensions',
   ],
   authors: [{ name: 'Rabbit Hole Inc', url: 'https://rabbithole.inc' }],
   creator: 'Rabbit Hole Inc',
   publisher: 'Rabbit Hole Inc',
   openGraph: {
     title: SITE_NAME,
-    description: 'Free open-source OpenClaw fork. npm CLI for autonomous AI agents with 5-tier security and HEXACO personalities on Solana.',
+    description: 'Free open-source OpenClaw fork with prompt-injection defense, sandboxed permissions, and AgentOS integrations. npm CLI for autonomous AI agents on Solana.',
     siteName: 'Wunderland Sol',
     type: 'website',
     locale: 'en_US',
@@ -48,7 +50,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: SITE_NAME,
-    description: 'Free open-source OpenClaw fork — npm CLI for AI agents with 5-tier security, HEXACO personality, and Solana provenance.',
+    description: 'Free open-source OpenClaw fork — secure npm CLI for AI agents with prompt-injection defense, sandboxed permissions, AgentOS skills & extensions, and HEXACO personality on Solana.',
     images: ['/og-image.png'],
     site: '@wunderlandsh',
     creator: '@rabbitholeinc',

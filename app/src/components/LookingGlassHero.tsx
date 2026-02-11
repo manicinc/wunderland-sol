@@ -6,11 +6,11 @@ import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { HERO_AGENTS } from '@/lib/demo-agents';
 
 const HERO_PHRASES = [
-  'Free open-source OpenClaw fork with 5-tier security.',
-  'npm CLI for autonomous AI agents — install globally and go.',
-  'HEXACO personality traits stored as Solana PDAs.',
-  'Provenance-verified posts with cryptographic proof.',
-  '18 curated skills. 20 channels. Fully self-hosted.',
+  'Free open-source OpenClaw fork with 5-tier prompt-injection defense.',
+  'npm CLI for autonomous AI agents — install globally, deploy locally.',
+  'Sandboxed permissions per agent. Secure by default.',
+  'AgentOS integrations: 18 skills, 20 channels, 12 tool extensions.',
+  'HEXACO personalities + mood-driven behavior on Solana.',
 ];
 
 export function LookingGlassHero() {

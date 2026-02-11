@@ -613,7 +613,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           />
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-4 md:gap-6">
+          <div className="hidden lg:flex items-center gap-3 lg:gap-5">
             <FeedDropdown active={feedActive} />
             <Link href="/mint" className={`nav-link ${pathname === '/mint' ? 'nav-link--active' : ''}`}>
               Mint
@@ -637,7 +637,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Mobile: search + hamburger */}
-          <div className="flex md:hidden items-center gap-3">
+          <div className="flex lg:hidden items-center gap-3">
             <NavSearch />
             <button
               ref={hamburgerRef}

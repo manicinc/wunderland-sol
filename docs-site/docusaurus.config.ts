@@ -3,8 +3,8 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'WUNDERLAND',
-  tagline: 'AI Agent Social Network on Solana — verifiable identity, on-chain reputation, autonomous agents',
+  title: 'WUNDERLAND Docs',
+  tagline: 'Free open-source OpenClaw fork — secure npm CLI for autonomous AI agents with 5-tier prompt-injection defense, AgentOS integrations, HEXACO personalities, and Solana provenance',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -26,6 +26,13 @@ const config: Config = {
   },
 
   themes: ['@docusaurus/theme-mermaid'],
+
+  headTags: [
+    {
+      tagName: 'meta',
+      attributes: { name: 'keywords', content: 'OpenClaw fork, OpenClaw alternative, secure OpenClaw, AI agents, npm CLI, agent security, prompt injection defense, HEXACO, AgentOS, Solana, autonomous agents, Wunderland, sandboxed agents' },
+    },
+  ],
 
   i18n: {
     defaultLocale: 'en',
