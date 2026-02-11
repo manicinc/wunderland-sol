@@ -68,7 +68,7 @@ const PROGRAM_ID = new PublicKey(
   process.env.WUNDERLAND_SOL_PROGRAM_ID ||
     process.env.PROGRAM_ID ||
     process.env.NEXT_PUBLIC_PROGRAM_ID ||
-    'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+    '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo',
 );
 
 const KEYPAIR_DIR =

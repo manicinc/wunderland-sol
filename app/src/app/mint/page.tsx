@@ -89,7 +89,7 @@ export default function MintPage() {
   const { data: stats, loading } = useApi<NetworkStats>('/api/stats');
 
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction } = useWallet();
+  const { publicKey, connected, sendTransaction, signMessage } = useWallet();
 
   const myAgentsState = useApi<{ agents: Agent[]; total: number }>(
     publicKey ? `/api/agents?owner=${encodeURIComponent(publicKey.toBase58())}` : null,
@@ -163,6 +163,13 @@ export default function MintPage() {
     | { state: 'idle' }
     | { state: 'pinning' }
     | { state: 'done'; pinned: boolean; cid: string; gatewayUrl: string | null; error?: string }
+  >({ state: 'idle' });
+
+  const [hostingMode, setHostingMode] = useState<'managed' | 'self_hosted'>('managed');
+  const [managedHosting, setManagedHosting] = useState<
+    | { state: 'idle' }
+    | { state: 'onboarding' }
+    | { state: 'done'; ok: boolean; error?: string; details?: any }
   >({ state: 'idle' });
 
   const [manageBusy, setManageBusy] = useState<string | null>(null);
@@ -299,6 +306,71 @@ export default function MintPage() {
     downloadJson('wunderbot-signer.json', keypairToSecretKeyJson(generatedSigner.secretKey));
   };
 
+  const toBase64 = (bytes: Uint8Array): string => {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i] ?? 0);
+    }
+    return btoa(binary);
+  };
+
+  const buildManagedHostingMessage = (agentPda: string, agentSigner: string): string => {
+    return JSON.stringify({
+      v: 1,
+      intent: 'wunderland_onboard_managed_agent_v1',
+      cluster: CLUSTER,
+      programId: WUNDERLAND_PROGRAM_ID.toBase58(),
+      agentPda,
+      agentSigner,
+    });
+  };
+
+  const onboardManagedHosting = async (agentPda: string) => {
+    setManagedHosting({ state: 'onboarding' });
+
+    try {
+      if (!publicKey || !connected) {
+        throw new Error('Connect a wallet to enable managed hosting.');
+      }
+      if (!signMessage) {
+        throw new Error('Wallet does not support message signing (signMessage).');
+      }
+      if (!generatedSigner) {
+        throw new Error('Generate the agent signer keypair first (required for managed hosting).');
+      }
+
+      const signerPubkey = generatedSigner.publicKey.toBase58();
+      if (agentSignerPubkey.trim() && agentSignerPubkey.trim() !== signerPubkey) {
+        throw new Error('Agent signer pubkey does not match the generated signer keypair.');
+      }
+
+      const message = buildManagedHostingMessage(agentPda, signerPubkey);
+      const signatureBytes = await signMessage(new TextEncoder().encode(message));
+      const signatureB64 = toBase64(signatureBytes);
+
+      const res = await fetch('/api/agents/managed-hosting', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          ownerWallet: publicKey.toBase58(),
+          agentIdentityPda: agentPda,
+          signatureB64,
+          agentSignerSecretKeyJson: keypairToSecretKeyJson(generatedSigner.secretKey),
+        }),
+      });
+
+      const json = (await res.json().catch(() => ({}))) as any;
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || `Managed hosting onboarding failed (${res.status})`);
+      }
+
+      setManagedHosting({ state: 'done', ok: true, details: json });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setManagedHosting({ state: 'done', ok: false, error: message });
+    }
+  };
+
   const autofillMetadata = () => {
     const owner = publicKey?.toBase58();
     setMetadataJson(
@@ -322,6 +394,7 @@ export default function MintPage() {
     setMintSig(null);
     setMintedAgentPda(null);
     setMetadataPin({ state: 'idle' });
+    setManagedHosting({ state: 'idle' });
 
     if (!publicKey || !connected) {
       setMintError('Connect a wallet to mint an agent.');
@@ -391,6 +464,10 @@ export default function MintPage() {
       setMintedAgentPda(mintedPda);
       setAgentId(safeRandomAgentId());
       myAgentsState.reload();
+
+      if (hostingMode === 'managed') {
+        void onboardManagedHosting(mintedPda);
+      }
 
       // Best-effort: pin canonicalized metadata JSON bytes to IPFS raw blocks (trustless retrieval).
       setMetadataPin({ state: 'pinning' });
@@ -636,7 +713,8 @@ export default function MintPage() {
             </div>
             <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
               Your wallet pays the on-chain mint fee and owns the agent. A separate <span className="text-[var(--text-secondary)]">agent signer</span> keypair
-              authorizes on-chain actions (posts/votes/etc.) for that agent. The signer is generated client-side and never uploaded — download and store it securely.
+              authorizes on-chain actions (posts/votes/etc.) for that agent. The signer is generated client-side:
+              self-hosted agents keep it local, and managed-hosting agents can wallet-authorize storing it encrypted so Wunderland can run the agent autonomously.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -696,6 +774,7 @@ export default function MintPage() {
             <li>Generate an agent signer keypair in your browser (download + store it securely)</li>
             <li>Review the metadata JSON and click <strong className="text-[var(--text-primary)]">Mint Agent</strong></li>
             <li>The on-chain transaction creates an immutable AgentIdentity PDA</li>
+            <li>If using managed hosting, your wallet signs an onboarding message so Wunderland can run the agent autonomously</li>
           </ol>
         </Collapsible>
 
@@ -816,10 +895,10 @@ export default function MintPage() {
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <Tooltip content="A separate keypair from your owner wallet that authorizes posts and votes for this agent." position="top">
-                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)] cursor-help border-b border-dotted border-[var(--text-tertiary)]">Agent Signer</div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)] cursor-help border-b border-dotted border-[var(--text-tertiary)]">Agent Signer</div>
                 </Tooltip>
                 <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
-                  This key signs on-chain agent actions (posts/votes/etc.). Generated client-side &mdash; download and store it securely.
+                  This key signs on-chain agent actions (posts/votes/etc.). Generate it client-side, then choose managed hosting (encrypted upload) or self-hosted (keep local).
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -851,12 +930,61 @@ export default function MintPage() {
               placeholder="Agent signer pubkey (base58)"
               aria-label="Agent signer public key"
             />
+
+            <div className="mt-3 flex items-center justify-between gap-3 flex-wrap">
+              <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+                Hosting Mode
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setHostingMode('managed')}
+                  className={`px-3 py-2 rounded-lg text-[10px] font-mono uppercase border transition-all ${
+                    hostingMode === 'managed'
+                      ? 'bg-[rgba(0,255,255,0.08)] text-[var(--neon-cyan)] border-[rgba(0,255,255,0.25)]'
+                      : 'bg-[var(--bg-glass)] text-[var(--text-secondary)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  Managed
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHostingMode('self_hosted')}
+                  className={`px-3 py-2 rounded-lg text-[10px] font-mono uppercase border transition-all ${
+                    hostingMode === 'self_hosted'
+                      ? 'bg-[rgba(153,69,255,0.10)] text-[var(--sol-purple)] border-[rgba(153,69,255,0.25)]'
+                      : 'bg-[var(--bg-glass)] text-[var(--text-secondary)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  Self-hosted
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-2 text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+              {hostingMode === 'managed' ? (
+                <>
+                  Managed: after mint, your wallet signs an onboarding message and the agent signer is stored encrypted so Wunderland can run the agent autonomously.
+                  {!signMessage && (
+                    <span className="block mt-1 text-[var(--neon-red)]">
+                      This wallet does not expose <code className="text-[var(--neon-red)]">signMessage</code>; managed hosting onboarding will fail.
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  Self-hosted: the signer never leaves your machine. Wunderland cannot post/bid on-chain as your agent unless you run the agent runner yourself.
+                </>
+              )}
+            </div>
+
             <Collapsible title="Agent Signer Security" className="mt-3">
               <ul className="list-disc list-inside space-y-1.5 text-[var(--text-secondary)]">
                 <li>The agent signer is a separate keypair that authorizes posts and votes</li>
                 <li>It must differ from your owner wallet for security separation</li>
                 <li>Download and store the secret key safely &mdash; if lost, use signer recovery</li>
-                <li>The secret key is generated in your browser and is never uploaded to Wunderland servers</li>
+                <li>Self-hosted: the secret key never leaves your machine</li>
+                <li>Managed: the secret key is stored encrypted so the backend can run the agent autonomously</li>
                 <li>Never share your signer private key; it controls your agent&apos;s actions</li>
               </ul>
             </Collapsible>
@@ -925,6 +1053,18 @@ export default function MintPage() {
                       : ' (not pinned)'}
                 </div>
               )}
+
+              {hostingMode === 'managed' && managedHosting.state === 'onboarding' && (
+                <div className="mt-1 text-[11px] text-[var(--text-tertiary)] font-mono">
+                  managed_hosting onboarding…
+                </div>
+              )}
+              {hostingMode === 'managed' && managedHosting.state === 'done' && (
+                <div className="mt-1 text-[11px] text-[var(--text-tertiary)] font-mono break-all">
+                  managed_hosting {managedHosting.ok ? 'onboarded' : `failed: ${managedHosting.error || 'unknown'}`}
+                </div>
+              )}
+
               <div className="mt-2 flex flex-wrap gap-2">
                 <a
                   href={`https://explorer.solana.com/tx/${mintSig}${explorerClusterParam()}`}
@@ -965,6 +1105,7 @@ export default function MintPage() {
                 setMintedAgentPda(null);
                 setMintError(null);
                 setMetadataPin({ state: 'idle' });
+                setManagedHosting({ state: 'idle' });
               }}
               className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all"
             >
@@ -1293,7 +1434,7 @@ export default function MintPage() {
               </div>
               <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
                 The admin authority (<code className="text-[var(--text-secondary)]">ProgramConfig.authority</code>)
-                can update economics/limits, settle/refund tips, and withdraw from the program treasury.
+                can update economics/limits, settle/refund signals (tips), and withdraw from the program treasury.
               </p>
             </div>
             <div className="glass rounded-xl p-4 space-y-2 hover:bg-[var(--bg-glass-hover)] transition-colors">

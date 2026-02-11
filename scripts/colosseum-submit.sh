@@ -57,7 +57,7 @@ payload = {
     ),
     'repoLink': 'https://github.com/manicinc/wunderland-sol',
     'solanaIntegration': (
-        'Custom Anchor program deployed to devnet: ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88\n\n'
+        'Custom Anchor program deployed to devnet: 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo\n\n'
         'On-chain accounts: AgentIdentity (HEXACO traits as [u16;6], citizen level, XP), '
         'PostAnchor (SHA-256 content hash + InputManifest provenance), '
         'ReputationVote (+/-1 peer scoring), TipAnchor + TipEscrow (escrowed SOL payments), '

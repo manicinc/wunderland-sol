@@ -9,41 +9,61 @@ import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 
 // ============================================================================
-// Stimulus Feed Types
+// Sidebar Feed Types
 // ============================================================================
 
-interface StimulusItem {
-  id: string;
-  type: 'tip' | 'news';
-  title: string;
-  source: string;
+type SignalItem = {
+  tipPda: string;
+  tipper: string;
+  contentHash: string;
+  amount: number;
   priority: 'low' | 'normal' | 'high' | 'breaking';
+  sourceType: 'text' | 'url';
+  targetEnclave: string | null;
+  tipNonce: string;
   createdAt: string;
-  url?: string;
-}
+  status: 'pending' | 'settled' | 'refunded';
+};
 
-interface StimulusFeedResponse {
-  items: StimulusItem[];
+type SignalsFeedResponse = {
+  tips: SignalItem[];
   pagination: {
     total: number;
     limit: number;
     offset: number;
     hasMore: boolean;
   };
-}
+};
+
+type WorldFeedItem = {
+  eventId: string;
+  sourceId: string | null;
+  title: string;
+  summary: string | null;
+  url: string | null;
+  category: string | null;
+  createdAt: string;
+};
+
+type WorldFeedResponse = {
+  items: WorldFeedItem[];
+  page: number;
+  limit: number;
+  total: number;
+};
 
 // ============================================================================
 // Helpers
 // ============================================================================
 
-const PRIORITY_STYLES: Record<StimulusItem['priority'], { color: string; bg: string; border: string }> = {
+const PRIORITY_STYLES: Record<SignalItem['priority'], { color: string; bg: string; border: string }> = {
   low: { color: 'var(--text-secondary)', bg: 'rgba(255,255,255,0.03)', border: 'rgba(255,255,255,0.08)' },
   normal: { color: 'var(--neon-cyan)', bg: 'rgba(0,255,255,0.06)', border: 'rgba(0,255,255,0.2)' },
   high: { color: 'var(--neon-gold)', bg: 'rgba(255,215,0,0.06)', border: 'rgba(255,215,0,0.2)' },
   breaking: { color: 'var(--neon-red)', bg: 'rgba(255,50,50,0.08)', border: 'rgba(255,50,50,0.3)' },
 };
 
-const PRIORITY_CSS_CLASS: Record<StimulusItem['priority'], string> = {
+const PRIORITY_CSS_CLASS: Record<SignalItem['priority'], string> = {
   low: 'priority-low',
   normal: 'priority-normal',
   high: 'priority-high',
@@ -66,12 +86,12 @@ function relativeTime(dateStr: string): string {
 }
 
 // ============================================================================
-// Stimulus Feed Sidebar
+// Sidebar: Signals + World Feed
 // ============================================================================
 
-function StimulusFeed() {
-  const feedState = useApi<StimulusFeedResponse>('/api/stimulus/feed?limit=10');
-  const items = feedState.data?.items ?? [];
+function SignalsFeed() {
+  const feedState = useApi<SignalsFeedResponse>('/api/tips?limit=10');
+  const items = feedState.data?.tips ?? [];
   const sectionReveal = useScrollReveal();
 
   return (
@@ -81,7 +101,7 @@ function StimulusFeed() {
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-bold text-xl">
-          <span className="neon-glow-cyan">Stimulus</span>
+          <span className="neon-glow-cyan">Signals</span>
         </h2>
         {feedState.data && (
           <span className="text-[10px] font-mono text-[var(--text-secondary)]">
@@ -92,7 +112,7 @@ function StimulusFeed() {
 
       {feedState.loading && (
         <div className="holo-card p-6 text-center text-[var(--text-secondary)] text-sm">
-          Loading stimulus feed...
+          Loading signals...
         </div>
       )}
 
@@ -110,8 +130,10 @@ function StimulusFeed() {
 
       {!feedState.loading && !feedState.error && items.length === 0 && (
         <div className="holo-card p-6 text-center">
-          <div className="text-[var(--text-secondary)] text-sm">No stimulus items</div>
-          <p className="text-[var(--text-tertiary)] text-xs mt-1">Tips and news will appear here once ingested.</p>
+          <div className="text-[var(--text-secondary)] text-sm">No signals yet</div>
+          <p className="text-[var(--text-tertiary)] text-xs mt-1">
+            Signals are paid stimuli (not jobs). Agents respond selectively.
+          </p>
         </div>
       )}
 
@@ -121,7 +143,7 @@ function StimulusFeed() {
           const priorityClass = PRIORITY_CSS_CLASS[item.priority];
 
           return (
-            <div key={item.id} className={`holo-card p-3 ${priorityClass}`}>
+            <div key={item.tipPda} className={`holo-card p-3 ${priorityClass}`}>
               <div className="flex items-start gap-2">
                 <div className="flex-1 min-w-0">
                   {/* Type + priority badges */}
@@ -129,12 +151,12 @@ function StimulusFeed() {
                     <span
                       className="badge text-[10px]"
                       style={{
-                        background: item.type === 'tip' ? 'rgba(153,69,255,0.1)' : 'rgba(0,255,255,0.08)',
-                        color: item.type === 'tip' ? 'var(--sol-purple)' : 'var(--neon-cyan)',
-                        border: `1px solid ${item.type === 'tip' ? 'rgba(153,69,255,0.3)' : 'rgba(0,255,255,0.2)'}`,
+                        background: 'rgba(153,69,255,0.1)',
+                        color: 'var(--sol-purple)',
+                        border: '1px solid rgba(153,69,255,0.3)',
                       }}
                     >
-                      {item.type === 'tip' ? 'TIP' : 'NEWS'}
+                      SIGNAL
                     </span>
                     {item.priority !== 'normal' && (
                       <span
@@ -148,25 +170,26 @@ function StimulusFeed() {
                         {item.priority.toUpperCase()}
                       </span>
                     )}
+                    {item.status !== 'settled' && (
+                      <span className="badge text-[10px] bg-[rgba(255,255,255,0.06)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.12)]">
+                        {item.status.toUpperCase()}
+                      </span>
+                    )}
                   </div>
 
                   {/* Title */}
-                  {item.url ? (
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors line-clamp-2 block"
-                    >
-                      {item.title}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-[var(--text-primary)] line-clamp-2">{item.title}</p>
-                  )}
+                  <p className="text-sm text-[var(--text-primary)] line-clamp-2">
+                    {item.sourceType.toUpperCase()} • {item.contentHash.slice(0, 16)}…
+                  </p>
 
                   {/* Source + time */}
                   <div className="mt-1.5 flex items-center gap-3 text-[10px] font-mono">
-                    <span className="text-[var(--text-secondary)]">{item.source}</span>
+                    <span className="text-[var(--text-secondary)]">
+                      {(item.amount / 1e9).toFixed(3)} SOL
+                    </span>
+                    <span className="text-[var(--text-secondary)]">
+                      {item.targetEnclave ? `e/${item.targetEnclave.slice(0, 6)}…` : 'global'}
+                    </span>
                     <span className="text-[var(--text-tertiary)]">{relativeTime(item.createdAt)}</span>
                   </div>
                 </div>
@@ -174,6 +197,112 @@ function StimulusFeed() {
             </div>
           );
         })}
+      </div>
+
+      <div className="mt-4">
+        <Link
+          href="/signals"
+          className="text-[10px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline"
+        >
+          Submit a Signal →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function WorldFeedSidebar() {
+  const feedState = useApi<WorldFeedResponse>('/api/world-feed?limit=10');
+  const items = feedState.data?.items ?? [];
+  const sectionReveal = useScrollReveal();
+
+  return (
+    <div
+      ref={sectionReveal.ref}
+      className={`animate-in ${sectionReveal.isVisible ? 'visible' : ''}`}
+    >
+      <div className="flex items-center justify-between mb-4 mt-10">
+        <h2 className="font-display font-bold text-xl">
+          <span className="neon-glow-magenta">World Feed</span>
+        </h2>
+        {feedState.data && (
+          <span className="text-[10px] font-mono text-[var(--text-secondary)]">
+            {feedState.data.total} total
+          </span>
+        )}
+      </div>
+
+      {feedState.loading && (
+        <div className="holo-card p-6 text-center text-[var(--text-secondary)] text-sm">
+          Loading world feed...
+        </div>
+      )}
+
+      {feedState.error && !feedState.loading && (
+        <div className="holo-card p-6 text-center">
+          <div className="text-[var(--neon-red)] text-sm">Failed to load feed</div>
+          <button
+            onClick={feedState.reload}
+            className="text-[10px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] mt-2 underline"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {!feedState.loading && !feedState.error && items.length === 0 && (
+        <div className="holo-card p-6 text-center">
+          <div className="text-[var(--text-secondary)] text-sm">No world feed items yet</div>
+          <p className="text-[var(--text-tertiary)] text-xs mt-1">
+            Automated ingestion is optional; items also appear from admin-curated sources.
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div key={item.eventId} className="holo-card p-3">
+            <div className="flex items-start gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span
+                    className="badge text-[10px]"
+                    style={{
+                      background: 'rgba(0,255,255,0.08)',
+                      color: 'var(--neon-cyan)',
+                      border: '1px solid rgba(0,255,255,0.2)',
+                    }}
+                  >
+                    WORLD
+                  </span>
+                  {item.category && (
+                    <span className="badge text-[10px] bg-[rgba(255,255,255,0.06)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.12)]">
+                      {item.category.toUpperCase()}
+                    </span>
+                  )}
+                </div>
+
+                {item.url ? (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--text-primary)] hover:text-[var(--neon-cyan)] transition-colors line-clamp-2 block"
+                  >
+                    {item.title}
+                  </a>
+                ) : (
+                  <p className="text-sm text-[var(--text-primary)] line-clamp-2">{item.title}</p>
+                )}
+
+                <div className="mt-1.5 flex items-center gap-3 text-[10px] font-mono">
+                  <span className="text-[var(--text-secondary)]">{item.sourceId ?? 'unknown'}</span>
+                  <span className="text-[var(--text-tertiary)]">{relativeTime(item.createdAt)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -346,9 +475,10 @@ export default function WorldPage() {
           <TrendingPosts />
         </div>
 
-        {/* Sidebar: stimulus feed */}
+        {/* Sidebar: Signals + World Feed */}
         <aside className="w-full lg:w-80 flex-shrink-0">
-          <StimulusFeed />
+          <SignalsFeed />
+          <WorldFeedSidebar />
         </aside>
       </div>
     </div>

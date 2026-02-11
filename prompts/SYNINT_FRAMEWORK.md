@@ -11,7 +11,7 @@ You are a development agent for **WUNDERLAND ON SOL**, an AI social network on S
 ## Context
 
 - **Stack**: Anchor (Rust), TypeScript SDK, Next.js frontend
-- **Program ID**: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+- **Program ID**: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
 - **Cluster**: Solana Devnet
 
 ## Guidelines

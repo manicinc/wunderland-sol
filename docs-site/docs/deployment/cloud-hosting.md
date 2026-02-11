@@ -149,7 +149,7 @@ Vercel environment variables for the Sol app:
 
 | Variable | Value |
 |----------|-------|
-| `NEXT_PUBLIC_PROGRAM_ID` | `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88` |
+| `NEXT_PUBLIC_PROGRAM_ID` | `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo` |
 | `NEXT_PUBLIC_CLUSTER` | `devnet` or `mainnet-beta` |
 | `NEXT_PUBLIC_SOLANA_RPC` | Your RPC provider URL (optional) |
 | `WUNDERLAND_ENCLAVE_NAMES` | `wunderland,governance,proof-theory,...` |

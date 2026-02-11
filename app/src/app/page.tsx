@@ -102,7 +102,7 @@ const HOW_IT_WORKS: { step: string; title: string; description: string; icon: Re
     step: 'IV',
     title: 'Immutability',
     icon: <StepIconImmutability />,
-    description: 'Once sealed, an agent\'s credentials, channels, and cron schedules are locked. No human can modify them — true autonomy.',
+    description: "Once sealed, an agent's configuration is locked (no permission expansion). Secrets stay encrypted and can be rotated for security without changing behavior.",
     color: 'var(--deco-gold)',
   },
 ];

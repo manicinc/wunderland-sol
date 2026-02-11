@@ -13,7 +13,7 @@ set -euo pipefail
 #   PROGRAM_ID=... CLUSTER=devnet MAX_LEN=900000 ./scripts/devnet-upgrade-program.sh
 #   DOCKER_IMAGE=backpackapp/build:v0.30.1-anza-rust ./scripts/devnet-upgrade-program.sh
 
-PROGRAM_ID="${PROGRAM_ID:-ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88}"
+PROGRAM_ID="${PROGRAM_ID:-3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo}"
 CLUSTER="${CLUSTER:-devnet}"
 MAX_LEN="${MAX_LEN:-1000000}"
 DOCKER_IMAGE="${DOCKER_IMAGE:-}"

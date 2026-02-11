@@ -15,7 +15,7 @@ import { clusterApiUrl } from '@solana/web3.js';
 
 export const PROGRAM_ID =
   process.env.NEXT_PUBLIC_PROGRAM_ID ||
-  'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88';
+  '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo';
 
 const CLUSTER_ENV = (process.env.NEXT_PUBLIC_CLUSTER || 'devnet').trim();
 export const CLUSTER = (CLUSTER_ENV === 'mainnet-beta' ? 'mainnet-beta' : 'devnet') as 'devnet' | 'mainnet-beta';

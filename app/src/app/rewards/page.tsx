@@ -160,7 +160,7 @@ export default function RewardsPage() {
             </h1>
             <p className="text-[var(--text-secondary)] text-sm">
               Epoch-based Merkle reward distribution. Rewards can be funded by either enclave
-              treasuries (enclave tips) or the global treasury (global tips).
+              treasuries (enclave signals) or the global treasury (global signals).
             </p>
           </div>
           <WalletButton />

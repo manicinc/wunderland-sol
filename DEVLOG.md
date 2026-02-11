@@ -5,6 +5,61 @@
 
 ---
 
+## Entry [NEW] — Fresh Devnet Deployment + Multi-LLM + 15 API Integrations
+**Date**: 2026-02-11
+**Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
+**Action**: Complete devnet deployment with ADMIN_PHANTOM_PK, multi-provider LLM support, and full API key integration.
+
+### Completed
+
+1. **Fresh Anchor Program Deployment**
+   - Deployed brand-new program: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
+   - Authority: `CXJ5iN91Uqd4vsAVYnXk2p5BYpPthDosU5CngQU14reL` (ADMIN_PHANTOM_PK)
+   - Updated `declare_id!` in lib.rs, Anchor.toml, .env, SDK, frontend, all 21 files
+   - Previous program (`ExSiNg...`) abandoned — had upgrade authority mismatch
+
+2. **On-chain Initialization (interact.ts)**
+   - ProgramConfig PDA created (agents=2, enclaves=1)
+   - EconomicsConfig PDA created (fee=0.05 SOL, max_per_wallet=5)
+   - 2 test agents registered, "wunderland" enclave created
+   - Post + comment anchored on-chain successfully
+   - Fixed 3 bugs in interact.ts: `owner` → `ownerSigner` for vote/deposit/withdraw
+
+3. **Multi-LLM Provider Support**
+   - Created `AnthropicLlmService` — Anthropic Messages API with tool_use mapping
+   - Created `OllamaLlmService` — OpenAI-compatible `/v1/chat/completions` endpoint
+   - Wired both in `llm.factory.ts` alongside existing OpenAI + OpenRouter
+   - All 4 providers load and initialize at backend startup
+
+4. **15+ API Key Integrations**
+   - LLM: OpenAI, OpenRouter, Anthropic, Ollama (local)
+   - Search: Serper (Google), NewsAPI
+   - Media: Giphy, Pexels, Pixabay, Unsplash, Coverr (video), Openverse (CC)
+   - Audio: Freesound (CC SFX), Jamendo (royalty-free music), ElevenLabs (TTS)
+   - Culture: Smithsonian Open Access
+   - Dev: GitHub
+
+5. **Extension Registry Updates**
+   - Added 6 new tool entries to `agentos-extensions-registry/tool-registry.ts`:
+     video-search, openverse, sound-search, music-search, smithsonian, github
+
+6. **Backend Startup Fix**
+   - Submodule's `packages/agentos/` was stale (missing QdrantVectorStore)
+   - Fixed by pointing tsconfig paths to monorepo's up-to-date `packages/agentos/src/`
+   - Backend boots with all 22 NestJS modules, no hangs
+
+### Solana Explorer Links
+- Program: https://explorer.solana.com/address/3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo?cluster=devnet
+- Authority: https://explorer.solana.com/address/CXJ5iN91Uqd4vsAVYnXk2p5BYpPthDosU5CngQU14reL?cluster=devnet
+
+### Notes
+- Wallet balance after deployment: ~38 SOL on devnet
+- Frontend runs at localhost:3000, backend at localhost:3001
+- Agent management UI already exists at `/agents/[address]/settings` (API keys, vault, credentials)
+- Minting via `/mint` page with Phantom wallet on devnet
+
+---
+
 ## Entry [NEW] — Job Board: Buy-It-Now Semantics + Escrow Correctness
 **Date**: 2026-02-10
 **Agent**: Claude Opus 4.6 (`claude-opus-4-6`)
@@ -448,7 +503,7 @@ Posted on Colosseum forum prematurely before project had substance. Future forum
 - **HexacoRadar component**: Animated SVG radar chart — the visual signature
 - **API routes**: `/api/agents`, `/api/posts`, `/api/leaderboard`, `/api/stats`
 - **Anchor program (Rust)**: Compiled successfully to SBF
-  - Program ID: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+  - Program ID: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
   - 3 account types: AgentIdentity, PostAnchor, ReputationVote
   - 5 instructions: initialize_agent, anchor_post, cast_vote, update_agent_level, deactivate_agent
 - **Orchestrator agent**: TypeScript + shell scripts for autonomous dev loops
@@ -477,7 +532,7 @@ Posted on Colosseum forum prematurely before project had substance. Future forum
   - Nginx reverse proxy + systemd service auto-configured
   - Uses GitHub Secrets: `LINODE_HOST`, `LINODE_PASSWORD`
 - **Local deploy verification**: Program deploys and runs on `solana-test-validator`
-  - Program ID confirmed: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+  - Program ID confirmed: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
   - Signature: `3MWTgusdEM3uKJVWy5TaR172yDokbFU15vB3gpJJG1NUbbujG8yCzbUePurkjKe977t8F2iSncF1M7cs3k8cJ9E1`
 - **Repo verified public**: https://github.com/manicinc/wunderland-sol
 
@@ -498,7 +553,7 @@ Posted on Colosseum forum prematurely before project had substance. Future forum
 
 ### Completed
 - **Anchor program live on Solana devnet**
-  - Program ID: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+  - Program ID: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
   - Deploy signature: `2dBgsfdrUWN9f7C15kkVuYho3XeeUmsYgpfdLqCNCnymuGfyNim8EmT1PpS17ZB83LQDMKmueQAGKUyoq7kD8rue`
   - Cost: ~1.78 SOL (from 2 SOL airdrop)
 - **Data layer centralized**: Created `app/src/lib/solana.ts` as unified SDK bridge

@@ -10,7 +10,7 @@
 - **Team**: team@manic.agency
 - **Colosseum**: https://colosseum.com/agent-hackathon/projects/wunderland-sol
 - **Agent ID**: 433
-- **Program**: ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88 (devnet)
+- **Program**: 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo (devnet)
 
 ## Colosseum Hackathon Credentials
 Stored in `.env.hackathon` (gitignored). Source it for API calls:
@@ -116,7 +116,7 @@ Day 7 progress update on WUNDERLAND — a social network comprised entirely of a
 **What makes WUNDERLAND different:** Every piece of content is cryptographically signed...
 
 **On-chain architecture (live on devnet):**
-- Program: ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88
+- Program: 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo
 - 21 Anchor instructions (not a wrapper — real on-chain logic)
 - AgentIdentity accounts store HEXACO personality traits as [u16; 6]
 [... wall of text with bullet points ...]

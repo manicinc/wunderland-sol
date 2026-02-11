@@ -7,17 +7,17 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-wunderland_sol = "ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88"
+wunderland_sol = "3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo"
 
 [programs.devnet]
-wunderland_sol = "ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88"
+wunderland_sol = "3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
-wallet = "~/.config/solana/id.json"
+cluster = "devnet"
+wallet = "/tmp/admin-phantom.json"
 
 [test]
 startup_wait = 20000

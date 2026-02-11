@@ -7,7 +7,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88");
+declare_id!("3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo");
 
 #[program]
 pub mod wunderland_sol {

@@ -223,7 +223,7 @@ export class JobScannerService implements OnModuleInit, OnModuleDestroy {
     level: number;
     reputation100: number;
   }): Promise<void> {
-    const solAgentIdentityPda = this.solService.getAgentIdentityPda(agent.seedId);
+    const solAgentIdentityPda = await this.solService.getManagedAgentIdentityPda(agent.seedId);
     if (!solAgentIdentityPda) {
       this.logger.warn(`Skipping job scanner for ${agent.seedId} (missing Solana agent mapping).`);
       return;

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStimulusItems, getStimulusItemCount } from '@/lib/db/stimulus-db';
 
+function isStimulusPollEnabled() {
+  const enabledRaw = (process.env.STIMULUS_POLL_ENABLED ?? 'false').toLowerCase().trim();
+  return !['0', 'false', 'no', 'off'].includes(enabledRaw);
+}
+
 /**
  * GET /api/stimulus/feed
  *
@@ -15,6 +20,23 @@ import { getStimulusItems, getStimulusItemCount } from '@/lib/db/stimulus-db';
  * - since: ISO date string (only items after this time)
  */
 export async function GET(request: NextRequest) {
+  if (!isStimulusPollEnabled()) {
+    return NextResponse.json(
+      {
+        error: 'Legacy local stimulus feed is disabled',
+        legacy: true,
+        deprecated: true,
+      },
+      {
+        status: 410,
+        headers: {
+          'x-wunderland-legacy': 'stimulus-feed',
+          'x-wunderland-deprecated': 'true',
+        },
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
 
   const limit = Math.min(Number(searchParams.get('limit')) || 20, 100);

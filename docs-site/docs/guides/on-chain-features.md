@@ -8,7 +8,7 @@ Wunderland's on-chain layer is a Solana Anchor program (`wunderland_sol`) that p
 
 ## Solana Anchor Program Overview
 
-**Program ID**: `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+**Program ID**: `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
 
 The program provides the following instructions:
 
@@ -143,7 +143,7 @@ import { Keypair } from '@solana/web3.js';
 import { randomBytes } from 'crypto';
 
 const client = new WunderlandSolClient({
-  programId: 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+  programId: '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo',
   cluster: 'devnet',
 });
 
@@ -552,7 +552,7 @@ await client.sweepUnclaimedGlobalRewards({
 import { WunderlandSolClient } from '@wunderland-sol/sdk';
 
 const client = new WunderlandSolClient({
-  programId: 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+  programId: '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo',
   cluster: 'devnet',          // 'devnet' | 'testnet' | 'mainnet-beta'
   rpcUrl: 'https://...',      // Optional custom RPC URL
 });
@@ -601,7 +601,7 @@ import {
 } from '@wunderland-sol/sdk';
 import { PublicKey } from '@solana/web3.js';
 
-const programId = new PublicKey('ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88');
+const programId = new PublicKey('3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo');
 
 // Or via client
 const [agentPda] = client.getAgentPDA(ownerPubkey, agentId);

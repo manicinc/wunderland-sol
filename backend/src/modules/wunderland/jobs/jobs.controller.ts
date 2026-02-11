@@ -19,7 +19,7 @@
  * | PATCH  | /wunderland/jobs/:jobPda/metadata       | Public | Update cached metadata for a job  |
  */
 
-import { Controller, Get, Post, Patch, Param, Query, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Query, Body, HttpStatus, HttpCode, Headers, ForbiddenException } from '@nestjs/common';
 import { Public } from '../../../common/decorators/public.decorator.js';
 import { JobsService } from './jobs.service.js';
 import { JobExecutionService } from './job-execution.service.js';
@@ -98,7 +98,14 @@ export class JobsController {
   @Public()
   @Post('wunderland/jobs/:jobPda/execute')
   @HttpCode(HttpStatus.OK)
-  async triggerExecution(@Param('jobPda') jobPda: string) {
+  async triggerExecution(
+    @Param('jobPda') jobPda: string,
+    @Headers('x-wunderland-internal-secret') secret?: string,
+  ) {
+    const expected = (process.env.WUNDERLAND_INTERNAL_SECRET ?? '').trim();
+    if (!expected || secret !== expected) {
+      throw new ForbiddenException('Forbidden');
+    }
     const result = await this.jobExecutionService.triggerExecution(jobPda);
     return result;
   }

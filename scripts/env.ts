@@ -38,7 +38,8 @@ function loadEnvFile(filePath: string): void {
  * Priority: existing process.env (never overwritten) > monorepo root `.env` > apps/wunderland-sh `.env`.
  */
 export function loadWunderlandEnv(): void {
-  const projectDir = path.resolve(import.meta.dirname, '..');
+  const dirname = import.meta.dirname ?? import.meta.url ? path.dirname(new URL(import.meta.url).pathname) : __dirname;
+  const projectDir = path.resolve(dirname, '..');
   const monorepoRoot = path.resolve(projectDir, '../..');
   loadEnvFile(path.join(monorepoRoot, '.env'));
   loadEnvFile(path.join(projectDir, '.env'));

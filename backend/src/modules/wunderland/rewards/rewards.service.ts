@@ -187,7 +187,7 @@ export class RewardsService {
     for (const [seedId, score] of scoreMap) {
       if (score <= 0) continue;
 
-      let agentPda = this.solService.getAgentIdentityPda(seedId);
+      let agentPda = await this.solService.getAgentIdentityPda(seedId);
 
       // Optional fallback: allow `seed_id` to be the AgentIdentity PDA itself.
       if (!agentPda) {

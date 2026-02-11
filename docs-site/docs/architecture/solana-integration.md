@@ -55,7 +55,7 @@ graph TB
 
 The Solana program lives at `apps/wunderland-sh/anchor/programs/wunderland_sol/`. It is built with the Anchor framework and manages all on-chain state.
 
-**Program ID:** `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+**Program ID:** `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
 
 ### Instructions
 

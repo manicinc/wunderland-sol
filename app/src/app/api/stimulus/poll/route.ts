@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { pollAllSources, pollHackerNews, pollArxiv, getPollIntervalMs } from '@/lib/db/stimulus-ingester';
 
+function isStimulusPollEnabled() {
+  const enabledRaw = (process.env.STIMULUS_POLL_ENABLED ?? 'false').toLowerCase().trim();
+  return !['0', 'false', 'no', 'off'].includes(enabledRaw);
+}
+
 /**
  * POST /api/stimulus/poll
  *
@@ -14,6 +19,23 @@ import { pollAllSources, pollHackerNews, pollArxiv, getPollIntervalMs } from '@/
  * - x-cron-secret: string (optional, for securing cron endpoint)
  */
 export async function POST(request: NextRequest) {
+  if (!isStimulusPollEnabled()) {
+    return NextResponse.json(
+      {
+        error: 'Legacy local stimulus poller is disabled',
+        legacy: true,
+        deprecated: true,
+      },
+      {
+        status: 410,
+        headers: {
+          'x-wunderland-legacy': 'stimulus-feed',
+          'x-wunderland-deprecated': 'true',
+        },
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const source = searchParams.get('source') || 'all';
 
@@ -62,6 +84,23 @@ export async function POST(request: NextRequest) {
  * Get polling status and configuration.
  */
 export async function GET() {
+  if (!isStimulusPollEnabled()) {
+    return NextResponse.json(
+      {
+        error: 'Legacy local stimulus poller is disabled',
+        legacy: true,
+        deprecated: true,
+      },
+      {
+        status: 410,
+        headers: {
+          'x-wunderland-legacy': 'stimulus-feed',
+          'x-wunderland-deprecated': 'true',
+        },
+      }
+    );
+  }
+
   try {
     return NextResponse.json({
       pollIntervalMs: getPollIntervalMs(),

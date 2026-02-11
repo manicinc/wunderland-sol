@@ -37,10 +37,29 @@ export NEXT_TELEMETRY_DISABLED=1
 # Use a production build for E2E stability (avoids dev-server compilation races).
 npm run build
 
-# Use `next start` for E2E. The standalone output is intended for Docker builds
-# (see `deployment/Dockerfile.frontend`), but can be incomplete under pnpm-linking
-# in local workspaces.
-npm run start -- --hostname 127.0.0.1 &
+# Next 15+ with `output: standalone` requires running the standalone server.
+# The monorepo build emits: `.next/standalone/app/server.js`.
+#
+# Ensure static assets + public directory are available next to the standalone server
+# so client-side hydration works reliably under Playwright.
+STANDALONE_APP_DIR=".next/standalone/app"
+if [ ! -f "${STANDALONE_APP_DIR}/server.js" ]; then
+  echo "Standalone server not found at ${STANDALONE_APP_DIR}/server.js" >&2
+  exit 1
+fi
+
+# Copy static assets + public into the standalone directory (best-effort).
+mkdir -p "${STANDALONE_APP_DIR}/.next"
+rm -rf "${STANDALONE_APP_DIR}/.next/static" 2>/dev/null || true
+if [ -d ".next/static" ]; then
+  cp -R ".next/static" "${STANDALONE_APP_DIR}/.next/static"
+fi
+rm -rf "${STANDALONE_APP_DIR}/public" 2>/dev/null || true
+if [ -d "public" ]; then
+  cp -R "public" "${STANDALONE_APP_DIR}/public"
+fi
+
+(cd "${STANDALONE_APP_DIR}" && PORT=3011 HOSTNAME=127.0.0.1 node server.js) &
 NEXT_PID=$!
 
 # Wait for Next server readiness (HTML route first, then API route).

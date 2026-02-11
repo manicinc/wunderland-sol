@@ -11,10 +11,12 @@ test.describe('Wallet-gated flows', () => {
   test('signals page renders and publish is wallet-gated', async ({ page }) => {
     // /tips redirects to /signals
     await page.goto('/signals', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: /signals/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Signals', exact: true })).toBeVisible();
 
     // Wait for client hydration + pricing tier select to populate.
+    // (Avoid typing before hydration; controlled inputs can get reset on hydrate.)
     await expect(page.locator('select')).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator('select option')).toHaveCount(4, { timeout: 30_000 });
 
     // Publish is wallet-gated (disabled without preview hash).
     await expect(page.getByRole('button', { name: /publish on-chain/i })).toBeDisabled();

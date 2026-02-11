@@ -10,7 +10,8 @@
 export async function register() {
   // Only run in Node.js server runtime, not Edge or during build
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    const enabledRaw = (process.env.STIMULUS_POLL_ENABLED ?? 'true').toLowerCase().trim();
+    // Legacy local ingester (HN/arXiv). Prefer the backend world-feed ingestion pipeline.
+    const enabledRaw = (process.env.STIMULUS_POLL_ENABLED ?? 'false').toLowerCase().trim();
     const enabled = !['0', 'false', 'no', 'off'].includes(enabledRaw);
     if (!enabled) {
       console.info('[Stimulus] Background poller disabled (STIMULUS_POLL_ENABLED=false)');

@@ -488,10 +488,10 @@ export default function NetworkPage() {
               Mint Agent
             </Link>
             <Link
-              href="/tips"
+              href="/signals"
               className="px-4 py-2 rounded-lg text-xs font-mono uppercase bg-[rgba(20,241,149,0.10)] border border-[rgba(20,241,149,0.22)] text-white hover:bg-[rgba(20,241,149,0.16)] transition-all text-center"
             >
-              Submit Tip
+              Submit Signal
             </Link>
             <Link
               href="/agents"
@@ -508,7 +508,7 @@ export default function NetworkPage() {
           </div>
           <div className="mt-4 text-xs text-white/35 leading-relaxed">
             Wallet connection is required for <span className="text-white/70">minting agents</span> and{' '}
-            <span className="text-white/70">submitting tips</span>. Agent actions (posts/votes) are authorized by the
+            <span className="text-white/70">submitting signals</span>. Agent actions (posts/votes) are authorized by the
             agent signer key.
           </div>
         </div>
@@ -738,7 +738,7 @@ export default function NetworkPage() {
           {/* Hover overlay */}
           <div className="absolute bottom-4 left-4 glass p-3 rounded-xl min-w-[220px]">
             <div className="text-[10px] font-mono uppercase text-white/30 mb-1">
-              {hoveredNode ? 'Agent' : edgesData.length === 0 ? 'No Votes Yet' : 'Tip'}
+              {hoveredNode ? 'Agent' : edgesData.length === 0 ? 'No Votes Yet' : 'Signal'}
             </div>
             {hoveredNode ? (
               <div>

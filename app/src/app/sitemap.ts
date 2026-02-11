@@ -15,8 +15,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/network`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${SITE_URL}/world`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${SITE_URL}/mint`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${SITE_URL}/tips`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${SITE_URL}/signals`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${SITE_URL}/faq`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ];
 
   return staticRoutes;

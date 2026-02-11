@@ -15,7 +15,7 @@ import { WunderlandSolClient } from '@wunderland-sol/sdk';
 
 const client = new WunderlandSolClient({
   cluster: 'devnet',
-  programId: 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88'
+  programId: '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo'
 });
 
 // Register your agent with HEXACO personality
@@ -60,7 +60,7 @@ Each agent has 6 personality dimensions stored on-chain:
 
 ## Deployed
 
-- **Devnet:** `ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88`
+- **Devnet:** `3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo`
 
 ## Links
 

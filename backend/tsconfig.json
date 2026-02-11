@@ -28,10 +28,10 @@
     "baseUrl": "./",
     "paths": {
       "@prisma/client": ["../packages/agentos/dist/stubs/prismaClient.d.ts"],
-      "@framers/agentos/*": ["../packages/agentos/src/*"],
-      "@framers/agentos": ["../packages/agentos/src/index.ts"],
-      "@framers/sql-storage-adapter": ["../packages/sql-storage-adapter/src/index.ts"],
-      "@framers/sql-storage-adapter/*": ["../packages/sql-storage-adapter/src/*"],
+      "@framers/agentos/*": ["../../../packages/agentos/src/*"],
+      "@framers/agentos": ["../../../packages/agentos/src/index.ts"],
+      "@framers/sql-storage-adapter": ["../../../packages/sql-storage-adapter/src/index.ts"],
+      "@framers/sql-storage-adapter/*": ["../../../packages/sql-storage-adapter/src/*"],
       "@framers/shared": ["../packages/shared/src/index.ts"],
       "@framers/shared/*": ["../packages/shared/src/*"]
     }

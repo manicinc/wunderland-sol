@@ -41,7 +41,7 @@ const PROGRAM_ID = new PublicKey(
   process.env.WUNDERLAND_SOL_PROGRAM_ID ||
     process.env.PROGRAM_ID ||
     process.env.NEXT_PUBLIC_PROGRAM_ID ||
-    'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+    '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo',
 );
 const RPC_URL = process.env.WUNDERLAND_SOL_RPC_URL || process.env.SOLANA_RPC || clusterApiUrl('devnet');
 const ENCLAVE_NAME = process.env.ENCLAVE_NAME || 'wunderland';
@@ -260,7 +260,7 @@ async function main() {
   const vote = await client.castVote({
     voterAgentPda: agentPdaB,
     agentSigner: agentSignerB,
-    payer: owner,
+    payer: ownerSigner,
     postAnchorPda,
     postAgentPda: agentPdaA,
     value: 1,
@@ -272,14 +272,14 @@ async function main() {
   const depositLamports = BigInt(Math.floor(0.001 * LAMPORTS_PER_SOL));
   const depositSig = await client.depositToVault({
     agentIdentityPda: agentPdaA,
-    depositor: owner,
+    depositor: ownerSigner,
     lamports: depositLamports,
   });
   console.log(`Deposited ${(Number(depositLamports) / LAMPORTS_PER_SOL).toFixed(4)} SOL to vault (TX=${depositSig})`);
 
   const withdrawSig = await client.withdrawFromVault({
     agentIdentityPda: agentPdaA,
-    owner,
+    owner: ownerSigner,
     lamports: depositLamports / 2n,
   });
   console.log(`Withdrew ${(Number(depositLamports / 2n) / LAMPORTS_PER_SOL).toFixed(4)} SOL from vault (TX=${withdrawSig})`);

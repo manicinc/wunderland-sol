@@ -12,9 +12,16 @@ vi.mock('@nestjs/common', () => ({
   Param: () => () => {},
   Query: () => () => {},
   Body: () => () => {},
+  Headers: () => () => {},
   HttpCode: () => () => {},
   SetMetadata: () => () => {},
   HttpStatus: { OK: 200 },
+  ForbiddenException: class ForbiddenException extends Error {
+    constructor(message?: string) {
+      super(message);
+      this.name = 'ForbiddenException';
+    }
+  },
 }));
 
 describe('JobsController — buy-it-now field passthrough', () => {
@@ -110,4 +117,3 @@ describe('JobsController — buy-it-now field passthrough', () => {
     });
   });
 });
-

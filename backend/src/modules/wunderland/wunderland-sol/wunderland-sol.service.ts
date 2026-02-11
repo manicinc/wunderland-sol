@@ -15,6 +15,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service.js';
+import { decryptSecret } from '../../../utils/crypto.js';
 
 type AnchorStatus = 'pending' | 'anchoring' | 'anchored' | 'failed' | 'missing_config' | 'disabled';
 
@@ -25,6 +26,15 @@ type AgentMapEntry = {
 
 type AgentMapFile = {
   agents: Record<string, AgentMapEntry>;
+};
+
+type DbAgentSignerRow = {
+  seed_id: string;
+  agent_identity_pda: string;
+  owner_wallet: string;
+  agent_signer_pubkey: string;
+  encrypted_signer_secret_key: string;
+  updated_at: number;
 };
 
 // ── IPFS CID derivation (CIDv1/raw/sha2-256) ───────────────────────────────
@@ -150,9 +160,58 @@ export class WunderlandSolService {
     };
   }
 
-  getAgentIdentityPda(seedId: string): string | null {
+  /**
+   * Resolve an AgentIdentity PDA for a given seedId.
+   *
+   * Resolution order:
+   * 1) If `seedId` is already a Pubkey (common for sol.wunderland.sh), return it.
+   * 2) Managed-hosting DB mapping (seed_id → agent_identity_pda).
+   * 3) Legacy JSON agent map file (WUNDERLAND_SOL_AGENT_MAP_PATH).
+   */
+  async getAgentIdentityPda(seedId: string): Promise<string | null> {
+    const raw = safeString(seedId).trim();
+    if (!raw) return null;
+
+    // 1) seedId is already a PDA (base58 pubkey)
+    try {
+      const web3 = await import('@solana/web3.js');
+      return new web3.PublicKey(raw).toBase58();
+    } catch {
+      // ignore
+    }
+
+    // 2) DB mapping (managed hosting)
+    const row = await this.db.get<{ agent_identity_pda: string }>(
+      'SELECT agent_identity_pda FROM wunderland_sol_agent_signers WHERE seed_id = ? LIMIT 1',
+      [raw],
+    );
+    const pdaFromDb = row?.agent_identity_pda && typeof row.agent_identity_pda === 'string' ? row.agent_identity_pda.trim() : '';
+    if (pdaFromDb) return pdaFromDb;
+
+    // 3) Legacy map file
     const agentMap = this.loadAgentMap();
-    const agentEntry = agentMap?.agents?.[seedId];
+    const agentEntry = agentMap?.agents?.[raw];
+    const pda = agentEntry?.agentIdentityPda;
+    return pda && typeof pda === 'string' && pda.trim() ? pda.trim() : null;
+  }
+
+  /**
+   * Resolve an AgentIdentity PDA only when the backend has an agent signer secret configured.
+   * Used to gate managed-only features like autonomous on-chain bidding.
+   */
+  async getManagedAgentIdentityPda(seedId: string): Promise<string | null> {
+    const raw = safeString(seedId).trim();
+    if (!raw) return null;
+
+    const row = await this.db.get<{ agent_identity_pda: string }>(
+      'SELECT agent_identity_pda FROM wunderland_sol_agent_signers WHERE seed_id = ? LIMIT 1',
+      [raw],
+    );
+    const pdaFromDb = row?.agent_identity_pda && typeof row.agent_identity_pda === 'string' ? row.agent_identity_pda.trim() : '';
+    if (pdaFromDb) return pdaFromDb;
+
+    const agentMap = this.loadAgentMap();
+    const agentEntry = agentMap?.agents?.[raw];
     const pda = agentEntry?.agentIdentityPda;
     return pda && typeof pda === 'string' && pda.trim() ? pda.trim() : null;
   }
@@ -301,6 +360,85 @@ export class WunderlandSolService {
     }
   }
 
+  private async loadManagedAgentSignerRow(seedId: string): Promise<DbAgentSignerRow | null> {
+    if (!seedId) return null;
+    try {
+      const row = await this.db.get<DbAgentSignerRow>(
+        `
+          SELECT
+            seed_id,
+            agent_identity_pda,
+            owner_wallet,
+            agent_signer_pubkey,
+            encrypted_signer_secret_key,
+            updated_at
+          FROM wunderland_sol_agent_signers
+          WHERE seed_id = ?
+             OR agent_identity_pda = ?
+          LIMIT 1
+        `,
+        [seedId, seedId],
+      );
+      return row ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  private parseAgentSignerSecretKeyJson(raw: string): number[] | null {
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed) || parsed.length !== 64) return null;
+      const bytes = parsed.map((n) => (Number(n) ?? 0) & 0xff);
+      if (bytes.length !== 64) return null;
+      return bytes;
+    } catch {
+      return null;
+    }
+  }
+
+  private async resolveManagedAgentSigner(seedId: string, web3: any): Promise<
+    | { ok: true; agentIdentityPda: any; agentSigner: any }
+    | { ok: false; error: string }
+  > {
+    const raw = safeString(seedId).trim();
+    if (!raw) return { ok: false, error: 'Missing seedId' };
+
+    // 1) DB-backed (managed hosting)
+    const dbRow = await this.loadManagedAgentSignerRow(raw);
+    if (dbRow?.encrypted_signer_secret_key && dbRow.agent_identity_pda) {
+      const decrypted = decryptSecret(String(dbRow.encrypted_signer_secret_key)) ?? String(dbRow.encrypted_signer_secret_key);
+      const secretKeyJson = this.parseAgentSignerSecretKeyJson(decrypted);
+      if (!secretKeyJson) {
+        return { ok: false, error: 'Invalid stored agent signer secret (could not parse 64-byte JSON array)' };
+      }
+
+      try {
+        const agentSigner = web3.Keypair.fromSecretKey(Uint8Array.from(secretKeyJson));
+        const agentIdentityPda = new web3.PublicKey(String(dbRow.agent_identity_pda));
+        return { ok: true, agentIdentityPda, agentSigner };
+      } catch (err) {
+        return { ok: false, error: `Invalid stored agent signer secret: ${err instanceof Error ? err.message : String(err)}` };
+      }
+    }
+
+    // 2) Legacy map file
+    const agentMap = this.loadAgentMap();
+    const agentEntry = agentMap?.agents?.[raw];
+    if (!agentEntry) {
+      return { ok: false, error: `No Solana agent signer configured for seedId "${raw}".` };
+    }
+
+    try {
+      const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
+      const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+      return { ok: true, agentIdentityPda, agentSigner };
+    } catch (err) {
+      return { ok: false, error: `Failed to load legacy agent signer keypair: ${err instanceof Error ? err.message : String(err)}` };
+    }
+  }
+
   private async anchorPostById(postId: string): Promise<void> {
     if (!this.enabled) {
       await this.setAnchorStatus(postId, 'disabled');
@@ -414,9 +552,12 @@ export class WunderlandSolService {
       }
     }
 
-    const agentMap = this.loadAgentMap();
-    const agentEntry = agentMap?.agents?.[seedId];
-    if (!agentEntry) {
+    // Lazy-load SDK + web3 (keeps tests happy when disabled).
+    const sdk = await import('@wunderland-sol/sdk');
+    const web3 = await import('@solana/web3.js');
+
+    const signerRes = await this.resolveManagedAgentSigner(seedId, web3);
+    if (!signerRes.ok) {
       await this.db.run(
         `
           UPDATE wunderland_posts
@@ -424,18 +565,10 @@ export class WunderlandSolService {
                  anchor_error = ?
            WHERE post_id = ?
         `,
-        [
-          'missing_config' satisfies AnchorStatus,
-          `No Solana agent mapping configured for seedId "${seedId}".`,
-          postId,
-        ]
+        ['missing_config' satisfies AnchorStatus, signerRes.error, postId],
       );
       return;
     }
-
-    // Lazy-load SDK + web3 (keeps tests happy when disabled).
-    const sdk = await import('@wunderland-sol/sdk');
-    const web3 = await import('@solana/web3.js');
 
     const client = new sdk.WunderlandSolClient({
       programId: this.programId,
@@ -444,8 +577,8 @@ export class WunderlandSolService {
     });
 
     const payer = this.loadKeypair(web3, this.relayerKeypairPath);
-    const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
-    const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+    const agentSigner = signerRes.agentSigner;
+    const agentIdentityPda = signerRes.agentIdentityPda;
 
     const enclavePda = await this.resolveEnclavePdaForPost({
       client,
@@ -633,18 +766,17 @@ export class WunderlandSolService {
       }
     }
 
-    const agentMap = this.loadAgentMap();
-    const agentEntry = agentMap?.agents?.[seedId];
-    if (!agentEntry) {
+    const sdk = await import('@wunderland-sol/sdk');
+    const web3 = await import('@solana/web3.js');
+
+    const signerRes = await this.resolveManagedAgentSigner(seedId, web3);
+    if (!signerRes.ok) {
       await this.db.run(
         `UPDATE wunderland_comments SET anchor_status = ?, anchor_error = ? WHERE comment_id = ?`,
-        ['missing_config', `No Solana agent mapping for seedId "${seedId}".`, commentId],
+        ['missing_config' satisfies AnchorStatus, signerRes.error, commentId],
       );
       return;
     }
-
-    const sdk = await import('@wunderland-sol/sdk');
-    const web3 = await import('@solana/web3.js');
 
     const client = new sdk.WunderlandSolClient({
       programId: this.programId,
@@ -653,8 +785,8 @@ export class WunderlandSolService {
     });
 
     const payer = this.loadKeypair(web3, this.relayerKeypairPath);
-    const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
-    const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+    const agentSigner = signerRes.agentSigner;
+    const agentIdentityPda = signerRes.agentIdentityPda;
 
     const parent = await this.db.get<{ sol_post_pda: string | null; sol_enclave_pda: string | null }>(
       `SELECT sol_post_pda, sol_enclave_pda FROM wunderland_posts WHERE post_id = ? LIMIT 1`,
@@ -871,12 +1003,6 @@ export class WunderlandSolService {
       return { success: false, error: 'Missing Solana configuration (PROGRAM_ID or RELAYER_KEYPAIR)' };
     }
 
-    const agentMap = this.loadAgentMap();
-    const agentEntry = agentMap?.agents?.[opts.seedId];
-    if (!agentEntry) {
-      return { success: false, error: `Agent ${opts.seedId} not found in agent map` };
-    }
-
     const messageHashHex = safeString(opts.messageHashHex).trim().toLowerCase();
     if (!/^[a-f0-9]{64}$/.test(messageHashHex)) {
       return { success: false, error: 'Invalid messageHashHex (expected 32-byte hex)' };
@@ -893,8 +1019,12 @@ export class WunderlandSolService {
       });
 
       const payer = this.loadKeypair(web3, this.relayerKeypairPath);
-      const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
-      const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+      const signerRes = await this.resolveManagedAgentSigner(opts.seedId, web3);
+      if (!signerRes.ok) {
+        return { success: false, error: signerRes.error };
+      }
+      const agentSigner = signerRes.agentSigner;
+      const agentIdentityPda = signerRes.agentIdentityPda;
       const jobPda = new web3.PublicKey(opts.jobPdaAddress);
 
       const res = await client.placeJobBid({
@@ -940,12 +1070,6 @@ export class WunderlandSolService {
       return { success: false, error: 'Missing Solana configuration (PROGRAM_ID or RELAYER_KEYPAIR)' };
     }
 
-    const agentMap = this.loadAgentMap();
-    const agentEntry = agentMap?.agents?.[opts.seedId];
-    if (!agentEntry) {
-      return { success: false, error: `Agent ${opts.seedId} not found in agent map` };
-    }
-
     try {
       // Lazy-load SDK + web3
       const sdk = await import('@wunderland-sol/sdk');
@@ -958,8 +1082,12 @@ export class WunderlandSolService {
       });
 
       const payer = this.loadKeypair(web3, this.relayerKeypairPath);
-      const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
-      const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+      const signerRes = await this.resolveManagedAgentSigner(opts.seedId, web3);
+      if (!signerRes.ok) {
+        return { success: false, error: signerRes.error };
+      }
+      const agentSigner = signerRes.agentSigner;
+      const agentIdentityPda = signerRes.agentIdentityPda;
       const jobPda = new web3.PublicKey(opts.jobPdaAddress);
 
       // Ensure submissionHash is Uint8Array (32 bytes)
@@ -1007,12 +1135,6 @@ export class WunderlandSolService {
       return { success: false, error: 'Missing Solana configuration (PROGRAM_ID or RELAYER_KEYPAIR)' };
     }
 
-    const agentMap = this.loadAgentMap();
-    const agentEntry = agentMap?.agents?.[opts.seedId];
-    if (!agentEntry) {
-      return { success: false, error: `Agent ${opts.seedId} not found in agent map` };
-    }
-
     try {
       // Lazy-load SDK + web3
       const sdk = await import('@wunderland-sol/sdk');
@@ -1025,8 +1147,12 @@ export class WunderlandSolService {
       });
 
       const payer = this.loadKeypair(web3, this.relayerKeypairPath);
-      const agentSigner = this.loadKeypair(web3, agentEntry.agentSignerKeypairPath);
-      const agentIdentityPda = new web3.PublicKey(agentEntry.agentIdentityPda);
+      const signerRes = await this.resolveManagedAgentSigner(opts.seedId, web3);
+      if (!signerRes.ok) {
+        return { success: false, error: signerRes.error };
+      }
+      const agentSigner = signerRes.agentSigner;
+      const agentIdentityPda = signerRes.agentIdentityPda;
       const jobPda = new web3.PublicKey(opts.jobPdaAddress);
 
       const signature = await client.withdrawJobBid({

@@ -207,12 +207,89 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       await this.dispatchPendingStimuliOnce();
     });
 
+    // Agent sync: register newly onboarded agents without restarting the backend.
+    // This makes mint → onboard → autonomous runtime fully end-to-end.
+    this.scheduleCron('agent_sync', 10_000, async () => {
+      await this.registerNewAgentsOnce();
+    });
+
     // 8. Start the network
     await this.network.start();
     this.logger.log(`Social orchestration started. ${agentCount} agents registered.`);
   }
 
   // ── Stimulus Dispatch (DB → StimulusRouter) ───────────────────────────────
+
+  private async registerNewAgentsOnce(): Promise<void> {
+    if (!this.network) return;
+
+    const agents = await this.db.all<{
+      seed_id: string;
+      owner_user_id: string;
+      display_name: string;
+      bio: string | null;
+      hexaco_traits: string;
+      subscribed_topics: string | null;
+      tool_access_profile: string | null;
+    }>(
+      `SELECT a.seed_id, a.owner_user_id, a.display_name, a.bio, a.hexaco_traits,
+              a.tool_access_profile, c.subscribed_topics
+       FROM wunderbots a
+       LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
+       WHERE a.status = 'active' AND (c.is_active = 1 OR c.is_active IS NULL)`
+    );
+
+    for (const agent of agents) {
+      const seedId = String(agent.seed_id ?? '').trim();
+      if (!seedId) continue;
+
+      // Skip already-registered agents.
+      if (this.network.getCitizen(seedId)?.isActive) continue;
+
+      try {
+        const hexaco = this.parseJson<HEXACOTraits>(agent.hexaco_traits, {
+          honesty_humility: 0.5,
+          emotionality: 0.5,
+          extraversion: 0.5,
+          agreeableness: 0.5,
+          conscientiousness: 0.5,
+          openness: 0.5,
+        });
+        const topics = this.parseJson<string[]>(agent.subscribed_topics, []);
+
+        const seedConfig: WunderlandSeedConfig = {
+          seedId,
+          name: agent.display_name,
+          description: agent.bio ?? '',
+          hexacoTraits: hexaco,
+          securityProfile: DEFAULT_SECURITY_PROFILE,
+          inferenceHierarchy: DEFAULT_INFERENCE_HIERARCHY,
+          stepUpAuthConfig: DEFAULT_STEP_UP_AUTH_CONFIG,
+          toolAccessProfile:
+            (agent.tool_access_profile as WunderlandSeedConfig['toolAccessProfile']) ||
+            'social-citizen',
+        };
+
+        const newsroomConfig: NewsroomConfig = {
+          seedConfig,
+          ownerId: agent.owner_user_id,
+          worldFeedTopics: topics,
+          acceptTips: true,
+          postingCadence: { type: 'interval', value: 3_600_000 },
+          maxPostsPerHour: 10,
+          approvalTimeoutMs: 300_000,
+          requireApproval: false,
+        };
+
+        await this.network.registerCitizen(newsroomConfig);
+        await this.trustEngine?.loadFromPersistence(seedId);
+
+        this.logger.log(`Registered new agent '${seedId}' without restart.`);
+      } catch (err) {
+        this.logger.warn(`Failed to register new agent '${seedId}': ${String((err as any)?.message ?? err)}`);
+      }
+    }
+  }
 
   private normalizePriority(raw: unknown): StimulusEvent['priority'] {
     const value = String(raw ?? 'normal').trim().toLowerCase();

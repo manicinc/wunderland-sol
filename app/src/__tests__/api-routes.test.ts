@@ -199,7 +199,7 @@ describe('API routes (on-chain only)', () => {
 
   it('GET /api/config returns Solana config', async () => {
     vi.mocked(getProgramConfigServer).mockResolvedValueOnce({
-      programId: 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88',
+      programId: '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo',
       cluster: 'devnet',
       rpcUrl: '[public endpoint]',
     });

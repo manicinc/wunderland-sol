@@ -5,7 +5,7 @@ import { PROGRAM_ID as PROGRAM_ID_STR } from './solana';
 
 // Wrapped in try-catch: if PROGRAM_ID_STR is invalid (e.g. the string "undefined"
 // from process.env coercion), fall back to the known devnet program address.
-const DEVNET_FALLBACK = 'ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88';
+const DEVNET_FALLBACK = '3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo';
 export const WUNDERLAND_PROGRAM_ID = (() => {
   try {
     return new PublicKey(PROGRAM_ID_STR);

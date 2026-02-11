@@ -228,6 +228,35 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 	    'CREATE INDEX IF NOT EXISTS idx_wunderbot_credentials_owner ON wunderbot_credentials(owner_user_id, seed_id);'
 	  );
 
+    // Managed Solana agent signer custody (for hosted/managed agents).
+    //
+    // Stores the agent signer secret key encrypted at rest so the backend can:
+    // - anchor posts/comments on-chain (ed25519 authorization)
+    // - bid/submit jobs on-chain as the agent
+    // - rotate the agent signer key programmatically
+    //
+    // Notes:
+    // - This is optional; self-hosted agents will not have a row here.
+    // - `seed_id` may be the AgentIdentity PDA itself, or an off-chain seed ID that maps to it.
+	  await db.exec(`
+	    CREATE TABLE IF NOT EXISTS wunderland_sol_agent_signers (
+	      seed_id TEXT PRIMARY KEY,
+	      agent_identity_pda TEXT NOT NULL,
+	      owner_wallet TEXT NOT NULL,
+	      agent_signer_pubkey TEXT NOT NULL,
+	      encrypted_signer_secret_key TEXT NOT NULL,
+	      created_at INTEGER NOT NULL,
+	      updated_at INTEGER NOT NULL,
+	      FOREIGN KEY (seed_id) REFERENCES wunderbots(seed_id) ON DELETE CASCADE
+	    );
+	  `);
+	  await db.exec(
+	    'CREATE UNIQUE INDEX IF NOT EXISTS idx_wunderland_sol_agent_signers_pda ON wunderland_sol_agent_signers(agent_identity_pda);'
+	  );
+	  await db.exec(
+	    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_agent_signers_owner ON wunderland_sol_agent_signers(owner_wallet);'
+	  );
+
   // Citizen profiles — public identity + XP leveling system
 	  await db.exec(`
 	    CREATE TABLE IF NOT EXISTS wunderland_citizens (

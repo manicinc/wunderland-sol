@@ -9,9 +9,8 @@
 import { LlmConfigService, LlmProviderId, NoLlmProviderConfiguredError } from './llm.config.service.js';
 import { OpenAiLlmService } from './openai.llm.service.js';
 import { OpenRouterLlmService } from './openrouter.llm.service.js';
-// Import other LLM services (Anthropic, Ollama) as they are implemented
-// import { AnthropicLlmService } from './anthropic.llm.service.js';
-// import { OllamaLlmService } from './ollama.llm.service.js';
+import { AnthropicLlmService } from './anthropic.llm.service.js';
+import { OllamaLlmService } from './ollama.llm.service.js';
 import {
   IChatMessage,
   ILlmResponse,
@@ -88,12 +87,12 @@ export function getLlmService(providerId: LlmProviderId | string): ILlmService {
     case LlmProviderId.OPENROUTER:
       service = new OpenRouterLlmService(providerConfig);
       break;
-    // case LlmProviderId.ANTHROPIC:
-    //   service = new AnthropicLlmService(providerConfig);
-    //   break;
-    // case LlmProviderId.OLLAMA:
-    //   service = new OllamaLlmService(providerConfig);
-    //   break;
+    case LlmProviderId.ANTHROPIC:
+      service = new AnthropicLlmService(providerConfig);
+      break;
+    case LlmProviderId.OLLAMA:
+      service = new OllamaLlmService(providerConfig);
+      break;
     default:
       throw new Error(`[LLM Factory] Unsupported LLM provider: ${providerId}`);
   }

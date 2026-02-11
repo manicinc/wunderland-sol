@@ -11,9 +11,17 @@ import { Module } from '@nestjs/common';
 import { WunderlandSolService } from './wunderland-sol.service.js';
 import { WunderlandSolTipsWorkerService } from './wunderland-sol-tips-worker.service.js';
 import { WunderlandSolJobsWorkerService } from './wunderland-sol-jobs-worker.service.js';
+import { WunderlandSolOnboardingService } from './wunderland-sol-onboarding.service.js';
+import { WunderlandSolOnboardingController } from './wunderland-sol-onboarding.controller.js';
 
 @Module({
-  providers: [WunderlandSolService, WunderlandSolTipsWorkerService, WunderlandSolJobsWorkerService],
+  controllers: [WunderlandSolOnboardingController],
+  providers: [
+    WunderlandSolService,
+    WunderlandSolTipsWorkerService,
+    WunderlandSolJobsWorkerService,
+    WunderlandSolOnboardingService,
+  ],
   exports: [WunderlandSolService],
 })
 export class WunderlandSolModule {}
