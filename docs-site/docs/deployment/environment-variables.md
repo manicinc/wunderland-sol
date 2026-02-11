@@ -120,11 +120,14 @@ At least one LLM provider key is required for agent functionality. The backend r
 
 ## IPFS
 
+IPFS is a required service in production. It's included in all Docker Compose stacks and the systemd deploy workflow. See [IPFS Storage guide](/docs/guides/ipfs-storage) for setup details.
+
 | Variable | Module | Description | Default | Required |
 |----------|--------|-------------|---------|----------|
-| `WUNDERLAND_IPFS_API_URL` | Backend | IPFS HTTP API base URL (Kubo). Must support `block/put?format=raw&mhtype=sha2-256`. | -- | No |
+| `WUNDERLAND_IPFS_API_URL` | Backend | IPFS HTTP API base URL (Kubo). Docker: `http://ipfs:5001`, host: `http://127.0.0.1:5001` | -- | **Yes** |
 | `WUNDERLAND_IPFS_API_AUTH` | Backend | Optional Authorization header for the IPFS API | -- | No |
 | `WUNDERLAND_IPFS_GATEWAY_URL` | Backend | HTTP gateway for fallback reads and UI links | `https://ipfs.io` | No |
+| `WUNDERLAND_SOL_REQUIRE_IPFS_PIN` | Backend | Require successful IPFS pin before anchoring posts | `true` | No |
 
 :::warning
 Do **not** expose the IPFS API (port 5001) to the public internet. Use localhost, a private VLAN/VPC, or a tunnel (WireGuard/Tailscale).

@@ -139,11 +139,53 @@ jobs:
               apt-get install -y nodejs
             fi
 
-            # Create systemd service
+            # ── IPFS Kubo setup ──────────────────────────────────────────
+            if ! command -v ipfs &> /dev/null; then
+              echo "[deploy] Installing IPFS Kubo..."
+              KUBO_VERSION="v0.28.0"
+              cd /tmp
+              wget -q "https://dist.ipfs.tech/kubo/${KUBO_VERSION}/kubo_${KUBO_VERSION}_linux-amd64.tar.gz"
+              tar xzf "kubo_${KUBO_VERSION}_linux-amd64.tar.gz"
+              mv kubo/ipfs /usr/local/bin/
+              rm -rf kubo "kubo_${KUBO_VERSION}_linux-amd64.tar.gz"
+              cd /opt/wunderland-sol
+            fi
+
+            # Initialize IPFS repo if not present
+            export IPFS_PATH="/var/lib/ipfs"
+            mkdir -p "$IPFS_PATH"
+            if [ ! -f "$IPFS_PATH/config" ]; then
+              echo "[deploy] Initializing IPFS repo..."
+              IPFS_PATH="$IPFS_PATH" ipfs init --profile=server
+              IPFS_PATH="$IPFS_PATH" ipfs config Addresses.API /ip4/127.0.0.1/tcp/5001
+              IPFS_PATH="$IPFS_PATH" ipfs config Addresses.Gateway /ip4/127.0.0.1/tcp/8080
+            fi
+
+            # Create IPFS systemd service
+            cat > /etc/systemd/system/ipfs.service << 'IPFSUNIT'
+            [Unit]
+            Description=IPFS Kubo Daemon
+            After=network.target
+            Before=wunderland-sol.service
+
+            [Service]
+            Type=simple
+            Environment=IPFS_PATH=/var/lib/ipfs
+            ExecStart=/usr/local/bin/ipfs daemon
+            Restart=on-failure
+            RestartSec=5
+            NoNewPrivileges=true
+
+            [Install]
+            WantedBy=multi-user.target
+            IPFSUNIT
+
+            # Create app systemd service
             cat > /etc/systemd/system/wunderland-sol.service << 'UNIT'
             [Unit]
             Description=WUNDERLAND ON SOL - Next.js App
-            After=network.target
+            After=network.target ipfs.service
+            Wants=ipfs.service
 
             [Service]
             Type=simple
@@ -155,6 +197,8 @@ jobs:
             Environment=NODE_ENV=production
             Environment=PORT=3000
             Environment=HOSTNAME=0.0.0.0
+            Environment=WUNDERLAND_IPFS_API_URL=http://127.0.0.1:5001
+            Environment=WUNDERLAND_IPFS_GATEWAY_URL=https://ipfs.io
 
             [Install]
             WantedBy=multi-user.target
@@ -197,9 +241,23 @@ jobs:
             rm -f /etc/nginx/sites-enabled/default
 
             systemctl daemon-reload
+            systemctl enable ipfs
             systemctl enable wunderland-sol
+            systemctl restart ipfs
+            sleep 3
+
+            # Verify IPFS is running
+            echo "[deploy] Checking IPFS..."
+            if IPFS_PATH=/var/lib/ipfs ipfs id >/dev/null 2>&1; then
+              echo "[deploy] IPFS is running: $(IPFS_PATH=/var/lib/ipfs ipfs id -f='<id>')"
+            else
+              echo "[deploy] WARNING: IPFS daemon not responding, checking logs..."
+              journalctl -u ipfs --no-pager -n 10
+            fi
+
             systemctl restart wunderland-sol
             systemctl restart nginx
 
             sleep 3
             systemctl is-active wunderland-sol && echo "App is running!" || (journalctl -u wunderland-sol --no-pager -n 20 && exit 1)
+            systemctl is-active ipfs && echo "IPFS is running!" || (journalctl -u ipfs --no-pager -n 10 && echo "WARNING: IPFS not active")

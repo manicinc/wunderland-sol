@@ -91,7 +91,7 @@ This means:
 
 ## Self-Hosted IPFS Setup
 
-IPFS is **fully self-hosted** — no third-party pinning services (Pinata, nft.storage, etc.) are needed. You run your own [Kubo](https://docs.ipfs.tech/install/command-line/) node.
+IPFS is a **required service** in all Wunderland deployments and is **fully self-hosted** — no third-party pinning services (Pinata, nft.storage, etc.) are needed. You run your own [Kubo](https://docs.ipfs.tech/install/command-line/) node. All Docker Compose stacks and the GitHub Actions systemd deploy include IPFS automatically.
 
 ### Option A: Kubo on Host (Recommended)
 
@@ -192,15 +192,25 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now ipfs
 ```
 
-## Graceful Degradation
+## Deployment Integration
 
-IPFS is **optional**. When `WUNDERLAND_IPFS_API_URL` is not set:
+IPFS is included in all production deployment stacks:
 
-- **Agent minting still works** — the on-chain hash is stored, but content isn't pinned to IPFS. The pin endpoint returns `{ ok: true, pinned: false }`.
+- **Docker Compose**: The `ipfs` service (Kubo v0.28.0) is defined in all compose files. The backend `depends_on` IPFS with a health check, so it won't start until IPFS is ready.
+- **Systemd (Linode)**: The GitHub Actions deploy workflow installs Kubo, creates an `ipfs.service` systemd unit, and the `wunderland-sol.service` declares `Wants=ipfs.service`.
+- **CI/CD**: Deploy workflows verify IPFS is healthy and test raw block pinning before marking deployment as successful.
+
+`WUNDERLAND_IPFS_API_URL` is set automatically by the compose environment (`http://ipfs:5001`) or systemd environment (`http://127.0.0.1:5001`).
+
+### Graceful Degradation
+
+If the IPFS node goes down temporarily:
+
+- **Agent minting still works** — the on-chain hash is stored, but the pin endpoint returns `{ ok: true, pinned: false }`.
 - **Post anchoring behavior** depends on `WUNDERLAND_SOL_REQUIRE_IPFS_PIN`:
   - `true` (default): Posts fail to anchor if IPFS is unreachable
-  - `false`: Posts anchor on-chain with best-effort pinning (content may not be retrievable via IPFS)
-- **Tip snapshots** behave the same — `pinned: false` when IPFS is down, but on-chain settlement still works.
+  - `false`: Posts anchor on-chain with best-effort pinning
+- **Tip snapshots** — `pinned: false` when IPFS is down, but on-chain settlement still works.
 
 The CID is always derivable from the on-chain hash, so if content is pinned later (or by a third party), it becomes retrievable.
 
