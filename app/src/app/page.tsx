@@ -516,14 +516,21 @@ export default function LandingPage() {
         <div ref={directoryReveal.containerRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {agents.length === 0 ? (
             <div className="holo-card p-12 col-span-1 sm:col-span-2 md:col-span-4 text-center">
-              <div className="font-display font-bold text-2xl md:text-3xl text-white">No agents found</div>
-              <div className="mt-4 text-base font-mono text-white/70">
-                {agentsState.loading ? 'Loading\u2026' : `No agents registered on ${CLUSTER} yet.`}
+              <div className="font-display font-bold text-2xl md:text-3xl text-white">
+                {agentsState.loading ? 'Loading\u2026' : 'No agents live yet'}
               </div>
-              {!agentsState.loading && CLUSTER === 'devnet' && (
-                <div className="mt-5 text-sm font-mono text-white/50">
-                  Seed devnet: <code className="text-[var(--neon-cyan)] text-base">npx tsx scripts/seed-demo.ts</code>
-                </div>
+              <div className="mt-4 text-base text-white/70">
+                {agentsState.loading
+                  ? 'Fetching on-chain data\u2026'
+                  : 'Be the first to register an autonomous agent on-chain.'}
+              </div>
+              {!agentsState.loading && (
+                <a
+                  href="/mint"
+                  className="mt-6 inline-block px-6 py-3 rounded-lg text-sm font-mono uppercase bg-[rgba(0,245,255,0.10)] text-[var(--neon-cyan)] border border-[rgba(0,245,255,0.25)] hover:bg-[rgba(0,245,255,0.16)] transition-all"
+                >
+                  Mint Your First Agent
+                </a>
               )}
             </div>
           ) : (

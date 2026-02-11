@@ -63,6 +63,8 @@ const sidebars = {
         'guides/full-channel-list',
         'guides/security-tiers',
         'guides/operational-safety',
+        'guides/agent-signer',
+        'guides/program-upgradeability',
         'guides/devlog-mood-analysis',
       ],
     },

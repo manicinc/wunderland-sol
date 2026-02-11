@@ -845,3 +845,730 @@ export function buildClaimRewardsIx(opts: {
   const instruction = new TransactionInstruction({ keys, programId, data });
   return { instruction, claimReceiptPda, vaultPda };
 }
+
+// ============================================================================
+// Additional discriminators (20 missing instructions)
+// ============================================================================
+
+const IX_ANCHOR_POST = hexToBytes('1011ad61fbecefdc');
+const IX_ANCHOR_COMMENT = hexToBytes('b8185b71a35c6690');
+const IX_CAST_VOTE = hexToBytes('14d40fbd45b44597');
+const IX_CREATE_ENCLAVE = hexToBytes('d787d4a97c0e2171');
+const IX_DEPOSIT_TO_VAULT = hexToBytes('123e6e081a6af897');
+const IX_PLACE_JOB_BID = hexToBytes('d99a41613aac327d');
+const IX_WITHDRAW_JOB_BID = hexToBytes('836d8215035071ce');
+const IX_SUBMIT_JOB = hexToBytes('fa81a184fea1226b');
+const IX_INITIALIZE_CONFIG = hexToBytes('d07f1501c2bec446');
+const IX_INITIALIZE_ECONOMICS = hexToBytes('b8221fc8b3c17f30');
+const IX_UPDATE_ECONOMICS = hexToBytes('014be500ee42f633');
+const IX_INITIALIZE_ENCLAVE_TREASURY = hexToBytes('483e10dec67a0ef1');
+const IX_PUBLISH_REWARDS_EPOCH = hexToBytes('19525833c4d2c227');
+const IX_PUBLISH_GLOBAL_REWARDS_EPOCH = hexToBytes('3c307f5430c258a5');
+const IX_SWEEP_UNCLAIMED_REWARDS = hexToBytes('a9f483bf0e7c882d');
+const IX_SWEEP_UNCLAIMED_GLOBAL_REWARDS = hexToBytes('eb099ec852844d21');
+const IX_SETTLE_TIP = hexToBytes('c250fdb543fd89b5');
+const IX_REFUND_TIP = hexToBytes('42a205ff3f7000f3');
+const IX_ROTATE_AGENT_SIGNER = hexToBytes('5b121230bad38aab');
+const IX_WITHDRAW_TREASURY = hexToBytes('283f7a9e90d85360');
+
+// ============================================================================
+// Additional helpers
+// ============================================================================
+
+const SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey('Sysvar1nstructions1111111111111111111111111');
+
+function i8LE(value: number): Uint8Array {
+  const out = new Uint8Array(1);
+  new DataView(out.buffer).setInt8(0, value);
+  return out;
+}
+
+function i64LE(value: bigint): Uint8Array {
+  const out = new Uint8Array(8);
+  new DataView(out.buffer).setBigInt64(0, value, true);
+  return out;
+}
+
+function u32LE(value: number): Uint8Array {
+  const out = new Uint8Array(4);
+  new DataView(out.buffer).setUint32(0, value, true);
+  return out;
+}
+
+// ============================================================================
+// Additional PDA helpers
+// ============================================================================
+
+export function deriveEnclavePda(
+  nameHash: Uint8Array,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  if (nameHash.length !== 32) throw new Error('nameHash must be 32 bytes.');
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('enclave'), Buffer.from(nameHash)],
+    programId,
+  );
+}
+
+export function deriveEnclaveTreasuryPda(
+  enclavePda: PublicKey,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('enclave_treasury'), enclavePda.toBuffer()],
+    programId,
+  );
+}
+
+export function derivePostAnchorPda(
+  agentIdentity: PublicKey,
+  totalEntries: number,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('post'), agentIdentity.toBuffer(), Buffer.from(u32LE(totalEntries))],
+    programId,
+  );
+}
+
+export function deriveReputationVotePda(
+  postAnchor: PublicKey,
+  voterAgent: PublicKey,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('vote'), postAnchor.toBuffer(), voterAgent.toBuffer()],
+    programId,
+  );
+}
+
+export function deriveGlobalRewardsEpochPda(
+  epoch: bigint,
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  const epochBuf = Buffer.alloc(8);
+  epochBuf.writeBigUInt64LE(epoch);
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('rewards_epoch'), SystemProgram.programId.toBuffer(), epochBuf],
+    programId,
+  );
+}
+
+// ============================================================================
+// Social instructions: anchor_post, anchor_comment, cast_vote, create_enclave
+// ============================================================================
+
+export function buildAnchorPostIx(opts: {
+  agentIdentity: PublicKey;
+  enclave: PublicKey;
+  payer: PublicKey;
+  totalEntries: number;
+  contentHash: Uint8Array;
+  manifestHash: Uint8Array;
+  programId?: PublicKey;
+}): { postAnchor: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.contentHash.length !== 32) throw new Error('contentHash must be 32 bytes.');
+  if (opts.manifestHash.length !== 32) throw new Error('manifestHash must be 32 bytes.');
+
+  const [postAnchor] = derivePostAnchorPda(opts.agentIdentity, opts.totalEntries, programId);
+
+  const data = concatBytes([IX_ANCHOR_POST, opts.contentHash, opts.manifestHash]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: postAnchor, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: true },
+      { pubkey: opts.enclave, isSigner: false, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { postAnchor, instruction };
+}
+
+export function buildAnchorCommentIx(opts: {
+  agentIdentity: PublicKey;
+  enclave: PublicKey;
+  parentPost: PublicKey;
+  payer: PublicKey;
+  totalEntries: number;
+  contentHash: Uint8Array;
+  manifestHash: Uint8Array;
+  programId?: PublicKey;
+}): { commentAnchor: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.contentHash.length !== 32) throw new Error('contentHash must be 32 bytes.');
+  if (opts.manifestHash.length !== 32) throw new Error('manifestHash must be 32 bytes.');
+
+  const [commentAnchor] = derivePostAnchorPda(opts.agentIdentity, opts.totalEntries, programId);
+
+  const data = concatBytes([IX_ANCHOR_COMMENT, opts.contentHash, opts.manifestHash]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: commentAnchor, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: true },
+      { pubkey: opts.enclave, isSigner: false, isWritable: false },
+      { pubkey: opts.parentPost, isSigner: false, isWritable: true },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { commentAnchor, instruction };
+}
+
+export function buildCastVoteIx(opts: {
+  postAnchor: PublicKey;
+  postAgent: PublicKey;
+  voterAgent: PublicKey;
+  payer: PublicKey;
+  value: 1 | -1;
+  programId?: PublicKey;
+}): { reputationVote: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [reputationVote] = deriveReputationVotePda(opts.postAnchor, opts.voterAgent, programId);
+
+  const data = concatBytes([IX_CAST_VOTE, i8LE(opts.value)]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: reputationVote, isSigner: false, isWritable: true },
+      { pubkey: opts.postAnchor, isSigner: false, isWritable: true },
+      { pubkey: opts.postAgent, isSigner: false, isWritable: true },
+      { pubkey: opts.voterAgent, isSigner: false, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { reputationVote, instruction };
+}
+
+export function buildCreateEnclaveIx(opts: {
+  creatorAgent: PublicKey;
+  payer: PublicKey;
+  nameHash: Uint8Array;
+  metadataHash: Uint8Array;
+  programId?: PublicKey;
+}): { enclave: PublicKey; enclaveTreasury: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.nameHash.length !== 32) throw new Error('nameHash must be 32 bytes.');
+  if (opts.metadataHash.length !== 32) throw new Error('metadataHash must be 32 bytes.');
+
+  const [config] = deriveConfigPda(programId);
+  const [enclave] = deriveEnclavePda(opts.nameHash, programId);
+  const [enclaveTreasury] = deriveEnclaveTreasuryPda(enclave, programId);
+
+  const data = concatBytes([IX_CREATE_ENCLAVE, opts.nameHash, opts.metadataHash]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: true },
+      { pubkey: opts.creatorAgent, isSigner: false, isWritable: false },
+      { pubkey: enclave, isSigner: false, isWritable: true },
+      { pubkey: enclaveTreasury, isSigner: false, isWritable: true },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { enclave, enclaveTreasury, instruction };
+}
+
+// ============================================================================
+// Job board instructions: place_job_bid, withdraw_job_bid, submit_job
+// ============================================================================
+
+export function buildPlaceJobBidIx(opts: {
+  jobPda: PublicKey;
+  agentIdentity: PublicKey;
+  payer: PublicKey;
+  bidLamports: bigint;
+  messageHash: Uint8Array;
+  programId?: PublicKey;
+}): { bidPda: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.messageHash.length !== 32) throw new Error('messageHash must be 32 bytes.');
+  if (opts.bidLamports <= 0n) throw new Error('bidLamports must be > 0.');
+
+  const [bidPda] = deriveJobBidPda({ jobPda: opts.jobPda, bidderAgentIdentity: opts.agentIdentity, programId });
+
+  const data = concatBytes([IX_PLACE_JOB_BID, u64LE(opts.bidLamports), opts.messageHash]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.jobPda, isSigner: false, isWritable: true },
+      { pubkey: bidPda, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { bidPda, instruction };
+}
+
+export function buildWithdrawJobBidIx(opts: {
+  jobPda: PublicKey;
+  agentIdentity: PublicKey;
+  programId?: PublicKey;
+}): { bidPda: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [bidPda] = deriveJobBidPda({ jobPda: opts.jobPda, bidderAgentIdentity: opts.agentIdentity, programId });
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.jobPda, isSigner: false, isWritable: false },
+      { pubkey: bidPda, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: false },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_WITHDRAW_JOB_BID),
+  });
+
+  return { bidPda, instruction };
+}
+
+export function buildSubmitJobIx(opts: {
+  jobPda: PublicKey;
+  agentIdentity: PublicKey;
+  payer: PublicKey;
+  submissionHash: Uint8Array;
+  programId?: PublicKey;
+}): { submissionPda: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.submissionHash.length !== 32) throw new Error('submissionHash must be 32 bytes.');
+
+  const [submissionPda] = deriveJobSubmissionPda(opts.jobPda, programId);
+
+  const data = concatBytes([IX_SUBMIT_JOB, opts.submissionHash]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.jobPda, isSigner: false, isWritable: true },
+      { pubkey: submissionPda, isSigner: false, isWritable: true },
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: false },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { submissionPda, instruction };
+}
+
+// ============================================================================
+// Rewards instructions
+// ============================================================================
+
+export function buildPublishRewardsEpochIx(opts: {
+  enclave: PublicKey;
+  authority: PublicKey;
+  epoch: bigint;
+  merkleRoot: Uint8Array;
+  amount: bigint;
+  claimWindowSeconds: bigint;
+  programId?: PublicKey;
+}): { rewardsEpoch: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.merkleRoot.length !== 32) throw new Error('merkleRoot must be 32 bytes.');
+
+  const [enclaveTreasury] = deriveEnclaveTreasuryPda(opts.enclave, programId);
+  const [rewardsEpoch] = deriveRewardsEpochPda(opts.enclave, opts.epoch, programId);
+
+  const data = concatBytes([
+    IX_PUBLISH_REWARDS_EPOCH,
+    u64LE(opts.epoch),
+    opts.merkleRoot,
+    u64LE(opts.amount),
+    i64LE(opts.claimWindowSeconds),
+  ]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.enclave, isSigner: false, isWritable: false },
+      { pubkey: enclaveTreasury, isSigner: false, isWritable: true },
+      { pubkey: rewardsEpoch, isSigner: false, isWritable: true },
+      { pubkey: opts.authority, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { rewardsEpoch, instruction };
+}
+
+export function buildPublishGlobalRewardsEpochIx(opts: {
+  authority: PublicKey;
+  epoch: bigint;
+  merkleRoot: Uint8Array;
+  amount: bigint;
+  claimWindowSeconds: bigint;
+  programId?: PublicKey;
+}): { rewardsEpoch: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.merkleRoot.length !== 32) throw new Error('merkleRoot must be 32 bytes.');
+
+  const [config] = deriveConfigPda(programId);
+  const [treasury] = deriveTreasuryPda(programId);
+  const [rewardsEpoch] = deriveGlobalRewardsEpochPda(opts.epoch, programId);
+
+  const data = concatBytes([
+    IX_PUBLISH_GLOBAL_REWARDS_EPOCH,
+    u64LE(opts.epoch),
+    opts.merkleRoot,
+    u64LE(opts.amount),
+    i64LE(opts.claimWindowSeconds),
+  ]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: treasury, isSigner: false, isWritable: true },
+      { pubkey: rewardsEpoch, isSigner: false, isWritable: true },
+      { pubkey: opts.authority, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { rewardsEpoch, instruction };
+}
+
+export function buildSweepUnclaimedRewardsIx(opts: {
+  enclave: PublicKey;
+  epoch: bigint;
+  programId?: PublicKey;
+}): { rewardsEpoch: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [enclaveTreasury] = deriveEnclaveTreasuryPda(opts.enclave, programId);
+  const [rewardsEpoch] = deriveRewardsEpochPda(opts.enclave, opts.epoch, programId);
+
+  const data = concatBytes([IX_SWEEP_UNCLAIMED_REWARDS, u64LE(opts.epoch)]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.enclave, isSigner: false, isWritable: false },
+      { pubkey: enclaveTreasury, isSigner: false, isWritable: true },
+      { pubkey: rewardsEpoch, isSigner: false, isWritable: true },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { rewardsEpoch, instruction };
+}
+
+export function buildSweepUnclaimedGlobalRewardsIx(opts: {
+  epoch: bigint;
+  programId?: PublicKey;
+}): { rewardsEpoch: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [config] = deriveConfigPda(programId);
+  const [treasury] = deriveTreasuryPda(programId);
+  const [rewardsEpoch] = deriveGlobalRewardsEpochPda(opts.epoch, programId);
+
+  const data = concatBytes([IX_SWEEP_UNCLAIMED_GLOBAL_REWARDS, u64LE(opts.epoch)]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: treasury, isSigner: false, isWritable: true },
+      { pubkey: rewardsEpoch, isSigner: false, isWritable: true },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { rewardsEpoch, instruction };
+}
+
+// ============================================================================
+// Agent signer rotation (agent-authorized, requires ed25519 sig)
+// ============================================================================
+
+export function buildRotateAgentSignerIx(opts: {
+  agentIdentity: PublicKey;
+  newAgentSigner: PublicKey;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const data = concatBytes([IX_ROTATE_AGENT_SIGNER, publicKeyBytes(opts.newAgentSigner)]);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_INSTRUCTIONS_PUBKEY, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+}
+
+// ============================================================================
+// Vault deposit (permissionless)
+// ============================================================================
+
+export function buildDepositToVaultIx(opts: {
+  agentIdentity: PublicKey;
+  depositor: PublicKey;
+  lamports: bigint;
+  programId?: PublicKey;
+}): { vault: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.lamports <= 0n) throw new Error('lamports must be > 0.');
+
+  const [vault] = deriveVaultPda(opts.agentIdentity, programId);
+
+  const data = concatBytes([IX_DEPOSIT_TO_VAULT, u64LE(opts.lamports)]);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.agentIdentity, isSigner: false, isWritable: false },
+      { pubkey: vault, isSigner: false, isWritable: true },
+      { pubkey: opts.depositor, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+
+  return { vault, instruction };
+}
+
+// ============================================================================
+// Tip settlement/refund (authority-only)
+// ============================================================================
+
+export function buildSettleTipIx(opts: {
+  authority: PublicKey;
+  tip: PublicKey;
+  targetEnclave: PublicKey;
+  programId?: PublicKey;
+}): { escrow: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [config] = deriveConfigPda(programId);
+  const [treasury] = deriveTreasuryPda(programId);
+  const [escrow] = deriveTipEscrowPda(opts.tip, programId);
+  const [enclaveTreasury] = deriveEnclaveTreasuryPda(opts.targetEnclave, programId);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: opts.authority, isSigner: true, isWritable: false },
+      { pubkey: opts.tip, isSigner: false, isWritable: true },
+      { pubkey: escrow, isSigner: false, isWritable: true },
+      { pubkey: treasury, isSigner: false, isWritable: true },
+      { pubkey: opts.targetEnclave, isSigner: false, isWritable: false },
+      { pubkey: enclaveTreasury, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_SETTLE_TIP),
+  });
+
+  return { escrow, instruction };
+}
+
+export function buildRefundTipIx(opts: {
+  authority: PublicKey;
+  tip: PublicKey;
+  tipper: PublicKey;
+  programId?: PublicKey;
+}): { escrow: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [config] = deriveConfigPda(programId);
+  const [escrow] = deriveTipEscrowPda(opts.tip, programId);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: opts.authority, isSigner: true, isWritable: false },
+      { pubkey: opts.tip, isSigner: false, isWritable: true },
+      { pubkey: escrow, isSigner: false, isWritable: true },
+      { pubkey: opts.tipper, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_REFUND_TIP),
+  });
+
+  return { escrow, instruction };
+}
+
+// ============================================================================
+// Treasury withdrawal (authority-only)
+// ============================================================================
+
+export function buildWithdrawTreasuryIx(opts: {
+  authority: PublicKey;
+  lamports: bigint;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+  if (opts.lamports <= 0n) throw new Error('lamports must be > 0.');
+
+  const [config] = deriveConfigPda(programId);
+  const [treasury] = deriveTreasuryPda(programId);
+
+  const data = concatBytes([IX_WITHDRAW_TREASURY, u64LE(opts.lamports)]);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: treasury, isSigner: false, isWritable: true },
+      { pubkey: opts.authority, isSigner: true, isWritable: true },
+    ],
+    data: Buffer.from(data),
+  });
+}
+
+// ============================================================================
+// Enclave treasury initialization (permissionless)
+// ============================================================================
+
+export function buildInitializeEnclaveTreasuryIx(opts: {
+  enclave: PublicKey;
+  payer: PublicKey;
+  programId?: PublicKey;
+}): { enclaveTreasury: PublicKey; instruction: TransactionInstruction } {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [enclaveTreasury] = deriveEnclaveTreasuryPda(opts.enclave, programId);
+
+  const instruction = new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: opts.enclave, isSigner: false, isWritable: false },
+      { pubkey: enclaveTreasury, isSigner: false, isWritable: true },
+      { pubkey: opts.payer, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_INITIALIZE_ENCLAVE_TREASURY),
+  });
+
+  return { enclaveTreasury, instruction };
+}
+
+// ============================================================================
+// Admin/authority instructions
+// ============================================================================
+
+const BPF_LOADER_UPGRADEABLE = new PublicKey('BPFLoaderUpgradeab1e11111111111111111111111');
+
+export function deriveProgramDataAddress(
+  programId: PublicKey = WUNDERLAND_PROGRAM_ID,
+): [PublicKey, number] {
+  return PublicKey.findProgramAddressSync(
+    [programId.toBuffer()],
+    BPF_LOADER_UPGRADEABLE,
+  );
+}
+
+export function buildInitializeConfigIx(opts: {
+  authority: PublicKey;
+  adminAuthority: PublicKey;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [config] = deriveConfigPda(programId);
+  const [treasury] = deriveTreasuryPda(programId);
+  const [programData] = deriveProgramDataAddress(programId);
+
+  const data = concatBytes([IX_INITIALIZE_CONFIG, publicKeyBytes(opts.adminAuthority)]);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: true },
+      { pubkey: treasury, isSigner: false, isWritable: true },
+      { pubkey: programData, isSigner: false, isWritable: false },
+      { pubkey: opts.authority, isSigner: true, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(data),
+  });
+}
+
+export function buildInitializeEconomicsIx(opts: {
+  authority: PublicKey;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [config] = deriveConfigPda(programId);
+  const [economics] = deriveEconomicsPda(programId);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: opts.authority, isSigner: true, isWritable: true },
+      { pubkey: economics, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from(IX_INITIALIZE_ECONOMICS),
+  });
+}
+
+export function buildUpdateEconomicsIx(opts: {
+  authority: PublicKey;
+  agentMintFeeLamports: bigint;
+  maxAgentsPerWallet: number;
+  recoveryTimelockSeconds: bigint;
+  programId?: PublicKey;
+}): TransactionInstruction {
+  const programId = opts.programId ?? WUNDERLAND_PROGRAM_ID;
+
+  const [config] = deriveConfigPda(programId);
+  const [economics] = deriveEconomicsPda(programId);
+
+  const data = concatBytes([
+    IX_UPDATE_ECONOMICS,
+    u64LE(opts.agentMintFeeLamports),
+    u16LE(opts.maxAgentsPerWallet),
+    i64LE(opts.recoveryTimelockSeconds),
+  ]);
+
+  return new TransactionInstruction({
+    programId,
+    keys: [
+      { pubkey: config, isSigner: false, isWritable: false },
+      { pubkey: opts.authority, isSigner: true, isWritable: false },
+      { pubkey: economics, isSigner: false, isWritable: true },
+    ],
+    data: Buffer.from(data),
+  });
+}

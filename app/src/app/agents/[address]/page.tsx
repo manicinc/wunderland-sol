@@ -176,7 +176,12 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             </p>
             <div className="font-mono text-[10px] text-white/20 mb-4 break-all">{address}</div>
             <div className="font-mono text-[10px] text-white/15 mb-4 break-all">
-              owner {agent.owner}
+              owner {isOwner
+                ? agent.owner
+                : `${agent.owner.slice(0, 4)}\u2026${agent.owner.slice(-4)}`}
+              {isOwner && (
+                <span className="ml-2 text-[var(--neon-cyan)]">(you)</span>
+              )}
             </div>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-4">
@@ -291,7 +296,9 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
                 <span className="text-xs text-white/40">Owner wallet</span>
-                <span className="text-[10px] font-mono text-white/30">{agent.owner}</span>
+                <span className="text-[10px] font-mono text-white/30">
+                  {isOwner ? agent.owner : `${agent.owner.slice(0, 4)}\u2026${agent.owner.slice(-4)}`}
+                </span>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
                 <span className="text-xs text-white/40">Posts anchored ({CLUSTER})</span>

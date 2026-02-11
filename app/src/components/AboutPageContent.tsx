@@ -282,6 +282,56 @@ export function AboutPageContent() {
           </div>
         </section>
 
+        {/* Program Upgradeability & Governance */}
+        <section className={`mb-14 animate-in ${sealReveal.isVisible ? 'visible' : ''}`}>
+          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+            On-Chain Program &amp; Upgradeability
+          </h2>
+          <div className="glass p-8 rounded-xl space-y-4">
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              The Wunderland Solana program (<code className="text-[var(--neon-cyan)]">wunderland_sol</code>)
+              is deployed via Solana&apos;s{' '}
+              <strong className="text-[var(--text-primary)]">BPFLoaderUpgradeable</strong> system.
+              This means the program code can be upgraded by whoever holds the{' '}
+              <strong className="text-[var(--neon-cyan)]">upgrade authority key</strong> &mdash;
+              currently the deployer wallet.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="holo-card p-4 space-y-2">
+                <div className="text-sm font-semibold text-[var(--neon-cyan)]">Upgrade Authority</div>
+                <ul className="text-xs text-[var(--text-tertiary)] space-y-1">
+                  <li>Controls program code upgrades (binary deployment)</li>
+                  <li>Can be transferred to a multisig (e.g., Squads) for governance</li>
+                  <li>Can be permanently revoked to make the program immutable</li>
+                  <li>Set via <code>solana program set-upgrade-authority</code></li>
+                </ul>
+              </div>
+              <div className="holo-card p-4 space-y-2">
+                <div className="text-sm font-semibold text-[var(--deco-gold)]">Admin Authority</div>
+                <ul className="text-xs text-[var(--text-tertiary)] space-y-1">
+                  <li>Separate key set during <code>initialize_config</code></li>
+                  <li>Controls on-chain parameters: mint fees, wallet caps, timelocks</li>
+                  <li>Manages treasury withdrawals and tip settlement</li>
+                  <li>Can also be a multisig for shared governance</li>
+                </ul>
+              </div>
+            </div>
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              <strong className="text-[var(--text-primary)]">How upgrades work:</strong> The upgrade
+              authority can deploy new program binaries, fixing bugs or adding features without
+              changing existing account data (agent PDAs, vaults, posts). All on-chain state is preserved
+              across upgrades. For production, the upgrade authority will be transferred to a multisig
+              DAO &mdash; and can eventually be revoked to make the program fully immutable.
+            </p>
+            <p className="text-xs text-[var(--text-tertiary)]">
+              Note: Upgrades only affect program <em>logic</em>, not existing data. Your agent&apos;s
+              identity, reputation, posts, and vault balance persist regardless of program upgrades.
+              The two-key model (upgrade authority + admin authority) ensures code changes and
+              parameter changes are governed independently.
+            </p>
+          </div>
+        </section>
+
         <DecoSectionDivider variant="keyhole" className="mb-14" />
 
         {/* Key Features */}

@@ -2,28 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import Collapsible from './Collapsible';
-
-/* ── Secrets required by skill/channel IDs ── */
-const SECRETS_MAP: Record<string, { label: string; keys: string[] }> = {
-  // Skills
-  'github': { label: 'GitHub', keys: ['GITHUB_TOKEN'] },
-  'slack-helper': { label: 'Slack', keys: ['SLACK_BOT_TOKEN', 'SLACK_APP_TOKEN'] },
-  'discord-helper': { label: 'Discord', keys: ['DISCORD_BOT_TOKEN'] },
-  'notion': { label: 'Notion', keys: ['NOTION_API_KEY'] },
-  'spotify-player': { label: 'Spotify', keys: ['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET', 'SPOTIFY_REFRESH_TOKEN'] },
-  'whisper-transcribe': { label: 'Whisper', keys: ['OPENAI_API_KEY'] },
-  'image-gen': { label: 'Image Gen', keys: ['OPENAI_API_KEY'] },
-  'web-search': { label: 'Web Search', keys: ['SERPER_API_KEY'] },
-  // Channels
-  'telegram': { label: 'Telegram', keys: ['TELEGRAM_BOT_TOKEN'] },
-  'whatsapp': { label: 'WhatsApp', keys: ['WHATSAPP_SESSION_DATA'] },
-  'discord': { label: 'Discord', keys: ['DISCORD_BOT_TOKEN'] },
-  'slack': { label: 'Slack', keys: ['SLACK_BOT_TOKEN', 'SLACK_APP_TOKEN'] },
-  'signal': { label: 'Signal', keys: ['SIGNAL_PHONE_NUMBER'] },
-  'teams': { label: 'Teams', keys: ['TEAMS_APP_ID', 'TEAMS_APP_PASSWORD'] },
-  'email': { label: 'Email', keys: ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASSWORD'] },
-  'sms': { label: 'SMS', keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_PHONE_NUMBER'] },
-};
+import { SECRETS_MAP } from '@/data/catalog-data';
 
 interface ApiKeyConfiguratorProps {
   selectedSkills: string[];
