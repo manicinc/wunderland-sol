@@ -1,0 +1,15 @@
+node_modules
+.next
+dist
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-journal
+db_data
+anchor/target
+docs-site/node_modules
+docs-site/.docusaurus
+docs-site/build
+.git
+.github

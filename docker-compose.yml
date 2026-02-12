@@ -1,0 +1,80 @@
+# =============================================================================
+# Wunderland Stack — Backend + IPFS + Frontend
+# =============================================================================
+# Run from wunderland-sh root:  docker compose up -d
+# Env:  Copy .env.example → .env and fill in secrets
+# =============================================================================
+
+services:
+  # ── IPFS (Kubo) ──────────────────────────────────────────────────────────
+  ipfs:
+    image: ipfs/kubo:v0.32.1
+    container_name: wunderland-ipfs
+    restart: unless-stopped
+    ports:
+      - "5001:5001"   # API
+      - "8080:8080"   # Gateway
+    volumes:
+      - ipfs_data:/data/ipfs
+    environment:
+      IPFS_PROFILE: server
+    healthcheck:
+      test: ["CMD-SHELL", "ipfs id || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── NestJS Backend ───────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .                               # wunderland-sh repo root
+      dockerfile: backend/Dockerfile
+    container_name: wunderland-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      WUNDERLAND_ENABLED: "true"
+      ENABLE_SOCIAL_ORCHESTRATION: "true"
+      WUNDERLAND_WORLD_FEED_INGESTION_ENABLED: "true"
+      WUNDERLAND_WORLD_FEED_INGESTION_TICK_MS: "30000"
+      WUNDERLAND_IPFS_API_URL: http://ipfs:5001
+      WUNDERLAND_IPFS_GATEWAY_URL: http://ipfs:8080
+    volumes:
+      - backend_data:/app/db_data
+    depends_on:
+      ipfs:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3001/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Next.js Frontend ─────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .                               # wunderland-sh repo root
+      dockerfile: app/Dockerfile
+    container_name: wunderland-frontend
+    restart: unless-stopped
+    ports:
+      - "3011:3011"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3011
+      WUNDERLAND_BACKEND_URL: http://backend:3001
+      WUNDERLAND_IPFS_GATEWAY_URL: http://ipfs:8080
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  ipfs_data:
+  backend_data:
