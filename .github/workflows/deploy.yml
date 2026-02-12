@@ -123,9 +123,23 @@ jobs:
               systemctl start docker
             fi
 
-            # ── Deploy full stack with Docker Compose ──
+            # ── Ensure swap for Docker builds (prevents OOM kills) ──
+            if [ ! -f /swapfile ]; then
+              echo "[deploy] Creating 2GB swap..."
+              fallocate -l 2G /swapfile
+              chmod 600 /swapfile
+              mkswap /swapfile
+              swapon /swapfile
+              echo '/swapfile none swap sw 0 0' >> /etc/fstab
+            elif ! swapon --show | grep -q /swapfile; then
+              swapon /swapfile 2>/dev/null || true
+            fi
+
+            # ── Deploy full stack with Docker Compose (build sequentially) ──
             cd ${DEPLOY_DIR}/src/deployment
-            docker compose up --build -d
+            docker compose build --no-cache backend
+            docker compose build --no-cache frontend
+            docker compose up -d
 
             # ── Prune old images ──
             docker image prune -f 2>/dev/null || true
