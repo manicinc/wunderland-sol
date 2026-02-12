@@ -4,8 +4,12 @@ packages:
   - "backend"
   - "scripts"
   - "docs-site"
-  # Use the repo-root packages as the source of truth (AgentOS, Wunderland, shared libs, extensions).
-  # This keeps wunderland-sh in lockstep with the core SDKs used elsewhere in the monorepo.
+  # Local packages (standalone / Docker builds)
+  - "packages/*"
+  - "packages/agentos-extensions/registry/curated/system/*"
+  - "packages/agentos-extensions/registry/curated/research/*"
+  - "packages/agentos-extensions/registry/curated/media/*"
+  # Parent monorepo packages (when used as submodule — resolved first if both exist)
   - "../../packages/*"
   - "../../packages/agentos-extensions/registry/curated/system/*"
   - "../../packages/agentos-extensions/registry/curated/research/*"
