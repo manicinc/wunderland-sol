@@ -37,6 +37,7 @@ import type {
   NewsroomConfig,
   WunderlandSeedConfig,
   HEXACOTraits,
+  InferenceHierarchyConfig,
   StimulusEvent,
   StimulusSource,
   TipPayload,
@@ -262,11 +263,12 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       display_name: string;
       bio: string | null;
       hexaco_traits: string;
+      inference_hierarchy: string | null;
       subscribed_topics: string | null;
       tool_access_profile: string | null;
     }>(
       `SELECT a.seed_id, a.owner_user_id, a.display_name, a.bio, a.hexaco_traits,
-              a.tool_access_profile, c.subscribed_topics
+              a.inference_hierarchy, a.tool_access_profile, c.subscribed_topics
        FROM wunderbots a
        LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
        WHERE a.status = 'active' AND (c.is_active = 1 OR c.is_active IS NULL)`
@@ -289,6 +291,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           openness: 0.5,
         });
         const topics = this.parseJson<string[]>(agent.subscribed_topics, []);
+        const dbHierarchy = this.parseJson<InferenceHierarchyConfig>(agent.inference_hierarchy, null as any);
 
         const seedConfig: WunderlandSeedConfig = {
           seedId,
@@ -296,7 +299,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           description: agent.bio ?? '',
           hexacoTraits: hexaco,
           securityProfile: DEFAULT_SECURITY_PROFILE,
-          inferenceHierarchy: DEFAULT_INFERENCE_HIERARCHY,
+          inferenceHierarchy: (dbHierarchy?.primaryModel?.modelId) ? dbHierarchy : DEFAULT_INFERENCE_HIERARCHY,
           stepUpAuthConfig: DEFAULT_STEP_UP_AUTH_CONFIG,
           toolAccessProfile:
             (agent.tool_access_profile as WunderlandSeedConfig['toolAccessProfile']) ||
@@ -317,7 +320,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         await this.network.registerCitizen(newsroomConfig);
         await this.trustEngine?.loadFromPersistence(seedId);
 
-        this.logger.log(`Registered new agent '${seedId}' without restart.`);
+        this.logger.log(`Registered new agent '${seedId}' (model: ${seedConfig.inferenceHierarchy.primaryModel.modelId}) without restart.`);
       } catch (err) {
         this.logger.warn(`Failed to register new agent '${seedId}': ${String((err as any)?.message ?? err)}`);
       }
@@ -538,11 +541,12 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       display_name: string;
       bio: string | null;
       hexaco_traits: string;
+      inference_hierarchy: string | null;
       subscribed_topics: string | null;
       tool_access_profile: string | null;
     }>(
       `SELECT a.seed_id, a.owner_user_id, a.display_name, a.bio, a.hexaco_traits,
-              a.tool_access_profile, c.subscribed_topics
+              a.inference_hierarchy, a.tool_access_profile, c.subscribed_topics
        FROM wunderbots a
        LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
        WHERE a.status = 'active' AND (c.is_active = 1 OR c.is_active IS NULL)`
@@ -560,6 +564,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           openness: 0.5,
         });
         const topics = this.parseJson<string[]>(agent.subscribed_topics, []);
+        const dbHierarchy = this.parseJson<InferenceHierarchyConfig>(agent.inference_hierarchy, null as any);
 
         const seedConfig: WunderlandSeedConfig = {
           seedId: agent.seed_id,
@@ -567,7 +572,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           description: agent.bio ?? '',
           hexacoTraits: hexaco,
           securityProfile: DEFAULT_SECURITY_PROFILE,
-          inferenceHierarchy: DEFAULT_INFERENCE_HIERARCHY,
+          inferenceHierarchy: (dbHierarchy?.primaryModel?.modelId) ? dbHierarchy : DEFAULT_INFERENCE_HIERARCHY,
           stepUpAuthConfig: DEFAULT_STEP_UP_AUTH_CONFIG,
           toolAccessProfile:
             (agent.tool_access_profile as WunderlandSeedConfig['toolAccessProfile']) ||
@@ -590,6 +595,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         // Load trust scores from persistence
         await this.trustEngine!.loadFromPersistence(agent.seed_id);
 
+        this.logger.log(`Registered agent '${agent.seed_id}' (model: ${seedConfig.inferenceHierarchy.primaryModel.modelId})`);
         count++;
       } catch (err) {
         this.logger.warn(`Failed to register agent '${agent.seed_id}': ${err}`);

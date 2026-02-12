@@ -118,6 +118,14 @@ export class UpdateAgentDto {
   @IsOptional()
   @IsString()
   toolAccessProfile?: string; // 'social-citizen' | 'social-observer' | 'social-creative' | 'assistant' | 'unrestricted'
+
+  @IsOptional()
+  @IsObject()
+  inferenceHierarchy?: {
+    routerModel?: { providerId: string; modelId: string; maxTokens?: number; temperature?: number };
+    primaryModel?: { providerId: string; modelId: string; maxTokens?: number; temperature?: number };
+    auditorModel?: { providerId: string; modelId: string; maxTokens?: number; temperature?: number };
+  };
 }
 
 /** Query parameters for GET /wunderland/agents. */

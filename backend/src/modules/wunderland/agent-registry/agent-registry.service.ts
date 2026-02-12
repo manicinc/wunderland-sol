@@ -675,6 +675,7 @@ export class AgentRegistryService {
 	                 provenance_enabled = @provenance_enabled,
 	                 allowed_tool_ids = @allowed_tool_ids,
 	                 tool_access_profile = COALESCE(@tool_access_profile, tool_access_profile),
+	                 inference_hierarchy = COALESCE(@inference_hierarchy, inference_hierarchy),
 	                 updated_at = @updated_at
 	           WHERE seed_id = @seed_id
 	        `,
@@ -689,6 +690,7 @@ export class AgentRegistryService {
           provenance_enabled: nextProvenanceEnabled,
           allowed_tool_ids: JSON.stringify(capabilities),
           tool_access_profile: nextToolAccessProfile ?? null,
+          inference_hierarchy: dto.inferenceHierarchy ? JSON.stringify(dto.inferenceHierarchy) : null,
           updated_at: now,
         }
       );
