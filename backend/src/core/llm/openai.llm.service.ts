@@ -60,16 +60,20 @@ export class OpenAiLlmService implements ILlmService {
   ): Promise<ILlmResponse> {
     const mappedModelId = this.mapToProviderModelId(modelId);
     try {
+      // gpt-5.x and o-series models require max_completion_tokens instead of max_tokens
+      const maxTokens = params?.max_tokens ?? parseInt(process.env.LLM_DEFAULT_MAX_TOKENS || '2048');
+      const usesMaxCompletionTokens = /^(gpt-5|o[1-9])/.test(mappedModelId);
+
       const requestPayload: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming = {
         model: mappedModelId,
-        messages: messages as OpenAI.Chat.ChatCompletionMessageParam[], // Cast to OpenAI's type
+        messages: messages as OpenAI.Chat.ChatCompletionMessageParam[],
         temperature: params?.temperature ?? parseFloat(process.env.LLM_DEFAULT_TEMPERATURE || '0.7'),
-        max_tokens: params?.max_tokens ?? parseInt(process.env.LLM_DEFAULT_MAX_TOKENS || '2048'),
+        ...(usesMaxCompletionTokens ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens }),
         top_p: params?.top_p,
         stop: params?.stop,
         user: params?.user,
-        tools: params?.tools as OpenAI.Chat.Completions.ChatCompletionTool[] | undefined, // Pass tools
-        tool_choice: params?.tool_choice as OpenAI.Chat.Completions.ChatCompletionToolChoiceOption | undefined, // Pass tool_choice
+        tools: params?.tools as OpenAI.Chat.Completions.ChatCompletionTool[] | undefined,
+        tool_choice: params?.tool_choice as OpenAI.Chat.Completions.ChatCompletionToolChoiceOption | undefined,
       };
 
       // Remove undefined optional parameters to avoid API errors
