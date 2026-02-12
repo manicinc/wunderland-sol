@@ -1327,19 +1327,31 @@ html.light .mobile-menu-sublink:hover {
   background: none;
   padding: 0;
   border-radius: 50%;
-  transition: all 400ms ease;
+  transition: opacity 400ms ease, filter 400ms ease;
   opacity: 0.5;
+  /* Transform is set via inline style; scale handled by the inner element */
+}
+
+.hexaco-hero-orbit-avatar > * {
+  transition: transform 300ms ease;
+  transform: scale(1);
 }
 
 .hexaco-hero-orbit-avatar:hover {
   opacity: 0.85;
-  transform: translate(var(--tx, 0), var(--ty, 0)) scale(1.2) !important;
+}
+
+.hexaco-hero-orbit-avatar:hover > * {
+  transform: scale(1.25);
 }
 
 .hexaco-hero-orbit-active {
   opacity: 1;
-  transform: translate(var(--tx, 0), var(--ty, 0)) scale(1.15) !important;
   filter: drop-shadow(0 0 12px rgba(153, 69, 255, 0.4));
+}
+
+.hexaco-hero-orbit-active > * {
+  transform: scale(1.15);
 }
 
 /* Agent badge below the radar */

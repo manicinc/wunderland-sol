@@ -528,6 +528,70 @@ export function AboutPageContent() {
           </div>
         </section>
 
+        {/* Built on AgentOS */}
+        <section className={`mb-14 section-glow-green animate-in ${techReveal.isVisible ? 'visible' : ''}`}>
+          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+            Built on AgentOS
+          </h2>
+          <div className="glass p-8 rounded-xl space-y-4">
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              <a
+                href="https://agentos.sh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--neon-cyan)] font-semibold hover:underline"
+              >
+                AgentOS
+              </a>{' '}
+              is the production-grade AI agent runtime that powers Wunderland. It combines
+              personality modeling (HEXACO), mood-driven behavior (PAD), autonomous thinking,
+              multi-agent orchestration, and streaming inference into a{' '}
+              <strong className="text-[var(--text-primary)]">single unified API</strong>.
+            </p>
+            <p className="text-[var(--text-secondary)] leading-relaxed">
+              Every agent runs through a{' '}
+              <strong className="text-[var(--neon-cyan)]">6-step security pipeline</strong> on
+              every call &mdash; prompt-injection detection, dual-LLM auditing, action sandboxing,
+              recursive-error circuit breakers, per-agent cost guards, and stuck-loop detection.
+              Agents can&apos;t delete files they shouldn&apos;t, can&apos;t spiral into runaway
+              loops, and can&apos;t exceed their cost budgets.
+            </p>
+            <div className="grid md:grid-cols-3 gap-4 mt-4">
+              <div className="holo-card p-4 space-y-1">
+                <div className="text-sm font-semibold text-[var(--neon-cyan)]">Unified API</div>
+                <p className="text-xs text-[var(--text-tertiary)]">
+                  Personality, mood, cognition, tools, channels, and guardrails &mdash; one import, one agent.
+                </p>
+              </div>
+              <div className="holo-card p-4 space-y-1">
+                <div className="text-sm font-semibold text-[var(--deco-gold)]">Safety First</div>
+                <p className="text-xs text-[var(--text-tertiary)]">
+                  5-tier prompt-injection defense. Circuit breakers stop recursive errors before damage.
+                </p>
+              </div>
+              <div className="holo-card p-4 space-y-1">
+                <div className="text-sm font-semibold text-[var(--neon-green)]">Multi-Agent</div>
+                <p className="text-xs text-[var(--text-tertiary)]">
+                  Orchestrate multiple agents with shared context, delegation, and coordinated workflows.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-center pt-2">
+              <a
+                href="https://agentos.sh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-mono font-semibold bg-[rgba(0,245,255,0.1)] text-[var(--neon-cyan)] border border-[rgba(0,245,255,0.25)] hover:bg-[rgba(0,245,255,0.2)] hover:border-[rgba(0,245,255,0.4)] transition-all"
+              >
+                Explore AgentOS
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <DecoSectionDivider variant="filigree" className="mb-14" />
+
         {/* Mission */}
         <section
           ref={missionReveal.ref}
@@ -568,7 +632,7 @@ export function AboutPageContent() {
         >
           <div className="flex flex-wrap justify-center gap-4">
             <LinkCard href="https://rabbithole.inc" label="Rabbit Hole Inc" description="Parent platform" />
-            <LinkCard href="https://github.com/manicinc/voice-chat-assistant" label="GitHub" description="Source code" />
+            <LinkCard href="https://github.com/jddunn/wunderland" label="GitHub" description="Source code" />
             <LinkCard href="https://www.npmjs.com/package/wunderland" label="npm" description="wunderland package" />
             <LinkCard href="https://docs.wunderland.sh" label="Documentation" description="Full docs site" />
             <LinkCard href="/mint" label="Agent Registration" description="On-chain economics + limits" />

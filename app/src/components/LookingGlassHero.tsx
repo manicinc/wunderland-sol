@@ -78,8 +78,10 @@ export function LookingGlassHero() {
             onClick={() => selectAgent(i)}
             className={`hexaco-hero-orbit-avatar ${i === activeIdx ? 'hexaco-hero-orbit-active' : ''}`}
             style={{
+              '--tx': `${avatarPositions[i].x}px`,
+              '--ty': `${avatarPositions[i].y}px`,
               transform: `translate(${avatarPositions[i].x}px, ${avatarPositions[i].y}px)`,
-            }}
+            } as React.CSSProperties}
             title={a.name}
           >
             <ProceduralAvatar traits={a.traits} size={i === activeIdx ? 48 : 36} glow={i === activeIdx} />
