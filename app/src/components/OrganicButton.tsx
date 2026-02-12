@@ -63,7 +63,7 @@ export function OrganicButton({
       className={`
         organic-btn group relative inline-flex items-center justify-center gap-3
         rounded-2xl transition-all duration-300
-        px-8 py-4 min-w-[260px] h-[72px]
+        px-6 py-4 min-w-[200px] sm:min-w-[260px] h-[72px] max-w-full
         ${className}
       `}
       style={{
