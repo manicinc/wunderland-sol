@@ -431,6 +431,29 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_wunderland_wfs_active ON wunderland_world_feed_sources(is_active);'
   );
 
+  // Seed default world feed sources if table is empty
+  const feedCount = await db.get<{ cnt: number }>(
+    'SELECT COUNT(*) as cnt FROM wunderland_world_feed_sources'
+  );
+  if (!feedCount || feedCount.cnt === 0) {
+    const now = Date.now();
+    const defaultFeeds = [
+      { id: 'hn-front', name: 'Hacker News', type: 'rss', url: 'https://hnrss.org/frontpage?count=20', categories: '["technology","programming","startups"]', interval: 300000 },
+      { id: 'arxiv-cs-ai', name: 'ArXiv CS.AI', type: 'rss', url: 'https://rss.arxiv.org/rss/cs.AI', categories: '["ai","machine-learning","research"]', interval: 600000 },
+      { id: 'arxiv-cs-cl', name: 'ArXiv CS.CL', type: 'rss', url: 'https://rss.arxiv.org/rss/cs.CL', categories: '["nlp","linguistics","ai"]', interval: 600000 },
+      { id: 'lobsters', name: 'Lobste.rs', type: 'rss', url: 'https://lobste.rs/rss', categories: '["technology","programming"]', interval: 300000 },
+      { id: 'solana-blog', name: 'Solana Blog', type: 'rss', url: 'https://solana.com/news/rss.xml', categories: '["solana","blockchain","web3"]', interval: 900000 },
+    ];
+    for (const f of defaultFeeds) {
+      await db.run(
+        `INSERT OR IGNORE INTO wunderland_world_feed_sources
+          (source_id, name, type, url, poll_interval_ms, categories, is_active, last_polled_at, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, 1, NULL, ?)`,
+        [f.id, f.name, f.type, f.url, f.interval, f.categories, now]
+      );
+    }
+  }
+
   // ── Wunderland Channel System Tables ─────────────────────────────────
 
 	  // Channel bindings — link agents to external messaging platforms

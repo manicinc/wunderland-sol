@@ -184,10 +184,11 @@ function JobsContent() {
     router.replace(`/jobs${qs ? `?${qs}` : ''}`, { scroll: false });
   }, [statusFilter, categoryFilter, debouncedQuery, router]);
 
-  // API call (will return empty until backend is built)
+  // Fetch on-chain jobs (enriched with metadata if backend is available)
   const jobsApi = useApi<{ jobs: Job[]; total: number }>('/api/jobs');
-  const jobs = jobsApi.data?.jobs?.length ? jobsApi.data.jobs : DEMO_JOBS;
-  const isDemo = !jobsApi.data?.jobs?.length;
+  const hasOnChainJobs = (jobsApi.data?.jobs?.length ?? 0) > 0;
+  const jobs = hasOnChainJobs ? jobsApi.data!.jobs : DEMO_JOBS;
+  const isDemo = !hasOnChainJobs && !jobsApi.loading;
 
   const filtered = useMemo(() => {
     return jobs.filter((j) => {
@@ -296,7 +297,7 @@ function JobsContent() {
 
       {isDemo && (
         <div className="mb-6 p-3 rounded-lg bg-[rgba(201,162,39,0.08)] border border-[rgba(201,162,39,0.15)] text-xs text-[var(--deco-gold)] font-mono">
-          Showing demo data. On-chain job indexing will populate real jobs.
+          No on-chain jobs found yet. Post the first job using your wallet, or browse demo listings below.
         </div>
       )}
 

@@ -22,6 +22,7 @@ const ACCOUNT_SIZE_POST_ANCHOR_CURRENT = 202;
 const ACCOUNT_SIZE_POST_ANCHOR_LEGACY = 125;
 const ACCOUNT_SIZE_REPUTATION_VOTE = 82;
 const ACCOUNT_SIZE_TIP_ANCHOR = 132;
+const ACCOUNT_SIZE_JOB_POSTING = 179; // 8 + 32 + 8 + 32 + 8 + 9 + 1 + 32 + 32 + 8 + 8 + 1
 const DISCRIMINATOR_LEN = 8;
 
 const SYSTEM_PROGRAM_ID = '11111111111111111111111111111111';
@@ -1041,4 +1042,156 @@ export async function getNetworkGraphServer(opts?: {
 
   return { nodes, edges };
   }); // end withRpcFallback
+}
+
+// ============================================================================
+// On-chain Job Postings
+// ============================================================================
+
+export type OnChainJob = {
+  jobPda: string;
+  creatorWallet: string;
+  metadataHash: string;
+  budgetLamports: string;
+  buyItNowLamports: string | null;
+  status: 'open' | 'assigned' | 'submitted' | 'completed' | 'cancelled';
+  assignedAgent: string | null;
+  acceptedBid: string | null;
+  createdAt: number;
+  updatedAt: number;
+  // Enriched from metadata cache (may be null if no cache)
+  title: string | null;
+  description: string | null;
+  metadata: Record<string, unknown> | null;
+  cluster: string | null;
+};
+
+function decodeJobPosting(pda: PublicKey, data: Buffer): OnChainJob | null {
+  try {
+    let offset = DISCRIMINATOR_LEN;
+
+    const creator = new PublicKey(data.subarray(offset, offset + 32)).toBase58();
+    offset += 32;
+
+    // jobNonce
+    offset += 8;
+
+    const metadataHashBytes = data.subarray(offset, offset + 32);
+    const metadataHash = Buffer.from(metadataHashBytes).toString('hex');
+    offset += 32;
+
+    const budgetLamports = data.readBigUInt64LE(offset).toString();
+    offset += 8;
+
+    const buyItNowTag = data.readUInt8(offset);
+    offset += 1;
+    let buyItNowLamports: string | null = null;
+    if (buyItNowTag === 1) {
+      buyItNowLamports = data.readBigUInt64LE(offset).toString();
+      offset += 8;
+    }
+
+    const statusByte = data.readUInt8(offset);
+    offset += 1;
+
+    const assignedAgentKey = new PublicKey(data.subarray(offset, offset + 32)).toBase58();
+    offset += 32;
+
+    const acceptedBidKey = new PublicKey(data.subarray(offset, offset + 32)).toBase58();
+    offset += 32;
+
+    const createdAtSec = Number(data.readBigInt64LE(offset));
+    offset += 8;
+
+    const updatedAtSec = Number(data.readBigInt64LE(offset));
+
+    const status =
+      statusByte === 1 ? 'assigned' as const
+      : statusByte === 2 ? 'submitted' as const
+      : statusByte === 3 ? 'completed' as const
+      : statusByte === 4 ? 'cancelled' as const
+      : 'open' as const;
+
+    return {
+      jobPda: pda.toBase58(),
+      creatorWallet: creator,
+      metadataHash,
+      budgetLamports,
+      buyItNowLamports,
+      status,
+      assignedAgent: assignedAgentKey === SYSTEM_PROGRAM_ID ? null : assignedAgentKey,
+      acceptedBid: acceptedBidKey === SYSTEM_PROGRAM_ID ? null : acceptedBidKey,
+      createdAt: createdAtSec,
+      updatedAt: updatedAtSec,
+      title: null,
+      description: null,
+      metadata: null,
+      cluster: DEFAULT_CLUSTER,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Simple in-memory metadata cache (populated when creators POST metadata after job creation)
+const jobMetadataCache = new Map<string, { title?: string; description?: string; metadata?: Record<string, unknown> }>();
+
+export function cacheJobMetadata(
+  jobPda: string,
+  meta: { title?: string; description?: string; metadata?: Record<string, unknown> },
+) {
+  jobMetadataCache.set(jobPda, meta);
+}
+
+export async function getAllJobsServer(opts?: {
+  status?: string;
+  creator?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ jobs: OnChainJob[]; total: number }> {
+  const limit = opts?.limit ?? 50;
+  const offsetN = opts?.offset ?? 0;
+
+  try {
+    return await withRpcFallback(async (connection, programId) => {
+      const accounts = await connection.getProgramAccounts(programId, {
+        filters: [{ dataSize: ACCOUNT_SIZE_JOB_POSTING }],
+      });
+
+      let decoded = accounts
+        .map((acc) => decodeJobPosting(acc.pubkey, acc.account.data as Buffer))
+        .filter((j): j is OnChainJob => j !== null);
+
+      // Filter by status
+      if (opts?.status && opts.status !== 'all') {
+        decoded = decoded.filter((j) => j.status === opts.status);
+      }
+
+      // Filter by creator
+      if (opts?.creator) {
+        decoded = decoded.filter((j) => j.creatorWallet === opts.creator);
+      }
+
+      // Enrich with cached metadata
+      for (const job of decoded) {
+        const cached = jobMetadataCache.get(job.jobPda);
+        if (cached) {
+          job.title = cached.title ?? null;
+          job.description = cached.description ?? null;
+          job.metadata = cached.metadata ?? null;
+        }
+      }
+
+      // Sort by createdAt descending
+      decoded.sort((a, b) => b.createdAt - a.createdAt);
+
+      const total = decoded.length;
+      const window = decoded.slice(offsetN, offsetN + limit);
+
+      return { jobs: window, total };
+    });
+  } catch (error) {
+    console.warn('[solana-server] Failed to fetch on-chain jobs (all RPCs exhausted):', error);
+    return { jobs: [], total: 0 };
+  }
 }
