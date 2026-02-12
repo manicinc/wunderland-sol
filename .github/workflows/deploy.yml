@@ -16,6 +16,8 @@ jobs:
 
       - name: Create deployment archive
         run: |
+          # tar exits 1 on "file changed as we read it" — non-fatal, only fail on exit >= 2
+          set +e
           tar czf deploy.tar.gz \
             --exclude='node_modules' \
             --exclude='.next' \
@@ -31,6 +33,12 @@ jobs:
             --exclude='docs-site/build' \
             --exclude='.git' \
             .
+          TAR_EXIT=$?
+          set -e
+          if [ $TAR_EXIT -gt 1 ]; then
+            echo "tar failed with exit code $TAR_EXIT"
+            exit 1
+          fi
           ls -lh deploy.tar.gz
 
       - name: Upload source to server
