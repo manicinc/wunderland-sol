@@ -77,7 +77,7 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: message || `Signal boost for post ${contentHash.slice(0, 12)}`,
+          content: message || `Tip for post ${contentHash.slice(0, 12)}`,
           sourceType: 'text',
         }),
       });
@@ -123,8 +123,8 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
               sourceType: 'text',
               url: null,
               contentType: 'text/plain',
-              contentPreview: message || `Signal boost for post ${contentHash.slice(0, 12)}`,
-              contentLengthBytes: (message || `Signal boost for post ${contentHash.slice(0, 12)}`).length,
+              contentPreview: message || `Tip for post ${contentHash.slice(0, 12)}`,
+              contentLengthBytes: (message || `Tip for post ${contentHash.slice(0, 12)}`).length,
             }),
           }),
         });
@@ -134,7 +134,7 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
 
       setResult({
         ok: true,
-        text: `Signal of ${tier.label} sent on-chain!`,
+        text: `Tip of ${tier.label} sent on-chain!`,
         sig,
       });
     } catch (err) {
@@ -151,15 +151,15 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
       <button
         type="button"
         onClick={handleOpen}
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-mono
+        className={`group/tip inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-mono
           text-[var(--text-tertiary)] hover:text-[var(--deco-gold)] hover:bg-[rgba(201,162,39,0.08)]
           transition-all ${className}`}
-        title={connected ? 'Signal boost this post' : 'Connect wallet to signal boost'}
+        title={connected ? 'Tip this post' : 'Connect wallet to tip'}
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="group-hover/tip:animate-[wiggle_0.4s_ease-in-out]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
-        Signal
+        <span>Tip<span className="opacity-0 group-hover/tip:opacity-100 transition-opacity">!</span></span>
       </button>
 
       {/* Modal overlay */}
@@ -176,7 +176,7 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
             {/* Header */}
             <div className="px-5 pt-5 pb-3 flex items-center justify-between">
               <h3 className="font-display font-semibold text-base text-[var(--text-primary)]">
-                Signal Boost
+                Tip Post
               </h3>
               <button
                 onClick={() => setModalOpen(false)}
@@ -241,7 +241,7 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
               {/* Fee summary */}
               <div className="p-3 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)]">
                 <div className="flex justify-between text-xs text-[var(--text-secondary)]">
-                  <span>Signal amount</span>
+                  <span>Tip amount</span>
                   <span className="font-mono">{TIP_TIERS[selectedTier].label}</span>
                 </div>
                 <div className="flex justify-between text-[10px] text-[var(--text-tertiary)] mt-1">
@@ -287,7 +287,7 @@ export function TipButton({ contentHash, enclavePda, className = '' }: TipButton
                   text-[#0a0a0f] hover:shadow-[0_0_20px_rgba(201,162,39,0.3)]
                   transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Signing…' : `Send ${TIP_TIERS[selectedTier].label} Signal`}
+                {submitting ? 'Signing…' : `Send ${TIP_TIERS[selectedTier].label} Tip`}
               </button>
 
               <p className="text-[10px] text-[var(--text-tertiary)] text-center font-mono">

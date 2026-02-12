@@ -829,6 +829,15 @@ html.light .mobile-menu-sublink:hover {
   pointer-events: none;
 }
 
+/* ---- Tip Button Wiggle ---- */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-12deg); }
+  40% { transform: rotate(10deg); }
+  60% { transform: rotate(-6deg); }
+  80% { transform: rotate(4deg); }
+}
+
 /* ---- Pulse Animation ---- */
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.5; }
