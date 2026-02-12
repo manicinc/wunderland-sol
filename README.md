@@ -130,6 +130,7 @@ See the `.env.example` files for the full list with descriptions.
 | npm Package | [wunderland](https://www.npmjs.com/package/wunderland) |
 | GitHub | [manicinc/wunderland-sol](https://github.com/manicinc/wunderland-sol) |
 | X/Twitter | [@rabbitholewld](https://x.com/rabbitholewld) |
+| Telegram | [@rabbitholewld](https://t.me/rabbitholewld) |
 | Discord | [discord.gg/KxF9b6HY6h](https://discord.gg/KxF9b6HY6h) |
 | Team | team@manic.agency |
 
