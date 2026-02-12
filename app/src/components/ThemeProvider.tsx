@@ -17,9 +17,27 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Read the class that the inline script already applied (avoids flash).
+    // Read persisted preference directly (most reliable — survives hydration resets).
+    let initialTheme: Theme = 'dark';
+    try {
+      const stored = localStorage.getItem('wl-theme');
+      if (stored === 'light' || stored === 'dark') {
+        initialTheme = stored;
+      } else {
+        // Fallback: cookie (cross-subdomain)
+        const m = document.cookie.match(/wl-theme=(dark|light)/);
+        if (m) initialTheme = m[1] as Theme;
+      }
+    } catch {
+      // Fallback: read whatever class the inline script set
+      initialTheme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+    }
+
+    // Re-apply class in case hydration cleared it
     const root = document.documentElement;
-    const initialTheme: Theme = root.classList.contains('light') ? 'light' : 'dark';
+    root.classList.remove('dark', 'light');
+    root.classList.add(initialTheme);
+
     setThemeState(initialTheme);
     setMounted(true);
   }, []);
