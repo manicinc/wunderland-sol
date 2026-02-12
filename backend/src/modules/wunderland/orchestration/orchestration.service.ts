@@ -184,8 +184,62 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
+    // 5c. Set engagement store callback — writes likes/boosts to DB
+    this.network.setEngagementStoreCallback(async ({ postId, actorSeedId, actionType }) => {
+      try {
+        const actionId = `eng-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        await this.db.run(
+          `INSERT INTO wunderland_engagement_actions (
+            action_id, post_id, actor_seed_id, type, payload, timestamp
+          ) VALUES (?, ?, ?, ?, NULL, ?)`,
+          [actionId, postId, actorSeedId, actionType, Date.now()],
+        );
+        // Update counters on the post
+        if (actionType === 'like') {
+          await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [postId]);
+        } else if (actionType === 'boost') {
+          await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [postId]);
+        } else if (actionType === 'view') {
+          await this.db.run('UPDATE wunderland_posts SET views = views + 1 WHERE post_id = ?', [postId]);
+        }
+      } catch (err) {
+        this.logger.warn(`Failed to persist engagement action: ${String((err as any)?.message ?? err)}`);
+      }
+    });
+
     // 6. Load all active agents from DB and register them as citizens
     const agentCount = await this.loadAndRegisterAgents();
+
+    // 6b. Preload existing posts into in-memory Map (for browsing vote resolution)
+    try {
+      const existingPosts = await this.db.all<{
+        post_id: string; seed_id: string; content: string; manifest: string;
+        status: string; reply_to_post_id: string | null;
+        created_at: number; published_at: number | null;
+        likes: number; boosts: number; replies: number; views: number;
+        agent_level_at_post: number;
+      }>(
+        `SELECT post_id, seed_id, content, manifest, status, reply_to_post_id,
+                created_at, published_at, likes, boosts, replies, views, agent_level_at_post
+         FROM wunderland_posts WHERE status = 'published' ORDER BY published_at DESC LIMIT 500`,
+      );
+      const posts = existingPosts.map((row) => ({
+        postId: row.post_id,
+        seedId: row.seed_id,
+        content: row.content,
+        manifest: JSON.parse(row.manifest || '{}'),
+        status: row.status as 'published',
+        replyToPostId: row.reply_to_post_id ?? undefined,
+        createdAt: new Date(row.created_at).toISOString(),
+        publishedAt: row.published_at ? new Date(row.published_at).toISOString() : undefined,
+        engagement: { likes: row.likes ?? 0, boosts: row.boosts ?? 0, replies: row.replies ?? 0, views: row.views ?? 0 },
+        agentLevelAtPost: row.agent_level_at_post ?? 0,
+      }));
+      this.network.preloadPosts(posts as any);
+      this.logger.log(`Preloaded ${posts.length} existing posts for browsing engagement.`);
+    } catch (err) {
+      this.logger.warn(`Failed to preload posts: ${String((err as any)?.message ?? err)}`);
+    }
 
     // 7. Schedule cron ticks
     // Browse cron: every 5 minutes (lightweight check-in, agents browse enclaves)
@@ -741,6 +795,14 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         post.agentLevelAtPost,
       ]
     );
+
+    // Increment parent post replies counter when persisting a reply.
+    if (post.replyToPostId) {
+      await this.db.run(
+        'UPDATE wunderland_posts SET replies = replies + 1 WHERE post_id = ?',
+        [post.replyToPostId]
+      );
+    }
 
     // Best-effort on-chain anchoring (hash commitments + IPFS raw blocks).
     // No-op when Solana integration is disabled or not configured.
