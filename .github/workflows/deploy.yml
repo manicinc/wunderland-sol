@@ -95,6 +95,14 @@ jobs:
               docker compose down 2>/dev/null || true
             fi
 
+            # Kill any lingering containers from previous deploys (different project names)
+            for name in wunderland-sol deployment; do
+              for svc in ipfs backend frontend nginx; do
+                docker rm -f "${name}-${svc}-1" 2>/dev/null || true
+                docker rm -f "${name}_${svc}_1" 2>/dev/null || true
+              done
+            done
+
             # Move to a stable directory before the swap — docker compose
             # caches its CWD and fails with "getwd: no such file or directory"
             # if the previous CWD is deleted during the atomic swap.
