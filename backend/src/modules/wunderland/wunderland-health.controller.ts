@@ -11,6 +11,7 @@ import { DatabaseService } from '../../database/database.service.js';
 import { WunderlandGateway } from './wunderland.gateway.js';
 import { WunderlandSolService } from './wunderland-sol/wunderland-sol.service.js';
 import { OrchestrationService } from './orchestration/orchestration.service.js';
+import { LlmConfigService } from '../../core/llm/llm.config.service.js';
 
 @Controller('wunderland')
 export class WunderlandHealthController {
@@ -83,6 +84,9 @@ export class WunderlandHealthController {
   @Get('diagnostics')
   async getDiagnostics() {
     const status = this.getStatus();
+    const llmConfig = LlmConfigService.getInstance();
+    const llmEnvAvailableProviders = llmConfig.getAvailableProviders();
+    const llmEnvAvailability = llmConfig.getProviderAvailabilitySnapshot();
 
     const count = async (sql: string, params?: any[]): Promise<number> => {
       const row = await this.db.get<{ count: number }>(sql, params).catch(() => undefined);
@@ -116,6 +120,8 @@ export class WunderlandHealthController {
       solIndexedAgents,
       solIndexedPosts,
       solIndexedComments,
+      llmCredentialApiKeys,
+      llmCredentialModelPrefs,
     ] = await Promise.all([
       count(`SELECT COUNT(1) as count FROM wunderland_posts WHERE status = 'published'`),
       count(
@@ -153,6 +159,8 @@ export class WunderlandHealthController {
       count(`SELECT COUNT(1) as count FROM wunderland_sol_agents`),
       count(`SELECT COUNT(1) as count FROM wunderland_sol_posts WHERE kind = 'post'`),
       count(`SELECT COUNT(1) as count FROM wunderland_sol_posts WHERE kind = 'comment'`),
+      count(`SELECT COUNT(1) as count FROM wunderbot_credentials WHERE credential_type LIKE 'LLM_API_KEY_%'`),
+      count(`SELECT COUNT(1) as count FROM wunderbot_credentials WHERE credential_type = 'LLM_MODEL'`),
     ]);
 
     const solIndexMeta = await this.db
@@ -186,6 +194,16 @@ export class WunderlandHealthController {
       env: {
         missingForAnchoring: envMissing,
         requireIpfsPin,
+      },
+      llm: {
+        env: {
+          availableProviders: llmEnvAvailableProviders,
+          availability: llmEnvAvailability,
+        },
+        credentials: {
+          apiKeys: llmCredentialApiKeys,
+          modelPrefs: llmCredentialModelPrefs,
+        },
       },
       db: {
         posts: {
@@ -248,7 +266,7 @@ export class WunderlandHealthController {
         COALESCE(pl.total_downvotes, 0) AS total_downvotes,
         COALESCE(pl.total_boosts, 0) AS total_boosts
       FROM wunderbots w
-      LEFT JOIN wunderland_agent_signers s ON s.seed_id = w.seed_id
+      LEFT JOIN wunderland_sol_agent_signers s ON s.seed_id = w.seed_id
       LEFT JOIN (
         SELECT seed_id, COUNT(1) AS cnt
         FROM wunderland_posts WHERE status = 'published'

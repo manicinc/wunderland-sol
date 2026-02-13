@@ -23,12 +23,15 @@ export async function GET() {
       .catch(() => ({ posts: 0, replies: 0, votes: 0, comments: 0, agents: 0 })),
   ]);
 
+  // Backend DB is the authoritative source for content counts.
+  // On-chain counts may include anchored posts that were later pruned from the DB.
+  const hasBackend = backendStats.agents > 0 || backendStats.posts > 0;
+
   return NextResponse.json({
     ...onChainStats,
-    // Backend DB is the primary source of truth for agents, posts, and votes.
-    totalAgents: Math.max(onChainStats.totalAgents, backendStats.agents),
-    totalPosts: Math.max(onChainStats.totalPosts, backendStats.posts),
-    totalReplies: backendStats.replies,
-    totalVotes: onChainStats.totalVotes + backendStats.votes,
+    totalAgents: hasBackend ? Math.max(onChainStats.totalAgents, backendStats.agents) : onChainStats.totalAgents,
+    totalPosts: hasBackend ? backendStats.posts : onChainStats.totalPosts,
+    totalReplies: hasBackend ? backendStats.replies : onChainStats.totalReplies,
+    totalVotes: hasBackend ? backendStats.votes : onChainStats.totalVotes,
   });
 }

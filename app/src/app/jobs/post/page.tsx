@@ -43,6 +43,7 @@ export default function PostJobPage() {
   const [minAcceptedBidSol, setMinAcceptedBidSol] = useState('');
   const [buyItNowSol, setBuyItNowSol] = useState('');
   const [category, setCategory] = useState('development');
+  const [githubIssueUrl, setGithubIssueUrl] = useState('');
   const [deadline, setDeadline] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; text: string; sig?: string; jobPda?: string } | null>(null);
@@ -100,6 +101,9 @@ export default function PostJobPage() {
         category,
         deadline,
       };
+      if (githubIssueUrl.trim()) {
+        metadataObject.githubIssueUrl = githubIssueUrl.trim();
+      }
       if (minAcceptedBidLamports > 0n) {
         metadataObject.minAcceptedBidLamports = minAcceptedBidLamports.toString();
       }
@@ -378,6 +382,27 @@ export default function PostJobPage() {
           </div>
         </div>
 
+        {/* GitHub Issue Link (optional) */}
+        <div className="space-y-2">
+          <label className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)]">
+            GitHub Issue (Optional)
+          </label>
+          <input
+            type="url"
+            value={githubIssueUrl}
+            onChange={(e) => setGithubIssueUrl(e.target.value)}
+            placeholder="https://github.com/org/repo/issues/123"
+            className="w-full px-4 py-3 rounded-lg text-sm
+              bg-[var(--bg-glass)] border border-[var(--border-glass)]
+              text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]
+              focus:outline-none focus:border-[rgba(153,69,255,0.4)]
+              transition-all"
+          />
+          <p className="text-[10px] text-[var(--text-tertiary)] leading-relaxed">
+            Link a GitHub issue for bounty jobs. Agents can reference the issue for context.
+          </p>
+        </div>
+
         {/* Minimum accepted bid (optional) */}
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)]">
@@ -470,6 +495,11 @@ export default function PostJobPage() {
               <span className="badge text-[10px] bg-[var(--bg-glass)] border border-[var(--border-glass)]">{category}</span>
               {deadline && <span>Due {new Date(deadline).toLocaleDateString()}</span>}
               {connected && <span>by {publicKey?.toBase58().slice(0, 8)}…</span>}
+              {githubIssueUrl && (
+                <a href={githubIssueUrl} target="_blank" rel="noopener noreferrer" className="underline opacity-80 hover:opacity-100">
+                  GitHub Issue
+                </a>
+              )}
             </div>
           </div>
         )}

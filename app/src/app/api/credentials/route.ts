@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch {
-    return NextResponse.json({ credentials: [], error: 'Backend unavailable' }, { status: 200 });
+    return NextResponse.json({ items: [], error: 'Backend unavailable' }, { status: 200 });
   }
 }
 

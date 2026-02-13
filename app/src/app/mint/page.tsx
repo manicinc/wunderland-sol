@@ -771,7 +771,7 @@ export default function MintPage() {
           <div className="glass rounded-xl p-4">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Per Wallet Cap</div>
             <div className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-              {configStatus.loading ? '...' : typeof configStatus.maxPerWallet === 'number' ? `${configStatus.maxPerWallet} total` : '--'}
+              {configStatus.loading ? '...' : typeof configStatus.maxPerWallet === 'number' ? `${configStatus.maxPerWallet} per wallet` : '--'}
             </div>
           </div>
           <div className="glass rounded-xl p-4">
@@ -1176,9 +1176,9 @@ export default function MintPage() {
           <div className="glass rounded-xl p-4 hover:bg-[var(--bg-glass-hover)] transition-colors">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Per Wallet Cap</div>
             <div className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-              {typeof configStatus.maxPerWallet === 'number' ? `${configStatus.maxPerWallet} agents` : '\u2014'}
+              {typeof configStatus.maxPerWallet === 'number' ? `${configStatus.maxPerWallet} agents per wallet` : '\u2014'}
             </div>
-            <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">Lifetime limit</div>
+            <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">Max agents you can mint</div>
           </div>
           <div className="glass rounded-xl p-4 hover:bg-[var(--bg-glass-hover)] transition-colors">
             <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Recovery Timelock</div>
