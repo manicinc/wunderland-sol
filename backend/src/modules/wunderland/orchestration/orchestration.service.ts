@@ -293,7 +293,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
     // Agent sync: register newly onboarded agents without restarting the backend.
     // This makes mint → onboard → autonomous runtime fully end-to-end.
-    this.scheduleCron('agent_sync', 10_000, async () => {
+    const agentSyncMs = Math.max(10_000, Number(process.env.WUNDERLAND_AGENT_SYNC_INTERVAL_MS ?? 60_000));
+    this.scheduleCron('agent_sync', agentSyncMs, async () => {
       await this.registerNewAgentsOnce();
     });
 
@@ -795,12 +796,27 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
   // ── Post Persistence ──────────────────────────────────────────────────────
 
   private async persistPost(post: WonderlandPost): Promise<void> {
+    const stimulus = (post as any)?.manifest?.stimulus as
+      | { type?: unknown; eventId?: unknown; sourceProviderId?: unknown; timestamp?: unknown }
+      | undefined;
+
+    const stimulusType = stimulus?.type ? String(stimulus.type) : null;
+    const stimulusEventId = stimulus?.eventId ? String(stimulus.eventId) : null;
+    const stimulusSourceProviderId = stimulus?.sourceProviderId ? String(stimulus.sourceProviderId) : null;
+    const stimulusTimestamp = (() => {
+      const raw = stimulus?.timestamp ? String(stimulus.timestamp) : '';
+      if (!raw) return null;
+      const ms = Date.parse(raw);
+      return Number.isNaN(ms) ? null : ms;
+    })();
+
     await this.db.run(
       `INSERT INTO wunderland_posts (
         post_id, seed_id, content, manifest, status,
         reply_to_post_id, created_at, published_at,
-        likes, boosts, replies, views, agent_level_at_post
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        likes, boosts, replies, views, agent_level_at_post,
+        stimulus_type, stimulus_event_id, stimulus_source_provider_id, stimulus_timestamp
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(post_id) DO UPDATE SET
         seed_id = excluded.seed_id,
         content = excluded.content,
@@ -812,7 +828,11 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         boosts = excluded.boosts,
         replies = excluded.replies,
         views = excluded.views,
-        agent_level_at_post = excluded.agent_level_at_post`,
+        agent_level_at_post = excluded.agent_level_at_post,
+        stimulus_type = excluded.stimulus_type,
+        stimulus_event_id = excluded.stimulus_event_id,
+        stimulus_source_provider_id = excluded.stimulus_source_provider_id,
+        stimulus_timestamp = excluded.stimulus_timestamp`,
       [
         post.postId,
         post.seedId,
@@ -827,6 +847,10 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         post.engagement.replies,
         post.engagement.views,
         post.agentLevelAtPost,
+        stimulusType,
+        stimulusEventId,
+        stimulusSourceProviderId,
+        stimulusTimestamp,
       ]
     );
 
