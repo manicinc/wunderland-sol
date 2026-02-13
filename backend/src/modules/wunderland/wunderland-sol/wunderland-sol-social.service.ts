@@ -468,8 +468,8 @@ export class WunderlandSolSocialService {
             p.post_index,
             p.content_hash_hex,
             p.manifest_hash_hex,
-            p.upvotes,
-            p.downvotes,
+            max(COALESCE(wp.likes, 0), p.upvotes) as upvotes,
+            max(COALESCE(wp.downvotes, 0), p.downvotes) as downvotes,
             p.comment_count,
             p.timestamp_sec,
             p.created_slot,
@@ -480,6 +480,7 @@ export class WunderlandSolSocialService {
             a.traits_json as agent_traits_json
           FROM wunderland_sol_posts p
           LEFT JOIN wunderland_sol_agents a ON a.agent_pda = p.agent_pda
+          LEFT JOIN wunderland_posts wp ON wp.sol_post_pda = p.post_pda
           ${whereSql}
           ORDER BY COALESCE(p.created_slot, 0) DESC, p.timestamp_sec DESC
           LIMIT ?
@@ -502,15 +503,19 @@ export class WunderlandSolSocialService {
       return { posts, total: scored.length, source: 'index' };
     }
 
+    // Merged vote expressions: prefer off-chain engagement counts over on-chain when available.
+    const mUp = 'max(COALESCE(wp.likes, 0), p.upvotes)';
+    const mDown = 'max(COALESCE(wp.downvotes, 0), p.downvotes)';
+
     const orderSql = (() => {
       if (sort === 'top') {
-        return 'ORDER BY (p.upvotes - p.downvotes) DESC, COALESCE(p.created_slot, 0) DESC, p.timestamp_sec DESC';
+        return `ORDER BY (${mUp} - ${mDown}) DESC, COALESCE(p.created_slot, 0) DESC, p.timestamp_sec DESC`;
       }
       if (sort === 'controversial') {
-        const minVotes = '(CASE WHEN p.upvotes < p.downvotes THEN p.upvotes ELSE p.downvotes END)';
-        const maxVotes = '(CASE WHEN p.upvotes > p.downvotes THEN p.upvotes ELSE p.downvotes END)';
+        const minVotes = `(CASE WHEN ${mUp} < ${mDown} THEN ${mUp} ELSE ${mDown} END)`;
+        const maxVotes = `(CASE WHEN ${mUp} > ${mDown} THEN ${mUp} ELSE ${mDown} END)`;
         const denom = `(CASE WHEN ${maxVotes} > 0 THEN ${maxVotes} ELSE 1 END)`;
-        const score = `((${minVotes} * 1.0) / ${denom}) * (p.upvotes + p.downvotes)`;
+        const score = `((${minVotes} * 1.0) / ${denom}) * (${mUp} + ${mDown})`;
         return `ORDER BY ${score} DESC, COALESCE(p.created_slot, 0) DESC, p.timestamp_sec DESC`;
       }
       // default: new
@@ -528,8 +533,8 @@ export class WunderlandSolSocialService {
           p.post_index,
           p.content_hash_hex,
           p.manifest_hash_hex,
-          p.upvotes,
-          p.downvotes,
+          ${mUp} as upvotes,
+          ${mDown} as downvotes,
           p.comment_count,
           p.timestamp_sec,
           p.created_slot,
@@ -540,6 +545,7 @@ export class WunderlandSolSocialService {
           a.traits_json as agent_traits_json
         FROM wunderland_sol_posts p
         LEFT JOIN wunderland_sol_agents a ON a.agent_pda = p.agent_pda
+        LEFT JOIN wunderland_posts wp ON wp.sol_post_pda = p.post_pda
         ${whereSql}
         ${orderSql}
         LIMIT ? OFFSET ?
@@ -567,8 +573,8 @@ export class WunderlandSolSocialService {
           p.post_index,
           p.content_hash_hex,
           p.manifest_hash_hex,
-          p.upvotes,
-          p.downvotes,
+          max(COALESCE(wp.likes, 0), p.upvotes) as upvotes,
+          max(COALESCE(wp.downvotes, 0), p.downvotes) as downvotes,
           p.comment_count,
           p.timestamp_sec,
           p.created_slot,
@@ -579,6 +585,7 @@ export class WunderlandSolSocialService {
           a.traits_json as agent_traits_json
         FROM wunderland_sol_posts p
         LEFT JOIN wunderland_sol_agents a ON a.agent_pda = p.agent_pda
+        LEFT JOIN wunderland_posts wp ON wp.sol_post_pda = p.post_pda
         WHERE p.post_pda = ?
         LIMIT 1
       `,
@@ -641,8 +648,8 @@ export class WunderlandSolSocialService {
             p.post_index,
             p.content_hash_hex,
             p.manifest_hash_hex,
-            p.upvotes,
-            p.downvotes,
+            max(COALESCE(wp.likes, 0), p.upvotes) as upvotes,
+            max(COALESCE(wp.downvotes, 0), p.downvotes) as downvotes,
             p.comment_count,
             p.timestamp_sec,
             p.created_slot,
@@ -653,6 +660,7 @@ export class WunderlandSolSocialService {
             a.traits_json as agent_traits_json
           FROM wunderland_sol_posts p
           LEFT JOIN wunderland_sol_agents a ON a.agent_pda = p.agent_pda
+          LEFT JOIN wunderland_posts wp ON wp.sol_post_pda = p.post_pda
           WHERE p.kind = 'comment'
             AND p.reply_to IN (${placeholders})
         `,
