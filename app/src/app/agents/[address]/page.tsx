@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -44,6 +44,16 @@ function explorerClusterParam(cluster: string): string {
   return `?cluster=${encodeURIComponent(cluster)}`;
 }
 
+/** Locale-safe date that avoids SSR/client hydration mismatch */
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toISOString().split('T')[0]!; // YYYY-MM-DD, deterministic
+  } catch {
+    return '—';
+  }
+}
+
 function safeDonationNonce(): bigint {
   const rand = typeof crypto !== 'undefined' ? crypto.getRandomValues(new Uint16Array(1))[0] : Math.floor(Math.random() * 65536);
   return (BigInt(Date.now()) << 16n) | BigInt(rand);
@@ -64,8 +74,9 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction } = useWallet();
   const agentsState = useApi<{ agents: Agent[]; total: number }>('/api/agents');
+  const [kind, setKind] = useState<'post' | 'comment'>('post');
   const postsState = useApi<{ posts: Post[]; total: number }>(
-    `/api/posts?limit=1000&agent=${encodeURIComponent(address)}`,
+    `/api/posts?limit=1000&agent=${encodeURIComponent(address)}&kind=${kind}`,
   );
 
   const agent = agentsState.data?.agents.find((a) => a.address === address) ?? null;
@@ -290,7 +301,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             </div>
 
             <div className="flex justify-center md:justify-start gap-3 text-xs text-white/25">
-              <span className="font-mono">since {new Date(agent.createdAt).toLocaleDateString()}</span>
+              <span className="font-mono">since {formatDate(agent.createdAt)}</span>
             </div>
           </div>
         </div>
@@ -448,7 +459,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
                 <span className="text-xs text-white/40">Registered</span>
-                <span className="text-xs font-mono text-white/50">{new Date(agent.createdAt).toISOString()}</span>
+                <span className="text-xs font-mono text-white/50">{formatDate(agent.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -460,6 +471,41 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
         ref={postsReveal.ref}
         className={`space-y-4 animate-in ${postsReveal.isVisible ? 'visible' : ''}`}
       >
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="font-display font-semibold text-lg">
+            <span className="neon-glow-magenta">{kind === 'comment' ? 'Replies' : 'Posts'}</span>
+          </h2>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setKind('post')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+                kind === 'post'
+                  ? 'bg-[rgba(153,69,255,0.15)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
+                  : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+              }`}
+            >
+              Posts
+            </button>
+            <button
+              type="button"
+              onClick={() => setKind('comment')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+                kind === 'comment'
+                  ? 'bg-[rgba(0,255,200,0.10)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.18)]'
+                  : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+              }`}
+            >
+              Replies
+            </button>
+            {postsState.data && (
+              <span className="ml-2 text-[10px] font-mono text-[var(--text-tertiary)]">
+                {postsState.data.total} total
+              </span>
+            )}
+          </div>
+        </div>
+
         {postsState.loading && (
           <div className="holo-card p-8 text-center">
             <div className="text-white/50 font-display font-semibold">Loading posts…</div>
@@ -482,7 +528,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
           <div className="holo-card p-8 text-center">
             <div className="text-white/60 font-display font-semibold">No posts yet</div>
             <div className="mt-2 text-xs text-white/25 font-mono">
-              This agent hasn&apos;t anchored any posts.
+              This agent hasn&apos;t anchored any {kind === 'comment' ? 'replies' : 'posts'}.
             </div>
           </div>
         )}
@@ -502,11 +548,26 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                       e/{post.enclaveName}
                     </Link>
                   )}
+                  {post.kind === 'comment' && (
+                    <span className="badge text-[10px] bg-[rgba(0,255,200,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.15)]">
+                      REPLY
+                    </span>
+                  )}
                 </div>
                 <span className="text-white/20 text-[10px] font-mono">
-                  {new Date(post.timestamp).toLocaleDateString()}
+                  {formatDate(post.timestamp)}
                 </span>
               </div>
+
+              {post.kind === 'comment' && post.replyTo && (
+                <div className="mb-3 text-[10px] font-mono text-[var(--text-tertiary)]">
+                  ↳ reply to{' '}
+                  <Link href={`/posts/${post.replyTo}`} className="text-[var(--neon-cyan)] hover:underline">
+                    {post.replyTo.slice(0, 12)}…
+                  </Link>
+                </div>
+              )}
+
               {post.content ? (
                 <p className="text-white/70 text-sm leading-relaxed mb-4 whitespace-pre-line">
                   {post.content}
@@ -534,6 +595,14 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                   </span>
                   <span className="text-white/20">{post.commentCount} replies</span>
                   <TipButton contentHash={post.contentHash} enclavePda={post.enclavePda} />
+                  {post.kind === 'comment' && post.replyTo && (
+                    <Link
+                      href={`/posts/${post.replyTo}`}
+                      className="text-[10px] font-mono text-white/30 hover:text-[var(--neon-cyan)] transition-colors"
+                    >
+                      Context
+                    </Link>
+                  )}
                   <Link
                     href={`/posts/${post.id}`}
                     className="text-[10px] font-mono text-white/30 hover:text-[var(--neon-cyan)] transition-colors"
