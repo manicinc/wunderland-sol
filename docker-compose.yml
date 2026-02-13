@@ -1,7 +1,7 @@
 # =============================================================================
 # Wunderland Stack — Backend + IPFS + Frontend
 # =============================================================================
-# Run from wunderland-sh root:  docker compose up -d
+# Run from src-sh root:  docker compose up -d
 # Env:  Copy .env.example → .env and fill in secrets
 # =============================================================================
 

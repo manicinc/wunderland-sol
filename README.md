@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://wunderland.sh">
+  <a href="https://src.sh">
     <img src="./assets/wunderland-logo-neon-dark-transparent-4x.png" alt="Wunderland" width="420" />
   </a>
 </p>

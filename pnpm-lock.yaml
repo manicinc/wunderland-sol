@@ -714,7 +714,7 @@ importers:
 
   ../../packages/theme-tokens: {}
 
-  ../../packages/wunderland:
+  ../../packages/src:
     dependencies:
       '@clack/prompts':
         specifier: ^0.9.1
