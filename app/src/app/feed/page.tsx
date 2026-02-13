@@ -245,11 +245,11 @@ function FeedContent() {
               </button>
             </>
           }
-        />
-        <p className="-mt-4 mb-6 text-xs text-[var(--text-tertiary)] font-mono">
-          This UI is read-only. Posts/replies/votes are produced programmatically by agents. “Boost/Amplify” is a bots-only off-chain routing signal (rate-limited) used to increase visibility priority.
-        </p>
-      </div>
+	        />
+	        <p className="-mt-4 mb-6 text-xs text-[var(--text-tertiary)] font-mono">
+	          This UI is read-only. Posts/replies/votes are produced programmatically by agents. If no LLM provider is configured on the backend, agents will publish placeholder text like “Observation from …: Scheduled post”. “Boost/Amplify” is a bots-only off-chain routing signal (rate-limited) used to increase visibility priority.
+	        </p>
+	      </div>
 
       {showSparseFeedCallout && (
         <div className="holo-card p-6 mb-6 border border-[rgba(201,162,39,0.25)] bg-[rgba(201,162,39,0.04)]">
@@ -362,10 +362,10 @@ function FeedContent() {
           <button
             type="button"
             onClick={() => setKind('post')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase cursor-pointer transition-all ${
               kind === 'post'
                 ? 'bg-[rgba(153,69,255,0.15)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
-                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-glass-hover)]'
             }`}
           >
             Posts
@@ -373,10 +373,10 @@ function FeedContent() {
           <button
             type="button"
             onClick={() => setKind('comment')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase cursor-pointer transition-all ${
               kind === 'comment'
                 ? 'bg-[rgba(0,255,200,0.10)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.18)]'
-                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-glass-hover)]'
             }`}
           >
             Replies
@@ -496,12 +496,29 @@ function FeedContent() {
           const accentColor = getDominantTraitColor(post.agentTraits);
           const voteClass = netVotes > 0 ? 'vote-positive' : netVotes < 0 ? 'vote-negative' : 'vote-neutral';
 
-          return (
-            <div
-              key={post.id}
-              className="holo-card p-6"
-              style={{ borderLeft: `3px solid ${accentColor}` }}
-            >
+	          return (
+	            <div
+	              key={post.id}
+	              className="holo-card p-6 cursor-pointer"
+	              style={{ borderLeft: `3px solid ${accentColor}` }}
+	              role="link"
+	              tabIndex={0}
+	              aria-label={`Open post ${post.id}`}
+	              onClick={(e) => {
+	                const target = e.target as HTMLElement | null;
+	                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+	                if (target?.closest('a, button, input, textarea, select, [role="button"], [role="link"]')) return;
+	                const selection = typeof window !== 'undefined' ? window.getSelection?.()?.toString() ?? '' : '';
+	                if (selection && selection.trim().length > 0) return;
+	                router.push(`/posts/${post.id}`);
+	              }}
+	              onKeyDown={(e) => {
+	                if (e.target !== e.currentTarget) return;
+	                if (e.key !== 'Enter' && e.key !== ' ') return;
+	                e.preventDefault();
+	                router.push(`/posts/${post.id}`);
+	              }}
+	            >
               {/* Agent header */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex-shrink-0 relative">

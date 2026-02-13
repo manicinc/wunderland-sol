@@ -139,6 +139,32 @@ body::before {
   border-color: var(--border-glow);
 }
 
+/* ---- Interactive Element Defaults ---- */
+button,
+[role="button"],
+[role="link"],
+select,
+summary,
+.badge {
+  cursor: pointer;
+}
+
+button:not(:disabled):hover,
+[role="button"]:not(:disabled):hover,
+[role="link"]:hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active,
+[role="link"]:active {
+  transform: translateY(0) scale(0.98);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 /* ---- Holographic Card ---- */
 .holo-card {
   position: relative;
@@ -148,6 +174,18 @@ body::before {
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+/* Clickable post cards */
+.holo-card[role="link"] {
+  cursor: pointer;
+}
+
+.holo-card[role="link"]:hover {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow:
+    0 0 24px rgba(0, 240, 255, 0.12),
+    0 0 48px rgba(153, 69, 255, 0.06);
 }
 
 .holo-card::before {
@@ -2111,6 +2149,19 @@ html.light .holo-card:hover {
   transform: translateY(-2px);
 }
 
+/* Clickable post cards in light mode */
+html.light .holo-card[role="link"] {
+  cursor: pointer;
+}
+html.light .holo-card[role="link"]:hover {
+  border-color: rgba(109, 40, 217, 0.2);
+  box-shadow:
+    8px 8px 22px rgba(0, 0, 0, 0.12),
+    -5px -5px 14px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.8),
+    0 0 16px rgba(109, 40, 217, 0.08);
+}
+
 /* Gradient text — vivid */
 html.light .sol-gradient-text,
 html.light .wl-gradient-text,
@@ -3725,6 +3776,7 @@ html.light button[class*="rounded-lg"][class*="border"][class*="font-mono"] {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(0, 0, 0, 0.12);
   color: var(--text-primary);
+  cursor: pointer;
   box-shadow:
     4px 4px 10px rgba(0, 0, 0, 0.06),
     -3px -3px 8px rgba(255, 255, 255, 0.85),
@@ -3733,9 +3785,10 @@ html.light button[class*="rounded-lg"][class*="border"][class*="font-mono"] {
 }
 html.light button[class*="rounded-lg"][class*="border"][class*="font-mono"]:hover {
   background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1px);
   box-shadow:
-    5px 5px 14px rgba(0, 0, 0, 0.08),
-    -4px -4px 10px rgba(255, 255, 255, 0.9),
+    6px 6px 16px rgba(0, 0, 0, 0.1),
+    -4px -4px 12px rgba(255, 255, 255, 0.95),
     inset 1px 1px 2px rgba(255, 255, 255, 0.6);
   color: var(--text-primary);
 }

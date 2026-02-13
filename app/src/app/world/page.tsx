@@ -200,10 +200,10 @@ function FilterChips({
           <button
             type="button"
             onClick={() => onCategoryChange('')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono cursor-pointer transition-all hover:shadow-[0_0_6px_rgba(0,255,255,0.1)] ${
               !activeCategory
                 ? 'bg-[rgba(0,255,255,0.12)] text-[var(--neon-cyan)] border border-[rgba(0,255,255,0.25)]'
-                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-glass-hover)]'
             }`}
           >
             All
@@ -216,7 +216,7 @@ function FilterChips({
                 key={cat}
                 type="button"
                 onClick={() => onCategoryChange(isActive ? '' : cat)}
-                className="px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all"
+                className="px-2.5 py-1 rounded-lg text-[11px] font-mono cursor-pointer transition-all hover:shadow-[0_0_6px_rgba(0,255,255,0.08)]"
                 style={{
                   background: isActive ? style.bg : 'var(--bg-glass)',
                   color: isActive ? style.color : 'var(--text-tertiary)',
@@ -237,10 +237,10 @@ function FilterChips({
           <button
             type="button"
             onClick={() => onSourceChange('')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono cursor-pointer transition-all hover:shadow-[0_0_6px_rgba(153,69,255,0.1)] ${
               !activeSource
                 ? 'bg-[rgba(153,69,255,0.12)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
-                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-glass-hover)]'
             }`}
           >
             All
@@ -252,10 +252,10 @@ function FilterChips({
                 key={src.sourceId}
                 type="button"
                 onClick={() => onSourceChange(isActive ? '' : src.sourceId)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-mono cursor-pointer transition-all hover:shadow-[0_0_6px_rgba(153,69,255,0.08)] ${
                   isActive
                     ? 'bg-[rgba(153,69,255,0.12)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
-                    : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+                    : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-glass-hover)]'
                 }`}
               >
                 {src.name}
@@ -281,6 +281,9 @@ function Pagination({
   totalPages: number;
   onPageChange: (p: number) => void;
 }) {
+  const [jumpValue, setJumpValue] = useState('');
+  const [showJump, setShowJump] = useState(false);
+
   if (totalPages <= 1) return null;
 
   const pages: (number | '...')[] = [];
@@ -296,48 +299,101 @@ function Pagination({
     pages.push(totalPages);
   }
 
+  const handleJump = (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = parseInt(jumpValue, 10);
+    if (!isNaN(target) && target >= 1 && target <= totalPages) {
+      onPageChange(target);
+      setJumpValue('');
+      setShowJump(false);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center gap-1.5 mt-8">
-      <button
-        type="button"
-        disabled={page <= 1}
-        onClick={() => onPageChange(page - 1)}
-        className="px-3 py-1.5 rounded-lg text-xs font-mono
-          bg-[var(--bg-glass)] border border-[var(--border-glass)]
-          text-[var(--text-secondary)] hover:text-[var(--text-primary)]
-          transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-      >
-        Prev
-      </button>
-      {pages.map((p, i) =>
-        p === '...' ? (
-          <span key={`dots-${i}`} className="px-2 text-[var(--text-tertiary)] text-xs font-mono">...</span>
-        ) : (
+    <div className="flex flex-col items-center gap-3 mt-8">
+      <div className="flex items-center justify-center gap-1.5">
+        <button
+          type="button"
+          disabled={page <= 1}
+          onClick={() => onPageChange(page - 1)}
+          className="px-3 py-1.5 rounded-lg text-xs font-mono cursor-pointer
+            bg-[var(--bg-glass)] border border-[var(--border-glass)]
+            text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)]
+            hover:border-[rgba(0,255,255,0.2)] hover:shadow-[0_0_8px_rgba(0,255,255,0.1)]
+            transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:transform-none"
+        >
+          Prev
+        </button>
+        {pages.map((p, i) =>
+          p === '...' ? (
+            <button
+              key={`dots-${i}`}
+              type="button"
+              onClick={() => setShowJump(!showJump)}
+              className="px-2 text-[var(--text-tertiary)] text-xs font-mono cursor-pointer hover:text-[var(--neon-cyan)] transition-colors"
+              title="Go to page..."
+            >
+              ...
+            </button>
+          ) : (
+            <button
+              key={p}
+              type="button"
+              onClick={() => onPageChange(p)}
+              className={`w-8 h-8 rounded-lg text-xs font-mono cursor-pointer transition-all ${
+                p === page
+                  ? 'bg-[rgba(0,255,255,0.12)] text-[var(--neon-cyan)] border border-[rgba(0,255,255,0.25)] shadow-[0_0_8px_rgba(0,255,255,0.15)]'
+                  : 'bg-[var(--bg-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] hover:border-[rgba(0,255,255,0.15)]'
+              }`}
+            >
+              {p}
+            </button>
+          ),
+        )}
+        <button
+          type="button"
+          disabled={page >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+          className="px-3 py-1.5 rounded-lg text-xs font-mono cursor-pointer
+            bg-[var(--bg-glass)] border border-[var(--border-glass)]
+            text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)]
+            hover:border-[rgba(0,255,255,0.2)] hover:shadow-[0_0_8px_rgba(0,255,255,0.1)]
+            transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:transform-none"
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Page jump input */}
+      {showJump && (
+        <form onSubmit={handleJump} className="flex items-center gap-2">
+          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">Go to page</span>
+          <input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={jumpValue}
+            onChange={(e) => setJumpValue(e.target.value)}
+            placeholder={String(page)}
+            className="w-16 px-2 py-1 rounded-lg text-xs font-mono text-center
+              bg-[var(--bg-glass)] border border-[var(--border-glass)]
+              text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]
+              focus:outline-none focus:border-[rgba(0,255,255,0.4)]
+              transition-all"
+            autoFocus
+          />
           <button
-            key={p}
-            type="button"
-            onClick={() => onPageChange(p)}
-            className={`w-8 h-8 rounded-lg text-xs font-mono transition-all ${
-              p === page
-                ? 'bg-[rgba(0,255,255,0.12)] text-[var(--neon-cyan)] border border-[rgba(0,255,255,0.25)]'
-                : 'bg-[var(--bg-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
+            type="submit"
+            className="px-2 py-1 rounded-lg text-[10px] font-mono cursor-pointer
+              bg-[rgba(0,255,255,0.08)] border border-[rgba(0,255,255,0.2)]
+              text-[var(--neon-cyan)] hover:bg-[rgba(0,255,255,0.15)]
+              transition-all"
           >
-            {p}
+            Go
           </button>
-        ),
+          <span className="text-[10px] font-mono text-[var(--text-tertiary)]">of {totalPages}</span>
+        </form>
       )}
-      <button
-        type="button"
-        disabled={page >= totalPages}
-        onClick={() => onPageChange(page + 1)}
-        className="px-3 py-1.5 rounded-lg text-xs font-mono
-          bg-[var(--bg-glass)] border border-[var(--border-glass)]
-          text-[var(--text-secondary)] hover:text-[var(--text-primary)]
-          transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-      >
-        Next
-      </button>
     </div>
   );
 }
