@@ -346,9 +346,11 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       inference_hierarchy: string | null;
       subscribed_topics: string | null;
       tool_access_profile: string | null;
+      base_system_prompt: string | null;
     }>(
       `SELECT a.seed_id, a.owner_user_id, a.display_name, a.bio, a.hexaco_traits,
-              a.inference_hierarchy, a.tool_access_profile, c.subscribed_topics
+              a.inference_hierarchy, a.tool_access_profile, a.base_system_prompt,
+              c.subscribed_topics
        FROM wunderbots a
        LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
        WHERE a.status = 'active' AND (c.is_active = 1 OR c.is_active IS NULL)`
@@ -362,14 +364,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       if (this.network.getCitizen(seedId)?.isActive) continue;
 
       try {
-        const hexaco = this.parseJson<HEXACOTraits>(agent.hexaco_traits, {
-          honesty_humility: 0.5,
-          emotionality: 0.5,
-          extraversion: 0.5,
-          agreeableness: 0.5,
-          conscientiousness: 0.5,
-          openness: 0.5,
-        });
+        const rawHexaco = this.parseJson<any>(agent.hexaco_traits, {});
+        const hexaco = this.normalizeHexacoKeys(rawHexaco);
         const topics = this.parseJson<string[]>(agent.subscribed_topics, []);
         const dbHierarchy = this.parseJson<InferenceHierarchyConfig>(agent.inference_hierarchy, null as any);
 
@@ -378,6 +374,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           name: agent.display_name,
           description: agent.bio ?? '',
           hexacoTraits: hexaco,
+          baseSystemPrompt: agent.base_system_prompt ?? undefined,
           securityProfile: DEFAULT_SECURITY_PROFILE,
           inferenceHierarchy: (dbHierarchy?.primaryModel?.modelId) ? dbHierarchy : DEFAULT_INFERENCE_HIERARCHY,
           stepUpAuthConfig: DEFAULT_STEP_UP_AUTH_CONFIG,
@@ -614,6 +611,20 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
   // ── Agent Loading ─────────────────────────────────────────────────────────
 
+  /**
+   * Normalize HEXACO keys from camelCase (stored by mint scripts) to snake_case (expected by HEXACOTraits interface).
+   */
+  private normalizeHexacoKeys(raw: any): HEXACOTraits {
+    return {
+      honesty_humility: raw.honesty_humility ?? raw.honestyHumility ?? 0.5,
+      emotionality: raw.emotionality ?? 0.5,
+      extraversion: raw.extraversion ?? 0.5,
+      agreeableness: raw.agreeableness ?? 0.5,
+      conscientiousness: raw.conscientiousness ?? 0.5,
+      openness: raw.openness ?? 0.5,
+    };
+  }
+
   private async loadAndRegisterAgents(): Promise<number> {
     const agents = await this.db.all<{
       seed_id: string;
@@ -624,9 +635,11 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       inference_hierarchy: string | null;
       subscribed_topics: string | null;
       tool_access_profile: string | null;
+      base_system_prompt: string | null;
     }>(
       `SELECT a.seed_id, a.owner_user_id, a.display_name, a.bio, a.hexaco_traits,
-              a.inference_hierarchy, a.tool_access_profile, c.subscribed_topics
+              a.inference_hierarchy, a.tool_access_profile, a.base_system_prompt,
+              c.subscribed_topics
        FROM wunderbots a
        LEFT JOIN wunderland_citizens c ON c.seed_id = a.seed_id
        WHERE a.status = 'active' AND (c.is_active = 1 OR c.is_active IS NULL)`
@@ -635,14 +648,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     let count = 0;
     for (const agent of agents) {
       try {
-        const hexaco = this.parseJson<HEXACOTraits>(agent.hexaco_traits, {
-          honesty_humility: 0.5,
-          emotionality: 0.5,
-          extraversion: 0.5,
-          agreeableness: 0.5,
-          conscientiousness: 0.5,
-          openness: 0.5,
-        });
+        const rawHexaco = this.parseJson<any>(agent.hexaco_traits, {});
+        const hexaco = this.normalizeHexacoKeys(rawHexaco);
         const topics = this.parseJson<string[]>(agent.subscribed_topics, []);
         const dbHierarchy = this.parseJson<InferenceHierarchyConfig>(agent.inference_hierarchy, null as any);
 
@@ -651,6 +658,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           name: agent.display_name,
           description: agent.bio ?? '',
           hexacoTraits: hexaco,
+          baseSystemPrompt: agent.base_system_prompt ?? undefined,
           securityProfile: DEFAULT_SECURITY_PROFILE,
           inferenceHierarchy: (dbHierarchy?.primaryModel?.modelId) ? dbHierarchy : DEFAULT_INFERENCE_HIERARCHY,
           stepUpAuthConfig: DEFAULT_STEP_UP_AUTH_CONFIG,

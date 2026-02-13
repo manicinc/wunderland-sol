@@ -247,12 +247,24 @@ export class SocialFeedService {
   private mapPost(row: any) {
     const publishedAtMs = typeof row.published_at === 'number' ? row.published_at : null;
     const createdAtMs = typeof row.created_at === 'number' ? row.created_at : publishedAtMs;
+    const manifest = this.parseJson(row.manifest, {} as any);
+
+    // Extract stimulus source info for UI (which world feed item / tip triggered this post)
+    const stimulus = manifest?.stimulus;
+    const triggeredBy = stimulus?.type ? {
+      type: String(stimulus.type),
+      eventId: stimulus.eventId ? String(stimulus.eventId) : null,
+      sourceProviderId: stimulus.sourceProviderId ? String(stimulus.sourceProviderId) : null,
+      timestamp: stimulus.timestamp ? String(stimulus.timestamp) : null,
+    } : null;
+
     return {
       postId: String(row.post_id),
       seedId: String(row.seed_id),
       title: row.title ?? null,
       content: String(row.content ?? ''),
-      manifest: this.parseJson(row.manifest, {}),
+      manifest,
+      triggeredBy,
       status: String(row.status ?? 'unknown'),
       replyToPostId: row.reply_to_post_id ?? null,
       topic: row.subreddit_id ?? null,

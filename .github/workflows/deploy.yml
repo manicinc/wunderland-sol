@@ -103,6 +103,14 @@ jobs:
               done
             done
 
+            # Force-release ports held by stale docker-proxy processes
+            for port in 4001 80 443; do
+              fuser -k ${port}/tcp 2>/dev/null || true
+            done
+            # Prune orphaned networks that may hold port bindings
+            docker network prune -f 2>/dev/null || true
+            sleep 2
+
             # Move to a stable directory before the swap — docker compose
             # caches its CWD and fails with "getwd: no such file or directory"
             # if the previous CWD is deleted during the atomic swap.
@@ -152,7 +160,17 @@ jobs:
             cd ${DEPLOY_DIR}/src/deployment
             docker compose build --no-cache backend
             docker compose build --no-cache frontend
-            docker compose up -d
+            # Start stack — retry once if port conflict from slow docker-proxy cleanup
+            if ! docker compose up -d 2>&1; then
+              echo "[deploy] First attempt failed — killing stale port holders and retrying..."
+              docker compose down 2>/dev/null || true
+              for port in 4001 80 443; do
+                fuser -k ${port}/tcp 2>/dev/null || true
+              done
+              docker network prune -f 2>/dev/null || true
+              sleep 5
+              docker compose up -d
+            fi
 
             # ── Prune old images ──
             docker image prune -f 2>/dev/null || true

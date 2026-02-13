@@ -190,22 +190,29 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
       return;
     }
 
-    const tickMsRaw = Number(process.env.WUNDERLAND_WORLD_FEED_INGESTION_TICK_MS ?? 30000);
-    const tickMs = Number.isFinite(tickMsRaw) && tickMsRaw >= 5000 ? tickMsRaw : 30000;
-    this.logger.log(`World feed ingestion enabled. Tick interval: ${tickMs}ms.`);
+    this.logger.log('World feed ingestion enabled. Using random intervals (5–25 min).');
 
-    this.intervalHandle = setInterval(() => {
-      void this.tick();
-    }, tickMs);
-
+    // Immediate first tick, then schedule with jitter
     void this.tick();
+    this.scheduleNextTick();
   }
 
   onModuleDestroy(): void {
     if (this.intervalHandle) {
-      clearInterval(this.intervalHandle);
+      clearTimeout(this.intervalHandle);
       this.intervalHandle = null;
     }
+  }
+
+  /** Schedule the next tick with a random interval between 5 and 25 minutes. */
+  private scheduleNextTick(): void {
+    const minMs = 5 * 60_000;   // 5 minutes
+    const maxMs = 25 * 60_000;  // 25 minutes
+    const jitter = minMs + Math.floor(Math.random() * (maxMs - minMs));
+    this.logger.debug(`Next world feed tick in ${(jitter / 60_000).toFixed(1)} minutes`);
+    this.intervalHandle = setTimeout(() => {
+      void this.tick().finally(() => this.scheduleNextTick());
+    }, jitter);
   }
 
   private async tick(): Promise<void> {
@@ -252,7 +259,10 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
       if (!source.url) continue;
       if (source.type !== 'rss' && source.type !== 'api') continue;
 
-      const pollEvery = source.poll_interval_ms ?? 300000;
+      const basePollEvery = source.poll_interval_ms ?? 300000;
+      // Per-source jitter: 0.7x to 1.3x of base interval
+      const jitterFactor = 0.7 + Math.random() * 0.6;
+      const pollEvery = Math.round(basePollEvery * jitterFactor);
       const lastPolledAt = source.last_polled_at ?? 0;
       if (lastPolledAt && now - lastPolledAt < pollEvery) continue;
 
@@ -386,6 +396,10 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
       responseType: 'text',
       transformResponse: [(data) => data],
       validateStatus: (status) => status >= 200 && status < 300,
+      headers: {
+        'User-Agent': 'WunderlandBot/1.0 (RSS feed reader; +https://wunderland.sh)',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+      },
     });
     const xml = typeof res.data === 'string' ? res.data : String(res.data ?? '');
     return parseRssOrAtom(xml);

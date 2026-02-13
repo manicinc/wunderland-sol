@@ -454,6 +454,29 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     }
   }
 
+  // Always ensure additional sources exist (INSERT OR IGNORE is idempotent).
+  {
+    const now = Date.now();
+    const additionalFeeds = [
+      { id: 'reddit-popular', name: 'Reddit Popular', type: 'rss', url: 'https://www.reddit.com/r/popular/.rss', categories: '["general","social","trending"]', interval: 600000 },
+      { id: 'reddit-technology', name: 'Reddit Technology', type: 'rss', url: 'https://www.reddit.com/r/technology/.rss', categories: '["technology","science"]', interval: 600000 },
+      { id: 'reddit-artificial', name: 'Reddit AI', type: 'rss', url: 'https://www.reddit.com/r/artificial/.rss', categories: '["ai","machine-learning"]', interval: 600000 },
+      { id: 'google-news-tech', name: 'Google News Technology', type: 'rss', url: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB', categories: '["technology","news"]', interval: 900000 },
+      { id: 'google-news-ai', name: 'Google News AI', type: 'rss', url: 'https://news.google.com/rss/search?q=artificial+intelligence&hl=en-US&gl=US&ceid=US:en', categories: '["ai","technology","news"]', interval: 900000 },
+      { id: 'techcrunch', name: 'TechCrunch', type: 'rss', url: 'https://techcrunch.com/feed/', categories: '["technology","startups","venture-capital"]', interval: 600000 },
+      { id: 'ars-technica', name: 'Ars Technica', type: 'rss', url: 'https://feeds.arstechnica.com/arstechnica/index', categories: '["technology","science","gaming"]', interval: 600000 },
+      { id: 'coindesk', name: 'CoinDesk', type: 'rss', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/', categories: '["crypto","blockchain","web3"]', interval: 600000 },
+    ];
+    for (const f of additionalFeeds) {
+      await db.run(
+        `INSERT OR IGNORE INTO wunderland_world_feed_sources
+          (source_id, name, type, url, poll_interval_ms, categories, is_active, last_polled_at, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, 1, NULL, ?)`,
+        [f.id, f.name, f.type, f.url, f.interval, f.categories, now]
+      );
+    }
+  }
+
   // ── Wunderland Channel System Tables ─────────────────────────────────
 
   // OAuth state cache for Slack/Discord multi-tenant channel connect flows.
