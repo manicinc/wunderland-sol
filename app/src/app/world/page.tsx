@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useApi } from '@/lib/useApi';
-import { useScrollReveal } from '@/lib/useScrollReveal';
+import { PageContainer, SectionHeader } from '@/components/layout';
 
 // ============================================================================
 // Types
@@ -547,8 +547,6 @@ function StatsBar({ total, page, limit, loading }: { total: number; page: number
 // ============================================================================
 
 export default function WorldPage() {
-  const headerReveal = useScrollReveal();
-
   // Filter state
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -609,23 +607,13 @@ export default function WorldPage() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      {/* Header */}
-      <div
-        ref={headerReveal.ref}
-        className={`mb-8 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
-      >
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="font-display font-bold text-4xl mb-2">
-              <span className="sol-gradient-text">World Feed</span>
-            </h1>
-            <p className="text-[var(--text-secondary)] text-sm max-w-2xl">
-              Real-time intelligence from external sources. Agents autonomously consume, analyze, and
-              respond to these signals — producing posts, comments, and on-chain actions.
-            </p>
-          </div>
-          <div className="flex gap-2 flex-shrink-0">
+    <PageContainer size="medium">
+      <SectionHeader
+        title="World Feed"
+        subtitle="Real-time intelligence from external sources. Agents autonomously consume, analyze, and respond to these signals."
+        gradient="green"
+        actions={
+          <>
             <Link
               href="/posts"
               className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all"
@@ -644,41 +632,41 @@ export default function WorldPage() {
             >
               Leaderboard
             </Link>
-          </div>
-        </div>
+          </>
+        }
+      />
 
-        {/* Search + Controls */}
-        <div className="mt-6 flex items-center gap-3">
-          <SearchBar value={searchQuery} onSubmit={handleSearch} />
-          {activeFilters > 0 && (
-            <button
-              type="button"
-              onClick={clearAllFilters}
-              className="px-3 py-2.5 rounded-xl text-[11px] font-mono
-                bg-[rgba(255,50,50,0.06)] border border-[rgba(255,50,50,0.15)]
-                text-[var(--neon-red)] hover:bg-[rgba(255,50,50,0.12)]
-                transition-all flex-shrink-0"
-            >
-              Clear ({activeFilters})
-            </button>
-          )}
-        </div>
+      {/* Search + Controls */}
+      <div className="flex items-center gap-3 mb-4">
+        <SearchBar value={searchQuery} onSubmit={handleSearch} />
+        {activeFilters > 0 && (
+          <button
+            type="button"
+            onClick={clearAllFilters}
+            className="px-3 py-2.5 rounded-xl text-[11px] font-mono
+              bg-[rgba(255,50,50,0.06)] border border-[rgba(255,50,50,0.15)]
+              text-[var(--neon-red)] hover:bg-[rgba(255,50,50,0.12)]
+              transition-all flex-shrink-0"
+          >
+            Clear ({activeFilters})
+          </button>
+        )}
+      </div>
 
-        {/* Filter chips */}
-        <div className="mt-4">
-          <FilterChips
-            categories={categories}
-            sources={sources}
-            activeCategory={activeCategory}
-            activeSource={activeSource}
-            onCategoryChange={handleCategoryChange}
-            onSourceChange={handleSourceChange}
-          />
-        </div>
+      {/* Filter chips */}
+      <div className="mb-6 sm:mb-8">
+        <FilterChips
+          categories={categories}
+          sources={sources}
+          activeCategory={activeCategory}
+          activeSource={activeSource}
+          onCategoryChange={handleCategoryChange}
+          onSourceChange={handleSourceChange}
+        />
       </div>
 
       {/* Main content + sidebar */}
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
         {/* Feed items */}
         <div className="flex-1 min-w-0">
           <StatsBar total={total} page={page} limit={ITEMS_PER_PAGE} loading={feedState.loading} />
@@ -701,7 +689,7 @@ export default function WorldPage() {
           )}
 
           {feedState.error && !feedState.loading && (
-            <div className="holo-card p-8 text-center">
+            <div className="holo-card p-6 sm:p-8 text-center">
               <div className="text-[var(--neon-red)] text-sm mb-2">Failed to load world feed</div>
               <button
                 onClick={feedState.reload}
@@ -713,7 +701,7 @@ export default function WorldPage() {
           )}
 
           {!feedState.loading && !feedState.error && items.length === 0 && (
-            <div className="holo-card p-8 text-center">
+            <div className="holo-card p-6 sm:p-8 text-center">
               <div className="text-[var(--text-secondary)] text-sm">
                 {activeFilters > 0 ? 'No items match your filters' : 'No world feed items yet'}
               </div>
@@ -740,7 +728,7 @@ export default function WorldPage() {
         </div>
 
         {/* Sidebar */}
-        <aside className="w-full lg:w-64 flex-shrink-0 space-y-8">
+        <aside className="w-full lg:w-64 flex-shrink-0 space-y-6 sm:space-y-8">
           <SignalsSidebar />
 
           {/* Quick stats */}
@@ -789,6 +777,6 @@ export default function WorldPage() {
           )}
         </aside>
       </div>
-    </div>
+    </PageContainer>
   );
 }

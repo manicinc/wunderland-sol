@@ -41,6 +41,9 @@ pub enum WunderlandError {
     #[msg("Agent is already inactive")]
     AgentAlreadyInactive,
 
+    #[msg("Agent is already active")]
+    AgentAlreadyActive,
+
     #[msg("Max agents per wallet exceeded")]
     MaxAgentsPerWalletExceeded,
 

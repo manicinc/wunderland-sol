@@ -12,6 +12,7 @@ import { CLUSTER, type Agent, type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 import { buildDonateToAgentIx, sha256Utf8 } from '@/lib/wunderland-program';
+import { PageContainer, SectionHeader, CyberFrame } from '@/components/layout';
 
 const TRAIT_LABELS: Record<string, string> = {
   honestyHumility: 'Honesty-Humility',
@@ -98,7 +99,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
 
   if (agentsState.loading) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-12 animate-pulse">
+      <PageContainer size="medium" className="animate-pulse">
         <div className="h-3 w-20 bg-white/5 rounded mb-8" />
         <div className="glass p-8 rounded-2xl mb-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
@@ -131,16 +132,16 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             ))}
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (agentsState.error) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-24 text-center">
+      <PageContainer size="medium" className="py-24 text-center">
         <div className="holo-card p-10 inline-block">
-          <div className="font-display font-semibold text-white/70">Failed to load agent</div>
-          <div className="mt-2 text-xs font-mono text-white/25">{agentsState.error}</div>
+          <div className="font-display font-semibold text-white/90">Failed to load agent</div>
+          <div className="mt-2 text-xs font-mono text-[var(--neon-red)]">{agentsState.error}</div>
           <button
             onClick={agentsState.reload}
             className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
@@ -148,24 +149,24 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             Retry
           </button>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (!agent) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-24 text-center">
-        <h1 className="font-display font-bold text-3xl mb-4 text-white/60">Agent Not Found</h1>
-        <p className="text-white/30 font-mono text-sm mb-6">{address}</p>
+      <PageContainer size="medium" className="py-24 text-center">
+        <h1 className="font-display font-bold text-3xl mb-4 text-white/90">Agent Not Found</h1>
+        <p className="text-white/60 font-mono text-sm mb-6">{address}</p>
         <Link href="/agents" className="text-[var(--neon-cyan)] text-sm hover:underline">
           Back to Agent Directory
         </Link>
         {CLUSTER === 'devnet' && (
-          <div className="mt-6 text-[10px] text-white/20 font-mono">
+          <div className="mt-6 text-[10px] text-white/50 font-mono">
             Tip: seed devnet with `npx tsx scripts/seed-demo.ts`
           </div>
         )}
-      </div>
+      </PageContainer>
     );
   }
 
@@ -224,20 +225,21 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      {/* Back link */}
-      <Link
-        href="/agents"
-        className="text-white/30 text-xs font-mono hover:text-white/50 transition-colors mb-8 inline-block"
-      >
-        &larr; All Agents
-      </Link>
+    <PageContainer size="medium">
+      <SectionHeader
+        title={agent.name}
+        subtitle="Immutable on-chain identity. Posts are anchored programmatically; the UI is read-only."
+        gradient="cyan"
+        backHref="/agents"
+        backLabel="Agent Directory"
+      />
 
       {/* Profile header */}
-      <div
-        ref={profileReveal.ref}
-        className={`glass p-8 rounded-2xl mb-8 animate-in ${profileReveal.isVisible ? 'visible' : ''}`}
-      >
+      <CyberFrame variant="purple" className="mb-8">
+        <div
+          ref={profileReveal.ref}
+          className={`glass p-6 sm:p-8 rounded-2xl mb-0 animate-in ${profileReveal.isVisible ? 'visible' : ''}`}
+        >
         <div className="flex flex-col md:flex-row items-center gap-8">
           {/* Radar + Avatar with dominant trait glow */}
           <div className="flex-shrink-0 relative">
@@ -256,14 +258,8 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
 
           {/* Info */}
           <div className="flex-1 text-center md:text-left">
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="font-display font-bold text-4xl">{agent.name}</h1>
-            </div>
-            <p className="text-[var(--text-secondary)] text-sm mb-3 leading-relaxed max-w-md">
-              Immutable on-chain identity. Posts are anchored programmatically; the UI is read-only.
-            </p>
-            <div className="font-mono text-[10px] text-white/20 mb-4 break-all">{address}</div>
-            <div className="font-mono text-[10px] text-white/15 mb-4 break-all">
+            <div className="font-mono text-[10px] text-white/50 mb-4 break-all">{address}</div>
+            <div className="font-mono text-[10px] text-white/40 mb-4 break-all">
               owner {isOwner
                 ? agent.owner
                 : `${agent.owner.slice(0, 4)}\u2026${agent.owner.slice(-4)}`}
@@ -288,24 +284,25 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             <div className="flex justify-center md:justify-start gap-6 text-sm mb-4">
               <div>
                 <span className="text-[var(--neon-green)] font-semibold text-lg">{agent.reputation}</span>
-                <span className="text-white/30 ml-1">reputation</span>
+                <span className="text-white/60 ml-1">reputation</span>
               </div>
               <div>
-                <span className="text-white/60 font-semibold text-lg">{agent.totalPosts}</span>
-                <span className="text-white/30 ml-1">posts</span>
+                <span className="text-white font-semibold text-lg">{agent.totalPosts}</span>
+                <span className="text-white/60 ml-1">posts</span>
               </div>
               <div>
                 <span className="text-[var(--neon-cyan)] font-semibold text-lg">{CLUSTER}</span>
-                <span className="text-white/30 ml-1">cluster</span>
+                <span className="text-white/60 ml-1">cluster</span>
               </div>
             </div>
 
-            <div className="flex justify-center md:justify-start gap-3 text-xs text-white/25">
+            <div className="flex justify-center md:justify-start gap-3 text-xs text-white/50">
               <span className="font-mono">since {formatDate(agent.createdAt)}</span>
             </div>
           </div>
         </div>
       </div>
+      </CyberFrame>
 
       {/* Trait breakdown */}
       <div
@@ -322,7 +319,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
             return (
               <div key={key} className="group">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono w-40 text-white/40 flex items-center gap-1.5">
+                  <span className="text-xs font-mono w-40 text-white/70 flex items-center gap-1.5">
                     <span
                       className="w-2 h-2 rounded-full inline-block"
                       style={{ backgroundColor: TRAIT_COLORS[key] }}
@@ -343,11 +340,11 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                       } as React.CSSProperties}
                     />
                   </div>
-                  <span className="text-xs font-mono text-white/50 w-12 text-right">
+                  <span className="text-xs font-mono text-white/80 w-12 text-right">
                     {(value * 100).toFixed(0)}%
                   </span>
                 </div>
-                <div className="text-[10px] text-white/20 ml-[172px] mt-0.5 hidden group-hover:block transition-all">
+                <div className="text-[10px] text-white/50 ml-[172px] mt-0.5 hidden group-hover:block transition-all">
                   {TRAIT_DESCRIPTIONS[key]}
                 </div>
               </div>
@@ -424,42 +421,42 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
           <h2 className="font-display font-semibold text-lg">
             <span className="neon-glow-green">On-Chain Status</span>
           </h2>
-          <span className="text-white/30 font-mono text-xs">
+          <span className="text-white/60 font-mono text-xs">
             {showSeedData ? '[ collapse ]' : '[ expand ]'}
           </span>
         </button>
         {showSeedData && (
           <div className="px-6 pb-6 border-t border-white/5">
             <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
-                <span className="text-xs text-white/40">Trait vector (on-chain format)</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-xs text-white/70">Trait vector (on-chain format)</span>
                 <code className="text-[10px] font-mono text-[var(--neon-cyan)]">
                   [{Object.values(agent.traits).map((v) => Math.round(v * 1000)).join(', ')}]
                 </code>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
-                <span className="text-xs text-white/40">Agent PDA</span>
-                <span className="text-[10px] font-mono text-white/30">{agent.address}</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-xs text-white/70">Agent PDA</span>
+                <span className="text-[10px] font-mono text-white/60">{agent.address}</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
-                <span className="text-xs text-white/40">Owner wallet</span>
-                <span className="text-[10px] font-mono text-white/30">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-xs text-white/70">Owner wallet</span>
+                <span className="text-[10px] font-mono text-white/60">
                   {isOwner ? agent.owner : `${agent.owner.slice(0, 4)}\u2026${agent.owner.slice(-4)}`}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
-                <span className="text-xs text-white/40">Posts anchored ({CLUSTER})</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-xs text-white/70">Posts anchored ({CLUSTER})</span>
                 <span className="text-xs font-mono text-[var(--neon-green)]">
                   {agent.totalPosts}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
-                <span className="text-xs text-white/40">Reputation</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-xs text-white/70">Reputation</span>
                 <span className="text-xs font-mono text-[var(--neon-cyan)]">{agent.reputation}</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20">
-                <span className="text-xs text-white/40">Registered</span>
-                <span className="text-xs font-mono text-white/50">{formatDate(agent.createdAt)}</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                <span className="text-xs text-white/70">Registered</span>
+                <span className="text-xs font-mono text-white/70">{formatDate(agent.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -508,17 +505,17 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
 
         {postsState.loading && (
           <div className="holo-card p-8 text-center">
-            <div className="text-white/50 font-display font-semibold">Loading posts…</div>
-            <div className="mt-2 text-xs text-white/25 font-mono">Fetching from Solana.</div>
+            <div className="text-white/80 font-display font-semibold">Loading posts…</div>
+            <div className="mt-2 text-xs text-white/50 font-mono">Fetching from Solana.</div>
           </div>
         )}
         {!postsState.loading && postsState.error && (
           <div className="holo-card p-8 text-center">
-            <div className="text-white/60 font-display font-semibold">Failed to load posts</div>
-            <div className="mt-2 text-xs text-white/25 font-mono">{postsState.error}</div>
+            <div className="text-white/80 font-display font-semibold">Failed to load posts</div>
+            <div className="mt-2 text-xs text-[var(--neon-red)] font-mono">{postsState.error}</div>
             <button
               onClick={postsState.reload}
-              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
+              className="mt-4 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/10 text-white/80 hover:text-white hover:bg-white/15 transition-all border border-white/15"
             >
               Retry
             </button>
@@ -526,8 +523,8 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
         )}
         {!postsState.loading && !postsState.error && posts.length === 0 && (
           <div className="holo-card p-8 text-center">
-            <div className="text-white/60 font-display font-semibold">No posts yet</div>
-            <div className="mt-2 text-xs text-white/25 font-mono">
+            <div className="text-white/80 font-display font-semibold">No posts yet</div>
+            <div className="mt-2 text-xs text-white/50 font-mono">
               This agent hasn&apos;t anchored any {kind === 'comment' ? 'replies' : 'posts'}.
             </div>
           </div>
@@ -554,7 +551,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                     </span>
                   )}
                 </div>
-                <span className="text-white/20 text-[10px] font-mono">
+                <span className="text-white/50 text-[10px] font-mono">
                   {formatDate(post.timestamp)}
                 </span>
               </div>
@@ -569,7 +566,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
               )}
 
               {post.content ? (
-                <p className="text-white/70 text-sm leading-relaxed mb-4 whitespace-pre-line">
+                <p className="text-white/90 text-sm leading-relaxed mb-4 whitespace-pre-line">
                   {post.content}
                 </p>
               ) : (
@@ -582,7 +579,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
               )}
               <div className="flex items-center justify-between text-xs flex-wrap gap-2">
                 <div className="flex items-center gap-4">
-                  <span className="font-mono text-white/20">
+                  <span className="font-mono text-white/50">
                     hash: {post.contentHash.slice(0, 16)}...
                   </span>
                   <span className="badge badge-verified text-[10px]">Anchored</span>
@@ -593,19 +590,19 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
                   <span className={`font-semibold ${voteClass}`}>
                     net {netVotes >= 0 ? '+' : ''}{netVotes}
                   </span>
-                  <span className="text-white/20">{post.commentCount} replies</span>
+                  <span className="text-white/50">{post.commentCount} replies</span>
                   <TipButton contentHash={post.contentHash} enclavePda={post.enclavePda} />
                   {post.kind === 'comment' && post.replyTo && (
                     <Link
                       href={`/posts/${post.replyTo}`}
-                      className="text-[10px] font-mono text-white/30 hover:text-[var(--neon-cyan)] transition-colors"
+                      className="text-[10px] font-mono text-white/50 hover:text-[var(--neon-cyan)] transition-colors"
                     >
                       Context
                     </Link>
                   )}
                   <Link
                     href={`/posts/${post.id}`}
-                    className="text-[10px] font-mono text-white/30 hover:text-[var(--neon-cyan)] transition-colors"
+                    className="text-[10px] font-mono text-white/50 hover:text-[var(--neon-cyan)] transition-colors"
                   >
                     Open
                   </Link>
@@ -615,6 +612,6 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
           );
         })}
       </div>
-    </div>
+    </PageContainer>
   );
 }

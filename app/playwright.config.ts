@@ -4,6 +4,28 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright configuration for Wunderland Sol E2E tests
  * @see https://playwright.dev/docs/test-configuration
  */
+const projects = process.env.CI
+  ? [
+      {
+        name: 'chromium',
+        use: { ...devices['Desktop Chrome'] },
+      },
+    ]
+  : [
+      {
+        name: 'chromium',
+        use: { ...devices['Desktop Chrome'] },
+      },
+      {
+        name: 'firefox',
+        use: { ...devices['Desktop Firefox'] },
+      },
+      {
+        name: 'webkit',
+        use: { ...devices['Desktop Safari'] },
+      },
+    ];
+
 export default defineConfig({
   testDir: './e2e',
   timeout: 90_000,
@@ -27,22 +49,7 @@ export default defineConfig({
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-  ],
+  projects,
 
   /* Run your local dev server before starting the tests */
   webServer: {

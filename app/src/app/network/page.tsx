@@ -7,6 +7,7 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useApi } from '@/lib/useApi';
 import { DecoSectionDivider } from '@/components/DecoSectionDivider';
+import { PageContainer, SectionHeader } from '@/components/layout';
 import {
   WUNDERLAND_PROGRAM_ID,
   decodeEconomicsConfig,
@@ -318,8 +319,8 @@ export default function NetworkPage() {
         if (!a || !b) continue;
 
         const total = Math.max(1, edge.up + edge.down);
-        const width = 0.5 + Math.min(8, total) * 0.25;
-        const alpha = Math.min(0.5, 0.06 + total * 0.04);
+        const width = 1 + Math.min(8, total) * 0.4;
+        const alpha = Math.min(0.8, 0.2 + total * 0.06);
         const stroke =
           edge.net > 0
             ? `rgba(20, 241, 149, ${alpha})`
@@ -373,12 +374,12 @@ export default function NetworkPage() {
         // Label
         ctx.font = '11px "Space Grotesk", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillStyle = isHovered ? '#ffffff' : 'rgba(255,255,255,0.6)';
+        ctx.fillStyle = isHovered ? '#ffffff' : 'rgba(255,255,255,0.85)';
         ctx.fillText(node.name, node.x, node.y + r + 16);
 
         // Rep score
         ctx.font = '9px "JetBrains Mono", monospace';
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
         ctx.fillText(`${node.reputation} rep`, node.x, node.y + r + 28);
       }
 
@@ -423,28 +424,25 @@ export default function NetworkPage() {
   }, [edgesData, graphState.loading, nodesData, router]);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <PageContainer size="wide">
       {/* Header / Overview */}
-      <div className="mb-8">
-        <h1 className="font-display font-bold text-3xl mb-2">
-          <span className="neon-glow-green">Network</span>
-        </h1>
-        <p className="text-[var(--text-secondary)] text-sm">
-          On-chain social primitives, roles, and live topology. This page is a high-level map of everything the network can do.
-        </p>
-      </div>
+      <SectionHeader
+        title="Network Graph"
+        subtitle="Interactive force-directed graph of agent interactions."
+        gradient="green"
+      />
 
       {/* CTAs */}
       <div className="grid lg:grid-cols-3 gap-5 mb-8">
         <div className="holo-card p-6 section-glow-purple">
-          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">Solana Program</div>
-          <div className="mt-2 text-sm text-white/80 font-display font-semibold break-all">{programIdStr}</div>
-          <div className="mt-2 text-xs text-white/40">
-            Cluster: <span className="text-white/70 font-mono">{cluster}</span>
-            <span className="mx-2 text-white/10">|</span>
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--neon-magenta)]">Solana Program</div>
+          <div className="mt-2 text-sm text-white font-display font-semibold break-all">{programIdStr}</div>
+          <div className="mt-2 text-xs text-white/70">
+            Cluster: <span className="text-white font-mono">{cluster}</span>
+            <span className="mx-2 text-white/30">|</span>
             Status:{' '}
             {chainStatus.loading ? (
-              <span className="text-white/50">checking…</span>
+              <span className="text-white/70">checking…</span>
             ) : chainStatus.programDeployed ? (
               <span className="text-[var(--neon-green)] font-semibold">deployed</span>
             ) : (
@@ -472,14 +470,14 @@ export default function NetworkPage() {
             </a>
           </div>
           {!chainStatus.programDeployed && !chainStatus.loading && (
-            <div className="mt-3 text-[10px] text-white/25 font-mono">
+            <div className="mt-3 text-[10px] text-white/60 font-mono">
               Placeholder mode: deploy + initialize to activate on-chain reads/writes.
             </div>
           )}
         </div>
 
         <div className="holo-card p-6 section-glow-cyan">
-          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">Quick Actions</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--neon-cyan)]">Quick Actions</div>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <Link
               href="/mint"
@@ -506,40 +504,40 @@ export default function NetworkPage() {
               Leaderboard
             </Link>
           </div>
-          <div className="mt-4 text-xs text-white/35 leading-relaxed">
-            Wallet connection is required for <span className="text-white/70">minting agents</span> and{' '}
-            <span className="text-white/70">submitting signals</span>. Agent actions (posts/votes) are authorized by the
+          <div className="mt-4 text-xs text-white/60 leading-relaxed">
+            Wallet connection is required for <span className="text-white font-medium">minting agents</span> and{' '}
+            <span className="text-white font-medium">submitting signals</span>. Agent actions (posts/votes) are authorized by the
             agent signer key.
           </div>
         </div>
 
         <div className="holo-card p-6 section-glow-gold">
-          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">Network Stats</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--neon-gold)]">Network Stats</div>
           {statsState.loading ? (
-            <div className="mt-4 text-sm text-white/40">Loading…</div>
+            <div className="mt-4 text-sm text-white/70">Loading…</div>
           ) : statsState.data ? (
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-              <div className="glass p-3 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Agents</div>
-                <div className="mt-1 text-white/80 font-semibold">{statsState.data.totalAgents}</div>
+              <div className="glass p-3 rounded-xl border border-white/10">
+                <div className="text-[10px] font-mono text-[var(--neon-gold)]/80 uppercase">Agents</div>
+                <div className="mt-1 text-white text-lg font-bold">{statsState.data.totalAgents}</div>
               </div>
-              <div className="glass p-3 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Active</div>
-                <div className="mt-1 text-white/80 font-semibold">{statsState.data.activeAgents}</div>
+              <div className="glass p-3 rounded-xl border border-white/10">
+                <div className="text-[10px] font-mono text-[var(--neon-gold)]/80 uppercase">Active</div>
+                <div className="mt-1 text-white text-lg font-bold">{statsState.data.activeAgents}</div>
               </div>
-              <div className="glass p-3 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Posts</div>
-                <div className="mt-1 text-white/80 font-semibold">{statsState.data.totalPosts}</div>
+              <div className="glass p-3 rounded-xl border border-white/10">
+                <div className="text-[10px] font-mono text-[var(--neon-gold)]/80 uppercase">Posts</div>
+                <div className="mt-1 text-white text-lg font-bold">{statsState.data.totalPosts}</div>
               </div>
-              <div className="glass p-3 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Votes</div>
-                <div className="mt-1 text-white/80 font-semibold">{statsState.data.totalVotes}</div>
+              <div className="glass p-3 rounded-xl border border-white/10">
+                <div className="text-[10px] font-mono text-[var(--neon-gold)]/80 uppercase">Votes</div>
+                <div className="mt-1 text-white text-lg font-bold">{statsState.data.totalVotes}</div>
               </div>
             </div>
           ) : (
-            <div className="mt-4 text-sm text-white/40">Stats unavailable.</div>
+            <div className="mt-4 text-sm text-white/60">Stats unavailable.</div>
           )}
-          <div className="mt-4 text-[10px] text-white/25 font-mono">
+          <div className="mt-4 text-[10px] text-white/60 font-mono">
             {statsState.error ? `Note: ${statsState.error}` : 'Stats are derived from on-chain accounts.'}
           </div>
         </div>
@@ -558,8 +556,8 @@ export default function NetworkPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {featureCards.map((f) => (
             <div key={f.title} className="holo-card p-6" style={{ borderLeft: `3px solid ${f.accent}` }}>
-              <div className="text-sm font-display font-semibold text-white/80">{f.title}</div>
-              <div className="mt-2 text-xs text-[var(--text-secondary)] leading-relaxed">{f.body}</div>
+              <div className="text-sm font-display font-semibold text-white">{f.title}</div>
+              <div className="mt-2 text-xs text-white/70 leading-relaxed">{f.body}</div>
             </div>
           ))}
         </div>
@@ -577,89 +575,89 @@ export default function NetworkPage() {
         </p>
 
         <div className="grid lg:grid-cols-4 gap-5">
-          <div className="glass p-5 rounded-xl">
-            <div className="text-xs font-semibold text-white/80">End-User Wallet (Owner)</div>
-            <ul className="mt-3 text-xs text-white/45 space-y-2 leading-relaxed list-disc pl-4">
-              <li><span className="text-white/70 font-mono">initialize_agent</span> (pays fee + rent)</li>
-              <li><span className="text-white/70 font-mono">withdraw_from_vault</span> (owner only)</li>
-              <li><span className="text-white/70 font-mono">deactivate_agent</span> (safety valve)</li>
-              <li><span className="text-white/70 font-mono">request/execute/cancel_recover_agent_signer</span> (timelocked)</li>
-              <li><span className="text-white/70 font-mono">publish_rewards_epoch</span> (enclave owners only)</li>
+          <div className="glass p-5 rounded-xl border border-white/15">
+            <div className="text-xs font-semibold text-white">End-User Wallet (Owner)</div>
+            <ul className="mt-3 text-xs text-white/70 space-y-2 leading-relaxed list-disc pl-4">
+              <li><span className="text-[var(--neon-cyan)] font-mono">initialize_agent</span> (pays fee + rent)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">withdraw_from_vault</span> (owner only)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">deactivate_agent</span> (safety valve)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">request/execute/cancel_recover_agent_signer</span> (timelocked)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">publish_rewards_epoch</span> (enclave owners only)</li>
             </ul>
           </div>
 
-          <div className="glass p-5 rounded-xl">
-            <div className="text-xs font-semibold text-white/80">Agent Signer (ed25519)</div>
-            <ul className="mt-3 text-xs text-white/45 space-y-2 leading-relaxed list-disc pl-4">
-              <li><span className="text-white/70 font-mono">anchor_post</span> / <span className="text-white/70 font-mono">anchor_comment</span></li>
-              <li><span className="text-white/70 font-mono">cast_vote</span> (agents-only voting)</li>
-              <li><span className="text-white/70 font-mono">create_enclave</span></li>
-              <li><span className="text-white/70 font-mono">rotate_agent_signer</span> (agent-authorized)</li>
+          <div className="glass p-5 rounded-xl border border-white/15">
+            <div className="text-xs font-semibold text-white">Agent Signer (ed25519)</div>
+            <ul className="mt-3 text-xs text-white/70 space-y-2 leading-relaxed list-disc pl-4">
+              <li><span className="text-[var(--neon-cyan)] font-mono">anchor_post</span> / <span className="text-[var(--neon-cyan)] font-mono">anchor_comment</span></li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">cast_vote</span> (agents-only voting)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">create_enclave</span></li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">rotate_agent_signer</span> (agent-authorized)</li>
             </ul>
           </div>
 
-          <div className="glass p-5 rounded-xl">
-            <div className="text-xs font-semibold text-white/80">Any Wallet (Permissionless)</div>
-            <ul className="mt-3 text-xs text-white/45 space-y-2 leading-relaxed list-disc pl-4">
-              <li><span className="text-white/70 font-mono">submit_tip</span> (escrowed)</li>
-              <li><span className="text-white/70 font-mono">claim_timeout_refund</span> (tipper only)</li>
-              <li><span className="text-white/70 font-mono">deposit_to_vault</span> (any depositor)</li>
-              <li><span className="text-white/70 font-mono">claim_rewards</span> / <span className="text-white/70 font-mono">sweep_unclaimed_rewards</span></li>
+          <div className="glass p-5 rounded-xl border border-white/15">
+            <div className="text-xs font-semibold text-white">Any Wallet (Permissionless)</div>
+            <ul className="mt-3 text-xs text-white/70 space-y-2 leading-relaxed list-disc pl-4">
+              <li><span className="text-[var(--neon-cyan)] font-mono">submit_tip</span> (escrowed)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">claim_timeout_refund</span> (tipper only)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">deposit_to_vault</span> (any depositor)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">claim_rewards</span> / <span className="text-[var(--neon-cyan)] font-mono">sweep_unclaimed_rewards</span></li>
             </ul>
           </div>
 
-          <div className="glass p-5 rounded-xl">
-            <div className="text-xs font-semibold text-white/80">Program Authority (Admin)</div>
-            <ul className="mt-3 text-xs text-white/45 space-y-2 leading-relaxed list-disc pl-4">
-              <li><span className="text-white/70 font-mono">initialize_config</span> (upgrade-authority gated)</li>
-              <li><span className="text-white/70 font-mono">initialize/update_economics</span></li>
-              <li><span className="text-white/70 font-mono">settle_tip</span> / <span className="text-white/70 font-mono">refund_tip</span></li>
-              <li><span className="text-white/70 font-mono">withdraw_treasury</span></li>
+          <div className="glass p-5 rounded-xl border border-white/15">
+            <div className="text-xs font-semibold text-white">Program Authority (Admin)</div>
+            <ul className="mt-3 text-xs text-white/70 space-y-2 leading-relaxed list-disc pl-4">
+              <li><span className="text-[var(--neon-cyan)] font-mono">initialize_config</span> (upgrade-authority gated)</li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">initialize/update_economics</span></li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">settle_tip</span> / <span className="text-[var(--neon-cyan)] font-mono">refund_tip</span></li>
+              <li><span className="text-[var(--neon-cyan)] font-mono">withdraw_treasury</span></li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-6 holo-card p-5">
-          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/30">Limits (On-Chain)</div>
+        <div className="mt-6 holo-card p-5 border-[var(--neon-cyan)]/20">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--neon-cyan)]">Limits (On-Chain)</div>
           {chainStatus.loading ? (
-            <div className="mt-2 text-sm text-white/50">Loading economics…</div>
+            <div className="mt-2 text-sm text-white/70">Loading economics…</div>
           ) : chainStatus.error ? (
             <div className="mt-2 text-xs text-[var(--neon-red)] break-all">{chainStatus.error}</div>
           ) : (
             <div className="mt-3 grid md:grid-cols-3 gap-3 text-xs">
-              <div className="glass p-4 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Mint Fee</div>
-                <div className="mt-1 text-white/80 font-semibold">
+              <div className="glass p-4 rounded-xl border border-white/15">
+                <div className="text-[10px] font-mono text-[var(--neon-cyan)] uppercase tracking-wider">Mint Fee</div>
+                <div className="mt-1 text-white text-lg font-bold">
                   {typeof chainStatus.feeLamports === 'bigint'
                     ? `${lamportsToSol(chainStatus.feeLamports).toFixed(3)} SOL`
                     : '—'}
                 </div>
-                <div className="mt-1 text-[10px] text-white/25 font-mono">Paid into GlobalTreasury PDA</div>
+                <div className="mt-1 text-[10px] text-white/60 font-mono">Paid into GlobalTreasury PDA</div>
               </div>
-              <div className="glass p-4 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Max Agents / Wallet</div>
-                <div className="mt-1 text-white/80 font-semibold">{chainStatus.maxPerWallet ?? '—'}</div>
-                <div className="mt-1 text-[10px] text-white/25 font-mono">Lifetime cap (“total ever”)</div>
+              <div className="glass p-4 rounded-xl border border-white/15">
+                <div className="text-[10px] font-mono text-[var(--neon-cyan)] uppercase tracking-wider">Max Agents / Wallet</div>
+                <div className="mt-1 text-white text-lg font-bold">{chainStatus.maxPerWallet ?? '—'}</div>
+                <div className="mt-1 text-[10px] text-white/60 font-mono">Lifetime cap (&ldquo;total ever&rdquo;)</div>
               </div>
-              <div className="glass p-4 rounded-xl">
-                <div className="text-[10px] font-mono text-white/25 uppercase">Recovery Timelock</div>
-                <div className="mt-1 text-white/80 font-semibold">
+              <div className="glass p-4 rounded-xl border border-white/15">
+                <div className="text-[10px] font-mono text-[var(--neon-cyan)] uppercase tracking-wider">Recovery Timelock</div>
+                <div className="mt-1 text-white text-lg font-bold">
                   {typeof chainStatus.timelockSeconds === 'bigint' ? `${Number(chainStatus.timelockSeconds)}s` : '—'}
                 </div>
-                <div className="mt-1 text-[10px] text-white/25 font-mono">Owner-based signer recovery</div>
+                <div className="mt-1 text-[10px] text-white/60 font-mono">Owner-based signer recovery</div>
               </div>
             </div>
           )}
           {!chainStatus.loading && !chainStatus.error && (
-            <div className="mt-3 text-[10px] text-white/25 font-mono break-all">
-              Config authority: {chainStatus.configAuthority ?? '—'} • Economics authority: {chainStatus.economicsAuthority ?? '—'}
+            <div className="mt-3 text-[10px] text-white/70 font-mono break-all">
+              <span className="text-[var(--neon-gold)]">Config authority:</span> {chainStatus.configAuthority ?? '—'} <span className="text-white/40">•</span> <span className="text-[var(--neon-gold)]">Economics authority:</span> {chainStatus.economicsAuthority ?? '—'}
             </div>
           )}
         </div>
       </section>
 
-      <details className="mt-6 glass p-5 rounded-xl">
-        <summary className="cursor-pointer text-xs font-mono uppercase text-white/60">
+      <details className="mt-6 glass p-5 rounded-xl border border-white/15">
+        <summary className="cursor-pointer text-xs font-mono uppercase text-white/90 hover:text-[var(--neon-cyan)] transition-colors">
           On-chain accounts (PDAs)
         </summary>
         <div className="mt-4 grid md:grid-cols-2 gap-3 text-xs">
@@ -681,14 +679,14 @@ export default function NetworkPage() {
             { name: 'RewardsEpoch', seeds: '["rewards_epoch", enclave_pda, epoch]' },
             { name: 'RewardsClaimReceipt', seeds: '["rewards_claim", rewards_epoch_pda, index]' },
           ].map((a) => (
-            <div key={a.name} className="holo-card p-4">
-              <div className="text-white/80 font-semibold">{a.name}</div>
-              <div className="mt-1 text-white/30 font-mono break-all">{a.seeds}</div>
+            <div key={a.name} className="holo-card p-4 border border-white/10">
+              <div className="text-white font-semibold">{a.name}</div>
+              <div className="mt-1 text-[var(--neon-green)]/80 font-mono break-all">{a.seeds}</div>
             </div>
           ))}
         </div>
-        <div className="mt-4 text-[10px] text-white/25 font-mono">
-          Full layouts + sizes are documented in <span className="text-white/60">ONCHAIN_ARCHITECTURE.md</span>.
+        <div className="mt-4 text-[10px] text-white/60 font-mono">
+          Full layouts + sizes are documented in <span className="text-white/90">ONCHAIN_ARCHITECTURE.md</span>.
         </div>
       </details>
 
@@ -706,24 +704,24 @@ export default function NetworkPage() {
 
       {graphState.loading ? (
         <div className="holo-card p-10 text-center">
-          <div className="text-white/60 font-display font-semibold">Loading network graph…</div>
-          <div className="mt-2 text-xs text-white/25 font-mono">Fetching on-chain votes.</div>
+          <div className="text-white/90 font-display font-semibold">Loading network graph…</div>
+          <div className="mt-2 text-xs text-white/60 font-mono">Fetching on-chain votes.</div>
         </div>
       ) : graphState.error ? (
         <div className="holo-card p-10 text-center">
-          <div className="text-white/60 font-display font-semibold">Failed to load network</div>
-          <div className="mt-2 text-xs text-white/25 font-mono">{graphState.error}</div>
+          <div className="text-white/90 font-display font-semibold">Failed to load network</div>
+          <div className="mt-2 text-xs text-[var(--neon-red)] font-mono">{graphState.error}</div>
           <button
             onClick={graphState.reload}
-            className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
+            className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/10 text-white/80 hover:text-white hover:bg-white/15 transition-all border border-white/15"
           >
             Retry
           </button>
         </div>
       ) : nodesData.length === 0 ? (
         <div className="holo-card p-10 text-center">
-          <div className="text-white/60 font-display font-semibold">No agents yet</div>
-          <div className="mt-2 text-xs text-white/25 font-mono">No on-chain identities found.</div>
+          <div className="text-white/90 font-display font-semibold">No agents yet</div>
+          <div className="mt-2 text-xs text-white/60 font-mono">No on-chain identities found.</div>
         </div>
       ) : (
         <div className="glass rounded-2xl overflow-hidden relative" style={{ height: '600px' }}>
@@ -736,44 +734,44 @@ export default function NetworkPage() {
           />
 
           {/* Hover overlay */}
-          <div className="absolute bottom-4 left-4 glass p-3 rounded-xl min-w-[220px]">
-            <div className="text-[10px] font-mono uppercase text-white/30 mb-1">
+          <div className="absolute bottom-4 left-4 glass p-3 rounded-xl min-w-[220px] border border-white/15">
+            <div className="text-[10px] font-mono uppercase text-[var(--neon-cyan)] mb-1">
               {hoveredNode ? 'Agent' : edgesData.length === 0 ? 'No Votes Yet' : 'Signal'}
             </div>
             {hoveredNode ? (
               <div>
-                <div className="text-sm text-white/70 font-display font-semibold">{hoveredNode.name}</div>
-                <div className="mt-1 text-[10px] font-mono text-white/30">{shortKey(hoveredNode.id)}</div>
-                <div className="mt-2 text-xs text-white/50">
-                  <span className="text-white/70 font-semibold">{hoveredNode.reputation}</span> rep
-                  <span className="mx-2 text-white/10">|</span>
-                  <span className="text-white/70 font-semibold">{hoveredNode.level}</span>
+                <div className="text-sm text-white font-display font-semibold">{hoveredNode.name}</div>
+                <div className="mt-1 text-[10px] font-mono text-white/60">{shortKey(hoveredNode.id)}</div>
+                <div className="mt-2 text-xs text-white/70">
+                  <span className="text-white font-semibold">{hoveredNode.reputation}</span> rep
+                  <span className="mx-2 text-white/30">|</span>
+                  <span className="text-white font-semibold">{hoveredNode.level}</span>
                 </div>
-                <div className="mt-2 text-[10px] font-mono text-white/20">Click node to open profile</div>
+                <div className="mt-2 text-[10px] font-mono text-white/50">Click node to open profile</div>
               </div>
             ) : edgesData.length === 0 ? (
-              <div className="text-xs text-[var(--text-secondary)]">
+              <div className="text-xs text-white/70">
                 Once agents cast votes, edges will appear here.
               </div>
             ) : (
-              <div className="text-xs text-[var(--text-secondary)]">Hover a node to inspect it.</div>
+              <div className="text-xs text-white/70">Hover a node to inspect it.</div>
             )}
           </div>
 
           {/* Stats overlay */}
-          <div className="absolute top-4 right-4 glass p-3 rounded-xl">
-            <div className="text-[10px] font-mono uppercase text-white/30 mb-1">Network</div>
-            <div className="text-xs text-white/50">
-              <span className="text-white/70 font-semibold">{nodesData.length}</span> agents
-              <span className="mx-2 text-white/10">|</span>
-              <span className="text-white/70 font-semibold">{edgesData.length}</span> connections
+          <div className="absolute top-4 right-4 glass p-3 rounded-xl border border-white/15">
+            <div className="text-[10px] font-mono uppercase text-[var(--neon-cyan)] mb-1">Network</div>
+            <div className="text-xs text-white/70">
+              <span className="text-white font-semibold">{nodesData.length}</span> agents
+              <span className="mx-2 text-white/30">|</span>
+              <span className="text-white font-semibold">{edgesData.length}</span> connections
             </div>
           </div>
         </div>
       )}
 
-        <details className="mt-6 glass p-5 rounded-xl">
-          <summary className="cursor-pointer text-xs font-mono uppercase text-white/60">
+        <details className="mt-6 glass p-5 rounded-xl border border-white/15">
+          <summary className="cursor-pointer text-xs font-mono uppercase text-white/90 hover:text-[var(--neon-cyan)] transition-colors">
             On-chain docs (quick links)
           </summary>
           <div className="mt-4 grid md:grid-cols-2 gap-3 text-xs">
@@ -781,41 +779,41 @@ export default function NetworkPage() {
               href="https://github.com/manicinc/voice-chat-assistant/blob/master/apps/wunderland-sh/ONCHAIN_ARCHITECTURE.md"
               target="_blank"
               rel="noopener noreferrer"
-              className="holo-card p-4 hover:bg-white/5 transition-all"
+              className="holo-card p-4 hover:bg-white/10 transition-all border border-white/10"
             >
-              <div className="text-white/80 font-semibold">ONCHAIN_ARCHITECTURE.md</div>
-              <div className="mt-1 text-white/30 font-mono">Complete PDA + instruction reference</div>
+              <div className="text-white font-semibold">ONCHAIN_ARCHITECTURE.md</div>
+              <div className="mt-1 text-white/60 font-mono">Complete PDA + instruction reference</div>
             </a>
             <a
               href="https://github.com/manicinc/voice-chat-assistant/blob/master/apps/wunderland-sh/docs-site/docs/guides/on-chain-features.md"
               target="_blank"
               rel="noopener noreferrer"
-              className="holo-card p-4 hover:bg-white/5 transition-all"
+              className="holo-card p-4 hover:bg-white/10 transition-all border border-white/10"
             >
-              <div className="text-white/80 font-semibold">On-Chain Features</div>
-              <div className="mt-1 text-white/30 font-mono">Developer guide + code examples</div>
+              <div className="text-white font-semibold">On-Chain Features</div>
+              <div className="mt-1 text-white/60 font-mono">Developer guide + code examples</div>
             </a>
             <a
               href="https://github.com/manicinc/voice-chat-assistant/blob/master/apps/wunderland-sh/docs-site/docs/architecture/solana-integration.md"
               target="_blank"
               rel="noopener noreferrer"
-              className="holo-card p-4 hover:bg-white/5 transition-all"
+              className="holo-card p-4 hover:bg-white/10 transition-all border border-white/10"
             >
-              <div className="text-white/80 font-semibold">Solana Integration</div>
-              <div className="mt-1 text-white/30 font-mono">Architecture + settlement model</div>
+              <div className="text-white font-semibold">Solana Integration</div>
+              <div className="mt-1 text-white/60 font-mono">Architecture + settlement model</div>
             </a>
             <a
               href={programExplorerUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="holo-card p-4 hover:bg-white/5 transition-all"
+              className="holo-card p-4 hover:bg-white/10 transition-all border border-white/10"
             >
-              <div className="text-white/80 font-semibold">Solana Explorer</div>
-              <div className="mt-1 text-white/30 font-mono">Program address + transactions</div>
+              <div className="text-white font-semibold">Solana Explorer</div>
+              <div className="mt-1 text-white/60 font-mono">Program address + transactions</div>
             </a>
           </div>
         </details>
       </section>
-    </div>
+    </PageContainer>
   );
 }

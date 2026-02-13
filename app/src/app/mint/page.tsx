@@ -8,9 +8,8 @@ import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 import { DecoSectionDivider } from '@/components/DecoSectionDivider';
 import { WalletButton } from '@/components/WalletButton';
-import Tooltip from '@/components/Tooltip';
 import Collapsible from '@/components/Collapsible';
-import { collectRequiredSecrets } from '@/data/catalog-data';
+import { PageContainer, SectionHeader, CyberFrame } from '@/components/layout';
 import { CLUSTER, isMainnet, type Agent } from '@/lib/solana';
 import {
   WUNDERLAND_PROGRAM_ID,
@@ -69,7 +68,6 @@ export default function MintPage() {
     publicKey ? `/api/agents?owner=${encodeURIComponent(publicKey.toBase58())}` : null,
   );
 
-  const headerReveal = useScrollReveal();
   const statsReveal = useScrollReveal();
   const mintReveal = useScrollReveal();
   const manageReveal = useScrollReveal();
@@ -96,7 +94,6 @@ export default function MintPage() {
 
   // SSR-safe initial value; randomized client-side after hydration.
   const [agentId, setAgentId] = useState<Uint8Array>(() => new Uint8Array(32));
-  const agentIdHex = useMemo(() => bytesToHex(agentId), [agentId]);
 
   const [metadataJson, setMetadataJson] = useState(() =>
     JSON.stringify(
@@ -278,7 +275,7 @@ export default function MintPage() {
     });
   };
 
-  const onboardManagedHosting = async (agentPda: string) => {
+  const onboardManagedHosting = async (agentPda: string): Promise<{ ok: boolean; error?: string }> => {
     dispatch({ type: 'SET_MANAGED_HOSTING', hosting: { state: 'onboarding' } });
 
     try {
@@ -306,9 +303,11 @@ export default function MintPage() {
       if (!res.ok || !json?.ok) throw new Error(json?.error || `Managed hosting onboarding failed (${res.status})`);
 
       dispatch({ type: 'SET_MANAGED_HOSTING', hosting: { state: 'done', ok: true, details: json } });
+      return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       dispatch({ type: 'SET_MANAGED_HOSTING', hosting: { state: 'done', ok: false, error: message } });
+      return { ok: false, error: message };
     }
   };
 
@@ -418,12 +417,33 @@ export default function MintPage() {
       setAgentId(safeRandomAgentId());
       myAgentsState.reload();
 
-      // Post-mint: parallel operations
-      if (wizard.hostingMode === 'managed') {
-        void onboardManagedHosting(mintedPda);
-      }
+      // Post-mint: run managed onboarding before credentials so the backend has a registry row.
+      void (async () => {
+        if (wizard.hostingMode === 'managed') {
+          const onboarding = await onboardManagedHosting(mintedPda);
+          if (!onboarding.ok) {
+            const filledCreds = Object.entries(wizard.credentialValues).filter(([, v]) => v.trim().length > 0);
+            if (filledCreds.length === 0) {
+              dispatch({
+                type: 'SET_CREDENTIAL_SUBMISSION',
+                submission: { state: 'done', submitted: 0, failed: [] },
+              });
+              return;
+            }
+            dispatch({
+              type: 'SET_CREDENTIAL_SUBMISSION',
+              submission: {
+                state: 'done',
+                submitted: 0,
+                failed: filledCreds.map(([key]) => ({ key, error: onboarding.error || 'Managed onboarding failed' })),
+              },
+            });
+            return;
+          }
+        }
 
-      void submitCredentials(mintedPda);
+        await submitCredentials(mintedPda);
+      })();
 
       // IPFS pin
       dispatch({ type: 'SET_METADATA_PIN', pin: { state: 'pinning' } });
@@ -650,21 +670,14 @@ export default function MintPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <PageContainer size="narrow">
       {/* Header */}
-      <div
-        ref={headerReveal.ref}
-        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
-      >
-        <h1 className="font-display font-bold text-3xl mb-3">
-          <span className="sol-gradient-text">Agent Registration</span>
-        </h1>
-        <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-          Agents are immutable on-chain identities. Registration is{' '}
-          <span className="text-[var(--text-secondary)]">permissionless</span> and wallet-signed,
-          subject to on-chain economics and per-wallet limits. Once started in a runtime, agents can operate fully autonomously.
-        </p>
-      </div>
+      <SectionHeader
+        title="Agent Registration"
+        subtitle="Mint new agents on Solana."
+        gradient="gold"
+        actions={<WalletButton variant="hero" />}
+      />
 
       {/* ── DEVNET BANNER ───────────────────────────────────────────── */}
       {!isMainnet && (
@@ -730,12 +743,12 @@ export default function MintPage() {
       <DecoSectionDivider variant="diamond" className="my-6" />
 
       {/* ── MINT WIZARD ─────────────────────────────────────────────────── */}
-      <div
-        ref={mintReveal.ref}
-        className={`holo-card p-6 section-glow-gold animate-in ${mintReveal.isVisible ? 'visible' : ''}`}
-      >
-        <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
-          <div>
+      <CyberFrame variant="gold" glow>
+        <div
+          ref={mintReveal.ref}
+          className={`holo-card p-6 section-glow-gold animate-in ${mintReveal.isVisible ? 'visible' : ''}`}
+        >
+          <div className="mb-4">
             <div className="text-xs text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
               Mint an Agent
             </div>
@@ -743,10 +756,6 @@ export default function MintPage() {
               Configure your agent's identity, personality, skills, channels, and API keys in a guided wizard.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <WalletButton variant="hero" />
-          </div>
-        </div>
 
         {/* On-chain stats row */}
         <div className="grid gap-3 sm:grid-cols-3 mb-4">
@@ -835,7 +844,6 @@ export default function MintPage() {
           {wizard.step === 6 && (
             <StepReview
               state={wizard}
-              dispatch={dispatch}
               onMint={mint}
               onEditStep={goToStep}
               connected={connected}
@@ -885,6 +893,7 @@ export default function MintPage() {
           </div>
         )}
       </div>
+      </CyberFrame>
 
       {/* ── MY AGENTS (owner-only actions) ──────────────────────────────── */}
       {connected && publicKey && (
@@ -1242,6 +1251,6 @@ export default function MintPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

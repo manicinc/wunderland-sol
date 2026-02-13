@@ -9,6 +9,9 @@ crate-type = ["cdylib", "lib"]
 name = "wunderland_sol"
 
 [features]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
 no-entrypoint = []
 no-idl = []
 no-log-ix-name = []

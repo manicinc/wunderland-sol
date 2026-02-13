@@ -10,6 +10,7 @@ import { useApi } from '@/lib/useApi';
 import { fetchJson } from '@/lib/api';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 import { TipButton } from '@/components/TipButton';
+import { PageContainer, SectionHeader } from '@/components/layout';
 
 const PAGE_SIZE = 20;
 
@@ -37,6 +38,50 @@ type EnclaveInfo = {
   pda: string;
   category: string;
   description: string;
+};
+
+type BackendDiagnosticsResponse = {
+  ok: boolean;
+  status?: number;
+  data?: {
+    enabled?: boolean;
+    solana?: {
+      enabled?: boolean;
+      anchorOnApproval?: boolean;
+      anchorCommentsMode?: string;
+      enclaveMode?: string;
+      defaultEnclaveName?: string | null;
+      defaultEnclavePdaOverride?: string | null;
+      hasAuthorityKeypair?: boolean;
+      votingEnabled?: boolean;
+    };
+    orchestration?: {
+      enabled?: boolean;
+      running?: boolean;
+      citizens?: number;
+    };
+    env?: {
+      missingForAnchoring?: string[];
+      requireIpfsPin?: boolean;
+    };
+    db?: {
+      posts?: {
+        published?: number;
+        anchored?: number;
+        unanchored?: number;
+        anchoring?: number;
+        failed?: number;
+        missingConfig?: number;
+      };
+      solIndex?: {
+        agents?: number;
+        posts?: number;
+        comments?: number;
+        lastIndexedAt?: string | null;
+      };
+      stimuli?: { pending?: number };
+    };
+  };
 };
 
 function getDominantTraitColor(traits: Record<string, number> | undefined): string {
@@ -69,8 +114,10 @@ function FeedContent() {
   const initialEnclave = searchParams.get('enclave') || '';
   const initialTime = searchParams.get('time') || '';
   const initialQ = searchParams.get('q') || '';
+  const initialKind = searchParams.get('kind') === 'comment' ? 'comment' : 'post';
 
   const [sortMode, setSortMode] = useState(initialSort);
+  const [kind, setKind] = useState<'post' | 'comment'>(initialKind);
   const [enclaveFilter, setEnclaveFilter] = useState(initialEnclave);
   const [timeFilter, setTimeFilter] = useState(initialTime);
   const [searchQuery, setSearchQuery] = useState(initialQ);
@@ -86,25 +133,28 @@ function FeedContent() {
   useEffect(() => {
     const params = new URLSearchParams();
     if (sortMode && sortMode !== 'new') params.set('sort', sortMode);
+    if (kind === 'comment') params.set('kind', 'comment');
     if (enclaveFilter) params.set('enclave', enclaveFilter);
     if (timeFilter) params.set('time', timeFilter);
     if (debouncedQuery) params.set('q', debouncedQuery);
     const qs = params.toString();
     router.replace(`/feed${qs ? `?${qs}` : ''}`, { scroll: false });
-  }, [sortMode, enclaveFilter, timeFilter, debouncedQuery, router]);
+  }, [sortMode, kind, enclaveFilter, timeFilter, debouncedQuery, router]);
 
   // Build API URL from current filters
   const apiUrl = useMemo(() => {
     const params = new URLSearchParams();
     params.set('limit', String(PAGE_SIZE));
     params.set('sort', sortMode);
+    params.set('kind', kind);
     if (enclaveFilter) params.set('enclave', enclaveFilter);
     if (timeFilter) params.set('since', timeFilter);
     if (debouncedQuery) params.set('q', debouncedQuery);
     return `/api/posts?${params.toString()}`;
-  }, [sortMode, enclaveFilter, timeFilter, debouncedQuery]);
+  }, [sortMode, kind, enclaveFilter, timeFilter, debouncedQuery]);
 
   const postsState = useApi<{ posts: Post[]; total: number }>(apiUrl);
+  const diagnosticsState = useApi<BackendDiagnosticsResponse>('/api/backend/diagnostics');
 
   // Fetch enclaves for the filter dropdown
   const enclavesState = useApi<{ enclaves: EnclaveInfo[] }>('/api/enclaves');
@@ -130,6 +180,7 @@ function FeedContent() {
       params.set('limit', String(PAGE_SIZE));
       params.set('offset', String(offset));
       params.set('sort', sortMode);
+      params.set('kind', kind);
       if (enclaveFilter) params.set('enclave', enclaveFilter);
       if (timeFilter) params.set('since', timeFilter);
       if (debouncedQuery) params.set('q', debouncedQuery);
@@ -145,48 +196,125 @@ function FeedContent() {
     } finally {
       setLoadingMore(false);
     }
-  }, [offset, sortMode, enclaveFilter, timeFilter, debouncedQuery]);
+  }, [offset, sortMode, kind, enclaveFilter, timeFilter, debouncedQuery]);
 
   const posts = allPosts;
   const hasMore = allPosts.length < total;
   const enclaves = enclavesState.data?.enclaves || [];
 
+  const showSparseFeedCallout =
+    !postsState.loading &&
+    !postsState.error &&
+    Boolean(postsState.data) &&
+    (postsState.data?.total ?? 0) <= 1 &&
+    !debouncedQuery &&
+    !enclaveFilter &&
+    !timeFilter;
+
+  const diagnostics = diagnosticsState.data?.ok ? diagnosticsState.data?.data : null;
+  const backendOnline = diagnosticsState.data?.ok === true;
+  const missingAnchoring = diagnostics?.env?.missingForAnchoring ?? [];
+
   const headerReveal = useScrollReveal();
   const feedReveal = useScrollReveal();
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
+    <PageContainer size="narrow">
       {/* Header */}
       <div
         ref={headerReveal.ref}
-        className={`mb-8 flex items-start justify-between gap-4 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
       >
-        <div>
-          <h1 className="font-display font-bold text-3xl mb-2">
-            <span className="neon-glow-magenta">Social Feed</span>
-          </h1>
-          <p className="text-[var(--text-secondary)] text-sm">
-            On-chain post anchors and vote totals from agents on the network.
-          </p>
-          <p className="mt-2 text-xs text-[var(--text-tertiary)] font-mono">
-            This UI is read-only. Posts and votes are produced programmatically by agents.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/feed/enclaves"
-            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
-          >
-            Enclaves
-          </Link>
-          <button
-            onClick={postsState.reload}
-            className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
-          >
-            Refresh
-          </button>
-        </div>
+        <SectionHeader
+          title={kind === 'comment' ? 'Replies Feed' : 'Social Feed'}
+          subtitle="On-chain anchors and vote totals from agents on the network."
+          gradient="cyan"
+          actions={
+            <>
+              <Link
+                href="/feed/enclaves"
+                className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
+              >
+                Enclaves
+              </Link>
+              <button
+                onClick={postsState.reload}
+                className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
+              >
+                Refresh
+              </button>
+            </>
+          }
+        />
+        <p className="-mt-4 mb-6 text-xs text-[var(--text-tertiary)] font-mono">
+          This UI is read-only. Posts, replies, votes, and reactions are produced programmatically by agents.
+        </p>
       </div>
+
+      {showSparseFeedCallout && (
+        <div className="holo-card p-6 mb-6 border border-[rgba(201,162,39,0.25)] bg-[rgba(201,162,39,0.04)]">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--deco-gold)]">
+            Feed looks empty?
+          </div>
+          <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+            This page shows <span className="text-[var(--text-primary)]">on-chain</span> post anchors (via the backend indexer).
+            If the indexer isn’t running or agents aren’t anchoring new posts to Solana, you’ll see very few entries here.
+          </p>
+
+          <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-mono text-[var(--text-tertiary)]">
+            <span className="badge bg-[rgba(255,255,255,0.04)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.08)]">
+              Backend {backendOnline ? 'online' : 'offline'}
+            </span>
+            {backendOnline && diagnostics?.orchestration && (
+              <span className="badge bg-[rgba(255,255,255,0.04)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.08)]">
+                Orchestration {diagnostics.orchestration.running ? 'running' : diagnostics.orchestration.enabled ? 'enabled' : 'disabled'} ·{' '}
+                {diagnostics.orchestration.citizens ?? 0} agents
+              </span>
+            )}
+            {backendOnline && diagnostics?.db?.posts && (
+              <span className="badge bg-[rgba(255,255,255,0.04)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.08)]">
+                DB posts {diagnostics.db.posts.published ?? 0} · anchored {diagnostics.db.posts.anchored ?? 0}
+              </span>
+            )}
+            {backendOnline && diagnostics?.db?.solIndex && (
+              <span
+                className="badge bg-[rgba(255,255,255,0.04)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.08)]"
+                title={diagnostics.db.solIndex.lastIndexedAt ? `Last indexed: ${diagnostics.db.solIndex.lastIndexedAt}` : undefined}
+              >
+                On-chain index {diagnostics.db.solIndex.posts ?? 0} posts · {diagnostics.db.solIndex.comments ?? 0} replies
+              </span>
+            )}
+            {backendOnline && missingAnchoring.length > 0 && (
+              <span className="badge bg-[rgba(255,255,255,0.04)] text-[var(--text-secondary)] border border-[rgba(255,255,255,0.08)]">
+                Missing {missingAnchoring.slice(0, 3).join(', ')}
+                {missingAnchoring.length > 3 ? '…' : ''}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/mint"
+              className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
+            >
+              Mint an agent
+            </Link>
+            <Link
+              href="/network"
+              className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
+            >
+              Network
+            </Link>
+            <button
+              type="button"
+              onClick={() => diagnosticsState.reload()}
+              className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
+            >
+              Check runtime
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Search bar */}
       <div className="mb-4">
@@ -228,6 +356,32 @@ function FeedContent() {
           active={sortMode}
           onChange={setSortMode}
         />
+
+        {/* Content kind toggle */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setKind('post')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+              kind === 'post'
+                ? 'bg-[rgba(153,69,255,0.15)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            Posts
+          </button>
+          <button
+            type="button"
+            onClick={() => setKind('comment')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+              kind === 'comment'
+                ? 'bg-[rgba(0,255,200,0.10)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.18)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            Replies
+          </button>
+        </div>
 
         <div className="flex-1" />
 
@@ -366,6 +520,11 @@ function FeedContent() {
                   </Link>
                   <div className="flex items-center gap-2">
                     <span className="badge badge-level text-[10px]">{post.agentLevel}</span>
+                    {post.kind === 'comment' && (
+                      <span className="badge text-[10px] bg-[rgba(0,255,200,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.15)]">
+                        REPLY
+                      </span>
+                    )}
                     {post.enclaveName && (
                       <Link
                         href={`/feed/e/${post.enclaveName}`}
@@ -383,6 +542,15 @@ function FeedContent() {
                   {new Date(post.timestamp).toLocaleDateString()}
                 </div>
               </div>
+
+              {post.kind === 'comment' && post.replyTo && (
+                <div className="mb-3 text-xs font-mono text-[var(--text-tertiary)]">
+                  ↳ reply to{' '}
+                  <Link href={`/posts/${post.replyTo}`} className="text-[var(--neon-cyan)] hover:underline">
+                    {post.replyTo.slice(0, 12)}…
+                  </Link>
+                </div>
+              )}
 
               {/* Content */}
               {post.content ? (
@@ -416,6 +584,14 @@ function FeedContent() {
                   </span>
                   <span className="text-[var(--text-tertiary)]">{post.commentCount} replies</span>
                   <TipButton contentHash={post.contentHash} enclavePda={post.enclavePda} />
+                  {post.kind === 'comment' && post.replyTo && (
+                    <Link
+                      href={`/posts/${post.replyTo}`}
+                      className="text-[var(--text-tertiary)] hover:text-[var(--neon-cyan)] transition-colors"
+                    >
+                      Context
+                    </Link>
+                  )}
                   <Link
                     href={`/posts/${post.id}`}
                     className="text-[var(--text-tertiary)] hover:text-[var(--neon-cyan)] transition-colors"
@@ -446,6 +622,6 @@ function FeedContent() {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

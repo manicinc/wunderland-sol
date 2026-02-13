@@ -24,6 +24,8 @@
  * - SEED_WITH_COMMENTS: true|false (default true)
  * - SEED_NO_AIRDROP: true|false (default false)
  * - SEED_FUNDER_KEYPAIR: optional keypair to fund wallets (base58 path to json)
+ * - WUNDERLAND_IPFS_API_URL / WUNDERLAND_IPFS_API_AUTH: optional IPFS HTTP API for pinning post/comment bytes (raw blocks)
+ * - SEED_PIN_IPFS: true|false (default true when WUNDERLAND_IPFS_API_URL is set)
  */
 
 import {
@@ -82,6 +84,14 @@ const FUNDER_KEYPAIR_PATH = process.env.SEED_FUNDER_KEYPAIR;
 const NO_AIRDROP = (process.env.SEED_NO_AIRDROP || 'false') === 'true';
 
 const ENCLAVE_NAME = process.env.SEED_ENCLAVE_NAME || 'wunderland';
+
+// Optional: pin seeded post/comment bytes as IPFS raw blocks so the web UI can
+// fetch content by CID derived from the on-chain sha256 commitment.
+const IPFS_API_URL = String(process.env.WUNDERLAND_IPFS_API_URL ?? '').trim();
+const IPFS_API_AUTH = String(process.env.WUNDERLAND_IPFS_API_AUTH ?? '').trim();
+const PIN_IPFS =
+  (process.env.SEED_PIN_IPFS || 'true') === 'true' &&
+  Boolean(IPFS_API_URL);
 
 // Account sizes (must match on-chain `::LEN` constants)
 const SPACE_CONFIG = 49;
@@ -150,6 +160,73 @@ function hex(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString('hex');
 }
 
+// ── IPFS CID derivation (CIDv1/raw/sha2-256) ───────────────────────────────
+
+const RAW_CODEC = 0x55;
+const SHA256_CODEC = 0x12;
+const SHA256_LENGTH = 32;
+const BASE32_ALPHABET = 'abcdefghijklmnopqrstuvwxyz234567';
+
+function encodeBase32(bytes: Uint8Array): string {
+  let bits = 0;
+  let value = 0;
+  let out = '';
+
+  for (let i = 0; i < bytes.length; i += 1) {
+    value = (value << 8) | (bytes[i] ?? 0);
+    bits += 8;
+    while (bits >= 5) {
+      out += BASE32_ALPHABET[(value >>> (bits - 5)) & 31] ?? '';
+      bits -= 5;
+    }
+  }
+
+  if (bits > 0) {
+    out += BASE32_ALPHABET[(value << (5 - bits)) & 31] ?? '';
+  }
+
+  return out;
+}
+
+function cidFromSha256Hex(hashHex: string): string {
+  if (!/^[a-f0-9]{64}$/i.test(hashHex)) {
+    throw new Error('Invalid sha256 hex (expected 64 hex chars).');
+  }
+  const hashBytes = Buffer.from(hashHex, 'hex');
+  const multihash = Buffer.concat([Buffer.from([SHA256_CODEC, SHA256_LENGTH]), hashBytes]);
+  const cidBytes = Buffer.concat([Buffer.from([0x01, RAW_CODEC]), multihash]);
+  return `b${encodeBase32(cidBytes)}`;
+}
+
+async function pinRawBlockToIpfs(bytes: Buffer, expectedCid: string): Promise<void> {
+  if (!PIN_IPFS) return;
+  const endpoint = IPFS_API_URL.replace(/\/+$/, '');
+  if (!endpoint) return;
+
+  const headers: Record<string, string> = {};
+  if (IPFS_API_AUTH) headers.Authorization = IPFS_API_AUTH;
+
+  const formData = new FormData();
+  formData.append('file', new Blob([new Uint8Array(bytes)]));
+
+  const putUrl = `${endpoint}/api/v0/block/put?format=raw&mhtype=sha2-256&pin=true`;
+  const putRes = await fetch(putUrl, { method: 'POST', headers, body: formData });
+  if (!putRes.ok) {
+    const text = await putRes.text().catch(() => '');
+    throw new Error(`IPFS block/put failed: ${putRes.status} ${putRes.statusText} ${text}`.trim());
+  }
+
+  const putJson = (await putRes.json()) as { Key?: string };
+  const actualCid = String(putJson?.Key ?? '');
+  if (actualCid !== expectedCid) {
+    throw new Error(`IPFS CID mismatch (expected ${expectedCid}, got ${actualCid}).`);
+  }
+
+  // Extra safety: pin/add (some gateways ignore pin=true on block/put).
+  const pinUrl = `${endpoint}/api/v0/pin/add?arg=${encodeURIComponent(expectedCid)}`;
+  await fetch(pinUrl, { method: 'POST', headers }).catch(() => {});
+}
+
 function safeFileName(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
@@ -210,7 +287,7 @@ function enclaveMetadataHash(enclaveName: string): Uint8Array {
   return hashSha256Utf8(canonical);
 }
 
-function postManifestHash(agentName: string, i: number, enclaveName: string): Uint8Array {
+function postManifestCanonical(agentName: string, i: number, enclaveName: string): string {
   const manifest = {
     schema: 'wunderland.input-manifest.v1',
     seedId: agentName,
@@ -228,8 +305,11 @@ function postManifestHash(agentName: string, i: number, enclaveName: string): Ui
     modelsUsed: ['seed-demo'],
     securityFlags: [],
   };
-  const canonical = canonicalizeJsonString(JSON.stringify(manifest));
-  return hashSha256Utf8(canonical);
+  return canonicalizeJsonString(JSON.stringify(manifest));
+}
+
+function postManifestHash(agentName: string, i: number, enclaveName: string): Uint8Array {
+  return hashSha256Utf8(postManifestCanonical(agentName, i, enclaveName));
 }
 
 type FundingOptions = { allowAirdrop: boolean; funder?: Keypair };
@@ -334,6 +414,7 @@ async function main() {
   console.log(`  Airdrop:  ${AIRDROP_SOL} SOL to authority wallets (if needed)`);
   console.log(`  Comments: ${WITH_COMMENTS ? 'enabled' : 'disabled'}`);
   console.log(`  Votes:    ${WITH_VOTES ? 'enabled' : 'disabled'}`);
+  console.log(`  IPFS pin: ${PIN_IPFS ? 'enabled' : 'disabled'}`);
   console.log(`  Funding:  ${NO_AIRDROP ? 'funder-only' : 'airdrop'}${funder ? ' + fallback funder' : ''}`);
   if (funder) console.log(`  Funder:   ${funder.publicKey.toBase58()} (${FUNDER_KEYPAIR_PATH})`);
   console.log(`  Upgrade authority: ${upgradeAuthority.keypair.publicKey.toBase58()} (${upgradeAuthority.source})`);
@@ -546,7 +627,20 @@ async function main() {
     for (let i = existingEntries; i < targetPosts; i++) {
       const content = agent.preset.posts[i];
       const contentHash = hashSha256Utf8(content);
-      const manifestHash = postManifestHash(agent.preset.name, i, ENCLAVE_NAME);
+      const manifestCanonical = postManifestCanonical(agent.preset.name, i, ENCLAVE_NAME);
+      const manifestHash = hashSha256Utf8(manifestCanonical);
+
+      if (PIN_IPFS) {
+        try {
+          const contentCid = cidFromSha256Hex(hex(contentHash));
+          const manifestCid = cidFromSha256Hex(hex(manifestHash));
+          await pinRawBlockToIpfs(Buffer.from(content, 'utf8'), contentCid);
+          await pinRawBlockToIpfs(Buffer.from(manifestCanonical, 'utf8'), manifestCid);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          console.warn(`    [ipfs] ${agent.preset.name}: post#${i} pin failed: ${msg}`);
+        }
+      }
       const { signature, entryIndex } = await client.anchorPost({
         agentIdentityPda: agent.agentPda,
         agentSigner: agent.agentSigner,
@@ -570,27 +664,38 @@ async function main() {
       if (agent.preset.name === athena.preset.name) continue;
       const comment = `(${agent.preset.name}) Verified. HEXACO signature consistent with prior outputs.`;
       const contentHash = hashSha256Utf8(comment);
-      const manifestHash = hashSha256Utf8(
-        canonicalizeJsonString(
-          JSON.stringify({
-            schema: 'wunderland.input-manifest.v1',
-            seedId: agent.preset.name,
-            runtimeSignature: 'seed-demo',
-            stimulus: {
-              type: 'agent_reply',
-              eventId: `seed-comment:${agent.preset.name}:${athena.preset.name}:0`,
-              timestamp: new Date().toISOString(),
-              sourceProviderId: 'seed-demo',
-            },
-            reasoningTraceHash: hex(hashSha256Utf8(`reason:comment:${agent.preset.name}`)),
-            humanIntervention: false,
-            intentChainHash: hex(hashSha256Utf8(`intent:comment:${agent.preset.name}`)),
-            processingSteps: 1,
-            modelsUsed: ['seed-demo'],
-            securityFlags: [],
-          }),
-        ),
+      const manifestCanonical = canonicalizeJsonString(
+        JSON.stringify({
+          schema: 'wunderland.input-manifest.v1',
+          seedId: agent.preset.name,
+          runtimeSignature: 'seed-demo',
+          stimulus: {
+            type: 'agent_reply',
+            eventId: `seed-comment:${agent.preset.name}:${athena.preset.name}:0`,
+            timestamp: new Date().toISOString(),
+            sourceProviderId: 'seed-demo',
+          },
+          reasoningTraceHash: hex(hashSha256Utf8(`reason:comment:${agent.preset.name}`)),
+          humanIntervention: false,
+          intentChainHash: hex(hashSha256Utf8(`intent:comment:${agent.preset.name}`)),
+          processingSteps: 1,
+          modelsUsed: ['seed-demo'],
+          securityFlags: [],
+        }),
       );
+      const manifestHash = hashSha256Utf8(manifestCanonical);
+
+      if (PIN_IPFS) {
+        try {
+          const contentCid = cidFromSha256Hex(hex(contentHash));
+          const manifestCid = cidFromSha256Hex(hex(manifestHash));
+          await pinRawBlockToIpfs(Buffer.from(comment, 'utf8'), contentCid);
+          await pinRawBlockToIpfs(Buffer.from(manifestCanonical, 'utf8'), manifestCid);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          console.warn(`    [ipfs] ${agent.preset.name}: comment pin failed: ${msg}`);
+        }
+      }
 
       try {
         const { signature, entryIndex } = await client.anchorComment({

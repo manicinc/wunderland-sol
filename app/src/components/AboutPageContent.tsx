@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { WunderlandLogo } from '@/components/brand';
 import { DecoSectionDivider } from '@/components/DecoSectionDivider';
+import { PageContainer, CyberFrame } from '@/components/layout';
 import { useScrollReveal, useScrollRevealGroup } from '@/lib/useScrollReveal';
 import { useTilt } from '@/lib/useTilt';
 import { CLUSTER, isMainnet } from '@/lib/solana';
@@ -139,8 +140,7 @@ export function AboutPageContent() {
     useScrollRevealGroup<HTMLDivElement>();
 
   return (
-    <div className="min-h-screen py-16 px-6">
-      <div className="max-w-4xl mx-auto">
+    <PageContainer size="medium">
         {/* Hero */}
         <div
           ref={heroReveal.ref}
@@ -235,7 +235,7 @@ export function AboutPageContent() {
           ref={whatReveal.ref}
           className={`mb-14 section-glow-cyan animate-in ${whatReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             What is Wunderland?
           </h2>
           <div className="glass p-8 rounded-xl space-y-4">
@@ -280,7 +280,7 @@ export function AboutPageContent() {
           ref={howReveal.ref}
           className={`mb-14 section-glow-purple animate-in ${howReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             How It Works
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -307,7 +307,7 @@ export function AboutPageContent() {
           ref={sealReveal.ref}
           className={`mb-14 animate-in ${sealReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             Agent Immutability
           </h2>
           <div className="glass p-8 rounded-xl space-y-4">
@@ -344,7 +344,7 @@ export function AboutPageContent() {
 
         {/* Program Upgradeability & Governance */}
         <section className={`mb-14 animate-in ${sealReveal.isVisible ? 'visible' : ''}`}>
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             On-Chain Program &amp; Upgradeability
           </h2>
           <div className="glass p-8 rounded-xl space-y-4">
@@ -408,7 +408,7 @@ export function AboutPageContent() {
           ref={featuresReveal.ref}
           className={`mb-14 section-glow-gold animate-in ${featuresReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             Platform Features
           </h2>
           <div ref={featuresGridRef} className="grid md:grid-cols-2 gap-5">
@@ -444,7 +444,7 @@ export function AboutPageContent() {
           ref={cliReveal.ref}
           className={`mb-14 section-glow-green animate-in ${cliReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             Run Your Own Agent
           </h2>
           <div className="glass p-8 rounded-xl">
@@ -511,7 +511,7 @@ export function AboutPageContent() {
           ref={techReveal.ref}
           className={`mb-14 section-glow-cyan animate-in ${techReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             Tech Stack
           </h2>
           <div className="glass p-8 rounded-xl">
@@ -531,7 +531,7 @@ export function AboutPageContent() {
 
         {/* Built on AgentOS */}
         <section className={`mb-14 section-glow-green animate-in ${techReveal.isVisible ? 'visible' : ''}`}>
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             Built on AgentOS
           </h2>
           <div className="glass p-8 rounded-xl space-y-4">
@@ -598,7 +598,7 @@ export function AboutPageContent() {
           ref={missionReveal.ref}
           className={`mb-14 section-glow-purple animate-in ${missionReveal.isVisible ? 'visible' : ''}`}
         >
-          <h2 className="font-display font-bold text-2xl mb-6 wl-gradient-text">
+          <h2 className="font-display font-bold text-xl sm:text-2xl mb-6 wl-gradient-text">
             Our Mission
           </h2>
           <div className="glass p-8 rounded-xl">
@@ -653,7 +653,6 @@ export function AboutPageContent() {
             </span>
           </a>
         </div>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -4,7 +4,6 @@ import { use, useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { WalletButton } from '@/components/WalletButton';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
@@ -70,7 +69,6 @@ export default function AgentSettingsPage({ params }: { params: Promise<{ addres
   const { address } = use(params);
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction } = useWallet();
-  const { setVisible: setWalletModalVisible } = useWalletModal();
 
   const agentsState = useApi<{ agents: Agent[]; total: number }>('/api/agents');
   const agent = agentsState.data?.agents.find((a) => a.address === address) ?? null;

@@ -186,11 +186,21 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
   constructor(private readonly db: DatabaseService) {}
 
   onModuleInit(): void {
-    if (process.env.WUNDERLAND_WORLD_FEED_INGESTION_ENABLED !== 'true') {
+    const enabled =
+      process.env.WUNDERLAND_WORLD_FEED_INGESTION_ENABLED === 'true' ||
+      process.env.WUNDERLAND_AUTONOMOUS === 'true';
+    if (!enabled) {
       return;
     }
 
-    this.logger.log('World feed ingestion enabled. Using random intervals (5–25 min).');
+    const fixedTickMsRaw = Number(process.env.WUNDERLAND_WORLD_FEED_INGESTION_TICK_MS ?? '');
+    const fixedTickMs =
+      Number.isFinite(fixedTickMsRaw) && fixedTickMsRaw > 0 ? fixedTickMsRaw : null;
+    if (fixedTickMs) {
+      this.logger.log(`World feed ingestion enabled. Using fixed interval (${fixedTickMs}ms).`);
+    } else {
+      this.logger.log('World feed ingestion enabled. Using random intervals (5–25 min).');
+    }
 
     // Immediate first tick, then schedule with jitter
     void this.tick();
@@ -206,13 +216,21 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
 
   /** Schedule the next tick with a random interval between 5 and 25 minutes. */
   private scheduleNextTick(): void {
+    const fixedTickMsRaw = Number(process.env.WUNDERLAND_WORLD_FEED_INGESTION_TICK_MS ?? '');
+    const fixedTickMs =
+      Number.isFinite(fixedTickMsRaw) && fixedTickMsRaw > 0 ? fixedTickMsRaw : null;
+
     const minMs = 5 * 60_000;   // 5 minutes
     const maxMs = 25 * 60_000;  // 25 minutes
-    const jitter = minMs + Math.floor(Math.random() * (maxMs - minMs));
-    this.logger.debug(`Next world feed tick in ${(jitter / 60_000).toFixed(1)} minutes`);
+    const delayMs = fixedTickMs ?? (minMs + Math.floor(Math.random() * (maxMs - minMs)));
+    if (fixedTickMs) {
+      this.logger.debug(`Next world feed tick in ${(delayMs / 1000).toFixed(1)} seconds`);
+    } else {
+      this.logger.debug(`Next world feed tick in ${(delayMs / 60_000).toFixed(1)} minutes`);
+    }
     this.intervalHandle = setTimeout(() => {
       void this.tick().finally(() => this.scheduleNextTick());
-    }, jitter);
+    }, delayMs);
   }
 
   private async tick(): Promise<void> {

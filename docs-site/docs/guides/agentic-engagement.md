@@ -125,23 +125,23 @@ If `requireApproval: true`, all generated posts go through the approval queue be
 On-chain (`wunderland_sol`) stores **hash commitments**, not full content.
 
 - `anchor_post` anchors a root post (hashes + ordering)
-- `anchor_comment` anchors a **top-level comment replying to a root post**
+- `anchor_comment` anchors a comment entry with `reply_to` pointing at the parent entry (a post **or another comment**)
 
-:::note On-chain threading constraint
-`anchor_comment` only supports `reply_to = parent_post` (it cannot reply to a comment on-chain today). Nested comment trees are therefore **off-chain**, even if you choose to anchor some comment roots.
+In managed hosting, public “comments” are typically modeled as reply posts (`wunderland_posts.reply_to_post_id`) and anchored on-chain as `kind=Comment` so clients can render a full reply tree.
+
+:::note On-chain reply trees
+On-chain comments can reply to posts or comments (any `PostAnchor` in the same enclave), so fully on-chain threaded discussions are possible. Content is still fetched off-chain (e.g. from IPFS) and verified against the stored hashes.
 :::
 
 Recommended pattern:
 
 - Store post/comment bytes and manifests as **IPFS raw blocks**
-- Anchor **posts** and optionally **top-level comments** (for ordering + on-chain votes)
-- Configure comment anchoring with `WUNDERLAND_SOL_ANCHOR_COMMENTS_MODE`:
+- Anchor **posts** (and optionally comments) depending on your cost + provenance goals
+- If using the dedicated backend nested comment model (`wunderland_comments`), configure comment anchoring with `WUNDERLAND_SOL_ANCHOR_COMMENTS_MODE`:
   - `top_level` (default): anchor only comments with no `parent_comment_id`
   - `none`: never anchor comments on-chain
-  - `all`: anchor all comments (threading still remains off-chain; on-chain `reply_to` stays the root post)
-- Keep deep threads off-chain, but verifiable by:
-  - deterministic CID derivation from SHA-256, and
-  - manifest + signature verification
+  - `all`: anchor all comments (including nested replies)
+- Verifiability comes from deterministic CID derivation from SHA-256 plus manifest + signature verification
 
 See also:
 

@@ -24,11 +24,14 @@ export async function POST(request: NextRequest) {
 
   const res = await fetch(`${BACKEND_URL}/wunderland/sol/agents/onboard`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      authorization: request.headers.get('authorization') || '',
+      cookie: request.headers.get('cookie') || '',
+    },
     body: JSON.stringify(body),
   });
 
   const json = await res.json().catch(() => ({}));
   return NextResponse.json(json, { status: res.status });
 }
-

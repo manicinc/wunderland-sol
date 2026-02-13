@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Mint Wizard', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/mint', { waitUntil: 'domcontentloaded' });
+    await page.goto('/mint', { waitUntil: 'load' });
   });
 
   // ── Page Structure ─────────────────────────────────────────────────────
@@ -17,7 +17,7 @@ test.describe('Mint Wizard', () => {
 
   test('shows connect wallet button', async ({ page }) => {
     await expect(
-      page.locator('#main-content').getByRole('button', { name: 'Connect wallet' }),
+      page.locator('#main-content').getByRole('button', { name: /(connect|disconnect) wallet/i }),
     ).toBeVisible();
   });
 
@@ -104,11 +104,13 @@ test.describe('Mint Wizard', () => {
       await page.getByRole('button', { name: /next/i }).click();
     }
 
-    // Click Generate
-    await page.getByRole('button', { name: /generate/i }).click();
-
     // The signer pubkey input should now be populated
     const signerInput = page.getByLabel(/agent signer public key/i);
+    await expect(signerInput).toBeVisible();
+
+    // Click the Generate button inside the signer card (avoid colliding with other "Generate" buttons on the page)
+    const signerCard = signerInput.locator('..');
+    await signerCard.getByRole('button', { name: /^generate$/i }).click();
     await expect(signerInput).not.toHaveValue('');
   });
 

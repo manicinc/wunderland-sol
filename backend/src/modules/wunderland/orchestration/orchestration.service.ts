@@ -14,6 +14,7 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
 import { callLlm } from '../../../core/llm/llm.factory';
+import { LlmConfigService } from '../../../core/llm/llm.config.service.js';
 import { ragService } from '../../../integrations/rag/rag.service.js';
 import { WunderlandVectorMemoryService } from './wunderland-vector-memory.service';
 import { WunderlandSolService } from '../wunderland-sol/wunderland-sol.service.js';
@@ -80,7 +81,9 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     private readonly vectorMemory: WunderlandVectorMemoryService,
     private readonly wunderlandSol: WunderlandSolService
   ) {
-    this.enabled = process.env.ENABLE_SOCIAL_ORCHESTRATION === 'true';
+    this.enabled =
+      process.env.ENABLE_SOCIAL_ORCHESTRATION === 'true' ||
+      process.env.WUNDERLAND_AUTONOMOUS === 'true';
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -184,10 +187,10 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       }
     });
 
-    // 5c. Set engagement store callback — writes likes/boosts to DB
-    this.network.setEngagementStoreCallback(async ({ postId, actorSeedId, actionType }) => {
-      try {
-        const actionId = `eng-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+	    // 5c. Set engagement store callback — writes votes/boosts/views to DB
+	    this.network.setEngagementStoreCallback(async ({ postId, actorSeedId, actionType }) => {
+	      try {
+	        const actionId = `eng-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         await this.db.run(
           `INSERT INTO wunderland_engagement_actions (
             action_id, post_id, actor_seed_id, type, payload, timestamp
@@ -195,31 +198,39 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           [actionId, postId, actorSeedId, actionType, Date.now()],
         );
         // Update counters on the post
-        if (actionType === 'like') {
-          await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [postId]);
-        } else if (actionType === 'boost') {
-          await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [postId]);
-        } else if (actionType === 'view') {
-          await this.db.run('UPDATE wunderland_posts SET views = views + 1 WHERE post_id = ?', [postId]);
-        }
+	        if (actionType === 'like') {
+	          await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [postId]);
+	        } else if (actionType === 'downvote') {
+	          await this.db.run('UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?', [postId]);
+	        } else if (actionType === 'boost') {
+	          await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [postId]);
+	        } else if (actionType === 'view') {
+	          await this.db.run('UPDATE wunderland_posts SET views = views + 1 WHERE post_id = ?', [postId]);
+	        }
 
         // Best-effort on-chain vote bridging (optional; gated by WUNDERLAND_SOL_VOTING_ENABLED).
-        // Maps: like => +1, boost => -1. (Views remain off-chain.)
-        if (actionType === 'like' || actionType === 'boost') {
-          try {
-            this.wunderlandSol.scheduleCastVote({
-              postId,
-              actorSeedId,
-              value: actionType === 'like' ? 1 : -1,
-            });
-          } catch {
-            // non-critical
-          }
-        }
-      } catch (err) {
-        this.logger.warn(`Failed to persist engagement action: ${String((err as any)?.message ?? err)}`);
-      }
-    });
+        // Maps: like => +1, downvote => -1. (Views/boosts remain off-chain.)
+	        if (actionType === 'like' || actionType === 'downvote') {
+	          try {
+	            this.wunderlandSol.scheduleCastVote({
+	              postId,
+	              actorSeedId,
+	              value: actionType === 'like' ? 1 : -1,
+	            });
+	          } catch {
+	            // non-critical
+	          }
+	        }
+
+	        // Off-chain amplify routing (bots-only): when an agent boosts a post,
+	        // re-surface it to a small set of other agents at higher priority.
+	        if (actionType === 'boost') {
+	          void this.dispatchAmplifyVisibility({ postId, boosterSeedId: actorSeedId }).catch(() => {});
+	        }
+	      } catch (err) {
+	        this.logger.warn(`Failed to persist engagement action: ${String((err as any)?.message ?? err)}`);
+	      }
+	    });
 
     // 6. Load all active agents from DB and register them as citizens
     const agentCount = await this.loadAndRegisterAgents();
@@ -230,11 +241,11 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         post_id: string; seed_id: string; content: string; manifest: string;
         status: string; reply_to_post_id: string | null;
         created_at: number; published_at: number | null;
-        likes: number; boosts: number; replies: number; views: number;
+        likes: number; downvotes: number; boosts: number; replies: number; views: number;
         agent_level_at_post: number;
       }>(
         `SELECT post_id, seed_id, content, manifest, status, reply_to_post_id,
-                created_at, published_at, likes, boosts, replies, views, agent_level_at_post
+                created_at, published_at, likes, downvotes, boosts, replies, views, agent_level_at_post
          FROM wunderland_posts WHERE status = 'published' ORDER BY published_at DESC LIMIT 500`,
       );
       const posts = existingPosts.map((row) => ({
@@ -246,7 +257,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         replyToPostId: row.reply_to_post_id ?? undefined,
         createdAt: new Date(row.created_at).toISOString(),
         publishedAt: row.published_at ? new Date(row.published_at).toISOString() : undefined,
-        engagement: { likes: row.likes ?? 0, boosts: row.boosts ?? 0, replies: row.replies ?? 0, views: row.views ?? 0 },
+        engagement: { likes: row.likes ?? 0, downvotes: row.downvotes ?? 0, boosts: row.boosts ?? 0, replies: row.replies ?? 0, views: row.views ?? 0 },
         agentLevelAtPost: row.agent_level_at_post ?? 0,
       }));
       this.network.preloadPosts(posts as any);
@@ -422,11 +433,11 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private selectTargetsForStimulus(opts: {
-    type: 'world_feed' | 'tip';
-    priority: StimulusEvent['priority'];
-    payload: any;
-  }): string[] {
+	  private async selectTargetsForStimulus(opts: {
+	    type: 'world_feed' | 'tip';
+	    priority: StimulusEvent['priority'];
+	    payload: any;
+	  }): Promise<string[]> {
     if (!this.network) return [];
 
     const citizens = this.network.listCitizens();
@@ -446,6 +457,45 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
     const category = opts.type === 'world_feed' ? String(opts.payload?.category ?? '').trim() : '';
 
+    // RAG-based routing: find agents whose prior posts are most similar to this stimulus.
+    const stimulusText = (() => {
+      if (opts.type === 'tip') {
+        return String(
+          opts.payload?.content ??
+          opts.payload?.title ??
+          opts.payload?.topic ??
+          opts.payload?.prompt ??
+          ''
+        ).trim();
+      }
+      const headline = String(
+        opts.payload?.title ??
+        opts.payload?.headline ??
+        opts.payload?.content ??
+        opts.payload?.summary ??
+        ''
+      ).trim();
+      const body = String(opts.payload?.summary ?? opts.payload?.body ?? '').trim();
+      const cat = category ? `Category: ${category}` : '';
+      return [headline, body, cat].filter(Boolean).join('\n');
+    })();
+
+    const ragBySeed = new Map<string, number>();
+    if (stimulusText) {
+      try {
+        const affinities = await this.vectorMemory.querySeedAffinities({
+          query: stimulusText,
+          topK: 80,
+          maxSeeds: 25,
+        });
+        for (const a of affinities) {
+          if (a?.seedId) ragBySeed.set(String(a.seedId), Number(a.score ?? 0));
+        }
+      } catch {
+        // Best-effort: routing still works without vector memory.
+      }
+    }
+
     const scored = citizens
       .filter((c) => c.isActive)
       .map((c) => {
@@ -463,6 +513,12 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         if (mood === 'excited' || mood === 'engaged' || mood === 'curious') score += 0.35;
         if (mood === 'bored') score -= 0.15;
 
+        // RAG affinity boost (0..~1): prefer agents with nearby memory.
+        const rag = ragBySeed.get(seedId);
+        if (typeof rag === 'number' && Number.isFinite(rag) && rag > 0) {
+          score += Math.max(0, Math.min(1, rag)) * 0.8;
+        }
+
         const last = this.routingLastSelectedAtMs.get(seedId) ?? 0;
         const sinceLast = last > 0 ? now - last : Number.POSITIVE_INFINITY;
         if (sinceLast < 15 * 60_000) score -= 0.5;
@@ -476,8 +532,89 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     for (const seedId of chosen) {
       this.routingLastSelectedAtMs.set(seedId, now);
     }
-    return chosen;
-  }
+	    return chosen;
+	  }
+
+	  private async dispatchAmplifyVisibility(opts: { postId: string; boosterSeedId: string }): Promise<void> {
+	    if (!this.network) return;
+
+	    const postId = String(opts.postId ?? '').trim();
+	    const boosterSeedId = String(opts.boosterSeedId ?? '').trim();
+	    if (!postId || !boosterSeedId) return;
+
+	    const row = await this.db.get<{ post_id: string; seed_id: string; content: string }>(
+	      'SELECT post_id, seed_id, content FROM wunderland_posts WHERE post_id = ? LIMIT 1',
+	      [postId],
+	    );
+	    if (!row?.post_id || !row.seed_id) return;
+
+	    const authorSeedId = String(row.seed_id).trim();
+	    const content = typeof row.content === 'string' ? row.content : '';
+	    if (!content.trim()) return;
+
+	    // Candidate recipients: active + allowed to act, excluding the author + booster.
+	    const safety = this.network.getSafetyEngine();
+	    const activeCandidates = this.network
+	      .listCitizens()
+	      .filter((c) => c.isActive)
+	      .map((c) => c.seedId)
+	      .filter((seedId) => seedId !== authorSeedId && seedId !== boosterSeedId)
+	      .filter((seedId) => safety.canAct(seedId).allowed);
+
+	    if (activeCandidates.length === 0) return;
+
+	    const now = Date.now();
+	    const recentlySelectedPenaltyCutoffMs = 15 * 60_000;
+	    const recentlySelected = (seedId: string): boolean => {
+	      const last = this.routingLastSelectedAtMs.get(seedId) ?? 0;
+	      return last > 0 && now - last < recentlySelectedPenaltyCutoffMs;
+	    };
+
+	    // Prefer RAG-relevant agents when vector memory is available; otherwise random sample.
+	    let ranked: string[] = [];
+	    try {
+	      const affinities = await this.vectorMemory.querySeedAffinities({
+	        query: content.slice(0, 1200),
+	        topK: 120,
+	        maxSeeds: 30,
+	      });
+	      ranked = affinities
+	        .map((a) => String(a.seedId))
+	        .filter((seedId) => activeCandidates.includes(seedId));
+	    } catch {
+	      ranked = [];
+	    }
+
+	    const pool = ranked.length > 0 ? ranked : [...activeCandidates].sort(() => Math.random() - 0.5);
+	    const targets: string[] = [];
+
+	    for (const seedId of pool) {
+	      if (targets.length >= 3) break;
+	      if (recentlySelected(seedId)) continue;
+	      targets.push(seedId);
+	    }
+
+	    // If everything was recently selected, fall back to the top of the pool.
+	    if (targets.length === 0) {
+	      for (const seedId of pool) {
+	        if (targets.length >= 2) break;
+	        targets.push(seedId);
+	      }
+	    }
+
+	    if (targets.length === 0) return;
+	    for (const seedId of targets) {
+	      this.routingLastSelectedAtMs.set(seedId, now);
+	    }
+
+	    // High priority increases the chance that the observer decides to respond,
+	    // but agents can still stay silent (urge gating applies).
+	    await this.network.getStimulusRouter().emitPostPublished(
+	      { postId, seedId: authorSeedId, content: content.slice(0, 600) },
+	      targets,
+	      'high',
+	    );
+	  }
 
   private buildEventFromStimulusRow(row: any, targetSeedIds: string[]): StimulusEvent | null {
     const createdAtMs = Number(row.created_at ?? Date.now());
@@ -579,7 +716,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         const targetSeedIds =
           rawTargets && rawTargets.length > 0
             ? rawTargets
-            : this.selectTargetsForStimulus({
+            : await this.selectTargetsForStimulus({
                 type: row.type === 'world_feed' ? 'world_feed' : 'tip',
                 priority: this.normalizePriority(row.priority),
                 payload: this.parseJson(row.payload, {}),
@@ -758,13 +895,10 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       );
     }
 
-    const hasAnyLLM =
-      Boolean(process.env.OPENAI_API_KEY?.trim()) ||
-      Boolean(process.env.OPENROUTER_API_KEY?.trim());
-
-    if (!hasAnyLLM) {
+    const availableProviders = LlmConfigService.getInstance().getAvailableProviders();
+    if (availableProviders.length === 0) {
       this.logger.log(
-        'No LLM API keys detected (OPENAI_API_KEY/OPENROUTER_API_KEY). Newsrooms will run in placeholder mode.'
+        'No LLM providers detected (OPENAI_API_KEY / OPENROUTER_API_KEY / ANTHROPIC_API_KEY / OLLAMA_BASE_URL). Newsrooms will run in placeholder mode.'
       );
       return;
     }
@@ -814,9 +948,9 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       `INSERT INTO wunderland_posts (
         post_id, seed_id, content, manifest, status,
         reply_to_post_id, created_at, published_at,
-        likes, boosts, replies, views, agent_level_at_post,
+        likes, downvotes, boosts, replies, views, agent_level_at_post,
         stimulus_type, stimulus_event_id, stimulus_source_provider_id, stimulus_timestamp
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(post_id) DO UPDATE SET
         seed_id = excluded.seed_id,
         content = excluded.content,
@@ -825,6 +959,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         reply_to_post_id = excluded.reply_to_post_id,
         published_at = excluded.published_at,
         likes = excluded.likes,
+        downvotes = excluded.downvotes,
         boosts = excluded.boosts,
         replies = excluded.replies,
         views = excluded.views,
@@ -843,6 +978,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         new Date(post.createdAt).getTime(),
         post.publishedAt ? new Date(post.publishedAt).getTime() : null,
         post.engagement.likes,
+        post.engagement.downvotes,
         post.engagement.boosts,
         post.engagement.replies,
         post.engagement.views,

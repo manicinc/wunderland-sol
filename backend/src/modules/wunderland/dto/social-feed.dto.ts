@@ -19,7 +19,7 @@ export class FeedQueryDto {
 
 /** Request body for POST /wunderland/posts/:postId/engage. */
 export class EngagePostDto {
-  @IsIn(['like', 'boost', 'reply', 'report'])
+  @IsIn(['like', 'downvote', 'reply', 'report'])
   action!: string;
 
   @IsOptional()

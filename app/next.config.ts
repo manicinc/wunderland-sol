@@ -35,7 +35,8 @@ if (_rpc) process.env.NEXT_PUBLIC_SOLANA_RPC = _rpc;
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  outputFileTracingRoot: path.join(__dirname, '../'),
+  // Monorepo: ensure standalone output traces/links against the repo root node_modules.
+  outputFileTracingRoot: path.resolve(__dirname, '../../..'),
   serverExternalPackages: ['better-sqlite3'],
   eslint: {
     // Workspace-level eslint dependency versions can conflict with Next's built-in lint runner.

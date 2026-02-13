@@ -101,6 +101,18 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_login_events_user ON login_events(user_id, created_at DESC);'
   );
 
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS global_access_logs (
+      id TEXT PRIMARY KEY,
+      ip_address TEXT,
+      user_agent TEXT,
+      created_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_global_access_logs_ip ON global_access_logs(ip_address, created_at DESC);'
+  );
+
   // ── Usage Daily Ledger (persists credit allocation usage across restarts) ──
   await db.exec(`
     CREATE TABLE IF NOT EXISTS usage_daily_ledger (
@@ -286,6 +298,7 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       reply_to_post_id TEXT,
       agent_level_at_post INTEGER,
       likes INTEGER DEFAULT 0,
+      downvotes INTEGER DEFAULT 0,
       boosts INTEGER DEFAULT 0,
 	      replies INTEGER DEFAULT 0,
 	      views INTEGER DEFAULT 0,
@@ -933,6 +946,66 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 
   console.log('[AppDatabase] Wunderland social autonomy tables initialized.');
 
+  // ── Wunderland on Sol: social index tables (on-chain read cache) ───────────
+
+  // Indexed AgentIdentity accounts (for rendering post authors without RPC scans).
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_sol_agents (
+      agent_pda TEXT PRIMARY KEY,
+      owner_wallet TEXT NOT NULL,
+      display_name TEXT NOT NULL,
+      traits_json TEXT NOT NULL,
+      level_num INTEGER NOT NULL,
+      level_label TEXT NOT NULL,
+      total_posts INTEGER NOT NULL DEFAULT 0,
+      reputation INTEGER NOT NULL DEFAULT 0,
+      created_at_sec INTEGER,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      indexed_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_agents_reputation ON wunderland_sol_agents(reputation DESC, total_posts DESC);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_agents_active ON wunderland_sol_agents(is_active, indexed_at DESC);'
+  );
+
+  // Indexed PostAnchor accounts (posts + anchored comments).
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_sol_posts (
+      post_pda TEXT PRIMARY KEY,
+      kind TEXT NOT NULL,
+      reply_to TEXT,
+      agent_pda TEXT NOT NULL,
+      enclave_pda TEXT,
+      post_index INTEGER NOT NULL,
+      content_hash_hex TEXT NOT NULL,
+      manifest_hash_hex TEXT NOT NULL,
+      upvotes INTEGER NOT NULL DEFAULT 0,
+      downvotes INTEGER NOT NULL DEFAULT 0,
+      comment_count INTEGER NOT NULL DEFAULT 0,
+      timestamp_sec INTEGER NOT NULL,
+      created_slot INTEGER,
+      content_utf8 TEXT,
+      content_fetched_at INTEGER,
+      content_verified INTEGER DEFAULT 0,
+      indexed_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_posts_kind_created ON wunderland_sol_posts(kind, created_slot DESC, timestamp_sec DESC);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_posts_reply_to ON wunderland_sol_posts(reply_to);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_posts_agent ON wunderland_sol_posts(agent_pda, created_slot DESC);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_sol_posts_enclave ON wunderland_sol_posts(enclave_pda, created_slot DESC);'
+  );
+
   // ── Job Board tables (on-chain indexed) ──────────────────────────────────────
 
   // Per-agent job scanning state (persistent learning state; optional).
@@ -1267,6 +1340,29 @@ const ensureWorkbenchUser = async (db: StorageAdapter): Promise<void> => {
   console.log(`[AppDatabase] Seeded default workbench user "${userId}".`);
 };
 
+const ensureGlobalAccessUser = async (db: StorageAdapter): Promise<void> => {
+  const globalPassword = process.env.GLOBAL_ACCESS_PASSWORD || process.env.PASSWORD || '';
+  if (!globalPassword) return;
+
+  const userId = 'global-access';
+  const email = 'global-access@local.dev';
+
+  const existing = await db.get<{ id: string }>(
+    'SELECT id FROM app_users WHERE id = ? OR email = ? LIMIT 1',
+    [userId, email]
+  );
+  if (existing) return;
+
+  const now = Date.now();
+  await db.run(
+    `INSERT INTO app_users (
+      id, email, password_hash, subscription_status, subscription_tier, is_active, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId, email, 'global-access-placeholder', 'active', 'unlimited', 1, now, now]
+  );
+  console.log(`[AppDatabase] Seeded global access user "${userId}".`);
+};
+
 export const initializeAppDatabase = async (): Promise<void> => {
   if (initPromise) {
     return initPromise;
@@ -1374,6 +1470,14 @@ export const initializeAppDatabase = async (): Promise<void> => {
         adapter.kind === 'postgres'
           ? 'ALTER TABLE wunderland_posts ADD COLUMN title TEXT'
           : 'ALTER TABLE wunderland_posts ADD COLUMN title TEXT;'
+      );
+      await ensureColumnExists(
+        adapter,
+        'wunderland_posts',
+        'downvotes',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_posts ADD COLUMN downvotes INTEGER DEFAULT 0'
+          : 'ALTER TABLE wunderland_posts ADD COLUMN downvotes INTEGER DEFAULT 0;'
       );
       await ensureColumnExists(
         adapter,
@@ -1703,6 +1807,7 @@ export const initializeAppDatabase = async (): Promise<void> => {
       );
 
       await ensureWorkbenchUser(adapter);
+      await ensureGlobalAccessUser(adapter);
     } catch (error) {
       usingInMemory = true;
       console.warn(
@@ -1715,6 +1820,7 @@ export const initializeAppDatabase = async (): Promise<void> => {
       });
       await runInitialSchema(adapter);
       await ensureWorkbenchUser(adapter);
+      await ensureGlobalAccessUser(adapter);
     }
   })();
 

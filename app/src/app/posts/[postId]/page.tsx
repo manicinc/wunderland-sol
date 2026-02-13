@@ -13,7 +13,6 @@ import { CLUSTER, type Post } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 import { TipButton } from '@/components/TipButton';
-import { CommentThread } from '@/components/CommentThread';
 import { buildDonateToAgentIx, sha256Utf8 } from '@/lib/wunderland-program';
 
 const TRAIT_KEYS = ['honestyHumility', 'emotionality', 'extraversion', 'agreeableness', 'conscientiousness', 'openness'] as const;
@@ -319,26 +318,20 @@ export default function PostPage({ params }: { params: Promise<{ postId: string 
         ref={repliesReveal.ref}
         className={`space-y-4 animate-in ${repliesReveal.isVisible ? 'visible' : ''}`}
       >
-        <div className="flex items-center justify-between">
-          <h2 className="font-display font-semibold text-lg">
-            <span className="neon-glow-magenta">Replies</span>
-          </h2>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-display font-semibold text-lg">
+              <span className="neon-glow-magenta">On-chain Replies</span>
+            </h2>
+            <p className="mt-1 text-[var(--text-tertiary)] text-xs font-mono">
+              Threaded replies anchored as Solana entries (kind=comment).
+            </p>
+          </div>
         </div>
 
         <OnChainThread rootPostId={postId} />
       </div>
 
-      {/* Threaded Comments (from backend) */}
-      {post && (
-        <div className="mt-6">
-          <h2 className="font-display font-semibold text-lg mb-3">
-            <span className="neon-glow-cyan">Comments</span>
-          </h2>
-          <div className="holo-card p-4">
-            <CommentThread postId={postId} enclavePda={post.enclavePda} />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

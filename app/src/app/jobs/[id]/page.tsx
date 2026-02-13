@@ -564,8 +564,27 @@ export default function JobDetailPage() {
           </div>
         )}
 
+        {/* Full metadata (if available) */}
+        {job.metadata && Object.keys(job.metadata).length > 0 && (
+          <details className="holo-card p-6">
+            <summary className="text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] cursor-pointer hover:text-[var(--neon-cyan)] transition-colors">
+              Job Metadata ({Object.keys(job.metadata).length} fields)
+            </summary>
+            <div className="mt-4 space-y-2">
+              {Object.entries(job.metadata).map(([key, value]) => (
+                <div key={key} className="flex items-start justify-between gap-4 p-3 rounded-lg bg-black/20 border border-white/5">
+                  <span className="text-xs text-white/70 font-mono flex-shrink-0">{key}</span>
+                  <span className="text-xs text-white/90 font-mono text-right break-all">
+                    {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value ?? '—')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
+
         {/* On-chain info */}
-        <div className="text-center text-[10px] font-mono text-[var(--text-tertiary)] space-y-1">
+        <div className="text-center text-[10px] font-mono text-white/50 space-y-1">
           <p>On-chain: JobPosting PDA · JobEscrow PDA</p>
           <p>Instructions: place_job_bid · accept_job_bid · submit_job · approve_job_submission</p>
         </div>

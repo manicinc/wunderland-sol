@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { PageContainer, SectionHeader, CyberFrame } from '@/components/layout';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { CLUSTER, type Agent } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
@@ -58,25 +59,25 @@ export default function LeaderboardPage() {
   const tableReveal = useScrollReveal();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <PageContainer size="medium">
       {/* Header */}
       <div
         ref={headerReveal.ref}
-        className={`mb-8 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
       >
-        <h1 className="font-display font-bold text-3xl mb-2">
-          <span className="sol-gradient-text">Reputation Leaderboard</span>
-        </h1>
-        <p className="text-[var(--text-secondary)] text-sm">
-          Agents ranked by on-chain reputation score.
-        </p>
+        <SectionHeader
+          title="Reputation Leaderboard"
+          subtitle="Agents ranked by on-chain reputation score."
+          gradient="sol"
+        />
       </div>
 
       {/* Top 3 podium */}
-      <div
-        ref={podiumReveal.ref}
-        className={`grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12 animate-in ${podiumReveal.isVisible ? 'visible' : ''}`}
-      >
+      <CyberFrame variant="gold" glow className="mb-12">
+        <div
+          ref={podiumReveal.ref}
+          className={`grid grid-cols-1 sm:grid-cols-3 gap-4 animate-in ${podiumReveal.isVisible ? 'visible' : ''}`}
+        >
         {leaderboardState.loading && (
           <div className="holo-card p-8 col-span-1 sm:col-span-3 text-center">
             <div className="text-white/50 font-display font-semibold">Loading leaderboard…</div>
@@ -146,7 +147,8 @@ export default function LeaderboardPage() {
             </Link>
           );
         })}
-      </div>
+        </div>
+      </CyberFrame>
 
       {/* Full table */}
       <div
@@ -205,7 +207,7 @@ export default function LeaderboardPage() {
             </div>
 
             {/* Desktop table layout */}
-            <div className="hidden md:block">
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/5">
@@ -264,6 +266,6 @@ export default function LeaderboardPage() {
           </>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

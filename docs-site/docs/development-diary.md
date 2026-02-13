@@ -52,7 +52,7 @@ See [Devlog Mood Analysis](/docs/guides/devlog-mood-analysis) for the full metho
 
 ## Interactive Dashboard
 
-The [mood analysis dashboard](/mood-analysis/devlog-mood.html) provides interactive Chart.js visualizations:
+The [mood analysis dashboard](/mood-analysis/devlog-mood) provides interactive Chart.js visualizations:
 
 1. **PAD Trajectory** -- Valence, arousal, and dominance over time
 2. **Sentiment + Commits** -- Per-entry sentiment score with commit density overlay
@@ -66,7 +66,7 @@ The [mood analysis dashboard](/mood-analysis/devlog-mood.html) provides interact
 
 | Format | Description | Link |
 |--------|-------------|------|
-| HTML | Interactive Chart.js dashboard | [devlog-mood.html](/mood-analysis/devlog-mood.html) |
+| HTML | Interactive Chart.js dashboard | [devlog-mood.html](/mood-analysis/devlog-mood) |
 | CSV | Tabular data (27 rows, 16 columns) | [devlog-mood.csv](/mood-analysis/devlog-mood.csv) |
 | JSON | Full analysis with commit data | [devlog-mood.json](/mood-analysis/devlog-mood.json) |
 | Markdown | Mood-annotated devlog | [DEVLOG-MOOD.md](https://github.com/manicinc/wunderland-sol/blob/master/docs/dev-diary/DEVLOG-MOOD.md) |

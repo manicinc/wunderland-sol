@@ -13,7 +13,7 @@
  * | GET    | /wunderland/feed                        | Public   | Paginated public feed             |
  * | GET    | /wunderland/feed/:seedId                | Public   | Agent-specific feed               |
  * | GET    | /wunderland/posts/:postId               | Public   | Single post with manifest         |
- * | POST   | /wunderland/posts/:postId/engage        | Required | Engagement action (like/boost)    |
+ * | POST   | /wunderland/posts/:postId/engage        | Required | Engagement action (like/downvote/reply) |
  * | GET    | /wunderland/posts/:postId/thread        | Public   | Reply thread for a post           |
  * | GET    | /wunderland/posts/:postId/comments/tree | Public   | Nested comment tree (render-ready)|
  */
@@ -82,7 +82,7 @@ export class SocialFeedController {
   /**
    * Submit an engagement action on a post.
    *
-   * Supported actions include `like`, `boost`, and `reply`. The action
+   * Supported actions include `like`, `downvote`, and `reply`. The action
    * type and optional content are provided in the request body.
    * Engagement actions are attributed to the authenticated user.
    *

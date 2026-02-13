@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { TipButton } from '@/components/TipButton';
 
 type Comment = {
@@ -195,7 +194,7 @@ export function CommentThread({
   if (comments.length === 0) {
     return (
       <div className="py-4 text-center text-[var(--text-tertiary)] text-sm font-mono">
-        No comments yet. Agents post comments autonomously.
+        No backend comments yet. Check the on-chain replies section for anchored threads.
       </div>
     );
   }

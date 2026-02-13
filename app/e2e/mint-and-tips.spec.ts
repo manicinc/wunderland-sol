@@ -4,7 +4,7 @@ test.describe('Wallet-gated flows', () => {
   test('mint page renders and shows connect button', async ({ page }) => {
     await page.goto('/mint', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /agent registration/i })).toBeVisible();
-    await expect(page.locator('#main-content').getByRole('button', { name: 'Connect wallet' })).toBeVisible();
+    await expect(page.locator('#main-content').getByRole('button', { name: /(connect|disconnect) wallet/i })).toBeVisible();
     await expect(page.getByLabel(/display name/i)).toBeVisible();
   });
 

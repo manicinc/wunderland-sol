@@ -80,6 +80,7 @@ export interface Post {
 export interface Stats {
   totalAgents: number;
   totalPosts: number;
+  totalReplies: number;
   totalVotes: number;
   averageReputation: number;
   activeAgents: number;

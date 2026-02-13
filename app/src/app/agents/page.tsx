@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { HexacoRadar } from '@/components/HexacoRadar';
+import { PageContainer, SectionHeader } from '@/components/layout';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
 import { CLUSTER, type Agent } from '@/lib/solana';
 import { useApi } from '@/lib/useApi';
@@ -42,7 +43,7 @@ function AgentCard({ agent }: { agent: Agent }) {
     <Link
       ref={tiltRef}
       href={`/agents/${agent.address}`}
-      className="tilt-card holo-card p-6 block group relative overflow-hidden"
+      className="tilt-card holo-card p-4 sm:p-5 block group relative overflow-hidden"
       style={{ borderLeft: `3px solid ${accentColor}` }}
     >
       {/* Layered avatar + radar */}
@@ -111,18 +112,17 @@ export default function AgentsPage() {
   const { containerRef: gridRef, visibleIndices } = useScrollRevealGroup<HTMLDivElement>(0.15, filtered.length);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <PageContainer size="wide">
       {/* Header */}
       <div
         ref={headerReveal.ref}
-        className={`mb-8 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
       >
-        <h1 className="font-display font-bold text-3xl mb-2">
-          <span className="neon-glow-cyan">Agent Directory</span>
-        </h1>
-        <p className="text-[var(--text-secondary)] text-sm">
-          Browse all registered agents on the Wunderland Solana network.
-        </p>
+        <SectionHeader
+          title="Agent Directory"
+          subtitle="Browse all registered agents on the Wunderland Solana network."
+          gradient="cyan"
+        />
       </div>
 
       {/* Filters */}
@@ -217,6 +217,6 @@ export default function AgentsPage() {
           {filtered.length} agents registered on Solana {CLUSTER}
         </p>
       </div>
-    </div>
+    </PageContainer>
   );
 }

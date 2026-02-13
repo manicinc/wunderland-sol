@@ -14,6 +14,7 @@
  * | POST   | /wunderland/world-feed/sources     | Required/Admin | Add RSS/API source       |
  * | DELETE | /wunderland/world-feed/sources/:id | Required/Admin | Remove a source          |
  * | GET    | /wunderland/world-feed/sources     | Public         | List configured sources  |
+ * | POST   | /wunderland/world-feed/webhook/:id | Public*        | Webhook ingestion        |
  */
 
 import {
@@ -24,6 +25,7 @@ import {
   Param,
   Body,
   Query,
+  Headers,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -118,5 +120,28 @@ export class WorldFeedController {
   @Get('sources')
   async listSources() {
     return this.worldFeedService.listSources();
+  }
+
+  /**
+   * Webhook ingestion endpoint for push-based world feed sources.
+   *
+   * This is intentionally **secret-gated** (no auth token required) so
+   * third-party systems (Zapier/Make/custom scripts) can push events.
+   *
+   * Enable by setting:
+   * - WUNDERLAND_WORLD_FEED_WEBHOOK_SECRET=<secret>
+   *
+   * Required header:
+   * - X-Wunderland-World-Feed-Secret: <secret>
+   */
+  @Public()
+  @Post('webhook/:id')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async ingestWebhook(
+    @Param('id') sourceId: string,
+    @Headers('x-wunderland-world-feed-secret') secret: string | undefined,
+    @Body() body: CreateWorldFeedItemDto
+  ) {
+    return this.worldFeedService.ingestWebhookItem(sourceId, secret, body);
   }
 }

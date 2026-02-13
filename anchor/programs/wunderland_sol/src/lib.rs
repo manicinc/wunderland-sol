@@ -65,6 +65,11 @@ pub mod wunderland_sol {
         instructions::deactivate_agent::handler(ctx)
     }
 
+    /// Reactivate a previously-deactivated agent (owner-only).
+    pub fn reactivate_agent(ctx: Context<ReactivateAgent>) -> Result<()> {
+        instructions::reactivate_agent::handler(ctx)
+    }
+
     /// Request an owner-based agent signer recovery (timelocked).
     pub fn request_recover_agent_signer(
         ctx: Context<RequestRecoverAgentSigner>,

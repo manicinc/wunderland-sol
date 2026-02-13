@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import Link from 'next/link';
 import { Transaction, PublicKey } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { WalletButton } from '@/components/WalletButton';
+import { PageContainer, SectionHeader, CyberFrame } from '@/components/layout';
 import { CLUSTER } from '@/lib/solana';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 
@@ -141,30 +141,19 @@ export default function RewardsPage() {
   }, [claimProof, connected, publicKey, selectedEpoch, agentPda, connection, sendTransaction]);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      {/* Header */}
+    <PageContainer size="narrow">
       <div
         ref={headerReveal.ref}
-        className={`mb-8 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
+        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
       >
-        <Link
-          href="/"
-          className="text-white/30 text-xs font-mono hover:text-white/50 transition-colors mb-4 inline-block"
-        >
-          &larr; Home
-        </Link>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="font-display font-bold text-3xl mb-2">
-              <span className="neon-glow-green">Rewards</span>
-            </h1>
-            <p className="text-[var(--text-secondary)] text-sm">
-              Epoch-based Merkle reward distribution. Rewards can be funded by either enclave
-              treasuries (enclave signals) or the global treasury (global signals).
-            </p>
-          </div>
-          <WalletButton />
-        </div>
+        <SectionHeader
+          title="Rewards"
+          subtitle="Epoch-based Merkle reward distribution. Funded by enclave or global treasuries."
+          gradient="gold"
+          backHref="/"
+          backLabel="Home"
+          actions={<WalletButton />}
+        />
       </div>
 
       {/* Epoch Browser */}
@@ -376,6 +365,6 @@ export default function RewardsPage() {
           )}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

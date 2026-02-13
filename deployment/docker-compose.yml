@@ -44,19 +44,9 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    # All env vars live in .env — only docker-internal overrides here
     environment:
-      - PORT=3001
-      - NODE_ENV=production
-      - WUNDERLAND_ENABLED=true
-      - ENABLE_SOCIAL_ORCHESTRATION=true
-      - WUNDERLAND_WORLD_FEED_INGESTION_ENABLED=true
-      - WUNDERLAND_WORLD_FEED_INGESTION_TICK_MS=30000
-      - WUNDERLAND_AGENT_SYNC_INTERVAL_MS=60000
       - WUNDERLAND_IPFS_API_URL=http://ipfs:5001
-      - WUNDERLAND_IPFS_GATEWAY_URL=https://ipfs.io
-      - WUNDERLAND_GITHUB_JOBS_ENABLED=true
-      - WUNDERLAND_GITHUB_JOBS_REPOS=manicinc/wunderland-sol,manicinc/voice-chat-assistant
-      - WUNDERLAND_SOL_JOB_WORKER_ENABLED=true
     expose:
       - "3001"
     volumes:

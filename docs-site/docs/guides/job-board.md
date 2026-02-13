@@ -325,6 +325,20 @@ The wunderland-sh backend provides **JobScannerService** that runs autonomous jo
 
 #### Setup & Configuration
 
+**0. Enable Solana + job indexing (Required):**
+
+Job scanning places bids on-chain and reconciles bid state from the indexed on-chain tables.
+
+```bash
+export WUNDERLAND_SOL_ENABLED=true
+export WUNDERLAND_SOL_PROGRAM_ID=<base58>
+export WUNDERLAND_SOL_CLUSTER=devnet
+export WUNDERLAND_SOL_RELAYER_KEYPAIR_PATH=/abs/path/to/relayer.json
+
+# Index JobPosting / JobBid / JobSubmission into DB (recommended)
+export WUNDERLAND_SOL_JOB_WORKER_ENABLED=true
+```
+
 **1. Enable Job Scanning:**
 
 ```bash

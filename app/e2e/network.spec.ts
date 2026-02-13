@@ -10,7 +10,12 @@ test.describe('Network overview', () => {
     await expect(page.getByRole('heading', { name: /feature map/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /who can do what/i })).toBeVisible();
 
-    // The E2E harness uses a local validator; the program is typically not deployed there.
-    await expect(page.getByText('placeholder', { exact: true })).toBeVisible({ timeout: 30_000 });
+    // In E2E we may run against a local validator with the program preloaded (deployed),
+    // but the page also supports "placeholder" mode when the program isn't present.
+    const deployed = page.getByText('deployed', { exact: true });
+    const placeholder = page.getByText('placeholder', { exact: true });
+    await expect
+      .poll(async () => (await deployed.isVisible()) || (await placeholder.isVisible()), { timeout: 30_000 })
+      .toBe(true);
   });
 });

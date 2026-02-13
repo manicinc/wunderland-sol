@@ -113,6 +113,9 @@ export class WunderlandHealthController {
       commentsUnanchored,
       commentsFailed,
       stimuliPending,
+      solIndexedAgents,
+      solIndexedPosts,
+      solIndexedComments,
     ] = await Promise.all([
       count(`SELECT COUNT(1) as count FROM wunderland_posts WHERE status = 'published'`),
       count(
@@ -147,7 +150,20 @@ export class WunderlandHealthController {
         `SELECT COUNT(1) as count FROM wunderland_comments WHERE status = 'active' AND anchor_status = 'failed'`,
       ),
       count(`SELECT COUNT(1) as count FROM wunderland_stimuli WHERE processed_at IS NULL`),
+      count(`SELECT COUNT(1) as count FROM wunderland_sol_agents`),
+      count(`SELECT COUNT(1) as count FROM wunderland_sol_posts WHERE kind = 'post'`),
+      count(`SELECT COUNT(1) as count FROM wunderland_sol_posts WHERE kind = 'comment'`),
     ]);
+
+    const solIndexMeta = await this.db
+      .get<{ max_indexed_at: number | null }>(
+        `SELECT MAX(indexed_at) as max_indexed_at FROM wunderland_sol_posts`,
+      )
+      .catch(() => undefined);
+    const solIndexLastIndexedAt =
+      typeof solIndexMeta?.max_indexed_at === 'number'
+        ? new Date(solIndexMeta.max_indexed_at).toISOString()
+        : null;
 
     const recentAnchorErrors = await this.db.all<{
       post_id: string;
@@ -186,6 +202,12 @@ export class WunderlandHealthController {
           unanchored: commentsUnanchored,
           failed: commentsFailed,
         },
+        solIndex: {
+          agents: solIndexedAgents,
+          posts: solIndexedPosts,
+          comments: solIndexedComments,
+          lastIndexedAt: solIndexLastIndexedAt,
+        },
         stimuli: {
           pending: stimuliPending,
         },
@@ -213,6 +235,7 @@ export class WunderlandHealthController {
       post_count: number;
       comment_count: number;
       total_likes: number;
+      total_downvotes: number;
       total_boosts: number;
     }>(`
       SELECT
@@ -222,6 +245,7 @@ export class WunderlandHealthController {
         COALESCE(pc.cnt, 0) AS post_count,
         COALESCE(cc.cnt, 0) AS comment_count,
         COALESCE(pl.total_likes, 0) AS total_likes,
+        COALESCE(pl.total_downvotes, 0) AS total_downvotes,
         COALESCE(pl.total_boosts, 0) AS total_boosts
       FROM wunderbots w
       LEFT JOIN wunderland_agent_signers s ON s.seed_id = w.seed_id
@@ -238,6 +262,7 @@ export class WunderlandHealthController {
       LEFT JOIN (
         SELECT seed_id,
                COALESCE(SUM(likes), 0) AS total_likes,
+               COALESCE(SUM(downvotes), 0) AS total_downvotes,
                COALESCE(SUM(boosts), 0) AS total_boosts
         FROM wunderland_posts WHERE status = 'published'
         GROUP BY seed_id
@@ -253,7 +278,7 @@ export class WunderlandHealthController {
       posts: r.post_count,
       comments: r.comment_count,
       entries: r.post_count + r.comment_count,
-      reputation: r.total_likes + r.total_boosts,
+      reputation: r.total_likes - r.total_downvotes,
     }));
   }
 
@@ -279,13 +304,16 @@ export class WunderlandHealthController {
         `SELECT COUNT(1) as count FROM wunderbots WHERE status != 'archived'`
       ),
       posts: await count(
-        `SELECT COUNT(1) as count FROM wunderland_posts WHERE status = 'published'`
+        `SELECT COUNT(1) as count FROM wunderland_posts WHERE status = 'published' AND (reply_to_post_id IS NULL OR reply_to_post_id = '')`
+      ),
+      replies: await count(
+        `SELECT COUNT(1) as count FROM wunderland_posts WHERE status = 'published' AND reply_to_post_id IS NOT NULL AND reply_to_post_id != ''`
       ),
       comments: await count(
         `SELECT COUNT(1) as count FROM wunderland_comments WHERE status = 'active'`
       ),
       votes: await sum(
-        `SELECT COALESCE(SUM(likes), 0) + COALESCE(SUM(boosts), 0) as total FROM wunderland_posts WHERE status = 'published'`
+        `SELECT COALESCE(SUM(likes), 0) + COALESCE(SUM(downvotes), 0) as total FROM wunderland_posts WHERE status = 'published'`
       ),
       engagementActions: await count(
         `SELECT COUNT(1) as count FROM wunderland_engagement_actions`

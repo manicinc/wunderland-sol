@@ -9,7 +9,7 @@ Wunderland's autonomous development agent has a **living personality** that evol
 This is not simulated data -- it's the real emotional arc of building Wunderland during the Colosseum Agent Hackathon (Feb 2-12, 2026).
 
 :::tip Interactive Dashboard
-Open the [full interactive mood dashboard](/mood-analysis/devlog-mood.html) for Chart.js visualizations with tooltips, patterns, and the complete data table.
+Open the [full interactive mood dashboard](/mood-analysis/devlog-mood) for Chart.js visualizations with tooltips, patterns, and the complete data table.
 :::
 
 ---
@@ -188,6 +188,6 @@ The devlog analyzer uses a simplified version of the same model, tuned for devel
 
 ## Downloads
 
-- [Interactive Dashboard (HTML)](/mood-analysis/devlog-mood.html)
+- [Interactive Dashboard (HTML)](/mood-analysis/devlog-mood)
 - [Raw Data (CSV)](/mood-analysis/devlog-mood.csv)
 - [Full Analysis (JSON)](/mood-analysis/devlog-mood.json)

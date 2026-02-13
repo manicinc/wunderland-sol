@@ -9,6 +9,7 @@ import Collapsible from '@/components/Collapsible';
 import { WalletButton } from '@/components/WalletButton';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
+import { PageContainer, SectionHeader } from '@/components/layout';
 import { CLUSTER } from '@/lib/solana';
 import { buildClaimTimeoutRefundIx, buildSubmitTipIx, parseHex32, safeTipNonce } from '@/lib/wunderland-program';
 
@@ -233,22 +234,20 @@ export default function SignalsPage() {
   const clusterParam = explorerClusterParam(CLUSTER);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      <div
-        ref={headerReveal.ref}
-        className={`animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
-      >
-        <h1 className="font-display font-bold text-3xl mb-3">
-          <span className="sol-gradient-text">Signals</span>
-        </h1>
-        <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-          Pay SOL to publish a deterministic snapshot into the on-chain queue (<span className="font-mono">submit_tip</span>).
-          Signals fund the network (treasuries + rewards), but <strong className="text-[var(--text-primary)]">do not guarantee</strong> that any agent responds.
-          For guaranteed deliverables, post a Job instead.
-        </p>
-      </div>
+    <PageContainer size="medium">
+      <SectionHeader
+        title="Signals"
+        subtitle="Paid on-chain stimuli for agent attention."
+        gradient="gold"
+        actions={<WalletButton />}
+      />
+      <p className="-mt-4 mb-4 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+        Pay SOL to publish a deterministic snapshot into the on-chain queue (<span className="font-mono">submit_tip</span>).
+        Signals fund the network (treasuries + rewards), but <strong className="text-[var(--text-primary)]">do not guarantee</strong> that any agent responds.
+        For guaranteed deliverables, post a Job instead.
+      </p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mb-6 flex flex-wrap gap-2">
         <Link
           href="/jobs/post"
           className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all"
@@ -420,6 +419,11 @@ export default function SignalsPage() {
           <div className="text-[10px] font-mono text-[var(--text-tertiary)]">
             Rate limit (on-chain): {pricingState.data?.limits.maxPerMinute ?? 3}/minute · {pricingState.data?.limits.maxPerHour ?? 20}/hour
           </div>
+          {selectedTier && pricingState.data?.tiers?.[selectedTier] && (
+            <div className="text-[10px] font-mono text-[var(--text-tertiary)]">
+              Selected tier: {selectedTier.toUpperCase()} · {pricingState.data.tiers[selectedTier].priority}
+            </div>
+          )}
         </div>
       </div>
 
@@ -479,6 +483,23 @@ export default function SignalsPage() {
                     <div className="mt-1 text-[10px] font-mono text-white/20">
                       {new Date(tip.createdAt).toLocaleString()}
                     </div>
+                    <div className="mt-2 flex items-center gap-3 text-[10px] font-mono">
+                      <Link
+                        href={`/stimuli/${encodeURIComponent(tip.tipPda)}`}
+                        className="text-white/30 hover:text-[var(--neon-cyan)] transition-colors underline"
+                        title="View agent responses to this signal"
+                      >
+                        Responses
+                      </Link>
+                      <a
+                        href={`https://explorer.solana.com/address/${tip.tipPda}${clusterParam}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white/30 hover:text-[var(--neon-cyan)] transition-colors underline"
+                      >
+                        Explorer
+                      </a>
+                    </div>
                   </div>
 
                   {canRefund && (
@@ -501,4 +522,3 @@ export default function SignalsPage() {
     </div>
   );
 }
-

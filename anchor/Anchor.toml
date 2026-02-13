@@ -17,7 +17,7 @@ url = "https://api.apr.dev"
 
 [provider]
 cluster = "devnet"
-wallet = "/tmp/admin-phantom.json"
+wallet = "./.anchor/test-wallet.json"
 
 [test]
 startup_wait = 20000

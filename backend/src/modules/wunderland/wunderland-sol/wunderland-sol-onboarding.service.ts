@@ -186,7 +186,10 @@ export type OnboardManagedAgentParams = {
 export class WunderlandSolOnboardingService {
   constructor(private readonly db: DatabaseService) {}
 
-  async onboardManagedAgent(params: OnboardManagedAgentParams): Promise<{
+  async onboardManagedAgent(
+    params: OnboardManagedAgentParams,
+    context?: { ownerUserId?: string }
+  ): Promise<{
     ok: boolean;
     seedId?: string;
     agentIdentityPda?: string;
@@ -267,39 +270,64 @@ export class WunderlandSolOnboardingService {
 
     const encryptedSignerSecret = encryptSecret(JSON.stringify(secretKey)) ?? JSON.stringify(secretKey);
 
-    await this.db.transaction(async (trx) => {
-      // 1) Ensure wallet-backed user exists (FK requirement).
-      const email = walletEmail(ownerWallet);
-      let user = await trx.get<{ id: string }>('SELECT id FROM app_users WHERE email = ? LIMIT 1', [email]);
-      if (!user) {
-        const userId = this.db.generateId();
-        await trx.run(
-          `
-            INSERT INTO app_users (
-              id,
-              email,
-              password_hash,
-              subscription_status,
-              subscription_tier,
-              is_active,
-              created_at,
-              updated_at,
-              metadata
-            ) VALUES (?, ?, ?, 'none', 'metered', 1, ?, ?, ?)
-          `,
-          [
-            userId,
-            email,
-            randomPasswordHash(),
-            now,
-            now,
-            JSON.stringify({ mode: 'wallet', wallet: ownerWallet }),
-          ],
-        );
-        user = { id: userId };
-      }
+    const ownerUserIdFromAuth =
+      typeof context?.ownerUserId === 'string' ? context.ownerUserId.trim() : '';
+    const authenticatedOwnerUserId = ownerUserIdFromAuth || null;
 
-      const userId = user.id;
+    if (authenticatedOwnerUserId) {
+      const existingUser = await this.db.get<{ id: string }>(
+        'SELECT id FROM app_users WHERE id = ? LIMIT 1',
+        [authenticatedOwnerUserId],
+      );
+      if (!existingUser) {
+        return { ok: false, error: 'Authenticated user not found in backend database.' };
+      }
+    }
+
+    await this.db.transaction(async (trx) => {
+      // 1) Determine backend owner user id.
+      // - If a valid session is present, attach the agent to that user (so the owner can manage
+      //   credentials/runtime via authenticated endpoints).
+      // - Otherwise, fall back to a wallet-backed pseudo-user (public onboarding mode).
+      let userId: string;
+      if (authenticatedOwnerUserId) {
+        userId = authenticatedOwnerUserId;
+      } else {
+        const email = walletEmail(ownerWallet);
+        let user = await trx.get<{ id: string }>(
+          'SELECT id FROM app_users WHERE email = ? LIMIT 1',
+          [email],
+        );
+        if (!user) {
+          const walletUserId = this.db.generateId();
+          await trx.run(
+            `
+              INSERT INTO app_users (
+                id,
+                email,
+                password_hash,
+                subscription_status,
+                subscription_tier,
+                is_active,
+                created_at,
+                updated_at,
+                metadata
+              ) VALUES (?, ?, ?, 'none', 'metered', 1, ?, ?, ?)
+            `,
+            [
+              walletUserId,
+              email,
+              randomPasswordHash(),
+              now,
+              now,
+              JSON.stringify({ mode: 'wallet', wallet: ownerWallet }),
+            ],
+          );
+          user = { id: walletUserId };
+        }
+
+        userId = user.id;
+      }
 
       // 2) Upsert the agent registry row (wunderbots).
       const existing = await trx.get<{ seed_id: string; owner_user_id: string }>(
@@ -463,4 +491,3 @@ export class WunderlandSolOnboardingService {
     };
   }
 }
-

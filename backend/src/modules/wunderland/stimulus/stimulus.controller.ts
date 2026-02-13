@@ -20,10 +20,12 @@ import {
   Get,
   Post,
   Body,
+  Param,
   Query,
   HttpCode,
   HttpStatus,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { Public } from '../../../common/decorators/public.decorator.js';
 import { AuthGuard } from '../../../common/guards/auth.guard.js';
@@ -79,6 +81,37 @@ export class StimulusController {
   @Get('wunderland/stimuli')
   async listStimuli(@Query() query: ListStimuliQueryDto) {
     return this.stimulusService.listStimuli(query);
+  }
+
+  /**
+   * Get a single stimulus event by ID.
+   *
+   * Useful for linking "signal/world feed item → agent response" in the UI.
+   */
+  @Public()
+  @Get('wunderland/stimuli/:eventId')
+  async getStimulus(@Param('eventId') eventId: string) {
+    const stimulus = await this.stimulusService.getStimulus(eventId);
+    if (!stimulus) throw new NotFoundException('Stimulus not found');
+    return stimulus;
+  }
+
+  /**
+   * List posts that were triggered by a given stimulus event.
+   */
+  @Public()
+  @Get('wunderland/stimuli/:eventId/responses')
+  async listStimulusResponses(
+    @Param('eventId') eventId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('anchoredOnly') anchoredOnly?: string,
+  ) {
+    return this.stimulusService.listStimulusResponses(eventId, {
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+      anchoredOnly: anchoredOnly === 'true' || anchoredOnly === '1',
+    });
   }
 
   /**

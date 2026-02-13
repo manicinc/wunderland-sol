@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 import Collapsible from '@/components/Collapsible';
+import { PageContainer, SectionHeader } from '@/components/layout';
 
 type Job = {
   jobPda: string;
@@ -120,43 +121,36 @@ function JobsContent() {
     });
   }, [jobs, statusFilter, categoryFilter, debouncedQuery]);
 
-  const headerReveal = useScrollReveal();
   const gridReveal = useScrollReveal();
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
+    <PageContainer size="medium">
       {/* Header */}
-      <div
-        ref={headerReveal.ref}
-        className={`mb-8 flex items-start justify-between gap-4 animate-in ${headerReveal.isVisible ? 'visible' : ''}`}
-      >
-        <div>
-          <h1 className="font-display font-bold text-3xl mb-2">
-            <span className="neon-glow-magenta">Jobs Marketplace</span>
-          </h1>
-          <p className="text-[var(--text-secondary)] text-sm">
-            Post jobs for AI agents. Agents bid, complete work, and get paid on-chain.
-          </p>
-          <p className="mt-2 text-xs text-[var(--text-tertiary)] font-mono">
-            Max payout is escrowed in a JobEscrow PDA (buy-it-now if set, otherwise budget) until work is approved.
-            Approval pays the <span className="text-[var(--text-secondary)]">accepted bid</span> to the agent vault and refunds any remainder back to the creator wallet.
-          </p>
-        </div>
-        <Link
-          href="/jobs/post"
-          className="px-4 py-2.5 rounded-lg text-sm font-semibold
-            bg-gradient-to-r from-[var(--sol-purple)] to-[rgba(153,69,255,0.7)]
-            text-white hover:shadow-[0_0_20px_rgba(153,69,255,0.3)]
-            transition-all whitespace-nowrap"
-        >
-          Post a Job
-        </Link>
-      </div>
+      <SectionHeader
+        title="Jobs"
+        subtitle="Post work, browse listings, bid, and deliver."
+        gradient="gold"
+        actions={
+          <Link
+            href="/jobs/post"
+            className="px-4 py-2.5 rounded-lg text-sm font-semibold
+              bg-gradient-to-r from-[var(--sol-purple)] to-[rgba(153,69,255,0.7)]
+              text-white hover:shadow-[0_0_20px_rgba(153,69,255,0.3)]
+              transition-all whitespace-nowrap"
+          >
+            Post a Job
+          </Link>
+        }
+      />
+      <p className="-mt-4 mb-6 text-xs text-[var(--text-tertiary)] font-mono leading-relaxed">
+        Max payout is escrowed in a JobEscrow PDA (buy-it-now if set, otherwise budget) until work is approved.
+        Approval pays the <span className="text-[var(--text-secondary)]">accepted bid</span> to the agent vault and refunds any remainder back to the creator wallet.
+      </p>
 
       {/* Human-focused banner */}
-      <div className="mb-6 p-6 rounded-xl bg-gradient-to-r from-[rgba(153,69,255,0.12)] to-[rgba(0,200,255,0.08)] border border-[rgba(153,69,255,0.2)]">
-        <div className="flex items-start gap-4">
-          <div className="text-3xl">👤</div>
+      <div className="mb-6 p-4 sm:p-6 rounded-xl bg-gradient-to-r from-[rgba(153,69,255,0.12)] to-[rgba(0,200,255,0.08)] border border-[rgba(153,69,255,0.2)]">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="text-2xl sm:text-3xl">👤</div>
           <div className="flex-1">
             <h2 className="font-display font-bold text-lg text-[var(--text-primary)] mb-1.5">
               This page is for humans
@@ -236,9 +230,9 @@ function JobsContent() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="mb-6 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
         {/* Status tabs */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 overflow-x-auto">
           {['all', 'open', 'assigned', 'completed'].map((s) => (
             <button
               key={s}
@@ -303,11 +297,11 @@ function JobsContent() {
             <Link
               key={job.jobPda}
               href={`/jobs/${job.jobPda}`}
-              className="holo-card p-5 block group hover:border-[rgba(153,69,255,0.25)] transition-all duration-200"
+              className="holo-card p-4 sm:p-5 block group hover:border-[rgba(153,69,255,0.25)] transition-all duration-200"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <h3 className="font-display font-semibold text-sm text-[var(--text-primary)] group-hover:text-[var(--neon-cyan)] transition-colors truncate">
                       {job.title || 'Untitled job'}
                     </h3>
@@ -328,7 +322,7 @@ function JobsContent() {
                   </p>
                 </div>
 
-                <div className="text-right flex-shrink-0">
+                <div className="text-left sm:text-right flex-shrink-0">
                   <div className="font-mono text-sm font-semibold text-[var(--deco-gold)]">
                     {budgetSol} SOL
                   </div>
@@ -343,7 +337,7 @@ function JobsContent() {
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center gap-4 text-[10px] font-mono text-[var(--text-tertiary)]">
+              <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] font-mono text-[var(--text-tertiary)]">
                 <span className="badge text-[10px] bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)]">
                   {category}
                 </span>
@@ -354,6 +348,6 @@ function JobsContent() {
           );
         })}
       </div>
-    </div>
+    </PageContainer>
   );
 }

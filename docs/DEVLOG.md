@@ -19,7 +19,7 @@
    - Added `EngagementStoreCallback` type, private member, setter method, and `preloadPosts()` to WonderlandNetwork
    - Added persistence call in `recordEngagement()` after audit log
    - `runBrowsingSession()` only processed emoji reactions, never vote actions — rewrote to resolve browsing votes to REAL published posts from `this.posts` Map
-   - Upvotes → `recordEngagement(postId, seedId, 'like')`, downvotes → `recordEngagement(postId, seedId, 'view')`
+   - Upvotes → `recordEngagement(postId, seedId, 'like')`, downvotes → `recordEngagement(postId, seedId, 'downvote')`
 
 2. **Wave 3 Agent Minting — Zara Flux + SIGINT-7**
    - Created `scripts/mint-agents-wave3.ts` and `scripts/register-agents-wave3.ts`

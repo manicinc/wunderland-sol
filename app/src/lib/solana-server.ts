@@ -644,6 +644,7 @@ export async function getAllAgentsServer(): Promise<Agent[]> {
 export async function getAllTipsServer(opts?: {
   limit?: number;
   offset?: number;
+  q?: string;
   tipper?: string;
   targetEnclave?: string | null;
   priority?: Tip['priority'];
@@ -651,6 +652,7 @@ export async function getAllTipsServer(opts?: {
 }): Promise<{ tips: Tip[]; total: number }> {
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
+  const q = opts?.q?.trim().toLowerCase();
 
   try {
     return await withRpcFallback(async (connection, programId) => {
@@ -670,7 +672,23 @@ export async function getAllTipsServer(opts?: {
         .filter((t) => (opts?.tipper ? t.tipper === opts.tipper : true))
         .filter((t) => (opts?.targetEnclave !== undefined ? t.targetEnclave === opts.targetEnclave : true))
         .filter((t) => (opts?.priority ? t.priority === opts.priority : true))
-        .filter((t) => (opts?.status ? t.status === opts.status : true));
+        .filter((t) => (opts?.status ? t.status === opts.status : true))
+        .filter((t) => {
+          if (!q) return true;
+          const haystack = [
+            t.tipPda,
+            t.tipper,
+            t.contentHash,
+            t.targetEnclave ?? 'global',
+            t.priority,
+            t.status,
+            t.tipNonce,
+            String(t.amount),
+          ]
+            .join(' ')
+            .toLowerCase();
+          return haystack.includes(q);
+        });
 
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -693,6 +711,8 @@ export async function getAllPostsServer(opts?: {
   enclave?: string;
   since?: string;
   q?: string;
+  includeIpfsContent?: boolean;
+  prefetchIpfsForSearch?: boolean;
 }): Promise<{ posts: Post[]; total: number }> {
   const limit = opts?.limit ?? 20;
   const offset = opts?.offset ?? 0;
@@ -703,6 +723,8 @@ export async function getAllPostsServer(opts?: {
   const enclave = opts?.enclave;
   const since = opts?.since;
   const q = opts?.q?.toLowerCase();
+  const includeIpfsContent = opts?.includeIpfsContent ?? true;
+  const prefetchIpfsForSearch = opts?.prefetchIpfsForSearch ?? true;
 
   try {
     return await withRpcFallback(async (connection, programId) => {
@@ -788,41 +810,55 @@ export async function getAllPostsServer(opts?: {
     }
 
     // Text search (content + agent + enclave).
-    // If `q` is set, we fetch+verify IPFS bytes for all candidates so results are accurate.
+    // If `q` is set, we *optionally* fetch+verify IPFS bytes for all candidates so results are accurate.
     let final = filtered;
     if (q) {
-      const concurrency = Math.max(1, Number(process.env.WUNDERLAND_IPFS_FETCH_CONCURRENCY ?? 8));
-      let i = 0;
-      const workers = Array.from({ length: concurrency }, async () => {
-        while (i < filtered.length) {
-          const idx = i++;
-          const p = filtered[idx];
-          if (!p || p.content) continue;
-          const content = await fetchVerifiedUtf8FromIpfs({ expectedSha256Hex: p.contentHash });
-          if (content) p.content = content;
-        }
-      });
-      await Promise.allSettled(workers);
+      if (includeIpfsContent && prefetchIpfsForSearch) {
+        const concurrency = Math.max(1, Number(process.env.WUNDERLAND_IPFS_FETCH_CONCURRENCY ?? 8));
+        let i = 0;
+        const workers = Array.from({ length: concurrency }, async () => {
+          while (i < filtered.length) {
+            const idx = i++;
+            const p = filtered[idx];
+            if (!p || p.content) continue;
+            const content = await fetchVerifiedUtf8FromIpfs({ expectedSha256Hex: p.contentHash });
+            if (content) p.content = content;
+          }
+        });
+        await Promise.allSettled(workers);
 
-      final = filtered.filter(
-        (p) =>
-          (p.content && p.content.toLowerCase().includes(q)) ||
-          p.agentName.toLowerCase().includes(q) ||
-          (p.enclaveName && p.enclaveName.toLowerCase().includes(q)),
-      );
+        final = filtered.filter(
+          (p) =>
+            (p.content && p.content.toLowerCase().includes(q)) ||
+            p.agentName.toLowerCase().includes(q) ||
+            (p.enclaveName && p.enclaveName.toLowerCase().includes(q)),
+        );
+      } else {
+        // Metadata-only search: avoid prefetching all IPFS content.
+        final = filtered.filter(
+          (p) =>
+            p.id.toLowerCase().includes(q) ||
+            p.agentName.toLowerCase().includes(q) ||
+            p.contentHash.toLowerCase().includes(q) ||
+            p.manifestHash.toLowerCase().includes(q) ||
+            (p.enclaveName && p.enclaveName.toLowerCase().includes(q)),
+        );
+      }
     }
 
     const total = final.length;
     const window = final.slice(offset, offset + limit);
 
     // Fetch + verify IPFS content for the returned window (on-chain-first).
-    await Promise.allSettled(
-      window.map(async (p) => {
-        if (p.content) return;
-        const content = await fetchVerifiedUtf8FromIpfs({ expectedSha256Hex: p.contentHash });
-        if (content) p.content = content;
-      }),
-    );
+    if (includeIpfsContent) {
+      await Promise.allSettled(
+        window.map(async (p) => {
+          if (p.content) return;
+          const content = await fetchVerifiedUtf8FromIpfs({ expectedSha256Hex: p.contentHash });
+          if (content) p.content = content;
+        }),
+      );
+    }
 
     return { posts: window, total };
     }); // end withRpcFallback
@@ -1040,6 +1076,7 @@ export async function getNetworkStatsServer(): Promise<Stats> {
   return {
     totalAgents: agents.length,
     totalPosts: total,
+    totalReplies: 0,
     totalVotes,
     averageReputation: Math.round(avgReputation * 100) / 100,
     activeAgents,
@@ -1113,22 +1150,69 @@ export async function getNetworkGraphServer(opts?: {
   ]);
 
   const postAuthorByPostPda = new Map<string, string>();
+  const decodedPosts: { agentAddress: string; kind: string; replyTo?: string }[] = [];
   for (const acc of postAccounts) {
     try {
       const post = decodePostAnchor(acc.pubkey, acc.account.data, agentByPda, enclaveDirectory);
       const agent = agentByPda.get(post.agentPda || '');
       if (!agent) continue;
       postAuthorByPostPda.set(acc.pubkey.toBase58(), agent.address);
+      decodedPosts.push({ agentAddress: agent.address, kind: post.kind, replyTo: post.replyTo });
     } catch {
       continue;
     }
   }
 
+  const edgeByKey = new Map<string, NetworkEdge>();
+
+  // Build edges from comment/reply relationships (agent A replies to agent B's post)
+  for (const post of decodedPosts) {
+    if (post.kind !== 'comment' || !post.replyTo) continue;
+    const parentAuthor = postAuthorByPostPda.get(post.replyTo);
+    if (!parentAuthor || parentAuthor === post.agentAddress) continue;
+
+    const key = `${post.agentAddress}->${parentAuthor}`;
+    const existing = edgeByKey.get(key) || { from: post.agentAddress, to: parentAuthor, up: 0, down: 0, net: 0 };
+    // Count replies as positive interactions
+    existing.up += 1;
+    existing.net += 1;
+    edgeByKey.set(key, existing);
+  }
+
+  // Build edges from enclave co-posting (agents who post in the same enclave)
+  const agentsByEnclave = new Map<string, Set<string>>();
+  for (const acc of postAccounts) {
+    try {
+      const post = decodePostAnchor(acc.pubkey, acc.account.data, agentByPda, enclaveDirectory);
+      const agent = agentByPda.get(post.agentPda || '');
+      if (!agent || !post.enclavePda) continue;
+      const set = agentsByEnclave.get(post.enclavePda) || new Set();
+      set.add(agent.address);
+      agentsByEnclave.set(post.enclavePda, set);
+    } catch {
+      continue;
+    }
+  }
+  // Create lightweight co-enclave edges (bidirectional, deduplicated)
+  for (const [, enclaveAgents] of agentsByEnclave) {
+    const arr = [...enclaveAgents];
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = i + 1; j < arr.length; j++) {
+        const [a, b] = arr[i] < arr[j] ? [arr[i], arr[j]] : [arr[j], arr[i]];
+        const key = `${a}->${b}`;
+        if (!edgeByKey.has(key)) {
+          // Create a weak co-enclave edge (1 up = co-enclave relationship)
+          edgeByKey.set(key, { from: a, to: b, up: 1, down: 0, net: 1 });
+        }
+      }
+    }
+  }
+
+  // Build edges from vote relationships
   const voteAccounts = await connection.getProgramAccounts(programId, {
     filters: [{ dataSize: ACCOUNT_SIZE_REPUTATION_VOTE }],
   });
 
-  const edgeByKey = new Map<string, NetworkEdge>();
   for (const acc of voteAccounts) {
     try {
       const decoded = decodeReputationVote(acc.account.data);
@@ -1285,11 +1369,13 @@ export function cacheJobMetadata(
 export async function getAllJobsServer(opts?: {
   status?: string;
   creator?: string;
+  q?: string;
   limit?: number;
   offset?: number;
 }): Promise<{ jobs: OnChainJob[]; total: number }> {
   const limit = opts?.limit ?? 50;
   const offsetN = opts?.offset ?? 0;
+  const q = opts?.q?.trim().toLowerCase();
 
   try {
     return await withRpcFallback(async (connection, programId) => {
@@ -1319,6 +1405,27 @@ export async function getAllJobsServer(opts?: {
           job.description = cached.description ?? null;
           job.metadata = cached.metadata ?? null;
         }
+      }
+
+      // Text search (metadata fields + cached title/description)
+      if (q) {
+        decoded = decoded.filter((j) => {
+          const haystack = [
+            j.jobPda,
+            j.creatorWallet,
+            j.metadataHash,
+            j.status,
+            j.assignedAgent ?? '',
+            j.acceptedBid ?? '',
+            j.title ?? '',
+            j.description ?? '',
+            j.buyItNowLamports ?? '',
+            j.budgetLamports ?? '',
+          ]
+            .join(' ')
+            .toLowerCase();
+          return haystack.includes(q);
+        });
       }
 
       // Sort by createdAt descending

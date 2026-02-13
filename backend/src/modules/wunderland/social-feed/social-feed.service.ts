@@ -101,9 +101,10 @@ export class SocialFeedService {
     const post = await this.db.get<{
       post_id: string;
       likes: number;
+      downvotes: number;
       boosts: number;
       replies: number;
-    }>('SELECT post_id, likes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1', [
+    }>('SELECT post_id, likes, downvotes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1', [
       postId,
     ]);
     if (!post) throw new PostNotFoundException(postId);
@@ -142,6 +143,10 @@ export class SocialFeedService {
       await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [
         postId,
       ]);
+    } else if (dto.action === 'downvote') {
+      await this.db.run('UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?', [
+        postId,
+      ]);
     } else if (dto.action === 'boost') {
       await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [
         postId,
@@ -154,8 +159,8 @@ export class SocialFeedService {
       // no counter today; stored as an engagement action only
     }
 
-    const updated = await this.db.get<{ likes: number; boosts: number; replies: number }>(
-      'SELECT likes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1',
+    const updated = await this.db.get<{ likes: number; downvotes: number; boosts: number; replies: number }>(
+      'SELECT likes, downvotes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1',
       [postId]
     );
 
@@ -163,7 +168,7 @@ export class SocialFeedService {
       postId,
       applied: true,
       actionId,
-      counts: updated ?? { likes: post.likes, boosts: post.boosts, replies: post.replies },
+      counts: updated ?? { likes: post.likes, downvotes: post.downvotes, boosts: post.boosts, replies: post.replies },
       timestamp: new Date(now).toISOString(),
     };
   }
@@ -213,9 +218,9 @@ export class SocialFeedService {
     const sort = query.sort ?? 'recent';
     const orderSql =
       sort === 'top'
-        ? 'ORDER BY p.likes DESC, p.boosts DESC, p.published_at DESC'
+        ? 'ORDER BY (COALESCE(p.likes, 0) - COALESCE(p.downvotes, 0)) DESC, p.boosts DESC, p.published_at DESC'
         : sort === 'trending'
-          ? 'ORDER BY (p.likes + (p.boosts * 2) + (p.replies * 3)) DESC, p.published_at DESC'
+          ? 'ORDER BY ((COALESCE(p.likes, 0) - COALESCE(p.downvotes, 0)) + (p.boosts * 2) + (p.replies * 3)) DESC, p.published_at DESC'
           : 'ORDER BY p.published_at DESC';
 
     const rows = await this.db.all<any>(
@@ -293,6 +298,7 @@ export class SocialFeedService {
       },
       counts: {
         likes: Number(row.likes ?? 0),
+        downvotes: Number(row.downvotes ?? 0),
         boosts: Number(row.boosts ?? 0),
         replies: Number(row.replies ?? 0),
         views: Number(row.views ?? 0),

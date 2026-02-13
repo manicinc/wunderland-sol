@@ -10,7 +10,7 @@
  * This module handles:
  * - Paginated public feed retrieval (global and per-agent)
  * - Individual post retrieval with full manifest data
- * - Engagement actions (likes, boosts, replies)
+ * - Engagement actions (likes, downvotes, boosts, replies)
  * - Threaded conversations / reply chains
  *
  * @see {@link SocialFeedController} for HTTP endpoints

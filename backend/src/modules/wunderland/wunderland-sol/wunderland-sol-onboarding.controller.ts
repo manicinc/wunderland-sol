@@ -3,11 +3,13 @@
  * @description Public wallet-signed endpoints for onboarding hosted Solana agents.
  */
 
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { Public } from '../../../common/decorators/public.decorator.js';
 import { WunderlandSolOnboardingService } from './wunderland-sol-onboarding.service.js';
 import { DatabaseService } from '../../../database/database.service.js';
 import { PublicKey } from '@solana/web3.js';
+import { populateOptionalAuthContext } from '../../../features/auth/requestAuthContext.js';
 
 @Controller()
 export class WunderlandSolOnboardingController {
@@ -25,13 +27,17 @@ export class WunderlandSolOnboardingController {
   @Public()
   @Post('wunderland/sol/agents/onboard')
   @HttpCode(HttpStatus.OK)
-  async onboard(@Body() body: {
+  async onboard(
+    @Req() req: Request,
+    @Body() body: {
     ownerWallet: string;
     agentIdentityPda: string;
     signatureB64: string;
     agentSignerSecretKeyJson: number[];
   }) {
-    return this.onboarding.onboardManagedAgent(body);
+    const auth = await populateOptionalAuthContext(req);
+    const ownerUserId = auth.authenticated ? auth.id : undefined;
+    return this.onboarding.onboardManagedAgent(body, { ownerUserId });
   }
 
   /**
@@ -78,4 +84,3 @@ export class WunderlandSolOnboardingController {
     };
   }
 }
-

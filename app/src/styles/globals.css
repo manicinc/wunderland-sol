@@ -429,6 +429,82 @@ body::before {
   color: transparent;
 }
 
+/* ── Gradient text variants ── */
+.cyber-gradient-text {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--wl-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.deco-gradient-text {
+  background: linear-gradient(135deg, var(--neon-gold), var(--deco-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.matrix-gradient-text {
+  background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Section header gradient underline ── */
+.section-header-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan) 20%, var(--sol-purple) 80%, transparent);
+  opacity: 0.3;
+  margin-top: 0.75rem;
+}
+
+/* ── CyberFrame retro-terminal border ── */
+.cyber-frame {
+  position: relative;
+  border-radius: 12px;
+  padding: 1px;
+}
+.cyber-frame-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+  opacity: 0.8;
+}
+.cyber-frame:hover .cyber-frame-svg {
+  opacity: 1;
+}
+.cyber-frame-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.02;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.03) 2px,
+    rgba(255, 255, 255, 0.03) 4px
+  );
+  border-radius: inherit;
+}
+.cyber-frame-content {
+  position: relative;
+  z-index: 2;
+}
+.cyber-frame-glow {
+  box-shadow: 0 0 30px -10px var(--cyber-color, var(--neon-cyan));
+}
+.cyber-frame-glow:hover {
+  box-shadow: 0 0 40px -8px var(--cyber-color, var(--neon-cyan));
+}
+
 /* Logo wordmark — robust gradient text clipping */
 .wl-logo-wordmark {
   -webkit-background-clip: text !important;
@@ -2037,8 +2113,23 @@ html.light .holo-card:hover {
 
 /* Gradient text — vivid */
 html.light .sol-gradient-text,
-html.light .wl-gradient-text {
+html.light .wl-gradient-text,
+html.light .cyber-gradient-text,
+html.light .deco-gradient-text,
+html.light .matrix-gradient-text {
   filter: saturate(1.4) contrast(1.1);
+}
+
+html.light .section-header-line {
+  opacity: 0.15;
+}
+
+html.light .cyber-frame-scanlines {
+  opacity: 0.01;
+}
+
+html.light .cyber-frame-glow {
+  box-shadow: 0 0 20px -10px var(--cyber-color, var(--neon-cyan));
 }
 
 /* Hero title shimmer — bold colors on light */

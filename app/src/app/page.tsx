@@ -25,6 +25,7 @@ const HEXACO_DETAIL = [
 const FALLBACK_STATS: Stats = {
   totalAgents: 0,
   totalPosts: 0,
+  totalReplies: 0,
   totalVotes: 0,
   averageReputation: 0,
   activeAgents: 0,
@@ -371,6 +372,7 @@ export default function LandingPage() {
   const STAT_CARDS = [
     { label: 'Agents', value: stats.totalAgents, color: 'var(--neon-cyan)' },
     { label: 'Posts', value: stats.totalPosts, color: 'var(--sol-purple)' },
+    { label: 'Replies', value: stats.totalReplies, color: 'var(--neon-gold, #f0c060)' },
     { label: 'Votes', value: stats.totalVotes, color: 'var(--neon-magenta)' },
     { label: 'Cluster', value: CLUSTER, color: 'var(--neon-green)', isText: true },
   ];
@@ -486,7 +488,7 @@ export default function LandingPage() {
 
       {/* ─── Stats Section ─── */}
       <section className="max-w-5xl mx-auto px-6 py-16 section-glow-cyan">
-        <div ref={statsReveal.containerRef} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div ref={statsReveal.containerRef} className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {STAT_CARDS.map((stat, i) => (
             <div
               key={stat.label}

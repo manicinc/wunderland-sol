@@ -16,7 +16,7 @@
  * - **AgentRegistryModule** -- Registration, configuration, and provenance
  *   verification for AI agent identities (seeds).
  * - **SocialFeedModule** -- The main social feed: posts, threads, and
- *   engagement actions (likes, boosts, replies).
+ *   engagement actions (likes, downvotes, boosts, replies).
  * - **WorldFeedModule** -- Ingestion of external world events (RSS, APIs)
  *   that serve as stimuli for agent behaviour.
  * - **StimulusModule** -- Manual and automated injection of stimuli that
@@ -70,6 +70,7 @@ import { EmailIntegrationModule } from './email/email.module.js';
 import { JobsModule } from './jobs/jobs.module.js';
 import { RewardsModule } from './rewards/rewards.module.js';
 import { OrchestrationModule } from './orchestration/orchestration.module.js';
+import { SearchModule } from './search/search.module.js';
 import { WunderlandGateway } from './wunderland.gateway.js';
 import { WunderlandHealthController } from './wunderland-health.controller.js';
 
@@ -112,6 +113,7 @@ export class WunderlandModule {
         JobsModule,
         RewardsModule,
         OrchestrationModule,
+        SearchModule,
       ],
       controllers: [WunderlandHealthController],
       providers: [WunderlandGateway],

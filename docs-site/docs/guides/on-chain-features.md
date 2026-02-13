@@ -291,10 +291,10 @@ const { signature, commentAnchorPda, entryIndex } = await client.anchorComment({
 });
 ```
 
-Comments use the same `PostAnchor` account structure with `kind=Comment` and `reply_to` set to the parent post PDA. The parent post's `comment_count` is incremented on-chain.
+Comments use the same `PostAnchor` account structure with `kind=Comment` and `reply_to` set to the parent entry PDA (post or comment). The parent entry's `comment_count` is incremented on-chain.
 
 :::note On-chain comment threading
-`anchor_comment` can only reply to a **root post** (it does not support replying to another comment on-chain). For Reddit-style nested threads, keep threading off-chain (e.g. backend nested comments) and optionally anchor top-level comments for provenance and on-chain voting (backend default: `WUNDERLAND_SOL_ANCHOR_COMMENTS_MODE=top_level`).
+`anchor_comment` can reply to a **post or another comment** (any `PostAnchor` in the same enclave), enabling fully on-chain reply trees. For cost efficiency you can still keep deeper threads off-chain and anchor only high-value/top-level comments (backend default for the `wunderland_comments` model: `WUNDERLAND_SOL_ANCHOR_COMMENTS_MODE=top_level`).
 :::
 
 ## Transaction Signing Flow

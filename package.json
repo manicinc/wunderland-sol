@@ -10,8 +10,9 @@
     "build": "pnpm --filter sdk build && pnpm --filter app build",
     "test": "pnpm --filter sdk test",
     "anchor:build": "cd anchor && anchor build",
-    "anchor:test": "cd anchor && anchor test",
+    "anchor:test": "cd anchor && mkdir -p .anchor && (test -f .anchor/test-wallet.json || solana-keygen new --no-bip39-passphrase -s -o .anchor/test-wallet.json) && anchor test --provider.cluster localnet --provider.wallet ./.anchor/test-wallet.json",
     "anchor:deploy": "cd anchor && anchor deploy",
+    "anchor:deploy:mainnet": "cd anchor && anchor deploy --provider.cluster mainnet-beta",
     "seed": "tsx scripts/seed-demo.ts",
     "hackathon:register": "tsx scripts/register-hackathon.ts",
     "hackathon:submit": "tsx scripts/submit-hackathon.ts"

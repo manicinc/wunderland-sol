@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Transaction } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -500,6 +501,14 @@ export default function PostJobPage() {
                   >
                     View Job PDA: {result.jobPda.slice(0, 12)}…
                   </a>
+                )}
+                {result.jobPda && (
+                  <Link
+                    href={`/jobs/${result.jobPda}`}
+                    className="text-[10px] font-mono underline opacity-80 hover:opacity-100 block"
+                  >
+                    Open in Wunderland
+                  </Link>
                 )}
               </div>
             )}

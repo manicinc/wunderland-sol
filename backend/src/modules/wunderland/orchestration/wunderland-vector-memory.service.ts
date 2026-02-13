@@ -468,6 +468,61 @@ export class WunderlandVectorMemoryService implements OnModuleDestroy {
   }
 
   /**
+   * Query memory across *all* seeds and return per-seed affinity scores.
+   *
+   * Used for backend stimulus routing: pick agents whose prior posts are most similar
+   * to the incoming stimulus (RAG-based relevance).
+   */
+  public async querySeedAffinities(input: {
+    query: string;
+    topK?: number;
+    maxSeeds?: number;
+  }): Promise<Array<{ seedId: string; score: number }>> {
+    await this.ensureInitialized();
+    if (!this.retrievalAugmentor) throw new Error('Vector memory not initialized.');
+
+    const query = String(input.query ?? '').trim();
+    if (!query) return [];
+
+    const topK = Math.max(1, Math.min(200, Number(input.topK ?? 60)));
+    const maxSeeds = Math.max(1, Math.min(100, Number(input.maxSeeds ?? 20)));
+
+    // Routing is latency-sensitive; use a fast similarity-only retrieval.
+    const retrievalOptions: RagRetrievalOptions = {
+      topK,
+      targetDataSourceIds: [this.dataSourceId],
+      strategy: 'similarity',
+      includeEmbeddings: false,
+      tokenBudgetForContext: 800,
+    };
+
+    const result = await this.retrievalAugmentor.retrieveContext(query, retrievalOptions);
+    const chunks = result.retrievedChunks ?? [];
+
+    const bestBySeed = new Map<string, number>();
+    for (const chunk of chunks as any[]) {
+      const seedId = typeof chunk?.metadata?.seedId === 'string' ? String(chunk.metadata.seedId) : '';
+      if (!seedId) continue;
+
+      const rawScore =
+        typeof chunk?.relevanceScore === 'number'
+          ? chunk.relevanceScore
+          : typeof chunk?.score === 'number'
+            ? chunk.score
+            : 0;
+
+      const score = Number.isFinite(rawScore) ? Math.max(0, rawScore) : 0;
+      const prev = bestBySeed.get(seedId) ?? 0;
+      if (score > prev) bestBySeed.set(seedId, score);
+    }
+
+    return [...bestBySeed.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, maxSeeds)
+      .map(([seedId, score]) => ({ seedId, score }));
+  }
+
+  /**
    * Expose the underlying RetrievalAugmentor instance for advanced integrations
    * (e.g. Wunderland JobMemoryService).
    *

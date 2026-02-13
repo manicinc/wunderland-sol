@@ -34,6 +34,21 @@ type StimulusItem = {
   processedAt?: string | null;
 };
 
+type StimulusResponsePost = {
+  postId: string;
+  seedId: string;
+  replyToPostId: string | null;
+  contentPreview: string;
+  createdAt: string;
+  publishedAt: string | null;
+  anchorStatus: string | null;
+  solPostPda: string | null;
+  agent: {
+    displayName: string | null;
+    level: number | null;
+  };
+};
+
 type TipItem = {
   tipId: string;
   amount: number;
@@ -59,6 +74,30 @@ function parseJsonOr<T>(raw: string | null | undefined, fallback: T): T {
 @Injectable()
 export class StimulusService {
   constructor(private readonly db: DatabaseService) {}
+
+  async getStimulus(eventId: string): Promise<StimulusItem | null> {
+    const row = await this.db.get<any>(
+      `
+        SELECT event_id, type, priority, payload, target_seed_ids, created_at, processed_at
+          FROM wunderland_stimuli
+         WHERE event_id = ?
+         LIMIT 1
+      `,
+      [eventId],
+    );
+
+    if (!row) return null;
+
+    return {
+      eventId: String(row.event_id),
+      type: String(row.type),
+      priority: String(row.priority ?? 'normal'),
+      payload: parseJsonOr<Record<string, unknown>>(row.payload, {}),
+      targetSeedIds: parseJsonOr<string[]>(row.target_seed_ids, []),
+      createdAt: new Date(Number(row.created_at ?? Date.now())).toISOString(),
+      processedAt: row.processed_at ? new Date(Number(row.processed_at)).toISOString() : null,
+    };
+  }
 
   async injectStimulus(userRole: string, dto: InjectStimulusDto) {
     if (userRole !== 'admin' && userRole !== 'global') {
@@ -157,6 +196,131 @@ export class StimulusService {
       limit,
       total,
     };
+  }
+
+  async listStimulusResponses(
+    eventId: string,
+    query: { page?: number; limit?: number; anchoredOnly?: boolean } = {}
+  ): Promise<PaginatedResponse<StimulusResponsePost>> {
+    const page = Math.max(1, Number(query.page ?? 1));
+    const limit = Math.min(50, Math.max(1, Number(query.limit ?? 25)));
+    const offset = (page - 1) * limit;
+
+    const anchoredOnly = Boolean(query.anchoredOnly);
+
+    const countWhere = anchoredOnly
+      ? `WHERE p.status = 'published' AND p.stimulus_event_id = ? AND p.sol_post_pda IS NOT NULL`
+      : `WHERE p.status = 'published' AND p.stimulus_event_id = ?`;
+
+    let totalRow = await this.db.get<{ count: number }>(
+      `SELECT COUNT(1) as count FROM wunderland_posts p ${countWhere}`,
+      [eventId],
+    );
+    let total = Number(totalRow?.count ?? 0) || 0;
+
+    // Lazy backfill: if columns weren't present at time of persistence, extract stimulus fields from manifest.
+    if (total === 0) {
+      await this.backfillStimulusColumnsForEvent(eventId);
+      totalRow = await this.db.get<{ count: number }>(
+        `SELECT COUNT(1) as count FROM wunderland_posts p ${countWhere}`,
+        [eventId],
+      );
+      total = Number(totalRow?.count ?? 0) || 0;
+    }
+
+    const rows = await this.db.all<any>(
+      `
+        SELECT
+          p.post_id,
+          p.seed_id,
+          p.reply_to_post_id,
+          p.content,
+          p.created_at,
+          p.published_at,
+          p.anchor_status,
+          p.sol_post_pda,
+          a.display_name as agent_display_name,
+          c.level as agent_level
+        FROM wunderland_posts p
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
+        ${countWhere}
+        ORDER BY COALESCE(p.published_at, p.created_at) DESC
+        LIMIT ? OFFSET ?
+      `,
+      [eventId, limit, offset],
+    );
+
+    return {
+      items: rows.map((row) => ({
+        postId: String(row.post_id),
+        seedId: String(row.seed_id),
+        replyToPostId: row.reply_to_post_id ? String(row.reply_to_post_id) : null,
+        contentPreview: String(row.content ?? '').slice(0, 800),
+        createdAt: new Date(Number(row.created_at ?? Date.now())).toISOString(),
+        publishedAt:
+          row.published_at == null || Number.isNaN(Number(row.published_at))
+            ? null
+            : new Date(Number(row.published_at)).toISOString(),
+        anchorStatus: row.anchor_status ? String(row.anchor_status) : null,
+        solPostPda: row.sol_post_pda ? String(row.sol_post_pda) : null,
+        agent: {
+          displayName: row.agent_display_name ? String(row.agent_display_name) : null,
+          level: row.agent_level == null ? null : Number(row.agent_level),
+        },
+      })),
+      page,
+      limit,
+      total,
+    };
+  }
+
+  private async backfillStimulusColumnsForEvent(eventId: string): Promise<void> {
+    const pattern = `%\"eventId\":\"${eventId}%`;
+
+    const rows = await this.db.all<{ post_id: string; manifest: string }>(
+      `
+        SELECT post_id, manifest
+          FROM wunderland_posts
+         WHERE stimulus_event_id IS NULL
+           AND manifest LIKE ?
+         ORDER BY created_at DESC
+         LIMIT 2500
+      `,
+      [pattern],
+    );
+
+    if (!rows.length) return;
+
+    for (const row of rows) {
+      const manifest = parseJsonOr<any>(row.manifest, null);
+      const stimulus = manifest?.stimulus;
+      if (!stimulus) continue;
+      const ev = stimulus.eventId ? String(stimulus.eventId) : '';
+      if (ev !== eventId) continue;
+
+      const stimulusType = stimulus.type ? String(stimulus.type) : null;
+      const stimulusSourceProviderId = stimulus.sourceProviderId ? String(stimulus.sourceProviderId) : null;
+      const stimulusTimestamp = (() => {
+        const raw = stimulus.timestamp ? String(stimulus.timestamp) : '';
+        if (!raw) return null;
+        const ms = Date.parse(raw);
+        return Number.isNaN(ms) ? null : ms;
+      })();
+
+      await this.db.run(
+        `
+          UPDATE wunderland_posts
+             SET stimulus_type = ?,
+                 stimulus_event_id = ?,
+                 stimulus_source_provider_id = ?,
+                 stimulus_timestamp = ?
+           WHERE post_id = ?
+             AND stimulus_event_id IS NULL
+        `,
+        [stimulusType, eventId, stimulusSourceProviderId, stimulusTimestamp, row.post_id],
+      );
+    }
   }
 
   async submitTip(userId: string, dto: SubmitTipDto) {

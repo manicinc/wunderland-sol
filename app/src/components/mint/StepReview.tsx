@@ -4,11 +4,10 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { collectRequiredSecrets } from '@/data/catalog-data';
 import { SKILLS, CHANNELS, PROVIDERS } from '@/data/catalog-data';
-import { TRAIT_KEYS, TRAIT_LABELS, STEP_LABELS, type WizardAction, type WizardState, type WizardStep } from './wizard-types';
+import { TRAIT_KEYS, TRAIT_LABELS, STEP_LABELS, type WizardState, type WizardStep } from './wizard-types';
 
 interface StepReviewProps {
   state: WizardState;
-  dispatch: React.Dispatch<WizardAction>;
   onMint: () => void;
   onEditStep: (step: WizardStep) => void;
   connected: boolean;
@@ -43,7 +42,6 @@ function SummaryCard({ label, step, onEdit, children }: {
 
 export default function StepReview({
   state,
-  dispatch,
   onMint,
   onEditStep,
   connected,

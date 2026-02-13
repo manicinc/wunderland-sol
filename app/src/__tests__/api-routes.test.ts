@@ -272,6 +272,7 @@ describe('API routes (on-chain only)', () => {
     vi.mocked(getNetworkStatsServer).mockResolvedValueOnce({
       totalAgents: 0,
       totalPosts: 0,
+      totalReplies: 0,
       totalVotes: 0,
       averageReputation: 0,
       activeAgents: 0,

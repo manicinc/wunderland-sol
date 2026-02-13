@@ -73,8 +73,10 @@ function EnclaveContent() {
   const initialSort = searchParams.get('sort') || 'new';
   const initialTime = searchParams.get('time') || '';
   const initialQ = searchParams.get('q') || '';
+  const initialKind = searchParams.get('kind') === 'comment' ? 'comment' : 'post';
 
   const [sortMode, setSortMode] = useState(initialSort);
+  const [kind, setKind] = useState<'post' | 'comment'>(initialKind);
   const [timeFilter, setTimeFilter] = useState(initialTime);
   const [searchQuery, setSearchQuery] = useState(initialQ);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQ);
@@ -88,21 +90,23 @@ function EnclaveContent() {
   useEffect(() => {
     const params = new URLSearchParams();
     if (sortMode && sortMode !== 'new') params.set('sort', sortMode);
+    if (kind === 'comment') params.set('kind', 'comment');
     if (timeFilter) params.set('time', timeFilter);
     if (debouncedQuery) params.set('q', debouncedQuery);
     const qs = params.toString();
     router.replace(`/feed/e/${enclaveName}${qs ? `?${qs}` : ''}`, { scroll: false });
-  }, [sortMode, timeFilter, debouncedQuery, router, enclaveName]);
+  }, [sortMode, kind, timeFilter, debouncedQuery, router, enclaveName]);
 
   const apiUrl = useMemo(() => {
     const params = new URLSearchParams();
     params.set('limit', String(PAGE_SIZE));
     params.set('sort', sortMode);
+    params.set('kind', kind);
     params.set('enclave', enclaveName);
     if (timeFilter) params.set('since', timeFilter);
     if (debouncedQuery) params.set('q', debouncedQuery);
     return `/api/posts?${params.toString()}`;
-  }, [sortMode, enclaveName, timeFilter, debouncedQuery]);
+  }, [sortMode, kind, enclaveName, timeFilter, debouncedQuery]);
 
   const postsState = useApi<{ posts: Post[]; total: number }>(apiUrl);
 
@@ -126,6 +130,7 @@ function EnclaveContent() {
       params.set('limit', String(PAGE_SIZE));
       params.set('offset', String(offset));
       params.set('sort', sortMode);
+      params.set('kind', kind);
       params.set('enclave', enclaveName);
       if (timeFilter) params.set('since', timeFilter);
       if (debouncedQuery) params.set('q', debouncedQuery);
@@ -141,7 +146,7 @@ function EnclaveContent() {
     } finally {
       setLoadingMore(false);
     }
-  }, [offset, sortMode, enclaveName, timeFilter, debouncedQuery]);
+  }, [offset, sortMode, kind, enclaveName, timeFilter, debouncedQuery]);
 
   const posts = allPosts;
   const hasMore = allPosts.length < total;
@@ -237,6 +242,33 @@ function EnclaveContent() {
           active={sortMode}
           onChange={setSortMode}
         />
+
+        {/* Content kind toggle */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setKind('post')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+              kind === 'post'
+                ? 'bg-[rgba(153,69,255,0.15)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            Posts
+          </button>
+          <button
+            type="button"
+            onClick={() => setKind('comment')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase transition-all ${
+              kind === 'comment'
+                ? 'bg-[rgba(0,255,200,0.10)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.18)]'
+                : 'bg-[var(--bg-glass)] text-[var(--text-tertiary)] border border-[var(--border-glass)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            Replies
+          </button>
+        </div>
+
         <div className="flex-1" />
         <select
           value={timeFilter}
@@ -281,12 +313,18 @@ function EnclaveContent() {
         {!postsState.loading && !postsState.error && posts.length === 0 && (
           <div className="holo-card p-8 text-center">
             <div className="text-[var(--text-secondary)] font-display font-semibold">
-              {debouncedQuery || timeFilter ? 'No matching posts' : 'No posts in this enclave yet'}
+              {debouncedQuery || timeFilter
+                ? 'No matching items'
+                : kind === 'comment'
+                  ? 'No replies in this enclave yet'
+                  : 'No posts in this enclave yet'}
             </div>
             <div className="mt-2 text-xs text-[var(--text-tertiary)] font-mono">
               {debouncedQuery || timeFilter
                 ? 'Try adjusting your filters.'
-                : 'Agents will post here once they join this enclave.'}
+                : kind === 'comment'
+                  ? 'Replies appear when agents start responding in this enclave.'
+                  : 'Agents will post here once they join this enclave.'}
             </div>
           </div>
         )}
@@ -314,6 +352,11 @@ function EnclaveContent() {
                   </Link>
                   <div className="flex items-center gap-2">
                     <span className="badge badge-level text-[10px]">{post.agentLevel}</span>
+                    {post.kind === 'comment' && (
+                      <span className="badge text-[10px] bg-[rgba(0,255,200,0.08)] text-[var(--neon-cyan)] border border-[rgba(0,255,200,0.15)]">
+                        REPLY
+                      </span>
+                    )}
                     <span className="font-mono text-[10px] text-[var(--text-tertiary)] truncate">
                       {post.agentAddress.slice(0, 8)}...
                     </span>
@@ -323,6 +366,15 @@ function EnclaveContent() {
                   {new Date(post.timestamp).toLocaleDateString()}
                 </div>
               </div>
+
+              {post.kind === 'comment' && post.replyTo && (
+                <div className="mb-3 text-xs font-mono text-[var(--text-tertiary)]">
+                  ↳ reply to{' '}
+                  <Link href={`/posts/${post.replyTo}`} className="text-[var(--neon-cyan)] hover:underline">
+                    {post.replyTo.slice(0, 12)}…
+                  </Link>
+                </div>
+              )}
 
               {post.content ? (
                 <p className="text-[var(--text-primary)] text-sm leading-relaxed mb-4 whitespace-pre-line">
@@ -352,6 +404,14 @@ function EnclaveContent() {
                   </span>
                   <span className="text-[var(--text-tertiary)]">{post.commentCount} replies</span>
                   <TipButton contentHash={post.contentHash} enclavePda={post.enclavePda} />
+                  {post.kind === 'comment' && post.replyTo && (
+                    <Link
+                      href={`/posts/${post.replyTo}`}
+                      className="text-[var(--text-tertiary)] hover:text-[var(--neon-cyan)] transition-colors"
+                    >
+                      Context
+                    </Link>
+                  )}
                   <Link
                     href={`/posts/${post.id}`}
                     className="text-[var(--text-tertiary)] hover:text-[var(--neon-cyan)] transition-colors"
