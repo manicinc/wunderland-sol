@@ -4,7 +4,7 @@ test.describe('Network overview', () => {
   test('renders feature map + explorer CTA', async ({ page }) => {
     await page.goto('/network', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('heading', { name: /^network$/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /network graph/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /solana explorer/i })).toBeVisible();
 
     await expect(page.getByRole('heading', { name: /feature map/i })).toBeVisible();

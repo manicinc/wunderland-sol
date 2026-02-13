@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * IntersectionObserver hook for scroll-reveal animations.
@@ -10,9 +10,13 @@ import { useEffect, useRef, useState, useCallback } from 'react';
  */
 export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
   threshold = 0.15,
-): { ref: React.RefObject<T>; isVisible: boolean } {
-  const ref = useRef<T>(null) as React.RefObject<T>;
+): { ref: React.RefCallback<T>; isVisible: boolean } {
+  const [node, setNode] = useState<T | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  const ref = useCallback((el: T | null) => {
+    setNode((prev) => (prev === el ? prev : el));
+  }, []);
 
   const checkReducedMotion = useCallback(() => {
     if (typeof window === 'undefined') return false;
@@ -20,27 +24,31 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
   }, []);
 
   useEffect(() => {
+    if (isVisible) return;
     if (checkReducedMotion()) {
       setIsVisible(true);
       return;
     }
 
-    const el = ref.current;
-    if (!el) return;
+    if (!node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.unobserve(el);
+          observer.unobserve(node);
         }
       },
       { threshold, rootMargin: '0px 0px -40px 0px' },
     );
 
-    observer.observe(el);
+    observer.observe(node);
     return () => observer.disconnect();
-  }, [threshold, checkReducedMotion]);
+  }, [threshold, checkReducedMotion, node, isVisible]);
 
   return { ref, isVisible };
 }
@@ -53,14 +61,17 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
 export function useScrollRevealGroup<T extends HTMLElement = HTMLDivElement>(
   threshold = 0.15,
   itemCount = 0,
-): { containerRef: React.RefObject<T>; visibleIndices: Set<number> } {
-  const containerRef = useRef<T>(null) as React.RefObject<T>;
+): { containerRef: React.RefCallback<T>; visibleIndices: Set<number> } {
+  const [container, setContainer] = useState<T | null>(null);
   const [visibleIndices, setVisibleIndices] = useState<Set<number>>(new Set());
+
+  const containerRef = useCallback((el: T | null) => {
+    setContainer((prev) => (prev === el ? prev : el));
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       // Mark all as visible immediately
-      const container = containerRef.current;
       if (container) {
         const children = container.querySelectorAll('[data-reveal-index]');
         const all = new Set<number>();
@@ -73,8 +84,18 @@ export function useScrollRevealGroup<T extends HTMLElement = HTMLDivElement>(
       return;
     }
 
-    const container = containerRef.current;
     if (!container) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      // Fallback: show everything
+      const children = container.querySelectorAll('[data-reveal-index]');
+      const all = new Set<number>();
+      children.forEach((child) => {
+        const idx = parseInt(child.getAttribute('data-reveal-index') || '0', 10);
+        all.add(idx);
+      });
+      setVisibleIndices(all);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -100,7 +121,7 @@ export function useScrollRevealGroup<T extends HTMLElement = HTMLDivElement>(
     children.forEach((child) => observer.observe(child));
 
     return () => observer.disconnect();
-  }, [threshold, itemCount]);
+  }, [threshold, itemCount, container]);
 
   return { containerRef, visibleIndices };
 }

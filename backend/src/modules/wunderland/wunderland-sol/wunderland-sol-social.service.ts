@@ -20,6 +20,18 @@ type SolAgentTraits = {
   openness: number;
 };
 
+export type SolAgentApi = {
+  address: string;
+  owner: string;
+  name: string;
+  traits: SolAgentTraits;
+  level: string;
+  reputation: number;
+  totalPosts: number;
+  createdAt: string;
+  isActive: boolean;
+};
+
 export type SolPostApi = {
   id: string;
   kind: 'post' | 'comment';
@@ -126,6 +138,18 @@ type SolPostRow = {
   agent_traits_json: string | null;
 };
 
+type SolAgentRow = {
+  agent_pda: string;
+  owner_wallet: string;
+  display_name: string;
+  traits_json: string | null;
+  level_label: string | null;
+  reputation: number | null;
+  total_posts: number | null;
+  created_at_sec: number | null;
+  is_active: number | null;
+};
+
 function safeTraits(traitsJson: string | null): SolAgentTraits {
   if (!traitsJson) {
     return {
@@ -158,6 +182,25 @@ function safeTraits(traitsJson: string | null): SolAgentTraits {
       openness: 0.5,
     };
   }
+}
+
+function rowToApiAgent(row: SolAgentRow): SolAgentApi {
+  const createdAtMs =
+    typeof row.created_at_sec === 'number' && Number.isFinite(row.created_at_sec)
+      ? row.created_at_sec * 1000
+      : 0;
+
+  return {
+    address: String(row.agent_pda),
+    owner: String(row.owner_wallet),
+    name: row.display_name ? String(row.display_name) : 'Unknown',
+    traits: safeTraits(row.traits_json),
+    level: row.level_label ? String(row.level_label) : 'Newcomer',
+    reputation: Number(row.reputation ?? 0),
+    totalPosts: Number(row.total_posts ?? 0),
+    createdAt: new Date(createdAtMs).toISOString(),
+    isActive: Number(row.is_active ?? 1) === 1,
+  };
 }
 
 function rowToApiPost(row: SolPostRow): SolPostApi {
@@ -232,6 +275,89 @@ export class WunderlandSolSocialService {
   private readonly ipfsInFlight = new Map<string, Promise<Buffer>>();
 
   constructor(private readonly db: DatabaseService) {}
+
+  async getAgents(opts?: {
+    owner?: string;
+    limit?: number;
+    offset?: number;
+    sort?: 'reputation' | 'entries' | 'name';
+  }): Promise<{ agents: SolAgentApi[]; total: number; source: 'index' }> {
+    const limit = Math.min(10_000, Math.max(1, Number(opts?.limit ?? 10_000)));
+    const offset = Math.max(0, Number(opts?.offset ?? 0));
+    const sort = (opts?.sort ?? 'reputation').trim().toLowerCase();
+
+    const where: string[] = [];
+    const params: Array<string | number> = [];
+
+    const owner = opts?.owner?.trim();
+    if (owner) {
+      where.push('a.owner_wallet = ?');
+      params.push(owner);
+    }
+
+    const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
+
+    const totalRow = await this.db.get<{ count: number }>(
+      `SELECT COUNT(1) as count FROM wunderland_sol_agents a ${whereSql}`,
+      params,
+    );
+    const total = Number(totalRow?.count ?? 0);
+
+    const orderSql =
+      sort === 'name'
+        ? 'ORDER BY a.display_name ASC'
+        : sort === 'entries'
+          ? 'ORDER BY a.total_posts DESC, a.reputation DESC'
+          : 'ORDER BY a.reputation DESC, a.total_posts DESC';
+
+    const rows = await this.db.all<SolAgentRow>(
+      `
+        SELECT
+          a.agent_pda,
+          a.owner_wallet,
+          a.display_name,
+          a.traits_json,
+          a.level_label,
+          a.reputation,
+          a.total_posts,
+          a.created_at_sec,
+          a.is_active
+        FROM wunderland_sol_agents a
+        ${whereSql}
+        ${orderSql}
+        LIMIT ? OFFSET ?
+      `,
+      [...params, limit, offset],
+    );
+
+    return { agents: rows.map(rowToApiAgent), total, source: 'index' };
+  }
+
+  async getAgentByPda(agentPda: string): Promise<SolAgentApi | null> {
+    const raw = String(agentPda ?? '').trim();
+    if (!raw) return null;
+
+    const row = await this.db.get<SolAgentRow>(
+      `
+        SELECT
+          a.agent_pda,
+          a.owner_wallet,
+          a.display_name,
+          a.traits_json,
+          a.level_label,
+          a.reputation,
+          a.total_posts,
+          a.created_at_sec,
+          a.is_active
+        FROM wunderland_sol_agents a
+        WHERE a.agent_pda = ?
+        LIMIT 1
+      `,
+      [raw],
+    );
+
+    return row ? rowToApiAgent(row) : null;
+  }
 
   async getPosts(opts: {
     limit?: number;

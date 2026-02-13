@@ -1,14 +1,27 @@
 'use client';
 
-import { use, useState, useEffect, useCallback, useMemo } from 'react';
+import { use, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import { Keypair, PublicKey, Transaction } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletButton } from '@/components/WalletButton';
 import { useApi } from '@/lib/useApi';
 import { useScrollReveal } from '@/lib/useScrollReveal';
 import { CLUSTER, type Agent } from '@/lib/solana';
-import { buildWithdrawFromVaultIx, deriveVaultPda, lamportsToSol } from '@/lib/wunderland-program';
+import {
+  WUNDERLAND_PROGRAM_ID,
+  buildCancelRecoverAgentSignerIx,
+  buildDeactivateAgentIx,
+  buildExecuteRecoverAgentSignerIx,
+  buildRequestRecoverAgentSignerIx,
+  buildWithdrawFromVaultIx,
+  decodeAgentSignerRecovery,
+  deriveRecoveryPda,
+  deriveVaultPda,
+  downloadJson,
+  keypairToSecretKeyJson,
+  lamportsToSol,
+} from '@/lib/wunderland-program';
 
 const LLM_PROVIDERS = [
   { id: 'anthropic', label: 'Anthropic (Claude)', models: ['claude-opus-4-6', 'claude-sonnet-4-5-20250929', 'claude-haiku-4-5-20251001'] },
@@ -68,10 +81,10 @@ function parseSolToLamports(value: string): bigint | null {
 export default function AgentSettingsPage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = use(params);
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction } = useWallet();
+  const { publicKey, connected, sendTransaction, signMessage } = useWallet();
 
-  const agentsState = useApi<{ agents: Agent[]; total: number }>('/api/agents');
-  const agent = agentsState.data?.agents.find((a) => a.address === address) ?? null;
+  const agentState = useApi<{ agent: Agent | null }>(`/api/agents/${encodeURIComponent(address)}`);
+  const agent = agentState.data?.agent ?? null;
 
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [loadingCreds, setLoadingCreds] = useState(false);
@@ -100,6 +113,40 @@ export default function AgentSettingsPage({ params }: { params: Promise<{ addres
   const [withdrawAmountSol, setWithdrawAmountSol] = useState('');
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawSig, setWithdrawSig] = useState<string | null>(null);
+
+  // Managed hosting onboarding (backend) — wallet-signed
+  const [hostingLoading, setHostingLoading] = useState(false);
+  const [hostingError, setHostingError] = useState<string | null>(null);
+  const [hostingStatus, setHostingStatus] = useState<{
+    onboarded: boolean;
+    seedId?: string;
+    agentSignerPubkey?: string;
+    updatedAt?: string | null;
+  }>({ onboarded: false });
+
+  const [onboardBusy, setOnboardBusy] = useState(false);
+  const [onboardError, setOnboardError] = useState<string | null>(null);
+  const [onboardOk, setOnboardOk] = useState<string | null>(null);
+  const [onboardSecretKeyJson, setOnboardSecretKeyJson] = useState<number[] | null>(null);
+  const [onboardSignerPubkey, setOnboardSignerPubkey] = useState<string>('');
+  const onboardFileRef = useRef<HTMLInputElement | null>(null);
+
+  // On-chain safety controls (deactivate + signer recovery)
+  const [chainBusy, setChainBusy] = useState<string | null>(null);
+  const [chainError, setChainError] = useState<string | null>(null);
+  const [chainSig, setChainSig] = useState<string | null>(null);
+
+  const [recovery, setRecovery] = useState<{
+    state: 'loading' | 'none' | 'pending' | 'error';
+    recoveryPda?: string;
+    newSigner?: string;
+    requestedAtIso?: string;
+    readyAtIso?: string;
+    message?: string;
+  }>({ state: 'loading' });
+
+  const [newSignerPubkey, setNewSignerPubkey] = useState<string>('');
+  const [recoveryKeypair, setRecoveryKeypair] = useState<Keypair | null>(null);
 
   const headerReveal = useScrollReveal();
   const llmReveal = useScrollReveal();
@@ -173,6 +220,293 @@ export default function AgentSettingsPage({ params }: { params: Promise<{ addres
       void loadVault();
     }
   }, [isOwner, loadCredentials, loadVault]);
+
+  const toBase64 = (bytes: Uint8Array): string => {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i] ?? 0);
+    }
+    return btoa(binary);
+  };
+
+  const buildManagedHostingMessage = (agentPda: string, agentSigner: string): string => {
+    return JSON.stringify({
+      v: 1,
+      intent: 'wunderland_onboard_managed_agent_v1',
+      cluster: CLUSTER,
+      programId: WUNDERLAND_PROGRAM_ID.toBase58(),
+      agentPda,
+      agentSigner,
+    });
+  };
+
+  const loadHostingStatus = useCallback(async () => {
+    if (!agentIdentityPk) return;
+    setHostingLoading(true);
+    setHostingError(null);
+    try {
+      const res = await fetch(
+        `/api/agents/managed-hosting?agentIdentityPda=${encodeURIComponent(address)}`,
+        { cache: 'no-store' },
+      );
+      const json = (await res.json().catch(() => ({}))) as any;
+      if (!res.ok || !json?.ok) {
+        setHostingStatus({ onboarded: false });
+        setHostingError(json?.error || `Failed to load status (HTTP ${res.status})`);
+        return;
+      }
+
+      setHostingStatus({
+        onboarded: Boolean(json.onboarded),
+        seedId: typeof json.seedId === 'string' ? json.seedId : undefined,
+        agentSignerPubkey: typeof json.agentSignerPubkey === 'string' ? json.agentSignerPubkey : undefined,
+        updatedAt: typeof json.updatedAt === 'string' ? json.updatedAt : null,
+      });
+    } catch (err) {
+      setHostingStatus({ onboarded: false });
+      setHostingError(err instanceof Error ? err.message : 'Failed to load status');
+    } finally {
+      setHostingLoading(false);
+    }
+  }, [address, agentIdentityPk]);
+
+  useEffect(() => {
+    if (isOwner) void loadHostingStatus();
+  }, [isOwner, loadHostingStatus]);
+
+  const openOnboardImport = () => {
+    setOnboardError(null);
+    setOnboardOk(null);
+    onboardFileRef.current?.click();
+  };
+
+  const importOnboardKeypair = async (file: File | null) => {
+    if (!file) return;
+    setOnboardError(null);
+    setOnboardOk(null);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text) as any;
+      const secret = Array.isArray(parsed)
+        ? parsed
+        : parsed && typeof parsed === 'object' && Array.isArray(parsed.secretKey)
+          ? parsed.secretKey
+          : null;
+
+      if (!Array.isArray(secret) || secret.length !== 64) {
+        throw new Error('Invalid keypair JSON (expected a 64-number array).');
+      }
+
+      const normalized = secret.map((n: any) => (Number(n) || 0) & 0xff);
+      const kp = Keypair.fromSecretKey(Uint8Array.from(normalized));
+
+      setOnboardSecretKeyJson(normalized);
+      setOnboardSignerPubkey(kp.publicKey.toBase58());
+    } catch (err) {
+      setOnboardSecretKeyJson(null);
+      setOnboardSignerPubkey('');
+      setOnboardError(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      if (onboardFileRef.current) onboardFileRef.current.value = '';
+    }
+  };
+
+  const onboardManagedHosting = async () => {
+    setOnboardError(null);
+    setOnboardOk(null);
+    setChainError(null);
+    setChainSig(null);
+
+    try {
+      if (!publicKey || !connected) throw new Error('Connect a wallet to onboard managed hosting.');
+      if (!signMessage) throw new Error('Wallet does not support message signing (signMessage).');
+      if (!onboardSecretKeyJson || onboardSecretKeyJson.length !== 64) {
+        throw new Error('Import the agent signer keypair JSON first.');
+      }
+
+      setOnboardBusy(true);
+
+      const kp = Keypair.fromSecretKey(Uint8Array.from(onboardSecretKeyJson));
+      const agentSigner = kp.publicKey.toBase58();
+
+      const message = buildManagedHostingMessage(address, agentSigner);
+      const signatureBytes = await signMessage(new TextEncoder().encode(message));
+      const signatureB64 = toBase64(signatureBytes);
+
+      const res = await fetch('/api/agents/managed-hosting', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          ownerWallet: publicKey.toBase58(),
+          agentIdentityPda: address,
+          signatureB64,
+          agentSignerSecretKeyJson: onboardSecretKeyJson,
+        }),
+      });
+
+      const json = (await res.json().catch(() => ({}))) as any;
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || `Onboarding failed (HTTP ${res.status})`);
+      }
+
+      setOnboardOk('Managed hosting enabled. Backend signer stored encrypted.');
+      await loadHostingStatus();
+    } catch (err) {
+      setOnboardError(err instanceof Error ? err.message : 'Onboarding failed');
+    } finally {
+      setOnboardBusy(false);
+    }
+  };
+
+  const loadRecovery = useCallback(async () => {
+    if (!agentIdentityPk) return;
+    setRecovery({ state: 'loading' });
+    try {
+      const [recoveryPda] = deriveRecoveryPda(agentIdentityPk, WUNDERLAND_PROGRAM_ID);
+      const info = await connection.getAccountInfo(recoveryPda, 'confirmed');
+      if (!info) {
+        setRecovery({ state: 'none' });
+        return;
+      }
+
+      const decoded = decodeAgentSignerRecovery(info.data);
+      setRecovery({
+        state: 'pending',
+        recoveryPda: recoveryPda.toBase58(),
+        newSigner: decoded.newAgentSigner.toBase58(),
+        requestedAtIso: new Date(Number(decoded.requestedAt) * 1000).toISOString(),
+        readyAtIso: new Date(Number(decoded.readyAt) * 1000).toISOString(),
+      });
+    } catch (err) {
+      setRecovery({
+        state: 'error',
+        message: err instanceof Error ? err.message : 'Failed to load recovery state',
+      });
+    }
+  }, [connection, agentIdentityPk]);
+
+  useEffect(() => {
+    if (isOwner) void loadRecovery();
+  }, [isOwner, loadRecovery]);
+
+  const deactivateOnChain = async () => {
+    if (!publicKey || !agentIdentityPk) return;
+    if (!agent?.isActive) return;
+
+    const typed = prompt('Type DEACTIVATE to permanently deactivate this agent:');
+    if (typed !== 'DEACTIVATE') return;
+
+    setChainError(null);
+    setChainSig(null);
+    setChainBusy('deactivate');
+    try {
+      const ix = buildDeactivateAgentIx({
+        owner: publicKey,
+        agentIdentity: agentIdentityPk,
+        programId: WUNDERLAND_PROGRAM_ID,
+      });
+      const tx = new Transaction().add(ix);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setChainSig(sig);
+      agentState.reload();
+      void loadRecovery();
+      void loadHostingStatus();
+    } catch (err) {
+      setChainError(err instanceof Error ? err.message : 'Deactivate failed');
+    } finally {
+      setChainBusy(null);
+    }
+  };
+
+  const generateRecoverySigner = () => {
+    const kp = Keypair.generate();
+    setRecoveryKeypair(kp);
+    setNewSignerPubkey(kp.publicKey.toBase58());
+  };
+
+  const downloadRecoverySigner = () => {
+    if (!recoveryKeypair) return;
+    downloadJson(
+      `wunderland-recovery-signer-${address.slice(0, 4)}.json`,
+      keypairToSecretKeyJson(recoveryKeypair.secretKey),
+    );
+  };
+
+  const requestRecovery = async () => {
+    if (!publicKey || !agentIdentityPk) return;
+    setChainError(null);
+    setChainSig(null);
+    setChainBusy('request_recovery');
+    try {
+      const newSignerStr = newSignerPubkey.trim();
+      if (!newSignerStr) throw new Error('Enter a new agent signer pubkey.');
+      const newSigner = new PublicKey(newSignerStr);
+      const { instruction } = buildRequestRecoverAgentSignerIx({
+        owner: publicKey,
+        agentIdentity: agentIdentityPk,
+        newAgentSigner: newSigner,
+        programId: WUNDERLAND_PROGRAM_ID,
+      });
+      const tx = new Transaction().add(instruction);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setChainSig(sig);
+      await loadRecovery();
+    } catch (err) {
+      setChainError(err instanceof Error ? err.message : 'Recovery request failed');
+    } finally {
+      setChainBusy(null);
+    }
+  };
+
+  const executeRecovery = async () => {
+    if (!publicKey || !agentIdentityPk) return;
+    setChainError(null);
+    setChainSig(null);
+    setChainBusy('execute_recovery');
+    try {
+      const { instruction } = buildExecuteRecoverAgentSignerIx({
+        owner: publicKey,
+        agentIdentity: agentIdentityPk,
+        programId: WUNDERLAND_PROGRAM_ID,
+      });
+      const tx = new Transaction().add(instruction);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setChainSig(sig);
+      setRecoveryKeypair(null);
+      setNewSignerPubkey('');
+      await loadRecovery();
+    } catch (err) {
+      setChainError(err instanceof Error ? err.message : 'Recovery execution failed');
+    } finally {
+      setChainBusy(null);
+    }
+  };
+
+  const cancelRecovery = async () => {
+    if (!publicKey || !agentIdentityPk) return;
+    setChainError(null);
+    setChainSig(null);
+    setChainBusy('cancel_recovery');
+    try {
+      const { instruction } = buildCancelRecoverAgentSignerIx({
+        owner: publicKey,
+        agentIdentity: agentIdentityPk,
+        programId: WUNDERLAND_PROGRAM_ID,
+      });
+      const tx = new Transaction().add(instruction);
+      const sig = await sendTransaction(tx, connection, { skipPreflight: false });
+      await connection.confirmTransaction(sig, 'confirmed');
+      setChainSig(sig);
+      await loadRecovery();
+    } catch (err) {
+      setChainError(err instanceof Error ? err.message : 'Recovery cancel failed');
+    } finally {
+      setChainBusy(null);
+    }
+  };
 
   const handleSaveLlm = async () => {
     if (!isOwner || !apiKeyValue.trim()) return;
@@ -288,7 +622,7 @@ export default function AgentSettingsPage({ params }: { params: Promise<{ addres
 
   const providerModels = LLM_PROVIDERS.find((p) => p.id === selectedProvider)?.models ?? [];
 
-  if (agentsState.loading) {
+  if (agentState.loading) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-12 animate-pulse">
         <div className="h-8 w-48 bg-white/5 rounded mb-4" />
@@ -368,6 +702,290 @@ export default function AgentSettingsPage({ params }: { params: Promise<{ addres
           {saveResult.text}
         </div>
 	      )}
+
+        {/* Managed Hosting */}
+        <div className="holo-card p-6 mb-6 section-glow-purple">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)] mb-2">
+                Managed Hosting (Bots)
+              </h2>
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                Enable autonomous backend actions by storing the agent signer key encrypted on the server.
+                Requires a wallet signature (<code className="font-mono">signMessage</code>) and the agent signer keypair JSON.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void loadHostingStatus()}
+              disabled={hostingLoading}
+              className="px-3 py-2 rounded text-[10px] font-mono uppercase
+                bg-[var(--bg-glass)] border border-[var(--border-glass)]
+                text-[var(--text-secondary)] hover:text-[var(--text-primary)]
+                transition-all disabled:opacity-40"
+            >
+              {hostingLoading ? 'Refreshing…' : 'Refresh'}
+            </button>
+          </div>
+
+          {hostingError && (
+            <div className="mt-4 text-xs text-[var(--neon-red)] p-3 rounded-lg bg-[rgba(255,50,50,0.06)] border border-[rgba(255,50,50,0.15)]">
+              {hostingError}
+            </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className={`badge text-[10px] ${hostingStatus.onboarded ? 'badge-verified' : 'bg-white/5 text-white/60 border border-white/10'}`}>
+              {hostingStatus.onboarded ? 'Onboarded' : 'Not onboarded'}
+            </span>
+            {hostingStatus.updatedAt && (
+              <span className="badge bg-white/5 text-white/40 border border-white/10 text-[10px] font-mono">
+                updated {new Date(hostingStatus.updatedAt).toISOString().split('T')[0]}
+              </span>
+            )}
+            {!signMessage && (
+              <span className="badge bg-[rgba(255,50,50,0.06)] text-[var(--neon-red)] border border-[rgba(255,50,50,0.15)] text-[10px] font-mono">
+                wallet missing signMessage
+              </span>
+            )}
+          </div>
+
+          {hostingStatus.onboarded && hostingStatus.agentSignerPubkey && (
+            <div className="mt-3 text-[11px] text-[var(--text-tertiary)] font-mono break-all">
+              signer {hostingStatus.agentSignerPubkey}
+            </div>
+          )}
+
+          {!hostingStatus.onboarded && (
+            <div className="mt-5 grid gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={openOnboardImport}
+                  className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] transition-all"
+                >
+                  Import signer JSON
+                </button>
+                <input
+                  ref={onboardFileRef}
+                  type="file"
+                  accept="application/json"
+                  className="hidden"
+                  onChange={(e) => void importOnboardKeypair(e.target.files?.[0] ?? null)}
+                />
+                <button
+                  type="button"
+                  onClick={() => void onboardManagedHosting()}
+                  disabled={onboardBusy || !onboardSecretKeyJson || !signMessage || !agent?.isActive}
+                  className="px-4 py-2 rounded-lg text-[10px] font-mono uppercase
+                    bg-[rgba(0,255,255,0.10)] border border-[rgba(0,255,255,0.20)]
+                    text-[var(--neon-cyan)] hover:shadow-[0_0_20px_rgba(0,255,255,0.25)]
+                    transition-all disabled:opacity-40"
+                >
+                  {onboardBusy ? 'Onboarding…' : 'Enable managed hosting'}
+                </button>
+              </div>
+
+              {onboardSignerPubkey && (
+                <div className="text-[11px] text-[var(--text-tertiary)] font-mono break-all">
+                  imported signer {onboardSignerPubkey}
+                </div>
+              )}
+
+              {!agent?.isActive && (
+                <div className="text-[11px] text-[var(--neon-red)]">
+                  This agent is inactive on-chain. Managed hosting onboarding is disabled.
+                </div>
+              )}
+
+              {onboardOk && (
+                <div className="text-xs text-[var(--neon-green)] p-3 rounded-lg bg-[rgba(0,255,100,0.06)] border border-[rgba(0,255,100,0.15)]">
+                  {onboardOk}
+                </div>
+              )}
+
+              {onboardError && (
+                <div className="text-xs text-[var(--neon-red)] p-3 rounded-lg bg-[rgba(255,50,50,0.06)] border border-[rgba(255,50,50,0.15)]">
+                  {onboardError}
+                </div>
+              )}
+
+              <div className="text-[10px] text-[var(--text-tertiary)] font-mono">
+                Tip: keep the signer keypair safe. If you rotate the signer on-chain, re-onboard managed hosting with the new signer.
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* On-chain Safety */}
+        <div className="holo-card p-6 mb-6 section-glow-cyan">
+          <h2 className="text-xs font-mono uppercase tracking-wider text-[var(--text-tertiary)] mb-4">
+            On-chain Safety (Owner)
+          </h2>
+
+          <div className="text-[11px] text-[var(--text-secondary)] leading-relaxed mb-4">
+            Deactivation is irreversible. Signer recovery is timelocked and lets you rotate the agent signer if the operational key is lost or compromised.
+          </div>
+
+          {chainError && (
+            <div className="mb-3 text-xs text-[var(--neon-red)] p-3 rounded-lg bg-[rgba(255,50,50,0.06)] border border-[rgba(255,50,50,0.15)]">
+              {chainError}
+            </div>
+          )}
+
+          {chainSig && (
+            <div className="mb-3 text-xs text-[var(--neon-cyan)] p-3 rounded-lg bg-[rgba(0,255,255,0.06)] border border-[rgba(0,255,255,0.15)]">
+              Transaction submitted:{' '}
+              <a href={explorerTxUrl(chainSig)} target="_blank" rel="noreferrer" className="underline">
+                view on explorer
+              </a>
+            </div>
+          )}
+
+          {/* Deactivate */}
+          <div className="p-4 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)]">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Deactivate Agent</div>
+                <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
+                  Current status: {agent?.isActive ? 'active' : 'inactive'}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => void deactivateOnChain()}
+                disabled={chainBusy !== null || !agent?.isActive}
+                className="px-4 py-2 rounded text-[10px] font-mono uppercase
+                  bg-[rgba(255,50,50,0.10)] border border-[rgba(255,50,50,0.20)]
+                  text-[var(--neon-red)] hover:shadow-[0_0_20px_rgba(255,50,50,0.25)]
+                  transition-all disabled:opacity-40"
+              >
+                {chainBusy === 'deactivate' ? 'Deactivating…' : 'Deactivate'}
+              </button>
+            </div>
+          </div>
+
+          {/* Signer recovery */}
+          <div className="mt-4 p-4 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)]">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Signer Recovery</div>
+                <div className="mt-1 text-[11px] text-[var(--text-tertiary)]">
+                  {recovery.state === 'pending' && recovery.readyAtIso
+                    ? `ready ${Date.now() >= new Date(recovery.readyAtIso).getTime() ? 'now' : 'at'} ${new Date(recovery.readyAtIso).toLocaleString()}`
+                    : recovery.state === 'none'
+                      ? 'no pending request'
+                      : recovery.state === 'loading'
+                        ? 'loading…'
+                        : '—'}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => void loadRecovery()}
+                disabled={recovery.state === 'loading' || chainBusy !== null}
+                className="px-3 py-2 rounded text-[10px] font-mono uppercase
+                  bg-[var(--bg-glass)] border border-[var(--border-glass)]
+                  text-[var(--text-secondary)] hover:text-[var(--text-primary)]
+                  transition-all disabled:opacity-40"
+              >
+                Refresh
+              </button>
+            </div>
+
+            {recovery.state === 'error' && (
+              <div className="mt-3 text-[11px] text-[var(--neon-red)] font-mono">
+                {recovery.message || 'Failed to load recovery status'}
+              </div>
+            )}
+
+            {recovery.state === 'pending' ? (
+              <div className="mt-3 space-y-3">
+                {recovery.newSigner && (
+                  <div className="text-[11px] text-[var(--text-tertiary)] font-mono break-all">
+                    new_signer {recovery.newSigner}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void executeRecovery()}
+                    disabled={
+                      chainBusy !== null ||
+                      !recovery.readyAtIso ||
+                      Date.now() < new Date(recovery.readyAtIso).getTime()
+                    }
+                    className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase
+                      bg-[rgba(0,255,255,0.06)] text-[var(--text-secondary)] border border-[rgba(0,255,255,0.2)]
+                      hover:bg-[rgba(0,255,255,0.10)] transition-all disabled:opacity-40"
+                  >
+                    {chainBusy === 'execute_recovery' ? 'Executing…' : 'Execute'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void cancelRecovery()}
+                    disabled={chainBusy !== null}
+                    className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase
+                      bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)]
+                      hover:bg-[var(--bg-glass-hover)] transition-all disabled:opacity-40"
+                  >
+                    {chainBusy === 'cancel_recovery' ? 'Canceling…' : 'Cancel'}
+                  </button>
+                </div>
+                {recovery.readyAtIso && Date.now() < new Date(recovery.readyAtIso).getTime() && (
+                  <div className="text-[11px] text-[var(--text-tertiary)]">
+                    Timelock not ready yet. You can execute once it matures.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="mt-3 grid gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={generateRecoverySigner}
+                    disabled={chainBusy !== null}
+                    className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase
+                      bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)]
+                      hover:bg-[var(--bg-glass-hover)] transition-all disabled:opacity-40"
+                  >
+                    Generate
+                  </button>
+                  <button
+                    type="button"
+                    onClick={downloadRecoverySigner}
+                    disabled={!recoveryKeypair || chainBusy !== null}
+                    className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase
+                      bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)]
+                      hover:bg-[var(--bg-glass-hover)] transition-all disabled:opacity-40"
+                  >
+                    Download
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void requestRecovery()}
+                    disabled={chainBusy !== null || !newSignerPubkey.trim()}
+                    className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase
+                      bg-[rgba(153,69,255,0.10)] text-[var(--text-secondary)] border border-[rgba(153,69,255,0.25)]
+                      hover:bg-[rgba(153,69,255,0.16)] transition-all disabled:opacity-40"
+                  >
+                    {chainBusy === 'request_recovery' ? 'Requesting…' : 'Request'}
+                  </button>
+                </div>
+                <input
+                  value={newSignerPubkey}
+                  onChange={(e) => setNewSignerPubkey(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-xs font-mono focus:outline-none focus:border-[var(--neon-cyan)]/50 transition-all"
+                  placeholder="New agent signer pubkey (base58)"
+                  aria-label="New agent signer pubkey"
+                />
+                <div className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                  After requesting, wait for the on-chain timelock, then execute. Update your runtime (or re-onboard managed hosting) to use the new signer key.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Vault */}
         <div className="holo-card p-6 mb-6 section-glow-green">

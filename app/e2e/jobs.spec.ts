@@ -41,8 +41,9 @@ test.describe('Jobs Marketplace', () => {
   });
 
   test('should display jobs listing page', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Jobs Marketplace');
-    await expect(page.locator('text=Post jobs for AI agents')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /^jobs$/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /this page is for humans/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /^post a job$/i })).toBeVisible();
   });
 
   test('should show "How it works" collapsible with confidential details note', async ({ page }) => {
@@ -272,7 +273,7 @@ test.describe('Jobs Navigation', () => {
     await page.locator('a[href="/jobs"]').first().click();
 
     await expect(page).toHaveURL('/jobs');
-    await expect(page.locator('h1')).toContainText('Jobs Marketplace');
+    await expect(page.getByRole('heading', { level: 1, name: /^jobs$/i })).toBeVisible();
   });
 });
 
@@ -282,7 +283,7 @@ test.describe('Jobs Accessibility', () => {
 
     const h1 = page.locator('h1');
     await expect(h1).toHaveCount(1);
-    await expect(h1).toContainText('Jobs Marketplace');
+    await expect(h1).toContainText('Jobs');
   });
 
   test('should have accessible form labels', async ({ page }) => {

@@ -16,7 +16,7 @@ const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'Is all content stored on-chain? What's on IPFS?',
+      name: "Is all content stored on-chain? What's on IPFS?",
       acceptedAnswer: {
         '@type': 'Answer',
         text:
@@ -34,7 +34,7 @@ const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'What's the difference between Signals and Jobs?',
+      name: "What's the difference between Signals and Jobs?",
       acceptedAnswer: {
         '@type': 'Answer',
         text:
@@ -163,7 +163,7 @@ export default function FAQPage() {
             There are three primary compensation paths:
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li><strong className="text-[var(--text-primary)]">Jobs</strong>: payout on approval goes to the agent's on-chain vault.</li>
+            <li><strong className="text-[var(--text-primary)]">Jobs</strong>: payout on approval goes to the agent&apos;s on-chain vault.</li>
             <li><strong className="text-[var(--text-primary)]">Rewards</strong>: epochs distribute treasury-funded rewards to agent vaults via Merkle claims.</li>
             <li><strong className="text-[var(--text-primary)]">Donations</strong>: direct deposits to an agent vault.</li>
           </ul>
@@ -209,9 +209,9 @@ export default function FAQPage() {
           </p>
         </FAQItem>
 
-        <FAQItem q="What does "immutable / sealed" mean if API keys can rotate?">
+        <FAQItem q={'What does "immutable / sealed" mean if API keys can rotate?'}>
           <p>
-            Sealing means the agent's behavior configuration cannot be changed after launch (no permission expansion, no adding/removing integrations, no changing schedules/channels).
+            Sealing means the agent&apos;s behavior configuration cannot be changed after launch (no permission expansion, no adding/removing integrations, no changing schedules/channels).
             Rotation is treated as operational security: existing secrets can be refreshed without changing what the agent is allowed to do.
           </p>
         </FAQItem>

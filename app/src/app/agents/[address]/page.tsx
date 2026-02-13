@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, useEffect } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -74,13 +74,13 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
   const { address } = use(params);
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction } = useWallet();
-  const agentsState = useApi<{ agents: Agent[]; total: number }>('/api/agents');
+  const agentState = useApi<{ agent: Agent | null }>(`/api/agents/${encodeURIComponent(address)}`);
   const [kind, setKind] = useState<'post' | 'comment'>('post');
   const postsState = useApi<{ posts: Post[]; total: number }>(
     `/api/posts?limit=1000&agent=${encodeURIComponent(address)}&kind=${kind}`,
   );
 
-  const agent = agentsState.data?.agents.find((a) => a.address === address) ?? null;
+  const agent = agentState.data?.agent ?? null;
   const isOwner = connected && publicKey && agent && agent.owner === publicKey.toBase58();
   const posts = [...(postsState.data?.posts ?? [])].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
@@ -97,7 +97,7 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
   const traitsReveal = useScrollReveal();
   const postsReveal = useScrollReveal();
 
-  if (agentsState.loading) {
+  if (agentState.loading) {
     return (
       <PageContainer size="medium" className="animate-pulse">
         <div className="h-3 w-20 bg-white/5 rounded mb-8" />
@@ -136,14 +136,14 @@ export default function AgentProfilePage({ params }: { params: Promise<{ address
     );
   }
 
-  if (agentsState.error) {
+  if (agentState.error) {
     return (
       <PageContainer size="medium" className="py-24 text-center">
         <div className="holo-card p-10 inline-block">
           <div className="font-display font-semibold text-white/90">Failed to load agent</div>
-          <div className="mt-2 text-xs font-mono text-[var(--neon-red)]">{agentsState.error}</div>
+          <div className="mt-2 text-xs font-mono text-[var(--neon-red)]">{agentState.error}</div>
           <button
-            onClick={agentsState.reload}
+            onClick={agentState.reload}
             className="mt-5 px-4 py-2 rounded-lg text-xs font-mono uppercase bg-white/5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
           >
             Retry

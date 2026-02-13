@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { Keypair } from '@solana/web3.js';
 import { downloadJson, keypairToSecretKeyJson } from '@/lib/wunderland-program';
 import Tooltip from '@/components/Tooltip';
@@ -13,14 +14,52 @@ interface StepSignerProps {
 }
 
 export default function StepSigner({ state, dispatch, walletSupportsSignMessage }: StepSignerProps) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
   const generateSigner = () => {
     const kp = Keypair.generate();
     dispatch({ type: 'SET_GENERATED_SIGNER', signer: kp });
+    setImportError(null);
   };
 
   const downloadSigner = () => {
     if (!state.generatedSigner) return;
     downloadJson('wunderbot-signer.json', keypairToSecretKeyJson(state.generatedSigner.secretKey));
+  };
+
+  const openImport = () => {
+    setImportError(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (file: File | null) => {
+    if (!file) return;
+    setImportError(null);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text) as any;
+      const secret = Array.isArray(parsed)
+        ? parsed
+        : parsed && typeof parsed === 'object' && Array.isArray(parsed.secretKey)
+          ? parsed.secretKey
+          : null;
+
+      if (!Array.isArray(secret) || secret.length !== 64) {
+        throw new Error('Invalid keypair JSON (expected a 64-number array).');
+      }
+
+      const bytes = Uint8Array.from(
+        secret.map((n: any) => (Number(n) || 0) & 0xff),
+      );
+      const kp = Keypair.fromSecretKey(bytes);
+      dispatch({ type: 'SET_GENERATED_SIGNER', signer: kp });
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      // Allow re-importing the same file again.
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -45,6 +84,15 @@ export default function StepSigner({ state, dispatch, walletSupportsSignMessage 
                 Generate
               </button>
             </Tooltip>
+            <Tooltip content="Import an existing signer keypair JSON (64-number array)" position="top">
+              <button
+                type="button"
+                onClick={openImport}
+                className="px-3 py-2 rounded-lg text-[10px] font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all"
+              >
+                Import
+              </button>
+            </Tooltip>
             <Tooltip content="Download the signer keypair JSON file. Store it safely!" position="top">
               <button
                 type="button"
@@ -58,12 +106,31 @@ export default function StepSigner({ state, dispatch, walletSupportsSignMessage 
           </div>
         </div>
         <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          className="hidden"
+          onChange={(e) => void handleImportFile(e.target.files?.[0] ?? null)}
+        />
+        <input
           value={state.agentSignerPubkey}
           onChange={(e) => dispatch({ type: 'SET_SIGNER_PUBKEY', pubkey: e.target.value })}
           className="mt-3 w-full px-4 py-3 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-xs font-mono focus:outline-none focus:border-[var(--neon-cyan)]/50 transition-all duration-300"
           placeholder="Agent signer pubkey (base58)"
           aria-label="Agent signer public key"
         />
+
+        {importError && (
+          <div className="mt-2 text-[11px] text-[var(--neon-red)] font-mono">
+            {importError}
+          </div>
+        )}
+
+        {state.hostingMode === 'managed' && !state.generatedSigner && (
+          <div className="mt-2 text-[11px] text-[var(--neon-red)]">
+            Managed hosting requires the signer <span className="font-mono">secret key</span>. Generate or import it above.
+          </div>
+        )}
       </div>
 
       <div className="glass rounded-xl p-4">

@@ -641,6 +641,27 @@ export async function getAllAgentsServer(): Promise<Agent[]> {
   }
 }
 
+export async function getAgentByPdaServer(agentPda: string): Promise<Agent | null> {
+  const pda = agentPda.trim();
+  if (!pda) return null;
+
+  try {
+    return await withRpcFallback(async (connection) => {
+      const pk = new PublicKey(pda);
+      const info = await connection.getAccountInfo(pk, 'confirmed');
+      if (!info?.data) return null;
+      try {
+        return decodeAgentIdentityWithFallback(pk, info.data);
+      } catch {
+        return null;
+      }
+    });
+  } catch (error) {
+    console.warn('[solana-server] Failed to fetch on-chain agent by PDA (all RPCs exhausted):', error);
+    return null;
+  }
+}
+
 export async function getAllTipsServer(opts?: {
   limit?: number;
   offset?: number;

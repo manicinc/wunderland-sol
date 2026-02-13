@@ -72,7 +72,6 @@ function explorerClusterParam(cluster: string): string {
 }
 
 export default function SignalsPage() {
-  const headerReveal = useScrollReveal();
   const submitReveal = useScrollReveal();
   const mySignalsReveal = useScrollReveal();
 
@@ -262,7 +261,7 @@ export default function SignalsPage() {
         </Link>
       </div>
 
-      <div className="mt-6">
+      <div className="mb-6">
         <Collapsible title="How it works" defaultOpen={true}>
           <div className="space-y-3 text-sm text-[var(--text-secondary)] leading-relaxed">
             <div>
@@ -285,9 +284,9 @@ export default function SignalsPage() {
 
       <div
         ref={submitReveal.ref}
-        className={`holo-card p-6 mt-6 section-glow-purple animate-in ${submitReveal.isVisible ? 'visible' : ''}`}
+        className={`holo-card p-4 sm:p-6 mt-6 section-glow-purple animate-in ${submitReveal.isVisible ? 'visible' : ''}`}
       >
-        <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4">
           <div>
             <h2 className="font-display font-semibold text-lg">
               <span className="neon-glow-purple">Publish a Signal</span>
@@ -296,7 +295,6 @@ export default function SignalsPage() {
               Choose <span className="font-mono">text</span> or <span className="font-mono">url</span>. URL signals snapshot + sanitize the page content.
             </div>
           </div>
-          <WalletButton />
         </div>
 
         <div className="grid gap-3">
@@ -429,7 +427,7 @@ export default function SignalsPage() {
 
       <div
         ref={mySignalsReveal.ref}
-        className={`holo-card p-6 section-glow-purple mt-6 animate-in ${mySignalsReveal.isVisible ? 'visible' : ''}`}
+        className={`holo-card p-4 sm:p-6 section-glow-purple mt-6 animate-in ${mySignalsReveal.isVisible ? 'visible' : ''}`}
       >
         <div className="flex items-center justify-between gap-4 mb-4">
           <h2 className="font-display font-semibold text-lg">
@@ -468,13 +466,13 @@ export default function SignalsPage() {
           {(mySignalsState.data?.tips ?? []).map((tip) => {
             const canRefund = tip.status === 'pending';
             return (
-              <div key={tip.tipPda} className="p-4 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)]">
-                <div className="flex items-start justify-between gap-3">
+              <div key={tip.tipPda} className="p-3 sm:p-4 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-glass)]">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-[10px] font-mono text-[var(--text-tertiary)] break-all">
                       {tip.tipPda}
                     </div>
-                    <div className="mt-1 flex items-center gap-2 text-[10px] font-mono">
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-mono">
                       <span className="text-white/70">{lamportsToSol(tip.amount)} SOL</span>
                       <span className="text-white/30">{tip.priority.toUpperCase()}</span>
                       <span className="text-white/30">{tip.sourceType.toUpperCase()}</span>
@@ -519,6 +517,6 @@ export default function SignalsPage() {
           })}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

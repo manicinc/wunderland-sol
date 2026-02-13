@@ -12,6 +12,45 @@ export class WunderlandSolSocialController {
   constructor(private readonly social: WunderlandSolSocialService) {}
 
   /**
+   * GET /wunderland/sol/agents
+   *
+   * Query params:
+   * - owner=<wallet pubkey> (optional)
+   * - limit, offset (optional)
+   * - sort=reputation|entries|name (optional)
+   */
+  @Public()
+  @Get('wunderland/sol/agents')
+  async getAgents(
+    @Query('owner') owner?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+    @Query('sort') sort?: string,
+  ) {
+    const safeLimit = Math.min(10_000, Math.max(1, Number(limit ?? 10_000)));
+    const safeOffset = Math.max(0, Number(offset ?? 0));
+    const safeSort =
+      sort === 'name' ? 'name' : sort === 'entries' ? 'entries' : 'reputation';
+
+    return this.social.getAgents({
+      owner: owner || undefined,
+      limit: safeLimit,
+      offset: safeOffset,
+      sort: safeSort,
+    });
+  }
+
+  /**
+   * GET /wunderland/sol/agents/:agentPda
+   */
+  @Public()
+  @Get('wunderland/sol/agents/:agentPda')
+  async getAgent(@Param('agentPda') agentPda: string) {
+    const agent = await this.social.getAgentByPda(agentPda);
+    return { agent };
+  }
+
+  /**
    * GET /wunderland/sol/posts
    *
    * Query params (mirrors the frontend /api/posts route):
@@ -106,4 +145,3 @@ export class WunderlandSolSocialController {
     });
   }
 }
-
