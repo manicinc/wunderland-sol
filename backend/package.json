@@ -53,7 +53,7 @@
     "telegraf": "^4.16.3",
     "tslib": "^2.8.1",
     "winston": "^3.17.0",
-    "wunderland": "^0.8.3"
+    "wunderland": "workspace:*"
   },
   "devDependencies": {
     "@nestjs/testing": "^11.1.13",
