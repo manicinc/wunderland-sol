@@ -12,6 +12,7 @@
  */
 
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import { DatabaseService } from '../../../database/database.service';
 import { callLlm, callLlmWithProviderConfig } from '../../../core/llm/llm.factory';
 import { LlmConfigService, LlmProviderId } from '../../../core/llm/llm.config.service.js';
@@ -42,6 +43,7 @@ import type {
   WunderlandSeedConfig,
   HEXACOTraits,
   InferenceHierarchyConfig,
+  SocialDynamicsConfig,
   StimulusEvent,
   StimulusSource,
   TipPayload,
@@ -124,13 +126,16 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
   private async bootstrap(): Promise<void> {
     // 1. Create WonderlandNetwork
+    const networkId = 'wunderland-main';
+    const socialDynamics = await this.loadSocialDynamicsConfig(networkId);
     this.network = new WonderlandNetwork({
-      networkId: 'wunderland-main',
+      networkId,
       worldFeedSources: [],
       globalRateLimits: { maxPostsPerHourPerAgent: 10, maxTipsPerHourPerUser: 20 },
       defaultApprovalTimeoutMs: 300_000,
       quarantineNewCitizens: false,
       quarantineDurationMs: 0,
+      socialDynamics,
     });
 
     const enableBehaviorTelemetryLogs = /^(1|true|yes)$/i.test(
@@ -961,6 +966,72 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  private async loadSocialDynamicsConfig(networkId: string): Promise<SocialDynamicsConfig | undefined> {
+    const defaults: SocialDynamicsConfig = {
+      pairwiseInfluenceDamping: {
+        enabled: true,
+        halfLifeMs: 6 * 60 * 60 * 1000,
+        suppressionThreshold: 0.2,
+        minWeight: 0.08,
+        scoreSlope: 0.28,
+        streakSlope: 0.18,
+        actionImpact: {
+          like: 1,
+          downvote: 1,
+          boost: 1.25,
+          reply: 1.25,
+          view: 0.2,
+          report: 0.8,
+          emoji_reaction: 0.6,
+        },
+      },
+    };
+
+    // Always return a usable config; fall back to defaults on parse/IO errors.
+    let parsed: SocialDynamicsConfig | undefined;
+    try {
+      const row = await this.db.get<{ config_json: string | null }>(
+        `SELECT config_json
+           FROM wunderland_social_dynamics_configs
+          WHERE network_id = ?
+          LIMIT 1`,
+        [networkId],
+      );
+      if (row?.config_json) {
+        const maybe = this.safeJsonParse<unknown>(row.config_json);
+        if (maybe && typeof maybe === 'object') {
+          parsed = maybe as SocialDynamicsConfig;
+        }
+      }
+    } catch (err) {
+      this.logger.warn(
+        `Failed to load social dynamics config for network '${networkId}': ${String(
+          (err as any)?.message ?? err,
+        )}`,
+      );
+    }
+
+    const effective = parsed ?? defaults;
+
+    // Backfill defaults (best-effort) so operators can tune without redeploying.
+    try {
+      const now = Date.now();
+      const configJson = JSON.stringify(effective);
+      const hash = createHash('sha256').update(configJson).digest('hex');
+      await this.db.run(
+        `INSERT INTO wunderland_social_dynamics_configs (
+          network_id, config_json, config_hash, updated_by_user_id, created_at, updated_at
+        ) VALUES (?, ?, ?, NULL, ?, ?)
+        ON CONFLICT(network_id) DO NOTHING`,
+        [networkId, configJson, hash, now, now],
+      );
+    } catch {
+      // non-critical
+    }
+
+    return effective;
+  }
+
   private async loadAndRegisterAgents(): Promise<number> {
     const agents = await this.db.all<{
       seed_id: string;
@@ -1202,6 +1273,19 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
       return Number.isNaN(ms) ? null : ms;
     })();
 
+    // Resolve enclave slug (e.g. "creative-chaos") to UUID enclave_id
+    const enclaveSlug = (post as any).enclave ?? null;
+    let enclaveId: string | null = null;
+    if (enclaveSlug) {
+      try {
+        const row = await this.db.get<{ enclave_id: string }>(
+          'SELECT enclave_id FROM wunderland_enclaves WHERE name = ? LIMIT 1',
+          [enclaveSlug],
+        );
+        enclaveId = row?.enclave_id ?? null;
+      } catch { /* non-critical */ }
+    }
+
     await this.db.run(
       `INSERT INTO wunderland_posts (
         post_id, seed_id, content, manifest, status,
@@ -1247,7 +1331,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         stimulusEventId,
         stimulusSourceProviderId,
         stimulusTimestamp,
-        (post as any).enclave ?? null,
+        enclaveId,
       ]
     );
 
