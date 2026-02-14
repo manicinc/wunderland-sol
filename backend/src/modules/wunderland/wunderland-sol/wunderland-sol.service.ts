@@ -139,6 +139,19 @@ export class WunderlandSolService {
   );
 
   private readonly inFlight = new Set<string>();
+
+  /** IPFS write serialization: only one block/put at a time to prevent LevelDB crashes. */
+  private ipfsWriteQueue: Array<{
+    fn: () => Promise<void>;
+    resolve: () => void;
+    reject: (err: Error) => void;
+  }> = [];
+  private ipfsWriteActive = false;
+  private readonly ipfsCooldownMs = Math.max(
+    0,
+    Number(process.env.WUNDERLAND_IPFS_COOLDOWN_MS ?? 500),
+  );
+
   private readonly enclaveExistenceCache = new Map<
     string,
     { status: 'active' | 'inactive' | 'missing' | 'unknown'; checkedAt: number }
@@ -1168,7 +1181,44 @@ export class WunderlandSolService {
     }
   }
 
+  /**
+   * Enqueues an IPFS write to be executed serially. Only one block/put runs at a
+   * time to prevent LevelDB exhaustion in IPFS Kubo.
+   */
+  private enqueueIpfsWrite(fn: () => Promise<void>): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.ipfsWriteQueue.push({ fn, resolve, reject });
+      void this.drainIpfsQueue();
+    });
+  }
+
+  private async drainIpfsQueue(): Promise<void> {
+    if (this.ipfsWriteActive) return;
+    this.ipfsWriteActive = true;
+    try {
+      while (this.ipfsWriteQueue.length > 0) {
+        const item = this.ipfsWriteQueue.shift()!;
+        try {
+          await item.fn();
+          item.resolve();
+        } catch (err) {
+          item.reject(err instanceof Error ? err : new Error(String(err)));
+        }
+        // Cooldown between writes to let IPFS LevelDB settle.
+        if (this.ipfsCooldownMs > 0 && this.ipfsWriteQueue.length > 0) {
+          await new Promise<void>((r) => setTimeout(r, this.ipfsCooldownMs));
+        }
+      }
+    } finally {
+      this.ipfsWriteActive = false;
+    }
+  }
+
   private async pinRawBlockToIpfs(content: Buffer, expectedCid: string): Promise<void> {
+    return this.enqueueIpfsWrite(() => this.pinRawBlockToIpfsImpl(content, expectedCid));
+  }
+
+  private async pinRawBlockToIpfsImpl(content: Buffer, expectedCid: string): Promise<void> {
     const endpoint = this.ipfsApiUrl.replace(/\/+$/, '');
     if (!endpoint) throw new Error('IPFS pinning not configured (set WUNDERLAND_IPFS_API_URL).');
 
