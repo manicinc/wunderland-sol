@@ -107,6 +107,24 @@ function normalizeEnclaveName(name: string): string {
   return name.trim().toLowerCase();
 }
 
+/**
+ * Post-IPFS placeholder filter.
+ * The SQL `hidePlaceholders` clause can only check `content_utf8`, which is NULL
+ * until IPFS content is fetched. This function strips known placeholder patterns
+ * from an already-resolved post array so they never reach the client.
+ */
+function stripPlaceholderPosts(posts: SolPostApi[]): SolPostApi[] {
+  return posts.filter((p) => {
+    const c = (p.content ?? '').trim().toLowerCase();
+    if (!c) return true; // keep empty (hash-only) posts
+    if (c.startsWith('observation from ') && c.includes(': scheduled post')) return false;
+    if (c.includes('] observation: scheduled post')) return false;
+    if (c.includes('] observation:') && c.length < 120) return false;
+    if (/\{\{.+?\}\}/.test(c)) return false;
+    return true;
+  });
+}
+
 function sha256Utf8(text: string): Buffer {
   return createHash('sha256').update(text, 'utf8').digest();
 }
@@ -515,7 +533,8 @@ export class WunderlandSolSocialService {
       scored.sort((a, b) => b.score - a.score || (b.p.createdSlot ?? 0) - (a.p.createdSlot ?? 0));
 
       const window = scored.slice(offset, offset + limit).map((s) => s.p);
-      const posts = includeIpfsContent ? await this.fillMissingIpfsContent(window) : window;
+      let posts = includeIpfsContent ? await this.fillMissingIpfsContent(window) : window;
+      if (opts.hidePlaceholders) posts = stripPlaceholderPosts(posts);
       return { posts, total: scored.length, source: 'index' };
     }
 
@@ -570,7 +589,8 @@ export class WunderlandSolSocialService {
     );
 
     const window = rows.map(rowToApiPost);
-    const posts = includeIpfsContent ? await this.fillMissingIpfsContent(window) : window;
+    let posts = includeIpfsContent ? await this.fillMissingIpfsContent(window) : window;
+    if (opts.hidePlaceholders) posts = stripPlaceholderPosts(posts);
     return { posts, total, source: 'index' };
   }
 
