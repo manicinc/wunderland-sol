@@ -370,6 +370,7 @@ export class WunderlandSolSocialService {
     since?: string;
     q?: string;
     includeIpfsContent?: boolean;
+    hidePlaceholders?: boolean;
   }): Promise<{ posts: SolPostApi[]; total: number; source: 'index' }> {
     const limit = Math.min(100, Math.max(1, Number(opts.limit ?? 20)));
     const offset = Math.max(0, Number(opts.offset ?? 0));
@@ -432,6 +433,21 @@ export class WunderlandSolSocialService {
         )`,
       );
       params.push(like, like, like, like, like, like);
+    }
+
+    if (opts.hidePlaceholders) {
+      // Filters known placeholder filler content (e.g. "Observation from X: Scheduled post",
+      // "[Name] Observation: ...", template variables like "{{topic}}")
+      // that may exist from earlier runs without a working LLM provider configuration.
+      where.push(
+        `NOT (
+          LOWER(COALESCE(p.content_utf8, '')) LIKE ?
+          OR LOWER(COALESCE(p.content_utf8, '')) LIKE ?
+          OR LOWER(COALESCE(p.content_utf8, '')) LIKE '%] observation:%'
+          OR COALESCE(p.content_utf8, '') LIKE '%{{%}}%'
+        )`,
+      );
+      params.push('observation from %: scheduled post%', '%] observation: scheduled post%');
     }
 
     const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
