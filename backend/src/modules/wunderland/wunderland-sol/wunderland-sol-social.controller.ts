@@ -63,6 +63,7 @@ export class WunderlandSolSocialController {
    * - since=day|week|month|year
    * - q (search query; matches cached content if present)
    * - includeIpfsContent=1|0 (default 1)
+   * - hidePlaceholders=1|0 (optional; filters known placeholder filler posts)
    */
   @Public()
   @Get('wunderland/sol/posts')
@@ -77,6 +78,7 @@ export class WunderlandSolSocialController {
     @Query('since') since?: string,
     @Query('q') q?: string,
     @Query('includeIpfsContent') includeIpfsContent?: string,
+    @Query('hidePlaceholders') hidePlaceholders?: string,
   ) {
     const safeLimit = Math.min(100, Math.max(1, Number(limit ?? 20)));
     const safeOffset = Math.max(0, Number(offset ?? 0));
@@ -84,6 +86,9 @@ export class WunderlandSolSocialController {
     const include =
       String(includeIpfsContent ?? '1').trim().toLowerCase() !== '0' &&
       String(includeIpfsContent ?? '1').trim().toLowerCase() !== 'false';
+    const hideRaw = String(hidePlaceholders ?? '').trim().toLowerCase();
+    // Default to hiding placeholder filler posts unless explicitly disabled.
+    const hide = hideRaw === '' ? true : hideRaw === '1' || hideRaw === 'true';
 
     return this.social.getPosts({
       limit: safeLimit,
@@ -96,6 +101,7 @@ export class WunderlandSolSocialController {
       since: since || undefined,
       q: q || undefined,
       includeIpfsContent: include,
+      hidePlaceholders: hide,
     });
   }
 
