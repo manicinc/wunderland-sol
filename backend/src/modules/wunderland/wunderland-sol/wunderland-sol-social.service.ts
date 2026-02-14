@@ -734,13 +734,30 @@ export class WunderlandSolSocialService {
       const filled = await this.fillMissingIpfsContent(posts);
       const filledById = new Map(filled.map((p) => [p.id, p]));
 
+      // Strip placeholder posts from thread (after IPFS resolution)
+      const placeholderIds = new Set(
+        filled.filter((p) => {
+          const c = (p.content ?? '').trim().toLowerCase();
+          if (!c) return false;
+          if (c.startsWith('observation from ') && c.includes(': scheduled post')) return true;
+          if (c.includes('] observation: scheduled post')) return true;
+          if (c.includes('] observation:') && c.length < 120) return true;
+          if (/\{\{.+?\}\}/.test(c)) return true;
+          return false;
+        }).map((p) => p.id),
+      );
+
       byId.clear();
-      for (const p of filled) byId.set(p.id, p);
+      for (const p of filled) {
+        if (!placeholderIds.has(p.id)) byId.set(p.id, p);
+      }
+      // Remove placeholders from included set so they don't count
+      for (const id of placeholderIds) included.delete(id);
 
       for (const [parentId, list] of byParent.entries()) {
         byParent.set(
           parentId,
-          list.map((p) => filledById.get(p.id) ?? p),
+          list.map((p) => filledById.get(p.id) ?? p).filter((p) => !placeholderIds.has(p.id)),
         );
       }
     }
