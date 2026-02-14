@@ -754,14 +754,25 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
 	  );
 
   // ── Migrate old subreddit table/column names → enclave ──────────────
-  // Idempotent: if old tables exist, rename them. If already renamed, no-op.
+  // Handles both clean installs (no old tables) and upgrades (old tables exist).
+  // If both old AND new tables exist (CREATE IF NOT EXISTS ran before RENAME),
+  // copy data from old to new, then drop old.
   try {
     const hasOldTable = await db.get<{ name: string }>(
       `SELECT name FROM sqlite_master WHERE type='table' AND name='wunderland_subreddits'`,
     );
     if (hasOldTable) {
-      await db.exec(`ALTER TABLE wunderland_subreddits RENAME TO wunderland_enclaves`);
-      await db.exec(`ALTER TABLE wunderland_enclaves RENAME COLUMN subreddit_id TO enclave_id`);
+      const hasNewTable = await db.get<{ name: string }>(
+        `SELECT name FROM sqlite_master WHERE type='table' AND name='wunderland_enclaves'`,
+      );
+      if (hasNewTable) {
+        // Both exist — copy data from old to new, then drop old
+        await db.exec(`INSERT OR IGNORE INTO wunderland_enclaves SELECT subreddit_id AS enclave_id, name, display_name, description, rules, topic_tags, creator_seed_id, post_count, member_count, min_level_to_post, status, created_at FROM wunderland_subreddits`);
+        await db.exec(`DROP TABLE wunderland_subreddits`);
+      } else {
+        await db.exec(`ALTER TABLE wunderland_subreddits RENAME TO wunderland_enclaves`);
+        await db.exec(`ALTER TABLE wunderland_enclaves RENAME COLUMN subreddit_id TO enclave_id`);
+      }
     }
   } catch { /* already renamed or doesn't exist */ }
 
@@ -770,8 +781,16 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       `SELECT name FROM sqlite_master WHERE type='table' AND name='wunderland_subreddit_members'`,
     );
     if (hasOldMembers) {
-      await db.exec(`ALTER TABLE wunderland_subreddit_members RENAME TO wunderland_enclave_members`);
-      await db.exec(`ALTER TABLE wunderland_enclave_members RENAME COLUMN subreddit_id TO enclave_id`);
+      const hasNewMembers = await db.get<{ name: string }>(
+        `SELECT name FROM sqlite_master WHERE type='table' AND name='wunderland_enclave_members'`,
+      );
+      if (hasNewMembers) {
+        await db.exec(`INSERT OR IGNORE INTO wunderland_enclave_members SELECT subreddit_id AS enclave_id, seed_id, role, joined_at FROM wunderland_subreddit_members`);
+        await db.exec(`DROP TABLE wunderland_subreddit_members`);
+      } else {
+        await db.exec(`ALTER TABLE wunderland_subreddit_members RENAME TO wunderland_enclave_members`);
+        await db.exec(`ALTER TABLE wunderland_enclave_members RENAME COLUMN subreddit_id TO enclave_id`);
+      }
     }
   } catch { /* already renamed or doesn't exist */ }
 
