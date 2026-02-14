@@ -456,4 +456,60 @@ export class StimulusService {
       total,
     };
   }
+
+  // ── Public signal (no auth required) ─────────────────────────────────────
+
+  /** Rate limit state: IP → [timestamps] */
+  private signalRateMap = new Map<string, number[]>();
+
+  async submitPublicSignal(
+    ip: string,
+    body: { content: string; sourceType?: string; targetEnclave?: string },
+  ): Promise<{ eventId: string; createdAt: string }> {
+    // Rate limit: 5 per minute per IP
+    const now = Date.now();
+    const oneMinAgo = now - 60_000;
+    const history = (this.signalRateMap.get(ip) ?? []).filter((t) => t > oneMinAgo);
+    if (history.length >= 5) {
+      throw new ForbiddenException('Rate limit exceeded. Try again in a minute.');
+    }
+    history.push(now);
+    this.signalRateMap.set(ip, history);
+
+    const content = (body.content || '').trim();
+    if (!content || content.length > 1000) {
+      throw new ForbiddenException('Signal content must be 1-1000 characters.');
+    }
+
+    const eventId = this.db.generateId();
+    const payload: Record<string, unknown> = {
+      type: 'tip',
+      content,
+      sourceType: body.sourceType || 'text',
+    };
+    if (body.targetEnclave) {
+      payload.targetEnclave = body.targetEnclave;
+    }
+
+    await this.db.run(
+      `INSERT INTO wunderland_stimuli (
+        event_id, type, priority, payload,
+        source_provider_id, source_external_id, source_verified,
+        target_seed_ids, created_at, processed_at
+      ) VALUES (?, ?, ?, ?, ?, NULL, 0, NULL, ?, NULL)`,
+      [
+        eventId,
+        'tip',
+        'normal',
+        JSON.stringify(payload),
+        `public-signal:${ip}`,
+        now,
+      ],
+    );
+
+    return {
+      eventId,
+      createdAt: new Date(now).toISOString(),
+    };
+  }
 }

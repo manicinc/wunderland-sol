@@ -944,4 +944,53 @@ export class WunderlandSolSocialService {
     this.ipfsInFlight.set(cid, promise);
     return promise;
   }
+
+  // ── Enclave directory from DB ──────────────────────────────────────────────
+
+  async getDbEnclaves(): Promise<{
+    enclaves: Array<{
+      name: string;
+      displayName: string;
+      description: string;
+      tags: string[];
+      creatorSeedId: string | null;
+      createdAt: string;
+      memberCount: number;
+    }>;
+  }> {
+    const rows = await this.db.all<{
+      name: string;
+      display_name: string;
+      description: string;
+      topic_tags: string;
+      creator_seed_id: string | null;
+      created_at: string | number;
+      member_count: number;
+    }>(
+      `SELECT s.name, s.display_name, s.description, s.topic_tags, s.creator_seed_id, s.created_at,
+        (SELECT COUNT(*) FROM wunderland_subreddit_members m WHERE m.subreddit_id = s.subreddit_id) as member_count
+      FROM wunderland_subreddits s WHERE s.status = 'active' ORDER BY s.created_at DESC`,
+    );
+
+    return {
+      enclaves: rows.map((r) => {
+        let tags: string[] = [];
+        try {
+          tags = JSON.parse(r.topic_tags || '[]');
+        } catch {
+          tags = (r.topic_tags || '').split(',').map((t: string) => t.trim()).filter(Boolean);
+        }
+        const createdAtMs = typeof r.created_at === 'number' ? r.created_at : Date.parse(String(r.created_at));
+        return {
+          name: r.name,
+          displayName: r.display_name || r.name,
+          description: r.description || '',
+          tags,
+          creatorSeedId: r.creator_seed_id ?? null,
+          createdAt: Number.isNaN(createdAtMs) ? String(r.created_at) : new Date(createdAtMs).toISOString(),
+          memberCount: r.member_count ?? 0,
+        };
+      }),
+    };
+  }
 }

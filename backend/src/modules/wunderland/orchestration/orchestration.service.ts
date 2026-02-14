@@ -13,11 +13,13 @@
 
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import { callLlm } from '../../../core/llm/llm.factory';
-import { LlmConfigService } from '../../../core/llm/llm.config.service.js';
+import { callLlm, callLlmWithProviderConfig } from '../../../core/llm/llm.factory';
+import { LlmConfigService, LlmProviderId } from '../../../core/llm/llm.config.service.js';
+import type { ILlmProviderConfig } from '../../../core/llm/llm.interfaces.js';
 import { ragService } from '../../../integrations/rag/rag.service.js';
 import { WunderlandVectorMemoryService } from './wunderland-vector-memory.service';
 import { WunderlandSolService } from '../wunderland-sol/wunderland-sol.service.js';
+import { CredentialsService } from '../credentials/credentials.service.js';
 import {
   WonderlandNetwork,
   TrustEngine,
@@ -71,6 +73,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly db: DatabaseService,
+    private readonly credentials: CredentialsService,
     private readonly moodPersistence: MoodPersistenceService,
     private readonly enclavePersistence: EnclavePersistenceService,
     private readonly browsingPersistence: BrowsingPersistenceService,
@@ -763,6 +766,160 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
+  private safeJsonParse<T>(value: string | null): T | null {
+    if (!value) return null;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return null;
+    }
+  }
+
+  private buildRuntimeProviderConfig(providerId: LlmProviderId, apiKey?: string): ILlmProviderConfig {
+    if (providerId === LlmProviderId.OPENAI) {
+      return {
+        providerId,
+        apiKey,
+        baseUrl: process.env.OPENAI_API_BASE_URL || 'https://api.openai.com/v1',
+        defaultModel: process.env.MODEL_PREF_OPENAI_DEFAULT || 'gpt-4o-mini',
+      };
+    }
+    if (providerId === LlmProviderId.OPENROUTER) {
+      return {
+        providerId,
+        apiKey,
+        baseUrl: process.env.OPENROUTER_API_BASE_URL || 'https://openrouter.ai/api/v1',
+        defaultModel: process.env.MODEL_PREF_OPENROUTER_DEFAULT || 'openai/gpt-4o-mini',
+        additionalHeaders: {
+          'HTTP-Referer': process.env.APP_URL || `http://localhost:${process.env.PORT || 3001}`,
+          'X-Title': process.env.APP_NAME || 'Wunderland',
+        },
+      };
+    }
+    if (providerId === LlmProviderId.ANTHROPIC) {
+      return {
+        providerId,
+        apiKey,
+        baseUrl: process.env.ANTHROPIC_API_BASE_URL || 'https://api.anthropic.com/v1',
+        defaultModel: process.env.MODEL_PREF_ANTHROPIC_DEFAULT || 'claude-3-haiku-20240307',
+        additionalHeaders: { 'anthropic-version': '2023-06-01' },
+      };
+    }
+    if (providerId === LlmProviderId.OLLAMA) {
+      return {
+        providerId,
+        apiKey: undefined,
+        baseUrl: process.env.OLLAMA_BASE_URL,
+        defaultModel: process.env.MODEL_PREF_OLLAMA_DEFAULT || 'llama3:latest',
+      };
+    }
+    return { providerId, apiKey };
+  }
+
+  private normalizeOpenRouterModel(model: string): string {
+    const trimmed = model.trim();
+    if (!trimmed) return trimmed;
+    if (trimmed.toLowerCase() === 'auto') return 'openrouter/auto';
+    return trimmed;
+  }
+
+  private async resolveAgentLlmFromCredentials(ownerUserId: string, seedId: string): Promise<{
+    modelOverride?: string;
+    runtimeProviderConfig?: ILlmProviderConfig;
+  }> {
+    const out: { modelOverride?: string; runtimeProviderConfig?: ILlmProviderConfig } = {};
+    try {
+      const vals = await this.credentials.getDecryptedValuesByType(ownerUserId, seedId, [
+        'LLM_MODEL',
+        'LLM_API_KEY_OPENAI',
+        'LLM_API_KEY_OPENROUTER',
+        'LLM_API_KEY_ANTHROPIC',
+      ]);
+
+      const openAiKey = vals.LLM_API_KEY_OPENAI?.trim() || null;
+      const openRouterKey = vals.LLM_API_KEY_OPENROUTER?.trim() || null;
+      const anthropicKey = vals.LLM_API_KEY_ANTHROPIC?.trim() || null;
+
+      const modelPrefRaw = vals.LLM_MODEL;
+      const parsed = this.safeJsonParse<any>(modelPrefRaw);
+      const prefProvider =
+        typeof parsed?.provider === 'string' ? parsed.provider.trim().toLowerCase() : '';
+      const prefModel = typeof parsed?.model === 'string' ? parsed.model.trim() : '';
+
+      const desiredProvider =
+        prefProvider === 'openai'
+          ? LlmProviderId.OPENAI
+          : prefProvider === 'openrouter'
+            ? LlmProviderId.OPENROUTER
+            : prefProvider === 'anthropic'
+              ? LlmProviderId.ANTHROPIC
+              : prefProvider === 'ollama'
+                ? LlmProviderId.OLLAMA
+                : null;
+
+      // Model override (applies even if we end up using env keys).
+      if (desiredProvider && prefModel) {
+        out.modelOverride =
+          desiredProvider === LlmProviderId.OPENROUTER ? this.normalizeOpenRouterModel(prefModel) : prefModel;
+      }
+
+      // Runtime key routing (agent-specific API keys)
+      if (desiredProvider === LlmProviderId.OPENROUTER && openRouterKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.OPENROUTER, openRouterKey);
+        return out;
+      }
+
+      if (desiredProvider === LlmProviderId.OPENAI && openAiKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.OPENAI, openAiKey);
+        return out;
+      }
+
+      if (desiredProvider === LlmProviderId.ANTHROPIC && anthropicKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.ANTHROPIC, anthropicKey);
+        return out;
+      }
+
+      // If they selected OpenAI/Anthropic but only provided an OpenRouter key, route via OpenRouter.
+      if (desiredProvider === LlmProviderId.OPENAI && openRouterKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.OPENROUTER, openRouterKey);
+        if (prefModel && !out.modelOverride) {
+          out.modelOverride = `openai/${prefModel}`;
+        } else if (out.modelOverride && !out.modelOverride.includes('/')) {
+          out.modelOverride = `openai/${out.modelOverride}`;
+        }
+        return out;
+      }
+
+      if (desiredProvider === LlmProviderId.ANTHROPIC && openRouterKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.OPENROUTER, openRouterKey);
+        if (prefModel && !out.modelOverride) {
+          out.modelOverride = `anthropic/${prefModel}`;
+        } else if (out.modelOverride && !out.modelOverride.includes('/')) {
+          out.modelOverride = `anthropic/${out.modelOverride}`;
+        }
+        return out;
+      }
+
+      // No explicit preference: if they at least stored an OpenRouter/OpenAI/Anthropic key, use it.
+      if (openRouterKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.OPENROUTER, openRouterKey);
+        return out;
+      }
+      if (openAiKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.OPENAI, openAiKey);
+        return out;
+      }
+      if (anthropicKey) {
+        out.runtimeProviderConfig = this.buildRuntimeProviderConfig(LlmProviderId.ANTHROPIC, anthropicKey);
+        return out;
+      }
+
+      return out;
+    } catch {
+      return out;
+    }
+  }
+
   private async loadAndRegisterAgents(): Promise<number> {
     const agents = await this.db.all<{
       seed_id: string;
@@ -790,6 +947,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         const hexaco = this.normalizeHexacoKeys(rawHexaco);
         const topics = this.parseJson<string[]>(agent.subscribed_topics, []);
         const dbHierarchy = this.parseJson<InferenceHierarchyConfig>(agent.inference_hierarchy, null as any);
+        const llmPref = await this.resolveAgentLlmFromCredentials(agent.owner_user_id, agent.seed_id);
 
         const seedConfig: WunderlandSeedConfig = {
           seedId: agent.seed_id,
@@ -805,6 +963,10 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
             'social-citizen',
         };
 
+        if (llmPref.runtimeProviderConfig && llmPref.modelOverride && seedConfig.inferenceHierarchy?.primaryModel) {
+          seedConfig.inferenceHierarchy.primaryModel.modelId = llmPref.modelOverride;
+        }
+
         const newsroomConfig: NewsroomConfig = {
           seedConfig,
           ownerId: agent.owner_user_id,
@@ -817,6 +979,32 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         };
 
         await this.network!.registerCitizen(newsroomConfig);
+
+        if (llmPref.runtimeProviderConfig) {
+          this.network!.setLLMCallbackForCitizen(agent.seed_id, async (messages, tools, options) => {
+            const effectiveModel = llmPref.modelOverride || options?.model;
+            const resp = await callLlmWithProviderConfig(messages as any, effectiveModel, {
+              temperature: options?.temperature,
+              max_tokens: options?.max_tokens,
+              tools: tools as any,
+            }, llmPref.runtimeProviderConfig!, agent.owner_user_id);
+
+            const usage = resp.usage
+              ? {
+                  prompt_tokens: resp.usage.prompt_tokens ?? 0,
+                  completion_tokens: resp.usage.completion_tokens ?? 0,
+                  total_tokens: resp.usage.total_tokens ?? 0,
+                }
+              : undefined;
+
+            return {
+              content: resp.text,
+              tool_calls: resp.toolCalls,
+              model: resp.model,
+              usage,
+            };
+          });
+        }
 
         // Load trust scores from persistence
         await this.trustEngine!.loadFromPersistence(agent.seed_id);
@@ -898,7 +1086,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     const availableProviders = LlmConfigService.getInstance().getAvailableProviders();
     if (availableProviders.length === 0) {
       this.logger.log(
-        'No LLM providers detected (OPENAI_API_KEY / OPENROUTER_API_KEY / ANTHROPIC_API_KEY / OLLAMA_BASE_URL). Newsrooms will run in placeholder mode.'
+        'No LLM providers detected (OPENAI_API_KEY / OPENROUTER_API_KEY / ANTHROPIC_API_KEY / OLLAMA_BASE_URL). Newsrooms will stay silent (no placeholder filler posts).'
       );
       return;
     }
@@ -949,8 +1137,9 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         post_id, seed_id, content, manifest, status,
         reply_to_post_id, created_at, published_at,
         likes, downvotes, boosts, replies, views, agent_level_at_post,
-        stimulus_type, stimulus_event_id, stimulus_source_provider_id, stimulus_timestamp
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        stimulus_type, stimulus_event_id, stimulus_source_provider_id, stimulus_timestamp,
+        subreddit_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(post_id) DO UPDATE SET
         seed_id = excluded.seed_id,
         content = excluded.content,
@@ -967,7 +1156,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         stimulus_type = excluded.stimulus_type,
         stimulus_event_id = excluded.stimulus_event_id,
         stimulus_source_provider_id = excluded.stimulus_source_provider_id,
-        stimulus_timestamp = excluded.stimulus_timestamp`,
+        stimulus_timestamp = excluded.stimulus_timestamp,
+        subreddit_id = excluded.subreddit_id`,
       [
         post.postId,
         post.seedId,
@@ -987,6 +1177,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         stimulusEventId,
         stimulusSourceProviderId,
         stimulusTimestamp,
+        (post as any).enclave ?? null,
       ]
     );
 

@@ -88,8 +88,8 @@ export default function PresetSelector({ onSelect, selected, className = '' }: P
         <div
           className="absolute z-50 left-0 right-0 mt-2 rounded-xl overflow-hidden
             border border-[var(--border-glass)]
-            bg-[rgba(10,10,15,0.95)] backdrop-blur-xl
-            shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_16px_rgba(153,69,255,0.08)]
+            bg-[var(--bg-surface)] backdrop-blur-xl
+            shadow-[0_8px_32px_rgba(0,0,0,0.15),0_0_16px_rgba(153,69,255,0.06)]
             max-h-[380px] overflow-y-auto"
           style={{ scrollbarWidth: 'thin' }}
         >

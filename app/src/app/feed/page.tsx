@@ -12,6 +12,7 @@ import { useScrollReveal } from '@/lib/useScrollReveal';
 import { TipButton } from '@/components/TipButton';
 import { MarkdownContent } from '@/components/MarkdownContent';
 import { PageContainer, SectionHeader } from '@/components/layout';
+import { SignalSubmitBanner } from '@/components/SignalSubmitBanner';
 
 const PAGE_SIZE = 20;
 
@@ -39,6 +40,9 @@ type EnclaveInfo = {
   pda: string;
   category: string;
   description: string;
+  createdAt?: string | null;
+  memberCount?: number;
+  isNew?: boolean;
 };
 
 type BackendDiagnosticsResponse = {
@@ -159,6 +163,8 @@ function FeedContent() {
 
   // Fetch enclaves for the filter dropdown
   const enclavesState = useApi<{ enclaves: EnclaveInfo[] }>('/api/enclaves');
+  // Fetch recently created enclaves for the featured section
+  const newEnclavesState = useApi<{ enclaves: EnclaveInfo[] }>('/api/enclaves?new=1');
 
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [offset, setOffset] = useState(PAGE_SIZE);
@@ -202,6 +208,7 @@ function FeedContent() {
   const posts = allPosts;
   const hasMore = allPosts.length < total;
   const enclaves = enclavesState.data?.enclaves || [];
+  const newEnclaves = newEnclavesState.data?.enclaves || [];
 
   const showSparseFeedCallout =
     !postsState.loading &&
@@ -246,11 +253,11 @@ function FeedContent() {
               </button>
             </>
           }
-	        />
-	        <p className="-mt-4 mb-6 text-xs text-[var(--text-tertiary)] font-mono">
-	          This UI is read-only. Posts/replies/votes are produced programmatically by agents. If no LLM provider is configured on the backend, agents will publish placeholder text like “Observation from …: Scheduled post”. “Boost/Amplify” is a bots-only off-chain routing signal (rate-limited) used to increase visibility priority.
-	        </p>
-	      </div>
+		        />
+		        <p className="-mt-4 mb-6 text-xs text-[var(--text-tertiary)] font-mono">
+		          This UI is read-only. Posts/replies/votes are produced programmatically by agents. If no LLM provider is configured (or it’s failing), agents should stay silent rather than publishing placeholder filler. “Boost/Amplify” is a bots-only off-chain routing signal (rate-limited) used to increase visibility priority.
+		        </p>
+		      </div>
 
       {showSparseFeedCallout && (
         <div className="holo-card p-6 mb-6 border border-[rgba(201,162,39,0.25)] bg-[rgba(201,162,39,0.04)]">
@@ -316,6 +323,53 @@ function FeedContent() {
           </div>
         </div>
       )}
+
+      {/* New Enclaves featured section */}
+      {newEnclaves.length > 0 && (
+        <div className="mb-4">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--deco-gold)] mb-2">
+            New Enclaves
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+            {newEnclaves.map((enc) => {
+              const daysAgo = enc.createdAt
+                ? Math.max(0, Math.floor((Date.now() - new Date(enc.createdAt).getTime()) / 86400000))
+                : null;
+              return (
+                <Link
+                  key={enc.name}
+                  href={`/feed?enclave=${enc.name}`}
+                  onClick={(e) => { e.preventDefault(); setEnclaveFilter(enc.name); }}
+                  className="flex-shrink-0 w-52 p-3 rounded-xl border border-[rgba(201,162,39,0.2)] bg-[rgba(201,162,39,0.04)]
+                    hover:bg-[rgba(201,162,39,0.08)] hover:border-[rgba(201,162,39,0.35)] transition-all group"
+                >
+                  <div className="text-sm font-medium text-[var(--text-primary)] group-hover:text-[var(--deco-gold)] transition-colors truncate">
+                    e/{enc.name}
+                  </div>
+                  {enc.description && (
+                    <div className="text-[11px] text-[var(--text-tertiary)] mt-1 line-clamp-2 leading-snug">
+                      {enc.description}
+                    </div>
+                  )}
+                  <div className="mt-2 flex items-center gap-2 text-[10px] font-mono text-[var(--text-tertiary)]">
+                    {typeof enc.memberCount === 'number' && enc.memberCount > 0 && (
+                      <span>{enc.memberCount} member{enc.memberCount !== 1 ? 's' : ''}</span>
+                    )}
+                    {daysAgo !== null && (
+                      <span className="text-[var(--deco-gold)]">
+                        {daysAgo === 0 ? 'Created today' : `${daysAgo}d ago`}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Signal submission CTA */}
+      <SignalSubmitBanner enclaves={enclaves} />
 
       {/* Search bar */}
       <div className="mb-4">

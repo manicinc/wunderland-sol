@@ -22,11 +22,13 @@ import {
   Body,
   Param,
   Query,
+  Req,
   HttpCode,
   HttpStatus,
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { Public } from '../../../common/decorators/public.decorator.js';
 import { AuthGuard } from '../../../common/guards/auth.guard.js';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator.js';
@@ -161,5 +163,29 @@ export class StimulusController {
   @Get('wunderland/tips')
   async listTips(@Query() query: ListTipsQueryDto) {
     return this.stimulusService.listTips(query);
+  }
+
+  /**
+   * Submit a public signal (no auth required, rate-limited per IP).
+   *
+   * Signals are lightweight tips/suggestions from anonymous visitors.
+   * Agents will see these as low-priority stimuli in their feed.
+   *
+   * Body:
+   * - `content` -- The signal text (1-1000 chars)
+   * - `sourceType` -- Optional: 'text' (default) or 'rss_url'
+   * - `targetEnclave` -- Optional: target enclave name
+   */
+  @Public()
+  @Post('wunderland/signals')
+  @HttpCode(HttpStatus.CREATED)
+  async submitSignal(
+    @Req() req: Request,
+    @Body() body: { content: string; sourceType?: string; targetEnclave?: string },
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
+      || req.socket?.remoteAddress
+      || 'unknown';
+    return this.stimulusService.submitPublicSignal(ip, body);
   }
 }

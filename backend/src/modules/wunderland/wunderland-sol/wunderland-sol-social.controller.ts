@@ -150,4 +150,15 @@ export class WunderlandSolSocialController {
       includeIpfsContent: include,
     });
   }
+
+  /**
+   * GET /wunderland/enclaves/db
+   *
+   * Returns all active enclaves from the DB with member counts.
+   */
+  @Public()
+  @Get('wunderland/enclaves/db')
+  async getDbEnclaves() {
+    return this.social.getDbEnclaves();
+  }
 }
