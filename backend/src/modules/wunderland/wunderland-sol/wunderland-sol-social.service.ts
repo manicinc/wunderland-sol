@@ -388,7 +388,7 @@ export class WunderlandSolSocialService {
     q?: string;
     includeIpfsContent?: boolean;
     hidePlaceholders?: boolean;
-  }): Promise<{ posts: SolPostApi[]; total: number; source: 'index' }> {
+  }): Promise<{ posts: SolPostApi[]; total: number; source: 'index' | 'database' | 'merged' }> {
     const limit = Math.min(100, Math.max(1, Number(opts.limit ?? 20)));
     const offset = Math.max(0, Number(opts.offset ?? 0));
     const kind = opts.kind === 'comment' ? 'comment' : 'post';
@@ -480,6 +480,9 @@ export class WunderlandSolSocialService {
     const total = Number(totalRow?.count ?? 0);
 
     if (total === 0) {
+      // On-chain index is empty for this query — fall back to off-chain DB posts.
+      const dbFallback = await this.getOffChainPosts(opts);
+      if (dbFallback.posts.length > 0) return dbFallback;
       return { posts: [], total: 0, source: 'index' };
     }
 
@@ -535,7 +538,7 @@ export class WunderlandSolSocialService {
       const window = scored.slice(offset, offset + limit).map((s) => s.p);
       let posts = includeIpfsContent ? await this.fillMissingIpfsContent(window) : window;
       if (opts.hidePlaceholders) posts = stripPlaceholderPosts(posts);
-      return { posts, total: scored.length, source: 'index' };
+      return this.mergeOffChainIfStale(posts, scored.length, opts);
     }
 
     // Merged vote expressions: prefer off-chain engagement counts over on-chain when available.
@@ -594,7 +597,235 @@ export class WunderlandSolSocialService {
     const window = rows.map(rowToApiPost);
     let posts = includeIpfsContent ? await this.fillMissingIpfsContent(window) : window;
     if (opts.hidePlaceholders) posts = stripPlaceholderPosts(posts);
-    return { posts, total, source: 'index' };
+    return this.mergeOffChainIfStale(posts, total, opts);
+  }
+
+  /**
+   * Queries `wunderland_posts` for published, unanchored posts and converts them
+   * to the same SolPostApi shape used by the on-chain index.
+   */
+  private async getOffChainPosts(opts: {
+    limit?: number;
+    offset?: number;
+    agentAddress?: string;
+    kind?: 'post' | 'comment';
+    sort?: string;
+    since?: string;
+    q?: string;
+    hidePlaceholders?: boolean;
+  }): Promise<{ posts: SolPostApi[]; total: number; source: 'database' }> {
+    const limit = Math.min(100, Math.max(1, Number(opts.limit ?? 20)));
+    const offset = Math.max(0, Number(opts.offset ?? 0));
+    const sort = (opts.sort ?? 'new').trim().toLowerCase();
+
+    const where: string[] = ["wp.status = 'published'"];
+    const params: Array<string | number> = [];
+
+    // Only include posts that are NOT already in the on-chain index.
+    where.push('wp.sol_post_pda IS NULL');
+
+    if (opts.kind === 'comment') {
+      where.push('wp.reply_to_post_id IS NOT NULL');
+    } else {
+      where.push('(wp.reply_to_post_id IS NULL OR wp.reply_to_post_id = \'\')');
+    }
+
+    const agent = opts.agentAddress?.trim();
+    if (agent) {
+      where.push('wp.seed_id = ?');
+      params.push(agent);
+    }
+
+    const since = (opts.since ?? '').trim().toLowerCase();
+    if (since) {
+      const now = Date.now();
+      let cutoffMs = 0;
+      if (since === 'day') cutoffMs = now - 24 * 60 * 60 * 1000;
+      else if (since === 'week') cutoffMs = now - 7 * 24 * 60 * 60 * 1000;
+      else if (since === 'month') cutoffMs = now - 30 * 24 * 60 * 60 * 1000;
+      else if (since === 'year') cutoffMs = now - 365 * 24 * 60 * 60 * 1000;
+      if (cutoffMs > 0) {
+        where.push('wp.created_at >= ?');
+        params.push(cutoffMs);
+      }
+    }
+
+    const qRaw = (opts.q ?? '').trim().toLowerCase();
+    if (qRaw) {
+      const like = `%${qRaw}%`;
+      where.push('(LOWER(COALESCE(wp.content, \'\')) LIKE ? OR LOWER(COALESCE(wp.seed_id, \'\')) LIKE ?)');
+      params.push(like, like);
+    }
+
+    if (opts.hidePlaceholders) {
+      where.push(
+        `NOT (
+          LOWER(COALESCE(wp.content, '')) LIKE 'observation from %'
+          OR LOWER(COALESCE(wp.content, '')) LIKE '%] observation:%'
+          OR COALESCE(wp.content, '') LIKE '%{{%}}%'
+        )`,
+      );
+    }
+
+    const whereSql = `WHERE ${where.join(' AND ')}`;
+
+    const totalRow = await this.db.get<{ count: number }>(
+      `SELECT COUNT(1) as count FROM wunderland_posts wp ${whereSql}`,
+      params,
+    );
+    const total = Number(totalRow?.count ?? 0);
+    if (total === 0) return { posts: [], total: 0, source: 'database' };
+
+    let orderSql = 'ORDER BY wp.created_at DESC';
+    if (sort === 'top') {
+      orderSql = 'ORDER BY (COALESCE(wp.likes, 0) - COALESCE(wp.downvotes, 0)) DESC, wp.created_at DESC';
+    }
+
+    const rows = await this.db.all<{
+      post_id: string;
+      seed_id: string;
+      content: string;
+      manifest: string | null;
+      reply_to_post_id: string | null;
+      likes: number | null;
+      downvotes: number | null;
+      replies: number | null;
+      created_at: number;
+      content_hash_hex: string | null;
+      manifest_hash_hex: string | null;
+    }>(
+      `
+        SELECT wp.post_id, wp.seed_id, wp.content, wp.manifest, wp.reply_to_post_id,
+               wp.likes, wp.downvotes, wp.replies, wp.created_at,
+               wp.content_hash_hex, wp.manifest_hash_hex
+          FROM wunderland_posts wp
+        ${whereSql}
+        ${orderSql}
+        LIMIT ? OFFSET ?
+      `,
+      [...params, limit, offset],
+    );
+
+    // Try to look up agent display names from the on-chain agent index.
+    const seedIds = [...new Set(rows.map((r) => String(r.seed_id)))];
+    const agentMap = new Map<string, { name: string; level: string; traits: SolAgentTraits }>();
+    if (seedIds.length > 0) {
+      try {
+        const placeholders = seedIds.map(() => '?').join(',');
+        const agentRows = await this.db.all<{
+          agent_pda: string;
+          display_name: string | null;
+          level_label: string | null;
+          traits_json: string | null;
+        }>(
+          `SELECT agent_pda, display_name, level_label, traits_json
+             FROM wunderland_sol_agents
+            WHERE agent_pda IN (${placeholders})`,
+          seedIds,
+        );
+        for (const a of agentRows) {
+          agentMap.set(String(a.agent_pda), {
+            name: a.display_name ? String(a.display_name) : 'Unknown',
+            level: a.level_label ? String(a.level_label) : 'Newcomer',
+            traits: safeTraits(a.traits_json),
+          });
+        }
+      } catch {
+        // non-critical
+      }
+    }
+
+    const posts: SolPostApi[] = rows.map((r) => {
+      const seedId = String(r.seed_id ?? '');
+      const agentInfo = agentMap.get(seedId);
+      const createdAtMs = Number(r.created_at ?? 0);
+      return {
+        id: String(r.post_id),
+        kind: r.reply_to_post_id ? ('comment' as const) : ('post' as const),
+        replyTo: r.reply_to_post_id ? String(r.reply_to_post_id) : undefined,
+        agentAddress: seedId,
+        agentPda: seedId,
+        agentName: agentInfo?.name ?? seedId.slice(0, 8) + '…',
+        agentLevel: agentInfo?.level ?? 'Newcomer',
+        agentTraits: agentInfo?.traits ?? safeTraits(null),
+        postIndex: 0,
+        content: String(r.content ?? ''),
+        contentHash: r.content_hash_hex ? String(r.content_hash_hex) : '',
+        manifestHash: r.manifest_hash_hex ? String(r.manifest_hash_hex) : '',
+        upvotes: Number(r.likes ?? 0),
+        downvotes: Number(r.downvotes ?? 0),
+        commentCount: Number(r.replies ?? 0),
+        timestamp: new Date(Number.isFinite(createdAtMs) ? createdAtMs : 0).toISOString(),
+      };
+    });
+
+    return { posts, total, source: 'database' };
+  }
+
+  /**
+   * After fetching on-chain posts, checks if the newest on-chain post is stale
+   * (older than 1 hour). If so, supplements the result with newer off-chain posts.
+   */
+  private async mergeOffChainIfStale(
+    indexPosts: SolPostApi[],
+    indexTotal: number,
+    opts: {
+      limit?: number;
+      offset?: number;
+      agentAddress?: string;
+      kind?: 'post' | 'comment';
+      sort?: string;
+      since?: string;
+      q?: string;
+      hidePlaceholders?: boolean;
+    },
+  ): Promise<{ posts: SolPostApi[]; total: number; source: 'index' | 'merged' }> {
+    // Only merge on the first page to keep pagination simple.
+    const offset = Math.max(0, Number(opts.offset ?? 0));
+    if (offset > 0) return { posts: indexPosts, total: indexTotal, source: 'index' };
+
+    // Determine if the on-chain index is stale (no post newer than 1 hour).
+    const newestOnChain = indexPosts.reduce((newest, p) => {
+      const t = new Date(p.timestamp).getTime();
+      return t > newest ? t : newest;
+    }, 0);
+    const staleThresholdMs = 60 * 60 * 1000; // 1 hour
+    const isStale = (Date.now() - newestOnChain) > staleThresholdMs;
+
+    if (!isStale) return { posts: indexPosts, total: indexTotal, source: 'index' };
+
+    try {
+      const limit = Math.min(100, Math.max(1, Number(opts.limit ?? 20)));
+      const dbResult = await this.getOffChainPosts({ ...opts, limit });
+      if (dbResult.posts.length === 0) return { posts: indexPosts, total: indexTotal, source: 'index' };
+
+      // Merge: off-chain posts first (newest), then on-chain, de-duplicated by ID.
+      const seenIds = new Set<string>();
+      const merged: SolPostApi[] = [];
+
+      for (const p of dbResult.posts) {
+        if (!seenIds.has(p.id)) {
+          seenIds.add(p.id);
+          merged.push(p);
+        }
+      }
+      for (const p of indexPosts) {
+        if (!seenIds.has(p.id)) {
+          seenIds.add(p.id);
+          merged.push(p);
+        }
+      }
+
+      // Re-sort by timestamp descending for 'new' sort.
+      if ((opts.sort ?? 'new') === 'new') {
+        merged.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      }
+
+      const mergedTotal = indexTotal + dbResult.total;
+      return { posts: merged.slice(0, limit), total: mergedTotal, source: 'merged' };
+    } catch {
+      return { posts: indexPosts, total: indexTotal, source: 'index' };
+    }
   }
 
   async getPostByPda(postPda: string, opts?: { includeIpfsContent?: boolean }): Promise<SolPostApi | null> {
