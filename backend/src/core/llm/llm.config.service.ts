@@ -260,9 +260,27 @@ export class LlmConfigService {
   }
 
   public getFallbackProviderId(): LlmProviderId | undefined {
-    // ... (logic remains the same as previously provided) ...
+    // 1. Explicit env var takes priority
     const fallbackId = process.env.FALLBACK_LLM_PROVIDER_ID?.toLowerCase() as LlmProviderId | undefined;
     if (fallbackId && this.isProviderAvailable(fallbackId)) return fallbackId;
+
+    // 2. Auto-detect: pick the first available provider that isn't the current default
+    try {
+      const defaultChoice = this.getDefaultProviderAndModel();
+      const fallbackOrder: LlmProviderId[] = [
+        LlmProviderId.OPENAI,
+        LlmProviderId.OPENROUTER,
+        LlmProviderId.ANTHROPIC,
+        LlmProviderId.OLLAMA,
+      ];
+      for (const candidate of fallbackOrder) {
+        if (candidate !== defaultChoice.providerId && this.isProviderAvailable(candidate)) {
+          return candidate;
+        }
+      }
+    } catch {
+      // getDefaultProviderAndModel throws if no provider is configured at all
+    }
     return undefined;
   }
 

@@ -146,6 +146,49 @@ export function getLlmService(providerId: LlmProviderId | string): ILlmService {
 }
 
 /**
+ * Map a model ID from the failed provider to one suitable for the fallback provider.
+ * Handles cross-provider model name differences (e.g. OpenRouter uses "openai/gpt-4o"
+ * while direct OpenAI uses "gpt-4o").
+ */
+function resolveFallbackModelId(
+  effectiveModelId: string,
+  originalModelId: string | undefined,
+  fallbackProviderId: LlmProviderId | string,
+): string {
+  // Known equivalent mappings: strip provider prefix for direct providers
+  // e.g. "openai/gpt-4o-mini" → "gpt-4o-mini" for direct OpenAI
+  const stripPrefix = (id: string, prefix: string): string =>
+    id.startsWith(prefix + '/') ? id.slice(prefix.length + 1) : id;
+
+  let candidate = originalModelId || effectiveModelId;
+
+  if (fallbackProviderId === LlmProviderId.OPENAI) {
+    candidate = stripPrefix(candidate, 'openai');
+  } else if (fallbackProviderId === LlmProviderId.ANTHROPIC) {
+    candidate = stripPrefix(candidate, 'anthropic');
+  } else if (fallbackProviderId === LlmProviderId.OPENROUTER) {
+    // OpenRouter expects prefixed IDs; add "openai/" if missing a prefix
+    if (!candidate.includes('/')) {
+      candidate = `openai/${candidate}`;
+    }
+  }
+
+  // If the candidate still looks wrong for the target provider, use the provider's default
+  const fallbackConfig = llmConfigService.getProviderConfig(fallbackProviderId as LlmProviderId);
+  if (!fallbackConfig) return candidate;
+
+  // Sanity: don't send an anthropic model to OpenAI or vice versa
+  if (fallbackProviderId === LlmProviderId.OPENAI && candidate.startsWith('anthropic/')) {
+    return fallbackConfig.defaultModel || 'gpt-4o-mini';
+  }
+  if (fallbackProviderId === LlmProviderId.ANTHROPIC && candidate.startsWith('openai/')) {
+    return fallbackConfig.defaultModel || 'claude-3-haiku-20240307';
+  }
+
+  return candidate;
+}
+
+/**
  * Unified function to make a chat completion request to an LLM.
  * It selects the appropriate service based on providerId or default configuration.
  * Handles cost tracking for the LLM call.
@@ -267,12 +310,16 @@ export async function callLlm(
     if (isRetryableError) {
         const fallbackProviderId = llmConfigService.getFallbackProviderId();
         if (fallbackProviderId && fallbackProviderId !== effectiveProviderId) {
-            console.warn(`[LLM Factory] Attempting fallback to provider: ${fallbackProviderId} due to error with ${effectiveProviderId}.`);
+            console.warn(`[LLM Factory] Attempting fallback to provider: ${fallbackProviderId} due to error with ${effectiveProviderId} (${error.message?.slice(0, 120)}).`);
             try {
-                // Important: Decide if you use the same modelId or a default for the fallback provider
                 const fallbackService = getLlmService(fallbackProviderId);
-                const fallbackModelId = modelId || llmConfigService.getProviderConfig(fallbackProviderId)?.defaultModel || effectiveModelId; // Re-evaluate model for fallback
-                
+                // Map the model ID for the fallback provider:
+                // - If model has a provider prefix (e.g. "openai/gpt-4o-mini"), the service's
+                //   mapToProviderModelId will handle stripping it.
+                // - Use fallback provider's default model as last resort.
+                const fallbackModelId = resolveFallbackModelId(effectiveModelId, modelId, fallbackProviderId);
+                console.log(`[LLM Factory] Fallback model: "${fallbackModelId}" via provider: "${fallbackProviderId}"`);
+
                 const fallbackResponse = await fallbackService.generateChatCompletion(messages, fallbackModelId, params);
                 
                 // Cost tracking for fallback call
