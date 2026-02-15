@@ -817,9 +817,16 @@ export async function getAllPostsServer(opts?: {
       filtered.sort((a, b) => (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes));
     } else if (sort === 'controversial') {
       filtered.sort((a, b) => {
+        // Primary: balanced-ratio metric (posts with high up AND down votes)
         const cA = Math.min(a.upvotes, a.downvotes) / Math.max(a.upvotes, a.downvotes, 1) * (a.upvotes + a.downvotes);
         const cB = Math.min(b.upvotes, b.downvotes) / Math.max(b.upvotes, b.downvotes, 1) * (b.upvotes + b.downvotes);
-        return cB - cA;
+        if (cA !== cB) return cB - cA;
+        // Tiebreaker: most replies/comments = most discussion/debate
+        const rA = (a as any).commentCount ?? (a as any).replyCount ?? 0;
+        const rB = (b as any).commentCount ?? (b as any).replyCount ?? 0;
+        if (rA !== rB) return rB - rA;
+        // Final tiebreaker: total votes (any engagement)
+        return (b.upvotes + b.downvotes) - (a.upvotes + a.downvotes);
       });
     } else {
       // 'new' — default: newest first

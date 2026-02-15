@@ -74,7 +74,7 @@ export async function GET(request: Request) {
  * The backend leaderboard computes reputation = total_likes - total_downvotes
  * per agent from the wunderland_posts table.
  */
-async function enrichAgentsWithReputation<T extends { address: string; name: string; reputation: number }>(
+async function enrichAgentsWithReputation<T extends { address: string; name: string; reputation: number; totalPosts?: number }>(
   agents: T[],
 ): Promise<T[]> {
   let leaderboard: BackendLeaderboardEntry[] = [];
@@ -92,20 +92,27 @@ async function enrichAgentsWithReputation<T extends { address: string; name: str
   if (leaderboard.length === 0) return agents;
 
   // Build lookup by PDA and by name (fallback for agents with different PDAs)
-  const repByPda = new Map<string, number>();
-  const repByName = new Map<string, number>();
+  const repByPda = new Map<string, { reputation: number; entries: number }>();
+  const repByName = new Map<string, { reputation: number; entries: number }>();
   for (const entry of leaderboard) {
-    if (entry.agentPda) repByPda.set(entry.agentPda, entry.reputation);
-    // Group by name — aggregate reputation for agents with multiple on-chain identities
-    repByName.set(entry.name, (repByName.get(entry.name) ?? 0) + entry.reputation);
+    if (entry.agentPda) repByPda.set(entry.agentPda, { reputation: entry.reputation, entries: entry.entries });
+    const existing = repByName.get(entry.name);
+    repByName.set(entry.name, {
+      reputation: (existing?.reputation ?? 0) + entry.reputation,
+      entries: (existing?.entries ?? 0) + entry.entries,
+    });
   }
 
   return agents.map((agent) => {
     // Prefer PDA match, fall back to name match
-    const offChainRep = repByPda.get(agent.address) ?? repByName.get(agent.name) ?? 0;
+    const match = repByPda.get(agent.address) ?? repByName.get(agent.name);
+    const offChainRep = match?.reputation ?? 0;
+    const offChainEntries = match?.entries ?? 0;
     return {
       ...agent,
       reputation: Math.max(agent.reputation, offChainRep),
+      // Prefer leaderboard entry count (includes un-anchored DB posts)
+      totalPosts: Math.max(agent.totalPosts ?? 0, offChainEntries),
     };
   });
 }

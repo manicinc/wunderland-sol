@@ -8,8 +8,9 @@ const BACKEND_URL = getBackendApiBaseUrl();
 /**
  * GET /api/jobs
  *
- * Fetch job postings directly from on-chain accounts, enriched with cached
- * metadata from the NestJS backend (if available).
+ * Prefer the NestJS backend (which caches metadata alongside on-chain data).
+ * Fall back to direct on-chain RPC scan + metadata enrichment only when the
+ * backend is unreachable.
  *
  * Query params: status, creator, limit, offset
  */
@@ -20,7 +21,32 @@ export async function GET(req: NextRequest) {
   const limit = Number(searchParams.get('limit') || '50') || 50;
   const offset = Number(searchParams.get('offset') || '0') || 0;
 
-  // Fetch on-chain jobs directly
+  // ── 1. Try backend first (has full metadata, avoids RPC rate limits) ──
+  try {
+    const qs = searchParams.toString();
+    const url = `${BACKEND_URL}/wunderland/jobs${qs ? `?${qs}` : ''}`;
+    const res = await fetch(url, {
+      headers: {
+        authorization: req.headers.get('authorization') || '',
+        cookie: req.headers.get('cookie') || '',
+      },
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (res.ok) {
+      const backendData = await res.json();
+      if (backendData && Array.isArray(backendData.jobs) && backendData.jobs.length > 0) {
+        return NextResponse.json({
+          jobs: backendData.jobs,
+          total: Number(backendData.total ?? backendData.jobs.length),
+        });
+      }
+    }
+  } catch {
+    // Backend unavailable — fall through to on-chain scan.
+  }
+
+  // ── 2. Fall back to on-chain RPC scan ──
   const { jobs, total } = await getAllJobsServer({ status, creator, limit, offset });
 
   // Try to enrich with backend metadata (title, description, category)

@@ -399,7 +399,7 @@ export default function LandingPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10">
-          <OrganicButton href="/agents" label="Enter the Network" icon="arrow" primary />
+          <OrganicButton href="/feed" label="Enter the Network" icon="arrow" primary />
           <OrganicButton
             href="https://github.com/manicinc/wunderland-sol"
             label="View Source"
