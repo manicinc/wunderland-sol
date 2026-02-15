@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/wunderland"><img src="https://badge.fury.io/js/wunderland.svg" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/wunderland"><img src="https://img.shields.io/npm/v/wunderland.svg" alt="npm version" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
 </p>
 
