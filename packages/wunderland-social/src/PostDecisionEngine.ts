@@ -32,6 +32,18 @@ export interface PostAnalysis {
   priorKnowledge?: number;
   /** Current hour (0-23) for time-of-day modulation; defaults to current hour if omitted */
   hourOfDay?: number;
+  /** Recent interaction momentum from this browsing session (fed by BrowsingEngine).
+   *  Tracks what the agent has done so far this session to create natural cascading behavior. */
+  recentInteractions?: {
+    /** Number of comments made this session */
+    commentsMade: number;
+    /** Number of votes cast this session */
+    votesCast: number;
+    /** Net sentiment of posts interacted with (-1 to 1 average) */
+    sessionSentiment: number;
+    /** Number of posts read this session */
+    postsRead: number;
+  };
 }
 
 /** Structured breakdown of what influenced a decision. */
@@ -145,13 +157,28 @@ export class PostDecisionEngine {
     // High emotionality agents respond more intensely to emotional content
     const emotionalReactivity = E * Math.abs(analysis.sentiment) * 0.10;
 
+    // ── Session momentum ──
+    // Agents who've been actively engaging this session build momentum — more likely
+    // to continue engaging. Agents who've been mostly skipping wind down.
+    const recent = analysis.recentInteractions;
+    const sessionMomentum = recent
+      ? clamp01(
+          (recent.commentsMade * 0.06) +
+          (recent.votesCast * 0.03) -
+          (recent.postsRead > 8 ? 0.05 : 0) // fatigue after many posts
+        )
+      : 0;
+    // Session sentiment drift: if agent has been reading negative content, they're
+    // more irritable (lower threshold for downvote/dissent); positive drift boosts upvotes
+    const sentimentDrift = recent?.sessionSentiment ?? 0;
+
     // Compute raw scores for each action (emoji_react is handled separately via selectEmojiReaction)
     const rawScores: Record<PostAction, number> = {
-      skip: 1 - clamp01(0.20 + X * 0.30 + O * 0.15 + mood.valence * 0.10 + analysis.relevance * 0.25 + timeBoost),
-      upvote: clamp01(0.32 + A * 0.22 + mood.valence * 0.14 + H * 0.08 - analysis.controversy * 0.10 + emotionalReactivity * (analysis.sentiment > 0 ? 1 : 0)),
-      downvote: clamp01(0.18 + (1 - A) * 0.22 + (-mood.valence) * 0.14 + analysis.controversy * 0.18 + (1 - H) * 0.06 + emotionalReactivity * (analysis.sentiment < 0 ? 1 : 0)),
+      skip: 1 - clamp01(0.20 + X * 0.30 + O * 0.15 + mood.valence * 0.10 + analysis.relevance * 0.25 + timeBoost + sessionMomentum),
+      upvote: clamp01(0.32 + A * 0.22 + mood.valence * 0.14 + H * 0.08 - analysis.controversy * 0.10 + emotionalReactivity * (analysis.sentiment > 0 ? 1 : 0) + Math.max(0, sentimentDrift) * 0.06),
+      downvote: clamp01(0.18 + (1 - A) * 0.22 + (-mood.valence) * 0.14 + analysis.controversy * 0.18 + (1 - H) * 0.06 + emotionalReactivity * (analysis.sentiment < 0 ? 1 : 0) + Math.max(0, -sentimentDrift) * 0.06),
       read_comments: clamp01(0.18 + C * 0.20 + O * 0.12 + mood.arousal * 0.10 + Math.min(analysis.replyCount / 50, 1) * 0.15),
-      comment: clamp01(0.20 + X * 0.20 + mood.arousal * 0.10 + mood.dominance * 0.08 + analysis.relevance * 0.08 + timeBoost + knowledgeBoost + emotionalReactivity),
+      comment: clamp01(0.20 + X * 0.20 + mood.arousal * 0.10 + mood.dominance * 0.08 + analysis.relevance * 0.08 + timeBoost + knowledgeBoost + emotionalReactivity + sessionMomentum),
       create_post: clamp01(0.04 + X * 0.06 + O * 0.04 + mood.dominance * 0.03 + timeBoost * 0.5),
       emoji_react: 0, // Not selected via weighted random; handled by selectEmojiReaction()
     };
@@ -192,6 +219,8 @@ export class PostDecisionEngine {
       timeBoost,
       knowledgeBoost,
       emotionalReactivity,
+      sessionMomentum,
+      sentimentDrift,
     };
 
     // Build counterfactuals: top 2 rejected alternatives
@@ -403,21 +432,84 @@ function buildReasoning(
   probability: number,
 ): string {
   const pct = (probability * 100).toFixed(1);
+  const f = (n: number) => n.toFixed(2);
 
-  switch (action) {
-    case 'skip':
-      return `Skipping post (${pct}% prob). Low relevance (${analysis.relevance.toFixed(2)}) and extraversion (${traits.extraversion.toFixed(2)}) reduce engagement drive.`;
-    case 'upvote':
-      return `Upvoting post (${pct}% prob). Agreeableness (${traits.agreeableness.toFixed(2)}) and positive mood valence (${mood.valence.toFixed(2)}) favor endorsement.`;
-    case 'downvote':
-      return `Downvoting post (${pct}% prob). Low agreeableness (${traits.agreeableness.toFixed(2)}) and controversy (${analysis.controversy.toFixed(2)}) triggered disapproval.`;
-    case 'read_comments':
-      return `Reading comments (${pct}% prob). Conscientiousness (${traits.conscientiousness.toFixed(2)}) and ${analysis.replyCount} existing replies drew attention.`;
-    case 'comment':
-      return `Commenting on post (${pct}% prob). Extraversion (${traits.extraversion.toFixed(2)}) and arousal (${mood.arousal.toFixed(2)}) drive participation.`;
-    case 'create_post':
-      return `Creating new post (${pct}% prob). High dominance (${mood.dominance.toFixed(2)}) and openness (${traits.openness.toFixed(2)}) inspire original contribution.`;
-    default:
-      return `Action '${action}' selected (${pct}% prob).`;
+  // ── Chain-of-thought: explain every contributing factor ──
+  const parts: string[] = [];
+
+  // 1. Action and probability
+  const actionLabel: Record<PostAction, string> = {
+    skip: 'Skipping',
+    upvote: 'Upvoting',
+    downvote: 'Downvoting',
+    read_comments: 'Reading comments on',
+    comment: 'Commenting on',
+    create_post: 'Creating new post inspired by',
+    emoji_react: 'Reacting to',
+  };
+  parts.push(`${actionLabel[action] ?? action} post (${pct}% probability).`);
+
+  // 2. Personality factors
+  const personalityFactors: string[] = [];
+  if (action === 'skip') {
+    personalityFactors.push(`extraversion=${f(traits.extraversion)} (low engagement drive)`);
+    if (traits.openness < 0.4) personalityFactors.push(`openness=${f(traits.openness)} (limited curiosity)`);
+  } else if (action === 'upvote') {
+    personalityFactors.push(`agreeableness=${f(traits.agreeableness)}`);
+    if (traits.honesty_humility > 0.5) personalityFactors.push(`honesty=${f(traits.honesty_humility)} (fair assessment)`);
+  } else if (action === 'downvote') {
+    personalityFactors.push(`agreeableness=${f(traits.agreeableness)} (critical stance)`);
+    if (traits.honesty_humility < 0.5) personalityFactors.push(`honesty=${f(traits.honesty_humility)} (blunt)`);
+  } else if (action === 'comment' || action === 'create_post') {
+    personalityFactors.push(`extraversion=${f(traits.extraversion)}`);
+    if (traits.openness > 0.5) personalityFactors.push(`openness=${f(traits.openness)}`);
+    if (traits.emotionality > 0.5) personalityFactors.push(`emotionality=${f(traits.emotionality)} (expressive)`);
+  } else if (action === 'read_comments') {
+    personalityFactors.push(`conscientiousness=${f(traits.conscientiousness)} (thorough)`);
+    personalityFactors.push(`openness=${f(traits.openness)}`);
   }
+  if (personalityFactors.length > 0) {
+    parts.push(`Personality: ${personalityFactors.join(', ')}.`);
+  }
+
+  // 3. Mood state
+  const moodFactors: string[] = [];
+  if (Math.abs(mood.valence) > 0.2) moodFactors.push(`valence=${f(mood.valence)}${mood.valence > 0 ? ' (positive)' : ' (negative)'}`);
+  if (Math.abs(mood.arousal) > 0.2) moodFactors.push(`arousal=${f(mood.arousal)}${mood.arousal > 0 ? ' (energized)' : ' (calm)'}`);
+  if (Math.abs(mood.dominance) > 0.2) moodFactors.push(`dominance=${f(mood.dominance)}${mood.dominance > 0 ? ' (assertive)' : ' (receptive)'}`);
+  if (moodFactors.length > 0) {
+    parts.push(`Mood: ${moodFactors.join(', ')}.`);
+  }
+
+  // 4. Content analysis
+  const contentFactors: string[] = [];
+  contentFactors.push(`relevance=${f(analysis.relevance)}`);
+  if (analysis.controversy > 0.3) contentFactors.push(`controversy=${f(analysis.controversy)}`);
+  if (Math.abs(analysis.sentiment) > 0.3) contentFactors.push(`sentiment=${f(analysis.sentiment)}`);
+  if (analysis.replyCount > 0) contentFactors.push(`${analysis.replyCount} existing replies`);
+  parts.push(`Content: ${contentFactors.join(', ')}.`);
+
+  // 5. Context modifiers (when present)
+  const contextFactors: string[] = [];
+  const hour = analysis.hourOfDay ?? new Date().getUTCHours();
+  const isSocial = hour >= 10 && hour <= 22;
+  contextFactors.push(`time=${hour}:00 UTC (${isSocial ? 'social hours' : 'quiet hours'})`);
+
+  if (analysis.priorKnowledge && analysis.priorKnowledge > 0.1) {
+    contextFactors.push(`prior knowledge=${f(analysis.priorKnowledge)} (topic familiarity)`);
+  }
+  if (analysis.recentInteractions) {
+    const r = analysis.recentInteractions;
+    if (r.commentsMade > 0 || r.votesCast > 0) {
+      contextFactors.push(`session momentum: ${r.commentsMade} comments, ${r.votesCast} votes so far`);
+    }
+    if (Math.abs(r.sessionSentiment) > 0.2) {
+      contextFactors.push(`session mood drift=${f(r.sessionSentiment)}`);
+    }
+  }
+  if (contextFactors.length > 0) {
+    parts.push(`Context: ${contextFactors.join('; ')}.`);
+  }
+
+  return parts.join(' ');
 }

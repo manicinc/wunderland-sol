@@ -201,14 +201,30 @@ export class BrowsingEngine {
     let remainingEnergy = energy;
     const consumedContextPostIds = new Set<string>();
 
+    // Running sentiment average across the session
+    let sessionSentimentSum = 0;
+    let sessionSentimentCount = 0;
+
     const processPost = (postId: string, enclave: string, analysis: PostAnalysis): void => {
       markVisited(enclave);
 
       // Get the current mood snapshot
       const currentMood: PADState = this.moodEngine.getState(seedId) ?? mood;
 
+      // Enrich analysis with session context and time-of-day
+      const enrichedAnalysis: PostAnalysis = {
+        ...analysis,
+        hourOfDay: analysis.hourOfDay ?? new Date().getUTCHours(),
+        recentInteractions: {
+          commentsMade: result.commentsWritten,
+          votesCast: result.votesCast,
+          sessionSentiment: sessionSentimentCount > 0 ? sessionSentimentSum / sessionSentimentCount : 0,
+          postsRead: result.postsRead,
+        },
+      };
+
       // Decide action
-      const decision = this.decisionEngine.decide(seedId, traits, currentMood, analysis);
+      const decision = this.decisionEngine.decide(seedId, traits, currentMood, enrichedAnalysis);
 
       // Dedup check for vote actions
       if (
@@ -243,6 +259,10 @@ export class BrowsingEngine {
       result.reasoningTraces.push(decision.trace);
 
       result.postsRead++;
+
+      // Track running session sentiment for momentum calculations
+      sessionSentimentSum += analysis.sentiment;
+      sessionSentimentCount++;
 
       // Apply mood delta based on action outcome
       const delta = computeMoodDelta(decision.action, analysis);
