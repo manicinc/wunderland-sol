@@ -670,7 +670,7 @@ export default function MintPage() {
   };
 
   return (
-    <PageContainer size="narrow">
+    <PageContainer size="wide">
       {/* Header */}
       <SectionHeader
         title="Agent Registration"
@@ -746,37 +746,37 @@ export default function MintPage() {
       <CyberFrame variant="gold" glow>
         <div
           ref={mintReveal.ref}
-          className={`holo-card p-6 section-glow-gold animate-in ${mintReveal.isVisible ? 'visible' : ''}`}
+          className={`holo-card p-8 section-glow-gold animate-in ${mintReveal.isVisible ? 'visible' : ''}`}
         >
-          <div className="mb-4">
-            <div className="text-xs text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
+          <div className="mb-6">
+            <div className="text-sm text-[var(--text-tertiary)] font-mono uppercase tracking-wider">
               Mint an Agent
             </div>
-            <p className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+            <p className="mt-2 text-base text-[var(--text-secondary)] leading-relaxed">
               Configure your agent's identity, personality, skills, channels, and API keys in a guided wizard.
             </p>
           </div>
 
         {/* On-chain stats row */}
-        <div className="grid gap-3 sm:grid-cols-3 mb-4">
-          <div className="glass rounded-xl p-4">
-            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Current Mint Fee</div>
-            <div className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+        <div className="grid gap-4 sm:grid-cols-3 mb-6">
+          <div className="glass rounded-xl p-5">
+            <div className="text-xs font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Current Mint Fee</div>
+            <div className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
               {configStatus.loading ? '...' : mintFeeSol !== null ? `${mintFeeSol.toFixed(2)} SOL` : '--'}
             </div>
-            <div className="mt-0.5 text-[9px] font-mono text-[var(--deco-gold)]">
+            <div className="mt-1 text-xs font-mono text-[var(--deco-gold)]">
               Flat — set by on-chain EconomicsConfig
             </div>
           </div>
-          <div className="glass rounded-xl p-4">
-            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Per Wallet Cap</div>
-            <div className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+          <div className="glass rounded-xl p-5">
+            <div className="text-xs font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">Per Wallet Cap</div>
+            <div className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
               {configStatus.loading ? '...' : typeof configStatus.maxPerWallet === 'number' ? `${configStatus.maxPerWallet} per wallet` : '--'}
             </div>
           </div>
-          <div className="glass rounded-xl p-4">
-            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">You Minted</div>
-            <div className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+          <div className="glass rounded-xl p-5">
+            <div className="text-xs font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">You Minted</div>
+            <div className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
               {!publicKey ? '--' : mintedCount === null ? '...' : String(mintedCount)}
             </div>
           </div>
@@ -928,19 +928,19 @@ export default function MintPage() {
 
         {/* Navigation buttons */}
         {wizard.step < 6 && !wizard.mintSig && (
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-[var(--border-glass)]">
+          <div className="flex items-center justify-between mt-8 pt-5 border-t border-[var(--border-glass)]">
             <button
               type="button"
               onClick={prevStep}
               disabled={wizard.step === 1}
-              className="px-4 py-2.5 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all disabled:opacity-30 disabled:hover:bg-[var(--bg-glass)]"
+              className="px-6 py-3 rounded-lg text-sm font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--text-primary)] transition-all disabled:opacity-30 disabled:hover:bg-[var(--bg-glass)]"
             >
               Back
             </button>
             <button
               type="button"
               onClick={nextStep}
-              className="px-4 py-2.5 rounded-lg text-xs font-mono uppercase bg-[rgba(0,245,255,0.08)] text-[var(--text-primary)] border border-[rgba(0,245,255,0.2)] hover:bg-[rgba(0,245,255,0.14)] transition-all"
+              className="px-6 py-3 rounded-lg text-sm font-mono uppercase bg-[rgba(0,245,255,0.08)] text-[var(--text-primary)] border border-[rgba(0,245,255,0.2)] hover:bg-[rgba(0,245,255,0.14)] transition-all"
             >
               {wizard.step === 5 ? 'Review' : 'Next'}
             </button>

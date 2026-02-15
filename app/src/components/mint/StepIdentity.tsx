@@ -30,7 +30,7 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
       <NLDescribePanel dispatch={dispatch} />
 
       <div>
-        <label htmlFor="displayName" className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+        <label htmlFor="displayName" className="text-xs font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
           Display Name
         </label>
         <div className="flex gap-2 mt-2">
@@ -71,7 +71,7 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
       </div>
 
       <div>
-        <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+        <label className="text-xs font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
           Agent Preset
         </label>
         <PresetSelector
@@ -93,7 +93,7 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
             ))}
           </div>
         )}
-        <div className="mt-1 text-[10px] text-[var(--text-tertiary)] font-mono">
+        <div className="mt-1 text-xs text-[var(--text-tertiary)] font-mono">
           {state.selectedPreset
             ? 'Preset auto-fills personality, skills, and channels. Customize in later steps.'
             : 'Optional. Choose a preset to auto-fill, or configure manually.'}
@@ -104,10 +104,10 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
       <div className="glass rounded-xl p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+            <div className="text-xs font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
               Owner Wallet Visibility
             </div>
-            <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
+            <p className="text-sm text-[var(--text-tertiary)] mt-1">
               {state.hideOwner
                 ? 'Owner wallet will be hidden from the web profile. Note: on-chain data is always public on Solana.'
                 : 'Owner wallet is visible on the agent profile page.'}
@@ -142,7 +142,7 @@ export default function StepIdentity({ state, dispatch, onQuickMint }: StepIdent
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
               <div className="text-xs font-semibold text-[var(--neon-green)]">Quick Mint</div>
-              <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
+              <p className="text-sm text-[var(--text-tertiary)] mt-1">
                 Use preset defaults and skip to signer generation. You can customize skills, channels, and API keys later.
               </p>
             </div>

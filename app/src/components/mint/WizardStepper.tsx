@@ -35,7 +35,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
       {/* Desktop stepper — horizontally scrollable */}
       <div
         ref={scrollRef}
-        className="hidden sm:flex items-center gap-1 mb-8 overflow-x-auto scrollbar-none pb-1"
+        className="hidden sm:flex items-center gap-1.5 mb-8 overflow-x-auto scrollbar-none pb-1"
       >
         {STEPS.map((step, i) => {
           const isCurrent = step === currentStep;
@@ -53,7 +53,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
                 onClick={() => canNavigate && onStepClick(step)}
                 disabled={!canNavigate}
                 className={`
-                  flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono transition-all whitespace-nowrap
+                  flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-sm font-mono transition-all whitespace-nowrap
                   ${isCurrent
                     ? 'bg-[rgba(0,245,255,0.08)] border border-[var(--neon-cyan)] text-[var(--text-primary)] shadow-[0_0_12px_rgba(0,245,255,0.15)]'
                     : isCompleted
@@ -65,7 +65,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
                 `}
               >
                 <span className={`
-                  flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shrink-0
+                  flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0
                   ${isCurrent
                     ? 'bg-[var(--neon-cyan)] text-[var(--bg-dark)]'
                     : isCompleted
@@ -74,7 +74,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
                   }
                 `}>
                   {isCompleted ? (
-                    <svg width="10" height="10" viewBox="0 0 16 16" fill="none">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
                       <path d="M3 8l3 3 7-7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   ) : step}
@@ -82,7 +82,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
                 <span>{STEP_LABELS[step]}</span>
               </button>
               {i < STEPS.length - 1 && (
-                <div className={`w-4 h-px mx-1 shrink-0 ${
+                <div className={`w-5 h-px mx-1.5 shrink-0 ${
                   step < currentStep ? 'bg-[var(--neon-green)]' : 'bg-[var(--border-glass)]'
                 }`} />
               )}
@@ -94,7 +94,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
       {/* Mobile stepper — also scrollable as pill buttons */}
       <div className="sm:hidden mb-6">
         <div
-          className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-2"
+          className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-2"
         >
           {STEPS.map((step) => {
             const isCurrent = step === currentStep;
@@ -108,7 +108,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
                 onClick={() => canNavigate && onStepClick(step)}
                 disabled={!canNavigate}
                 className={`
-                  shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[0.65rem] font-mono transition-all whitespace-nowrap
+                  shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono transition-all whitespace-nowrap
                   ${isCurrent
                     ? 'bg-[rgba(0,245,255,0.1)] border border-[var(--neon-cyan)] text-[var(--neon-cyan)]'
                     : isCompleted
@@ -119,7 +119,7 @@ export default function WizardStepper({ currentStep, state, onStepClick }: Wizar
                 `}
               >
                 <span className={`
-                  inline-flex items-center justify-center w-4 h-4 rounded-full text-[8px] font-bold shrink-0
+                  inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold shrink-0
                   ${isCurrent
                     ? 'bg-[var(--neon-cyan)] text-[var(--bg-dark)]'
                     : isCompleted

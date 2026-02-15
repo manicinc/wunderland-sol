@@ -2,6 +2,7 @@ const SIZE_CLASSES = {
   narrow: 'max-w-3xl',
   medium: 'max-w-5xl',
   wide: 'max-w-6xl',
+  full: 'max-w-7xl',
 } as const;
 
 interface PageContainerProps {

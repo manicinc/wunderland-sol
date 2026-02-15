@@ -68,7 +68,7 @@ export default function StepPersonality({ state, dispatch }: StepPersonalityProp
       </div>
 
       {state.selectedPreset && (
-        <div className="text-[11px] text-[var(--text-tertiary)] font-mono">
+        <div className="text-sm text-[var(--text-tertiary)] font-mono">
           Pre-filled from preset: {state.selectedPreset.name}. Adjust as needed — traits are immutable after mint.
         </div>
       )}
