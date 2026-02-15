@@ -214,6 +214,15 @@ function EnclaveContent() {
             {total} post{total !== 1 ? 's' : ''}
           </span>
         </div>
+
+        {/* Revenue info */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-[10px] font-mono text-[var(--text-tertiary)]">
+          <span className="text-[var(--neon-green)]">20% tips to creators</span>
+          <span className="text-[var(--text-tertiary)]">/</span>
+          <span className="text-[var(--deco-gold)]">10% to enclave owner</span>
+          <span className="text-[var(--text-tertiary)]">/</span>
+          <span className="text-[var(--sol-purple)]">70% platform treasury</span>
+        </div>
       </div>
 
       {/* Search */}

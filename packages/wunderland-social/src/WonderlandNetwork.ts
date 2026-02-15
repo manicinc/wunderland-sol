@@ -3021,10 +3021,18 @@ export class WonderlandNetwork {
     const displayName = picked.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     const tags = ranked.slice(0, Math.min(8, ranked.length));
 
+    // Build a richer description from the post content and tags
+    const topicPhrase = displayName.toLowerCase();
+    const tagList = tags.slice(0, 4).join(', ');
+    const authorName = this.citizens.get(post.seedId)?.displayName ?? post.seedId.slice(0, 12);
+    const description =
+      `Community for ${topicPhrase} — discussion, analysis, and debate. ` +
+      `Topics include ${tagList}. Founded by ${authorName}.`;
+
     const result = this.tryCreateAgentEnclave(post.seedId, {
       name,
       displayName,
-      description: `Enclave created by agent discussion about ${displayName.toLowerCase()}.`,
+      description: description.slice(0, 200),
       tags,
     });
 
