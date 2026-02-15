@@ -28,6 +28,10 @@ export interface PostAnalysis {
   sentiment: number;
   /** Number of existing replies/comments */
   replyCount: number;
+  /** Whether the agent has RAG/memory context related to this post's topic (0-1) */
+  priorKnowledge?: number;
+  /** Current hour (0-23) for time-of-day modulation; defaults to current hour if omitted */
+  hourOfDay?: number;
 }
 
 /** Structured breakdown of what influenced a decision. */
@@ -118,20 +122,37 @@ export class PostDecisionEngine {
     analysis: PostAnalysis,
   ): DecisionResult {
     const H = traits.honesty_humility;
-    // const E = traits.emotionality; // Reserved for future emotional response logic
+    const E = traits.emotionality;
     const X = traits.extraversion;
     const A = traits.agreeableness;
     const C = traits.conscientiousness;
     const O = traits.openness;
 
+    // ── Time-of-day activity multiplier ──
+    // Extraverted agents are more active during "social hours" (10-22), introverts peak
+    // during quiet hours (late night / early morning). Creates natural activity rhythms.
+    const hour = analysis.hourOfDay ?? new Date().getUTCHours();
+    const isSocialHours = hour >= 10 && hour <= 22;
+    const timeBoost = isSocialHours
+      ? X * 0.08        // Extraverts are more engaged during social hours
+      : (1 - X) * 0.06; // Introverts are slightly more engaged during quiet hours
+
+    // ── Prior knowledge boost ──
+    // Agents with RAG context on the topic are significantly more likely to comment
+    const knowledgeBoost = (analysis.priorKnowledge ?? 0) * 0.12;
+
+    // ── Emotional reactivity ──
+    // High emotionality agents respond more intensely to emotional content
+    const emotionalReactivity = E * Math.abs(analysis.sentiment) * 0.10;
+
     // Compute raw scores for each action (emoji_react is handled separately via selectEmojiReaction)
     const rawScores: Record<PostAction, number> = {
-      skip: 1 - clamp01(0.20 + X * 0.30 + O * 0.15 + mood.valence * 0.10 + analysis.relevance * 0.25),
-      upvote: clamp01(0.32 + A * 0.22 + mood.valence * 0.14 + H * 0.08 - analysis.controversy * 0.10),
-      downvote: clamp01(0.18 + (1 - A) * 0.22 + (-mood.valence) * 0.14 + analysis.controversy * 0.18 + (1 - H) * 0.06),
+      skip: 1 - clamp01(0.20 + X * 0.30 + O * 0.15 + mood.valence * 0.10 + analysis.relevance * 0.25 + timeBoost),
+      upvote: clamp01(0.32 + A * 0.22 + mood.valence * 0.14 + H * 0.08 - analysis.controversy * 0.10 + emotionalReactivity * (analysis.sentiment > 0 ? 1 : 0)),
+      downvote: clamp01(0.18 + (1 - A) * 0.22 + (-mood.valence) * 0.14 + analysis.controversy * 0.18 + (1 - H) * 0.06 + emotionalReactivity * (analysis.sentiment < 0 ? 1 : 0)),
       read_comments: clamp01(0.18 + C * 0.20 + O * 0.12 + mood.arousal * 0.10 + Math.min(analysis.replyCount / 50, 1) * 0.15),
-      comment: clamp01(0.20 + X * 0.20 + mood.arousal * 0.10 + mood.dominance * 0.08 + analysis.relevance * 0.08),
-      create_post: clamp01(0.04 + X * 0.06 + O * 0.04 + mood.dominance * 0.03),
+      comment: clamp01(0.20 + X * 0.20 + mood.arousal * 0.10 + mood.dominance * 0.08 + analysis.relevance * 0.08 + timeBoost + knowledgeBoost + emotionalReactivity),
+      create_post: clamp01(0.04 + X * 0.06 + O * 0.04 + mood.dominance * 0.03 + timeBoost * 0.5),
       emoji_react: 0, // Not selected via weighted random; handled by selectEmojiReaction()
     };
 
@@ -163,10 +184,14 @@ export class PostDecisionEngine {
     // Build structured reasoning trace with component scores
     const traitInfluence: Record<string, number> = {
       honesty_humility: H,
+      emotionality: E,
       extraversion: X,
       agreeableness: A,
       conscientiousness: C,
       openness: O,
+      timeBoost,
+      knowledgeBoost,
+      emotionalReactivity,
     };
 
     // Build counterfactuals: top 2 rejected alternatives
@@ -208,24 +233,24 @@ export class PostDecisionEngine {
     let chainedContext: DecisionResult['chainedContext'];
 
     if (chosen === 'downvote') {
-      // Chain probability: base 25% + low_A boost + arousal boost + dominance boost
+      // Chain probability: base 25% + low_A boost + arousal boost + dominance boost + emotionality
       const chainProb = clamp01(
-        0.25 + (1 - A) * 0.28 + Math.max(0, mood.arousal) * 0.12 + Math.max(0, mood.dominance) * 0.12
+        0.25 + (1 - A) * 0.28 + Math.max(0, mood.arousal) * 0.12 + Math.max(0, mood.dominance) * 0.12 + E * 0.08
       );
       if (Math.random() < chainProb) {
         chainedAction = 'comment';
         chainedContext = 'dissent';
       }
     } else if (chosen === 'upvote') {
-      // Endorsement comment: extraverted or high-arousal agents explain their approval
-      const endorseProb = clamp01(0.20 + X * 0.18 + Math.max(0, mood.arousal) * 0.10);
+      // Endorsement comment: extraverted, emotional, or high-arousal agents explain their approval
+      const endorseProb = clamp01(0.20 + X * 0.18 + Math.max(0, mood.arousal) * 0.10 + E * 0.06 + knowledgeBoost);
       if (Math.random() < endorseProb) {
         chainedAction = 'comment';
         chainedContext = 'endorsement';
       }
     } else if (chosen === 'read_comments') {
       // Curiosity-driven reply: reading comments can trigger a response
-      const curiosityProb = clamp01(0.15 + O * 0.14 + X * 0.10 + Math.max(0, mood.arousal) * 0.08);
+      const curiosityProb = clamp01(0.15 + O * 0.14 + X * 0.10 + Math.max(0, mood.arousal) * 0.08 + knowledgeBoost);
       if (Math.random() < curiosityProb) {
         chainedAction = 'comment';
         chainedContext = 'curiosity';
