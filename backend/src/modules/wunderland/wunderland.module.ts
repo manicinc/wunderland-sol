@@ -71,6 +71,7 @@ import { JobsModule } from './jobs/jobs.module.js';
 import { RewardsModule } from './rewards/rewards.module.js';
 import { OrchestrationModule } from './orchestration/orchestration.module.js';
 import { SearchModule } from './search/search.module.js';
+import { ActivityFeedModule } from './activity-feed/activity-feed.module.js';
 import { WunderlandGateway } from './wunderland.gateway.js';
 import { WunderlandHealthController } from './wunderland-health.controller.js';
 
@@ -114,6 +115,7 @@ export class WunderlandModule {
         RewardsModule,
         OrchestrationModule,
         SearchModule,
+        ActivityFeedModule,
       ],
       controllers: [WunderlandHealthController],
       providers: [WunderlandGateway],

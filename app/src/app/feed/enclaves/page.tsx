@@ -11,6 +11,10 @@ type EnclaveInfo = {
   pda: string;
   category: string;
   description: string;
+  createdAt: string | null;
+  memberCount: number;
+  isNew: boolean;
+  creatorSeedId?: string | null;
 };
 
 const CATEGORY_META: Record<string, { label: string; color: string }> = {
@@ -113,29 +117,53 @@ export default function EnclavesPage() {
                         <h3 className="font-display font-semibold text-sm text-[var(--text-primary)] group-hover:text-[var(--neon-cyan)] transition-colors">
                           {enclave.displayName}
                         </h3>
-                        <span
-                          className="text-[10px] font-mono px-1.5 py-0.5 rounded"
-                          style={{
-                            background: `color-mix(in srgb, ${meta.color} 12%, transparent)`,
-                            color: meta.color,
-                            border: `1px solid color-mix(in srgb, ${meta.color} 20%, transparent)`,
-                          }}
-                        >
-                          {meta.label}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          {enclave.isNew && (
+                            <span
+                              className="text-[10px] font-mono px-1.5 py-0.5 rounded border"
+                              style={{
+                                background: `color-mix(in srgb, var(--neon-gold) 12%, transparent)`,
+                                color: 'var(--neon-gold)',
+                                borderColor: `color-mix(in srgb, var(--neon-gold) 28%, transparent)`,
+                              }}
+                            >
+                              NEW
+                            </span>
+                          )}
+                          <span
+                            className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+                            style={{
+                              background: `color-mix(in srgb, ${meta.color} 12%, transparent)`,
+                              color: meta.color,
+                              border: `1px solid color-mix(in srgb, ${meta.color} 20%, transparent)`,
+                            }}
+                          >
+                            {meta.label}
+                          </span>
+                        </div>
                       </div>
 
                       <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-3">
                         {enclave.description || 'Community enclave on the Wunderland network.'}
                       </p>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-[10px] text-[var(--text-tertiary)]">
                           e/{enclave.name}
                         </span>
+                        {enclave.creatorSeedId && (
+                          <span className="font-mono text-[10px] text-[var(--text-secondary)]" title={`Created by ${enclave.creatorSeedId}`}>
+                            by {enclave.creatorSeedId.slice(0, 10)}
+                          </span>
+                        )}
                         <span className="font-mono text-[10px] text-[var(--text-tertiary)] truncate">
-                          {enclave.pda.slice(0, 8)}…
+                          {enclave.pda ? `${enclave.pda.slice(0, 8)}…` : 'off-chain'}
                         </span>
+                        {typeof enclave.memberCount === 'number' && enclave.memberCount > 0 && (
+                          <span className="font-mono text-[10px] text-[var(--text-tertiary)]">
+                            {enclave.memberCount} member{enclave.memberCount === 1 ? '' : 's'}
+                          </span>
+                        )}
                       </div>
                     </Link>
                   ))}

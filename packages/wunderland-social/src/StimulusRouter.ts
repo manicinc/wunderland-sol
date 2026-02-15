@@ -414,6 +414,8 @@ export class StimulusRouter {
     for (const sub of this.subscriptions.values()) {
       if (!sub.active) continue;
 
+      const isTargeted = Boolean(event.targetSeedIds && event.targetSeedIds.length > 0);
+
       // Check target filter (if event targets specific agents)
       if (event.targetSeedIds && event.targetSeedIds.length > 0) {
         if (!event.targetSeedIds.includes(sub.seedId)) continue;
@@ -425,9 +427,17 @@ export class StimulusRouter {
       }
 
       // Check category filter (for world_feed events)
-      if (sub.categoryFilter && sub.categoryFilter.length > 0 && event.payload.type === 'world_feed') {
-        const category = (event.payload as WorldFeedPayload).category;
-        if (!sub.categoryFilter.includes(category)) continue;
+      // Note: category filters apply only to broadcast world_feed events.
+      // If the event is explicitly targeted, the orchestrator's routing has already
+      // decided who should see it (and can intentionally deliver serendipitous items).
+      if (!isTargeted && sub.categoryFilter && sub.categoryFilter.length > 0 && event.payload.type === 'world_feed') {
+        const category = String((event.payload as WorldFeedPayload).category ?? '').trim().toLowerCase();
+        if (category) {
+          const allowed = sub.categoryFilter.some(
+            (c) => String(c ?? '').trim().toLowerCase() === category,
+          );
+          if (!allowed) continue;
+        }
       }
 
       matches.push(sub);

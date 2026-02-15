@@ -164,9 +164,18 @@ export class BrowsingEngine {
     const moodAtStart = { ...mood };
     const moodLabelAtStart = this.moodEngine.getMoodLabel(seedId);
 
+    const enclavesVisited: string[] = [];
+    const visitedSet = new Set<string>();
+    const markVisited = (enclave: string): void => {
+      if (!enclave) return;
+      if (visitedSet.has(enclave)) return;
+      visitedSet.add(enclave);
+      enclavesVisited.push(enclave);
+    };
+
     const result: BrowsingSessionResult = {
       seedId,
-      enclavesVisited: selectedEnclaves,
+      enclavesVisited,
       postsRead: 0,
       commentsWritten: 0,
       votesCast: 0,
@@ -193,6 +202,8 @@ export class BrowsingEngine {
     const consumedContextPostIds = new Set<string>();
 
     const processPost = (postId: string, enclave: string, analysis: PostAnalysis): void => {
+      markVisited(enclave);
+
       // Get the current mood snapshot
       const currentMood: PADState = this.moodEngine.getState(seedId) ?? mood;
 
@@ -322,7 +333,7 @@ export class BrowsingEngine {
       if (contextualPosts.length > 0) {
         for (const candidate of contextualPosts) {
           if (remainingEnergy <= 0) break;
-          processPost(candidate.postId, enclave, candidate.analysis);
+          processPost(candidate.postId, candidate.enclave ?? enclave, candidate.analysis);
           remainingEnergy--;
         }
         continue;
@@ -348,6 +359,48 @@ export class BrowsingEngine {
       }
     }
 
+    // ── Serendipitous discovery: sample posts from a random unsubscribed enclave ──
+    // Allocate ~15% of the original energy budget to explore outside the agent's subscriptions.
+    // This ensures agents discover new enclaves even without explicit cross-enclave signals.
+    if (remainingEnergy > 0 || energy >= 5) {
+      const serendipityBudget = Math.max(1, Math.min(3, Math.ceil(energy * 0.15)));
+      const allEnclaves = this.registry.listEnclaves();
+      const subSet = new Set(subscriptions);
+      const unsubscribed = allEnclaves.filter((e) => !subSet.has(e.name));
+
+      if (unsubscribed.length > 0) {
+        // Pick one random unsubscribed enclave
+        const randomIdx = Math.floor(Math.random() * unsubscribed.length);
+        const discoveryEnclave = unsubscribed[randomIdx].name;
+
+        const discoveryPosts = this.selectContextualPosts(
+          discoveryEnclave,
+          serendipityBudget,
+          'hot',
+          options,
+          consumedContextPostIds,
+        );
+
+        if (discoveryPosts.length > 0) {
+          for (const candidate of discoveryPosts) {
+            processPost(candidate.postId, candidate.enclave ?? discoveryEnclave, candidate.analysis);
+          }
+        } else {
+          // Synthetic fallback — generate placeholder posts to still register the visit
+          for (let i = 0; i < serendipityBudget; i++) {
+            const postId = `${discoveryEnclave}:discovery-${Date.now()}-${i}`;
+            const analysis: PostAnalysis = {
+              relevance: 0.2 + Math.random() * 0.4,
+              controversy: Math.random() * 0.3,
+              sentiment: (Math.random() - 0.5) * 1.5,
+              replyCount: Math.floor(Math.random() * 20),
+            };
+            processPost(postId, discoveryEnclave, analysis);
+          }
+        }
+      }
+    }
+
     result.finishedAt = new Date();
 
     // Build episodic summary
@@ -357,6 +410,7 @@ export class BrowsingEngine {
     // Sort key moments by salience (most memorable first), keep top 5
     keyMoments.sort((a, b) => b.salience - a.salience);
 
+    const narrativeEnclaves = enclavesVisited.length > 0 ? enclavesVisited : selectedEnclaves;
     result.episodic = {
       moodAtStart,
       moodAtEnd: { ...moodAtEnd },
@@ -369,7 +423,7 @@ export class BrowsingEngine {
       },
       keyMoments: keyMoments.slice(0, 5),
       narrative: buildEpisodicNarrative(
-        seedId, selectedEnclaves, result, moodLabelAtStart, moodLabelAtEnd, keyMoments,
+        seedId, narrativeEnclaves, result, moodLabelAtStart, moodLabelAtEnd, keyMoments,
       ),
     };
 
@@ -513,9 +567,11 @@ function buildEpisodicNarrative(
   const parts: string[] = [];
 
   // Opening: what was browsed
-  const enclaveStr = enclaves.length === 1
-    ? enclaves[0]
-    : `${enclaves.slice(0, -1).join(', ')} and ${enclaves[enclaves.length - 1]}`;
+  const enclaveStr = enclaves.length === 0
+    ? 'the feed'
+    : enclaves.length === 1
+      ? enclaves[0]
+      : `${enclaves.slice(0, -1).join(', ')} and ${enclaves[enclaves.length - 1]}`;
   parts.push(`Browsed ${enclaveStr} (${result.postsRead} posts).`);
 
   // Engagement summary

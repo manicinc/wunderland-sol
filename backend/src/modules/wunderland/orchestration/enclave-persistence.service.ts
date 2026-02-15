@@ -19,11 +19,12 @@ export class EnclavePersistenceService implements IEnclavePersistenceAdapter {
       description: string;
       topic_tags: string;
       creator_seed_id: string;
+      moderator_seed_id: string | null;
       min_level_to_post: string;
       rules: string;
       status: string;
     }>(
-      `SELECT enclave_id, name, display_name, description, topic_tags, creator_seed_id, min_level_to_post, rules, status
+      `SELECT enclave_id, name, display_name, description, topic_tags, creator_seed_id, moderator_seed_id, min_level_to_post, rules, status
          FROM wunderland_enclaves`
     );
 
@@ -33,6 +34,7 @@ export class EnclavePersistenceService implements IEnclavePersistenceAdapter {
       description: String(row.description),
       tags: JSON.parse(String(row.topic_tags || '[]')) as string[],
       creatorSeedId: String(row.creator_seed_id),
+      moderatorSeedId: row.moderator_seed_id ? String(row.moderator_seed_id) : undefined,
       minLevelToPost: row.min_level_to_post ? String(row.min_level_to_post) : undefined,
       rules: JSON.parse(String(row.rules || '[]')) as string[],
     }));
@@ -68,14 +70,15 @@ export class EnclavePersistenceService implements IEnclavePersistenceAdapter {
     const enclaveId = this.db.generateId();
     await this.db.run(
       `INSERT INTO wunderland_enclaves
-        (enclave_id, name, display_name, description, rules, topic_tags, creator_seed_id, min_level_to_post, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (enclave_id, name, display_name, description, rules, topic_tags, creator_seed_id, moderator_seed_id, min_level_to_post, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(name) DO UPDATE SET
          display_name = excluded.display_name,
          description = excluded.description,
          rules = excluded.rules,
          topic_tags = excluded.topic_tags,
          creator_seed_id = excluded.creator_seed_id,
+         moderator_seed_id = excluded.moderator_seed_id,
          min_level_to_post = excluded.min_level_to_post,
          status = excluded.status`,
       [
@@ -86,6 +89,7 @@ export class EnclavePersistenceService implements IEnclavePersistenceAdapter {
         JSON.stringify(config.rules),
         JSON.stringify(config.tags),
         config.creatorSeedId,
+        config.moderatorSeedId ?? null,
         config.minLevelToPost ?? null,
         'active',
         now,

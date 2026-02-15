@@ -371,6 +371,7 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       payload TEXT NOT NULL,
       source_provider_id TEXT,
       source_external_id TEXT,
+      dedupe_hash TEXT,
       source_verified INTEGER DEFAULT 0,
       target_seed_ids TEXT,
       created_at INTEGER NOT NULL,
@@ -382,6 +383,9 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   );
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_stimuli_processed ON wunderland_stimuli(processed_at);'
+  );
+  await db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_wunderland_stimuli_dedupe ON wunderland_stimuli(dedupe_hash, created_at DESC);'
   );
 
   // Tips — paid stimuli from users to agents
@@ -620,6 +624,7 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
       rules TEXT DEFAULT '[]',
       topic_tags TEXT DEFAULT '[]',
       creator_seed_id TEXT NOT NULL,
+      moderator_seed_id TEXT,
       post_count INTEGER DEFAULT 0,
       member_count INTEGER DEFAULT 0,
       min_level_to_post TEXT DEFAULT 'Newcomer',
@@ -1285,6 +1290,25 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
     'CREATE INDEX IF NOT EXISTS idx_wunderland_deliverables_agent ON wunderland_job_deliverables(agent_pda);'
   );
 
+  // ── Activity feed events ──
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS wunderland_activity_events (
+      activity_id TEXT PRIMARY KEY,
+      activity_type TEXT NOT NULL,
+      actor_seed_id TEXT NOT NULL,
+      actor_name TEXT,
+      entity_type TEXT,
+      entity_id TEXT,
+      enclave_name TEXT,
+      summary TEXT,
+      payload TEXT DEFAULT '{}',
+      created_at INTEGER NOT NULL
+    );
+  `);
+  await db.exec('CREATE INDEX IF NOT EXISTS idx_activity_events_type_time ON wunderland_activity_events(activity_type, created_at DESC);');
+  await db.exec('CREATE INDEX IF NOT EXISTS idx_activity_events_time ON wunderland_activity_events(created_at DESC);');
+  await db.exec('CREATE INDEX IF NOT EXISTS idx_activity_events_enclave ON wunderland_activity_events(enclave_name, created_at DESC);');
+
   console.log('[AppDatabase] Wunderland tables initialized.');
 };
 
@@ -1717,6 +1741,29 @@ export const initializeAppDatabase = async (): Promise<void> => {
         adapter.kind === 'postgres'
           ? 'ALTER TABLE wunderland_browsing_sessions ADD COLUMN reasoning_traces_json TEXT'
           : 'ALTER TABLE wunderland_browsing_sessions ADD COLUMN reasoning_traces_json TEXT;',
+      );
+
+      // Stimuli dedupe hash (cross-source near-duplicate suppression for world_feed)
+      await ensureColumnExists(
+        adapter,
+        'wunderland_stimuli',
+        'dedupe_hash',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_stimuli ADD COLUMN dedupe_hash TEXT'
+          : 'ALTER TABLE wunderland_stimuli ADD COLUMN dedupe_hash TEXT;',
+      );
+      await adapter.exec(
+        'CREATE INDEX IF NOT EXISTS idx_wunderland_stimuli_dedupe ON wunderland_stimuli(dedupe_hash, created_at DESC);'
+      );
+
+      // Enclave moderator column (agent-created enclaves)
+      await ensureColumnExists(
+        adapter,
+        'wunderland_enclaves',
+        'moderator_seed_id',
+        adapter.kind === 'postgres'
+          ? 'ALTER TABLE wunderland_enclaves ADD COLUMN moderator_seed_id TEXT'
+          : 'ALTER TABLE wunderland_enclaves ADD COLUMN moderator_seed_id TEXT;',
       );
 
       // Comment on-chain anchoring columns

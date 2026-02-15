@@ -63,6 +63,7 @@ import { TrustPersistenceService } from './trust-persistence.service';
 import { DMPersistenceService } from './dm-persistence.service';
 import { SafetyPersistenceService } from './safety-persistence.service';
 import { AlliancePersistenceService } from './alliance-persistence.service';
+import { ActivityFeedService } from '../activity-feed/activity-feed.service.js';
 
 @Injectable()
 export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
@@ -78,6 +79,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
   private readonly enabled: boolean;
   private stimulusDispatchInFlight = false;
   private readonly routingLastSelectedAtMs: Map<string, number> = new Map();
+  private readonly routingLastSelectedByCategoryAtMs: Map<string, number> = new Map();
+  private readonly routingLastSelectedBySourceAtMs: Map<string, number> = new Map();
 
   constructor(
     private readonly db: DatabaseService,
@@ -90,7 +93,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     private readonly safetyPersistence: SafetyPersistenceService,
     private readonly alliancePersistence: AlliancePersistenceService,
     private readonly vectorMemory: WunderlandVectorMemoryService,
-    private readonly wunderlandSol: WunderlandSolService
+    private readonly wunderlandSol: WunderlandSolService,
+    private readonly activityFeed: ActivityFeedService,
   ) {
     this.enabled =
       process.env.ENABLE_SOCIAL_ORCHESTRATION === 'true' ||
@@ -177,6 +181,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     this.network.setMoodPersistenceAdapter(this.moodPersistence);
     this.network.setEnclavePersistenceAdapter(this.enclavePersistence);
     this.network.setBrowsingPersistenceAdapter(this.browsingPersistence);
+    this.network.setActivityPersistenceAdapter(this.activityFeed);
 
     // 3. Initialize enclave system (loads persisted enclaves, creates defaults)
     await this.network.initializeEnclaveSystem();
@@ -506,6 +511,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 	    type: 'world_feed' | 'tip';
 	    priority: StimulusEvent['priority'];
 	    payload: any;
+      sourceProviderId?: string;
 	  }): Promise<string[]> {
     if (!this.network) return [];
 
@@ -524,7 +530,8 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           ? 3
           : 2;
 
-    const category = opts.type === 'world_feed' ? String(opts.payload?.category ?? '').trim() : '';
+    const category = opts.type === 'world_feed' ? String(opts.payload?.category ?? '').trim().toLowerCase() : '';
+    const sourceProviderId = String(opts.sourceProviderId ?? '').trim();
 
     // RAG-based routing: find agents whose prior posts are most similar to this stimulus.
     const stimulusText = (() => {
@@ -573,7 +580,10 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
         if (opts.type === 'world_feed') {
           const topics = Array.isArray(c.subscribedTopics) ? c.subscribedTopics : [];
-          if (category && topics.includes(category)) score += 1.25;
+          const topicMatch = category
+            ? topics.some((t) => String(t ?? '').trim().toLowerCase() === category)
+            : false;
+          if (topicMatch) score += 1.25;
           else if (topics.length === 0) score += 0.15; // generalist
           else score -= 0.4; // off-topic
         }
@@ -588,6 +598,24 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           score += Math.max(0, Math.min(1, rag)) * 0.8;
         }
 
+        // Diversity penalties: avoid hammering the same agent with the same category/source.
+        if (opts.type === 'world_feed') {
+          if (category) {
+            const key = `${seedId}::cat::${category}`;
+            const lastCat = this.routingLastSelectedByCategoryAtMs.get(key) ?? 0;
+            const sinceCat = lastCat > 0 ? now - lastCat : Number.POSITIVE_INFINITY;
+            if (sinceCat < 20 * 60_000) score -= 0.35;
+            else if (sinceCat < 60 * 60_000) score -= 0.15;
+          }
+          if (sourceProviderId) {
+            const key = `${seedId}::src::${sourceProviderId}`;
+            const lastSrc = this.routingLastSelectedBySourceAtMs.get(key) ?? 0;
+            const sinceSrc = lastSrc > 0 ? now - lastSrc : Number.POSITIVE_INFINITY;
+            if (sinceSrc < 30 * 60_000) score -= 0.25;
+            else if (sinceSrc < 90 * 60 * 1000) score -= 0.10;
+          }
+        }
+
         const last = this.routingLastSelectedAtMs.get(seedId) ?? 0;
         const sinceLast = last > 0 ? now - last : Number.POSITIVE_INFINITY;
         if (sinceLast < 15 * 60_000) score -= 0.5;
@@ -600,6 +628,14 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     const chosen = scored.slice(0, Math.max(1, desired)).map((s) => s.seedId);
     for (const seedId of chosen) {
       this.routingLastSelectedAtMs.set(seedId, now);
+      if (opts.type === 'world_feed') {
+        if (category) {
+          this.routingLastSelectedByCategoryAtMs.set(`${seedId}::cat::${category}`, now);
+        }
+        if (sourceProviderId) {
+          this.routingLastSelectedBySourceAtMs.set(`${seedId}::src::${sourceProviderId}`, now);
+        }
+      }
     }
 	    return chosen;
 	  }
@@ -789,6 +825,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
                 type: row.type === 'world_feed' ? 'world_feed' : 'tip',
                 priority: this.normalizePriority(row.priority),
                 payload: this.parseJson(row.payload, {}),
+                sourceProviderId: row.source_provider_id ? String(row.source_provider_id) : undefined,
               });
 
         const event = this.buildEventFromStimulusRow(row, targetSeedIds);
@@ -1354,6 +1391,21 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         enclaveId,
       ]
     );
+
+    // Emit activity event for post publication.
+    const isReply = !!post.replyToPostId;
+    try {
+      await this.activityFeed.recordEvent(
+        isReply ? 'comment_published' : 'post_published',
+        post.seedId,
+        null,
+        'post',
+        post.postId,
+        enclaveSlug,
+        isReply ? `replied in e/${enclaveSlug ?? 'feed'}` : `posted in e/${enclaveSlug ?? 'feed'}`,
+        { contentPreview: post.content?.slice(0, 80) },
+      );
+    } catch { /* non-critical */ }
 
     // Increment parent post replies counter when persisting a reply.
     if (post.replyToPostId) {

@@ -36,6 +36,7 @@ import { SafeGuardrails, type FolderPermissionConfig } from 'wunderland';
 import type { IMoodPersistenceAdapter } from './MoodPersistence.js';
 import type { IEnclavePersistenceAdapter } from './EnclavePersistence.js';
 import type { IBrowsingPersistenceAdapter, ExtendedBrowsingSessionRecord } from './BrowsingPersistence.js';
+import type { IActivityPersistenceAdapter } from './ActivityPersistence.js';
 import type { LLMInvokeCallback, DynamicVoiceSnapshot } from './NewsroomAgency.js';
 import type { ITool } from '@framers/agentos/core/tools/ITool';
 import { resolveAgentWorkspaceBaseDir, resolveAgentWorkspaceDir } from '@framers/agentos/core/workspace/AgentWorkspace';
@@ -314,8 +315,14 @@ export class WonderlandNetwork {
   /** Whether the enclave subsystem has been initialized */
   private enclaveSystemInitialized = false;
 
-  /** Timestamp of last agent-created enclave (rate-limit: 1 per 24h network-wide) */
+  /** Timestamp of last agent-created enclave (global cooldown to prevent spam) */
   private lastEnclaveProposalAtMs?: number;
+
+  /** Per-agent timestamp of last agent-created enclave (prevents one agent from spamming). */
+  private lastEnclaveProposalBySeedId: Map<string, number> = new Map();
+
+  /** Per-agent timestamp of last enclave auto-leave (prevents churn). */
+  private lastEnclaveLeaveAtMsBySeedId: Map<string, number> = new Map();
 
   /** Browsing session log (seedId -> most recent session record) */
   private browsingSessionLog: Map<string, BrowsingSessionRecord> = new Map();
@@ -325,6 +332,7 @@ export class WonderlandNetwork {
   private moodPersistenceAdapter?: IMoodPersistenceAdapter;
   private enclavePersistenceAdapter?: IEnclavePersistenceAdapter;
   private browsingPersistenceAdapter?: IBrowsingPersistenceAdapter;
+  private activityPersistenceAdapter?: IActivityPersistenceAdapter;
 
   // ── Safety & Guards ──
 
@@ -1110,6 +1118,11 @@ export class WonderlandNetwork {
     this.browsingPersistenceAdapter = adapter;
   }
 
+  /** Set persistence adapter for activity feed events. */
+  setActivityPersistenceAdapter(adapter: IActivityPersistenceAdapter): void {
+    this.activityPersistenceAdapter = adapter;
+  }
+
   /**
    * Subscribe to telemetry updates (mood drift, voice profile, engagement impact).
    */
@@ -1782,7 +1795,7 @@ export class WonderlandNetwork {
     }
 
     const elapsed = Math.max(0, nowMs - vector.updatedAtMs);
-    const retain = Math.exp(-elapsed / Math.max(1, halfLifeMs));
+    const retain = Math.exp(-Math.log(2) * elapsed / Math.max(1, halfLifeMs));
     return {
       valence: vector.valence * retain,
       arousal: vector.arousal * retain,
@@ -2429,42 +2442,186 @@ export class WonderlandNetwork {
 
     // Browsing-driven enclave discovery: when an agent engages positively with
     // posts from enclaves they're not subscribed to, they auto-join.
+    // Also: if an enclave is consistently negative, they may auto-leave (with cooldown + hysteresis).
     if (this.enclaveRegistry) {
-      const currentSubs = new Set(this.enclaveRegistry.getSubscriptions(seedId));
-      const enclaveEngagement = new Map<string, number>();
+      const registry = this.enclaveRegistry;
+      const currentSubs = new Set(registry.getSubscriptions(seedId));
+      const joinedThisSession = new Set<string>();
+      let subscriptionsChanged = false;
+
+      type EnclaveSessionSignal = {
+        score: number;
+        upvotes: number;
+        downvotes: number;
+        comments: number;
+        createdPosts: number;
+        endorsementComments: number;
+        dissentComments: number;
+      };
+
+      const signalsByEnclave = new Map<string, EnclaveSessionSignal>();
+      const ensureSignal = (enclave: string): EnclaveSessionSignal => {
+        const existing = signalsByEnclave.get(enclave);
+        if (existing) return existing;
+        const fresh: EnclaveSessionSignal = {
+          score: 0,
+          upvotes: 0,
+          downvotes: 0,
+          comments: 0,
+          createdPosts: 0,
+          endorsementComments: 0,
+          dissentComments: 0,
+        };
+        signalsByEnclave.set(enclave, fresh);
+        return fresh;
+      };
 
       for (const action of sessionResult.actions) {
         const post = postById.get(action.postId);
         const enclave = post?.enclave ?? action.enclave;
-        if (!enclave || currentSubs.has(enclave)) continue;
+        if (!enclave) continue;
 
-        // Positive engagement signals: upvote, comment, emoji, read_comments
-        const signal = action.action === 'upvote' ? 2
-          : action.action === 'comment' || action.action === 'create_post' ? 3
-          : action.action === 'read_comments' ? 1
-          : (action.emojis && action.emojis.length > 0) ? 1
-          : 0;
+        const signal = ensureSignal(enclave);
 
-        if (signal > 0) {
-          enclaveEngagement.set(enclave, (enclaveEngagement.get(enclave) ?? 0) + signal);
+        // Primary action contribution.
+        if (action.action === 'upvote') {
+          signal.upvotes += 1;
+          signal.score += 2;
+        } else if (action.action === 'downvote') {
+          signal.downvotes += 1;
+          signal.score -= 2;
+        } else if (action.action === 'comment') {
+          signal.comments += 1;
+          signal.score += 2;
+        } else if (action.action === 'create_post') {
+          signal.createdPosts += 1;
+          signal.score += 3;
+        } else if (action.action === 'read_comments') {
+          signal.score += 0.5;
+        }
+
+        // Emoji reactions are weak positive signals.
+        if (action.emojis && action.emojis.length > 0) {
+          signal.score += Math.min(1.5, action.emojis.length * 0.5);
+        }
+
+        // Chained comment (after vote/read) further adjusts the signal.
+        if (action.chainedAction === 'comment') {
+          signal.comments += 1;
+          if (action.chainedContext === 'dissent') {
+            signal.dissentComments += 1;
+            signal.score -= 0.75;
+          } else if (action.chainedContext === 'endorsement') {
+            signal.endorsementComments += 1;
+            signal.score += 1.25;
+          } else {
+            signal.score += 0.5;
+          }
         }
       }
 
-      // Auto-join enclaves where engagement score exceeds threshold
-      // (2+ positive interactions with that enclave's content)
-      for (const [enclave, score] of enclaveEngagement) {
-        if (score >= 2) {
-          try {
-            this.enclaveRegistry.subscribe(seedId, enclave);
-            // Update the newsroom's enclave list
-            const newsroom = this.newsrooms.get(seedId);
-            if (newsroom) {
-              const updatedSubs = this.enclaveRegistry.getSubscriptions(seedId);
-              newsroom.setEnclaveSubscriptions(updatedSubs);
-            }
-          } catch {
-            // Enclave doesn't exist or already subscribed — safe to ignore
+      // Auto-join enclaves where engagement is meaningfully positive.
+      // Uses a personality-weighted subscription budget so agents don't endlessly subscribe.
+      const traits = citizen.personality;
+      const O = traits?.openness ?? 0.5;
+      const C = traits?.conscientiousness ?? 0.5;
+      const activeCount = this.listCitizens().length;
+      const crowdScale = this.clamp01((activeCount - 20) / 180);
+      let maxAutoSubs = Math.round(10 + O * 12 - crowdScale * 2);
+      maxAutoSubs = Math.max(10, Math.min(22, maxAutoSubs));
+
+      const remainingBudget = Math.max(0, maxAutoSubs - currentSubs.size);
+      if (remainingBudget > 0) {
+        const moodEndArousal = sessionResult.episodic?.moodAtEnd?.arousal ?? 0;
+        let maxJoinsThisSession = 1;
+        if (crowdScale < 0.5) maxJoinsThisSession = 2; // small-medium networks explore faster
+        if (O >= 0.75 && moodEndArousal > 0.15) maxJoinsThisSession = Math.max(maxJoinsThisSession, 2);
+
+        let joinThreshold =
+          2.4 +
+          crowdScale * 0.7 +
+          (C - 0.5) * 0.35 -
+          (O - 0.5) * 0.5;
+        if (currentSubs.size >= maxAutoSubs - 2) joinThreshold += 0.6;
+        joinThreshold = Math.max(2.0, Math.min(5.0, joinThreshold));
+
+        const joinLimit = Math.min(maxJoinsThisSession, remainingBudget);
+        const candidates = [...signalsByEnclave.entries()]
+          .filter(([enclave]) => enclave && !currentSubs.has(enclave))
+          .filter(([, signal]) => signal.score >= joinThreshold)
+          .sort((a, b) => b[1].score - a[1].score)
+          .slice(0, joinLimit);
+
+        for (const [enclave] of candidates) {
+          const joined = registry.subscribe(seedId, enclave);
+          if (joined) {
+            subscriptionsChanged = true;
+            currentSubs.add(enclave);
+            joinedThisSession.add(enclave);
+            this.emitActivity('enclave_joined', seedId, 'enclave', enclave, enclave,
+              `joined e/${enclave}`);
           }
+        }
+      }
+
+      // Auto-leave enclaves that are strongly negative (hysteresis + cooldown).
+      // This prevents subscription lists from only ever growing.
+      const MIN_SUBS_TO_KEEP = 3;
+      const nowMs = Date.now();
+      const leaveCooldownMs = 12 * 60 * 60 * 1000;
+      const lastLeaveAt = this.lastEnclaveLeaveAtMsBySeedId.get(seedId) ?? 0;
+      const canLeaveNow = !lastLeaveAt || nowMs - lastLeaveAt >= leaveCooldownMs;
+
+      if (canLeaveNow && currentSubs.size > MIN_SUBS_TO_KEEP) {
+        const pinned = new Set(['introductions', 'governance']);
+        const candidates = [...signalsByEnclave.entries()]
+          .filter(([enclave]) => currentSubs.has(enclave))
+          .filter(([enclave]) => !pinned.has(enclave))
+          .filter(([enclave]) => !joinedThisSession.has(enclave))
+          .filter(([enclave]) => {
+            const config = registry.getEnclave(enclave);
+            return config?.creatorSeedId !== seedId && config?.moderatorSeedId !== seedId;
+          })
+          .filter(([, signal]) => {
+            // "Strongly negative": multiple downvotes or a big negative net.
+            if (signal.score <= -4) return true;
+            if (signal.downvotes >= 3 && signal.upvotes === 0) return true;
+            return false;
+          })
+          .sort((a, b) => a[1].score - b[1].score);
+
+        const worst = candidates[0];
+        if (worst) {
+          const [enclave, signal] = worst;
+          const traits = citizen.personality;
+          const A = traits?.agreeableness ?? 0.5;
+          const O = traits?.openness ?? 0.5;
+          const moodShift = sessionResult.episodic?.moodShift?.valence ?? 0;
+
+          let leaveProb = 0.08;
+          leaveProb += A * 0.18;
+          leaveProb -= O * 0.10;
+          leaveProb += Math.max(0, -moodShift) * 0.55;
+          leaveProb += Math.min(0.2, Math.max(0, (-signal.score - 3) * 0.04));
+          leaveProb = Math.max(0.02, Math.min(0.55, leaveProb));
+
+          if (Math.random() < leaveProb) {
+            const left = registry.unsubscribe(seedId, enclave);
+            if (left) {
+              subscriptionsChanged = true;
+              currentSubs.delete(enclave);
+              this.lastEnclaveLeaveAtMsBySeedId.set(seedId, nowMs);
+              this.emitActivity('enclave_left', seedId, 'enclave', enclave, enclave,
+                `left e/${enclave}`);
+            }
+          }
+        }
+      }
+
+      if (subscriptionsChanged) {
+        const newsroom = this.newsrooms.get(seedId);
+        if (newsroom) {
+          newsroom.setEnclaveSubscriptions(registry.getSubscriptions(seedId));
         }
       }
     }
@@ -2558,11 +2715,39 @@ export class WonderlandNetwork {
       return { created: false, enclaveName: '' };
     }
 
+    const normalizedTags = [...new Set(
+      (proposal.tags ?? [])
+        .map((t) => String(t ?? '').trim().toLowerCase())
+        .filter((t) => t.length >= 2)
+        .map((t) =>
+          t
+            .replace(/[^a-z0-9-]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '')
+            .slice(0, 32),
+        )
+        .filter(Boolean),
+    )].slice(0, 12);
+
+    if (normalizedTags.length === 0) {
+      return { created: false, enclaveName: '' };
+    }
+
     // Conservative: check if any existing enclave already covers these tags.
-    const matches = this.enclaveRegistry.matchEnclavesByTags(proposal.tags);
+    const matches = this.enclaveRegistry.matchEnclavesByTags(normalizedTags);
     if (matches.length > 0) {
       // Subscribe the agent to the best match instead of creating a new one.
-      const best = matches[0]!;
+      const tagSet = new Set(normalizedTags);
+      const best = matches
+        .map((m) => {
+          const overlap = m.tags.filter((t) => tagSet.has(String(t).toLowerCase())).length;
+          const nameOverlap = m.name
+            .split('-')
+            .filter((w) => w.length > 1)
+            .filter((w) => tagSet.has(w)).length;
+          return { m, score: overlap + nameOverlap * 0.5 };
+        })
+        .sort((a, b) => b.score - a.score)[0]!.m;
       this.enclaveRegistry.subscribe(seedId, best.name);
       return { created: false, enclaveName: best.name };
     }
@@ -2575,32 +2760,52 @@ export class WonderlandNetwork {
       .replace(/^-|-$/g, '')
       .slice(0, 40);
 
-    if (!safeName) {
+    if (!safeName || safeName.length < 3) {
       return { created: false, enclaveName: '' };
     }
 
-    // Prevent creating too many enclaves (hard limit of 50 total).
-    if (this.enclaveRegistry.listEnclaves().length >= 50) {
+    // Prevent creating too many enclaves (hard limit of 80 total).
+    if (this.enclaveRegistry.listEnclaves().length >= 80) {
       return { created: false, enclaveName: '' };
     }
 
     try {
       this.enclaveRegistry.createEnclave({
         name: safeName,
-        displayName: proposal.displayName.slice(0, 60),
-        description: proposal.description.slice(0, 200),
-        tags: proposal.tags.slice(0, 10),
+        displayName: (proposal.displayName || safeName).slice(0, 60),
+        description: (proposal.description || `Enclave proposed by ${seedId}.`).slice(0, 200),
+        tags: normalizedTags,
         creatorSeedId: seedId,
-        rules: ['Be respectful', 'Stay on topic'],
+        moderatorSeedId: seedId,
+        rules: ['Be respectful', 'Stay on topic', 'Add signal (not noise)'],
       });
 
       console.log(`[WonderlandNetwork] Agent '${seedId}' created enclave '${safeName}'`);
+      this.emitActivity('enclave_created', seedId, 'enclave', safeName, safeName,
+        `created enclave e/${safeName}`, { displayName: proposal.displayName, tags: normalizedTags });
       return { created: true, enclaveName: safeName };
     } catch {
       // Enclave already exists — subscribe instead.
       this.enclaveRegistry.subscribe(seedId, safeName);
       return { created: false, enclaveName: safeName };
     }
+  }
+
+  /** Fire-and-forget activity event. Swallows errors to never block social logic. */
+  private emitActivity(
+    type: import('./ActivityPersistence.js').ActivityEventType,
+    actorSeedId: string,
+    entityType: string | null,
+    entityId: string | null,
+    enclaveName: string | null,
+    summary: string,
+    payload?: Record<string, unknown>,
+  ): void {
+    if (!this.activityPersistenceAdapter) return;
+    const actorName = this.citizens.get(actorSeedId)?.displayName ?? null;
+    this.activityPersistenceAdapter
+      .recordActivity(type, actorSeedId, actorName, entityType, entityId, enclaveName, summary, payload)
+      .catch(() => {});
   }
 
   // ── Internal ──
@@ -2729,53 +2934,103 @@ export class WonderlandNetwork {
   private maybeProposesNewEnclave(post: WonderlandPost): void {
     if (!this.enclaveRegistry) return;
 
-    // Rate limit: max 1 enclave creation per 24h across all agents
     const now = Date.now();
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-    if (this.lastEnclaveProposalAtMs && now - this.lastEnclaveProposalAtMs < ONE_DAY_MS) return;
+    if (post.replyToPostId) return;
+    if (!post.content || post.content.trim().length < 160) return;
 
-    // Hard limit: 50 total enclaves
-    if (this.enclaveRegistry.listEnclaves().length >= 50) return;
+    // Rate limits: conservative global throttle + per-agent cooldown
+    const activeCount = this.listCitizens().length;
+    const crowdScale = this.clamp01((activeCount - 20) / 180);
+    const GLOBAL_COOLDOWN_MS = Math.round(
+      (4 * 60 * 60 * 1000) * (1 - crowdScale) + (12 * 60 * 60 * 1000) * crowdScale,
+    );
+    const PER_AGENT_COOLDOWN_MS = Math.round(
+      (18 * 60 * 60 * 1000) * (1 - crowdScale) + (48 * 60 * 60 * 1000) * crowdScale,
+    );
+    if (this.lastEnclaveProposalAtMs && now - this.lastEnclaveProposalAtMs < GLOBAL_COOLDOWN_MS) return;
+    const lastByAgent = this.lastEnclaveProposalBySeedId.get(post.seedId);
+    if (lastByAgent && now - lastByAgent < PER_AGENT_COOLDOWN_MS) return;
+
+    // Hard limit: 80 total enclaves
+    if (this.enclaveRegistry.listEnclaves().length >= 80) return;
 
     // Level gate: only CONTRIBUTOR+ agents (level >= 3)
     const author = this.citizens.get(post.seedId);
     if (!author || author.level < Level.CONTRIBUTOR) return;
 
-    // 2% probability on any post
-    if (Math.random() > 0.02) return;
+    // Probability depends on personality + current mood (still capped).
+    const traits = author.personality;
+    const O = traits?.openness ?? 0.5;
+    const X = traits?.extraversion ?? 0.5;
+    const C = traits?.conscientiousness ?? 0.5;
+    const mood = this.moodEngine?.getState(post.seedId);
+    const arousal = mood?.arousal ?? 0;
+    const dominance = mood?.dominance ?? 0;
+
+    let p =
+      0.008 +
+      O * 0.028 +
+      X * 0.006 +
+      Math.max(0, arousal) * 0.008 +
+      Math.max(0, dominance) * 0.005;
+    p *= 0.75 + (1 - C) * 0.5; // less conscientious agents create more enclaves
+    const activityScale = Math.max(0.4, Math.min(1.5, Math.sqrt(60 / Math.max(20, activeCount || 20))));
+    p *= activityScale;
+    p = Math.min(0.035, Math.max(0.003, p));
+    if (Math.random() > p) return;
 
     // Extract significant words from post content (3+ chars, not stop words)
     const stopWords = new Set([
-      'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was',
-      'one', 'our', 'out', 'has', 'its', 'his', 'how', 'man', 'new', 'now', 'old', 'see',
-      'way', 'who', 'did', 'get', 'let', 'say', 'she', 'too', 'use', 'from', 'have', 'been',
-      'this', 'that', 'with', 'they', 'will', 'each', 'make', 'like', 'just', 'over', 'such',
-      'take', 'than', 'them', 'very', 'some', 'into', 'most', 'also', 'what', 'when', 'more',
-      'about', 'which', 'their', 'there', 'these', 'would', 'could', 'should', 'think', 'where',
-      'agent', 'agents', 'post', 'posted', 'wunderland', 'enclave',
+      'a', 'an', 'and', 'are', 'as', 'at', 'be', 'been', 'but', 'by', 'can', 'could', 'did',
+      'do', 'does', 'doing', 'done', 'each', 'for', 'from', 'get', 'got', 'had', 'has', 'have',
+      'her', 'here', 'his', 'how', 'i', 'if', 'in', 'into', 'is', 'it', 'its', 'just', 'like',
+      'make', 'more', 'most', 'my', 'new', 'no', 'not', 'now', 'of', 'on', 'one', 'or', 'our',
+      'out', 'over', 'really', 'say', 'see', 'she', 'should', 'some', 'take', 'than', 'that',
+      'the', 'their', 'them', 'there', 'these', 'they', 'think', 'this', 'those', 'to', 'too',
+      'use', 'very', 'was', 'we', 'were', 'what', 'when', 'where', 'which', 'who', 'will',
+      'with', 'would', 'you', 'your',
+      'agent', 'agents', 'wunderland', 'enclave', 'post', 'posted', 'thread', 'reply', 'replies',
+      'http', 'https', 'www',
     ]);
     const words = post.content
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, ' ')
       .split(/\s+/)
-      .filter((w) => w.length >= 3 && !stopWords.has(w));
+      .filter((w) => w.length >= 2 && /[a-z]/.test(w) && !stopWords.has(w));
 
-    // Pick 2-3 significant words for the enclave name and tags
-    const unique = [...new Set(words)];
-    if (unique.length < 2) return;
-    const picked = unique.slice(0, 3);
+    const freq = new Map<string, number>();
+    for (const w of words) {
+      freq.set(w, (freq.get(w) ?? 0) + 1);
+    }
+
+    const ranked = [...freq.entries()]
+      .map(([word, count]) => {
+        let score = count;
+        // Prefer moderately long words (but avoid extremely long tokens).
+        score += Math.min(0.9, Math.max(0, (word.length - 3) * 0.08));
+        if (word.length > 16) score -= 0.6;
+        return { word, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((r) => r.word);
+
+    // Pick 2-3 significant words for the enclave name and 4-8 for tags.
+    const picked = ranked.slice(0, 3);
+    if (picked.length < 2) return;
     const name = picked.join('-');
     const displayName = picked.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const tags = ranked.slice(0, Math.min(8, ranked.length));
 
     const result = this.tryCreateAgentEnclave(post.seedId, {
       name,
       displayName,
       description: `Enclave created by agent discussion about ${displayName.toLowerCase()}.`,
-      tags: picked,
+      tags,
     });
 
     if (result.created) {
       this.lastEnclaveProposalAtMs = now;
+      this.lastEnclaveProposalBySeedId.set(post.seedId, now);
       console.log(`[WonderlandNetwork] New enclave '${result.enclaveName}' proposed by '${post.seedId}' from post content`);
     }
   }

@@ -10,6 +10,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import { URL } from 'node:url';
 import axios from 'axios';
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service.js';
@@ -40,6 +41,7 @@ type IngestedWorldFeedItem = {
   summary?: string | null;
   url?: string | null;
   category?: string | null;
+  dedupeHash?: string;
 };
 
 function isNonNull<T>(value: T | null): value is T {
@@ -182,6 +184,37 @@ function deriveExternalId(
     item.url ?? '',
     item.category ?? '',
     item.summary ?? '',
+  ].join('|');
+  return createHash('sha256').update(key, 'utf8').digest('hex');
+}
+
+function normalizeForDedupeKey(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 220);
+}
+
+function normalizeUrlForDedupeKey(url: string | null | undefined): string {
+  const raw = typeof url === 'string' ? url.trim() : '';
+  if (!raw) return '';
+  try {
+    const parsed = new URL(raw);
+    parsed.hash = '';
+    parsed.search = '';
+    return `${parsed.hostname}${parsed.pathname}`.toLowerCase();
+  } catch {
+    return raw.toLowerCase().replace(/[#?].*$/, '').slice(0, 256);
+  }
+}
+
+function computeWorldFeedDedupeHash(item: { title: string; url?: string | null; category?: string | null }): string {
+  const key = [
+    normalizeForDedupeKey(item.title ?? ''),
+    normalizeUrlForDedupeKey(item.url ?? null),
+    normalizeForDedupeKey(String(item.category ?? '')),
   ].join('|');
   return createHash('sha256').update(key, 'utf8').digest('hex');
 }
@@ -329,7 +362,14 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
             category,
           });
 
-          const parsed: IngestedWorldFeedItem = { externalId, title, summary, url, category };
+          const parsed: IngestedWorldFeedItem = {
+            externalId,
+            title,
+            summary,
+            url,
+            category,
+            dedupeHash: computeWorldFeedDedupeHash({ title, url, category }),
+          };
           return parsed;
         })
         .filter(isNonNull)
@@ -343,9 +383,12 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
         return;
       }
 
+      const dedupeWindowMs = 7 * 24 * 60 * 60 * 1000;
       const insertedCount = await this.db.transaction(async (trx) => {
         let inserted = 0;
         for (const item of items) {
+          const dedupeHash =
+            item.dedupeHash ?? computeWorldFeedDedupeHash({ title: item.title, url: item.url, category: item.category });
           const existing = await trx.get<{ event_id: string }>(
             `
               SELECT event_id
@@ -358,6 +401,19 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
             [source.source_id, item.externalId]
           );
           if (existing) continue;
+
+          const dup = await trx.get<{ event_id: string }>(
+            `
+              SELECT event_id
+                FROM wunderland_stimuli
+               WHERE type = 'world_feed'
+                 AND dedupe_hash = ?
+                 AND created_at >= ?
+               LIMIT 1
+            `,
+            [dedupeHash, options.now - dedupeWindowMs],
+          );
+          if (dup) continue;
 
           const eventId = this.db.generateId();
           const payload = {
@@ -376,11 +432,12 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
                 payload,
                 source_provider_id,
                 source_external_id,
+                dedupe_hash,
                 source_verified,
                 target_seed_ids,
                 created_at,
                 processed_at
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
             `,
             [
               eventId,
@@ -389,6 +446,7 @@ export class WorldFeedIngestionService implements OnModuleInit, OnModuleDestroy 
               JSON.stringify(payload),
               source.source_id,
               item.externalId,
+              dedupeHash,
               0,
               options.now,
             ]

@@ -68,6 +68,7 @@ export {
 export type { IMoodPersistenceAdapter } from './MoodPersistence.js';
 export type { IEnclavePersistenceAdapter } from './EnclavePersistence.js';
 export type { IBrowsingPersistenceAdapter, ExtendedBrowsingSessionRecord } from './BrowsingPersistence.js';
+export type { IActivityPersistenceAdapter, ActivityEventType } from './ActivityPersistence.js';
 
 // Source fetchers
 export { createDefaultFetchers } from './sources/index.js';

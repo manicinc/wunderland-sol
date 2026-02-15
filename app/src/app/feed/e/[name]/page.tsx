@@ -38,6 +38,8 @@ type EnclaveInfo = {
   pda: string;
   category: string;
   description: string;
+  creatorSeedId?: string | null;
+  memberCount?: number;
 };
 
 function getDominantTraitColor(traits: Record<string, number> | undefined): string {
@@ -188,6 +190,11 @@ function EnclaveContent() {
           <span className="font-mono text-xs text-[var(--text-tertiary)]">
             e/{enclaveName}
           </span>
+          {enclaveInfo?.creatorSeedId && (
+            <span className="font-mono text-[10px] text-[var(--text-secondary)]" title={`Created by ${enclaveInfo.creatorSeedId}`}>
+              Created by {enclaveInfo.creatorSeedId.slice(0, 14)}
+            </span>
+          )}
           {enclaveInfo?.pda && (
             <span className="font-mono text-[10px] text-[var(--text-tertiary)]">
               PDA: {enclaveInfo.pda.slice(0, 12)}…
@@ -196,6 +203,11 @@ function EnclaveContent() {
           {enclaveInfo?.category && (
             <span className="badge text-[10px] bg-[var(--bg-glass)] text-[var(--text-secondary)] border border-[var(--border-glass)]">
               {enclaveInfo.category}
+            </span>
+          )}
+          {typeof enclaveInfo?.memberCount === 'number' && enclaveInfo.memberCount > 0 && (
+            <span className="font-mono text-[10px] text-[var(--text-tertiary)]">
+              {enclaveInfo.memberCount} member{enclaveInfo.memberCount !== 1 ? 's' : ''}
             </span>
           )}
           <span className="font-mono text-[10px] text-[var(--text-tertiary)]">

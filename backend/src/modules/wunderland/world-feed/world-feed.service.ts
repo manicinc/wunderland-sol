@@ -8,6 +8,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import { URL } from 'node:url';
 import { Injectable } from '@nestjs/common';
 import {
   BadRequestException,
@@ -77,6 +78,37 @@ function deriveWebhookExternalId(
   return createHash('sha256').update(key, 'utf8').digest('hex');
 }
 
+function normalizeForDedupeKey(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 220);
+}
+
+function normalizeUrlForDedupeKey(url: string | null | undefined): string {
+  const raw = typeof url === 'string' ? url.trim() : '';
+  if (!raw) return '';
+  try {
+    const parsed = new URL(raw);
+    parsed.hash = '';
+    parsed.search = '';
+    return `${parsed.hostname}${parsed.pathname}`.toLowerCase();
+  } catch {
+    return raw.toLowerCase().replace(/[#?].*$/, '').slice(0, 256);
+  }
+}
+
+function computeWorldFeedDedupeHash(item: { title: string; url?: string | null; category?: string | null }): string {
+  const key = [
+    normalizeForDedupeKey(item.title ?? ''),
+    normalizeUrlForDedupeKey(item.url ?? null),
+    normalizeForDedupeKey(String(item.category ?? '')),
+  ].join('|');
+  return createHash('sha256').update(key, 'utf8').digest('hex');
+}
+
 @Injectable()
 export class WorldFeedService {
   constructor(private readonly db: DatabaseService) {}
@@ -110,6 +142,7 @@ export class WorldFeedService {
       url: dto.url ?? null,
       category: dto.category ?? null,
     };
+    const dedupeHash = computeWorldFeedDedupeHash(payload);
 
     await this.db.run(
       `
@@ -120,11 +153,12 @@ export class WorldFeedService {
           payload,
           source_provider_id,
           source_external_id,
+          dedupe_hash,
           source_verified,
           target_seed_ids,
           created_at,
           processed_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
       `,
       [
         eventId,
@@ -133,6 +167,7 @@ export class WorldFeedService {
         JSON.stringify(payload),
         sourceId,
         externalId,
+        dedupeHash,
         dto.verified ? 1 : 0,
         now,
       ]
@@ -233,6 +268,23 @@ export class WorldFeedService {
       url: dto.url ?? null,
       category: category ?? null,
     };
+    const dedupeHash = computeWorldFeedDedupeHash(payload);
+
+    const dedupeWindowMs = 7 * 24 * 60 * 60 * 1000;
+    const dup = await this.db.get<{ event_id: string }>(
+      `
+        SELECT event_id
+          FROM wunderland_stimuli
+         WHERE type = 'world_feed'
+           AND dedupe_hash = ?
+           AND created_at >= ?
+         LIMIT 1
+      `,
+      [dedupeHash, now - dedupeWindowMs],
+    );
+    if (dup) {
+      return { inserted: false, duplicate: true, externalId };
+    }
 
     await this.db.transaction(async (trx) => {
       await trx.run(
@@ -244,11 +296,12 @@ export class WorldFeedService {
             payload,
             source_provider_id,
             source_external_id,
+            dedupe_hash,
             source_verified,
             target_seed_ids,
             created_at,
             processed_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
         `,
         [
           eventId,
@@ -257,6 +310,7 @@ export class WorldFeedService {
           JSON.stringify(payload),
           sourceId,
           externalId,
+          dedupeHash,
           1,
           now,
         ]

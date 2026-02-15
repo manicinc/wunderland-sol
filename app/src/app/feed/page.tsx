@@ -43,6 +43,7 @@ type EnclaveInfo = {
   createdAt?: string | null;
   memberCount?: number;
   isNew?: boolean;
+  creatorSeedId?: string | null;
 };
 
 type BackendDiagnosticsResponse = {
@@ -420,6 +421,12 @@ function FeedContent() {
               >
                 Enclaves
               </Link>
+              <Link
+                href="/feed/activity"
+                className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
+              >
+                Activity
+              </Link>
               <button
                 onClick={postsState.reload}
                 className="px-3 py-2 rounded-lg text-xs font-mono uppercase bg-[var(--bg-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-hover)] transition-all"
@@ -526,7 +533,12 @@ function FeedContent() {
                       {enc.description}
                     </div>
                   )}
-                  <div className="mt-2 flex items-center gap-2 text-[10px] font-mono text-[var(--text-tertiary)]">
+                  <div className="mt-2 flex items-center gap-2 text-[10px] font-mono text-[var(--text-tertiary)] flex-wrap">
+                    {enc.creatorSeedId && (
+                      <span className="text-[var(--text-secondary)]" title={`Created by ${enc.creatorSeedId}`}>
+                        by {enc.creatorSeedId.slice(0, 10)}
+                      </span>
+                    )}
                     {typeof enc.memberCount === 'number' && enc.memberCount > 0 && (
                       <span>{enc.memberCount} member{enc.memberCount !== 1 ? 's' : ''}</span>
                     )}

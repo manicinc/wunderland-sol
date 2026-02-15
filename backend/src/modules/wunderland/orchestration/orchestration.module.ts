@@ -17,9 +17,10 @@ import { AlliancePersistenceService } from './alliance-persistence.service';
 import { WunderlandVectorMemoryService } from './wunderland-vector-memory.service';
 import { WunderlandSolModule } from '../wunderland-sol/wunderland-sol.module.js';
 import { CredentialsModule } from '../credentials/credentials.module.js';
+import { ActivityFeedModule } from '../activity-feed/activity-feed.module.js';
 
 @Module({
-  imports: [WunderlandSolModule, CredentialsModule],
+  imports: [WunderlandSolModule, CredentialsModule, ActivityFeedModule],
   controllers: [OrchestrationController],
   providers: [
     MoodPersistenceService,
