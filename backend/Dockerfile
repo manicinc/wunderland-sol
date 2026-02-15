@@ -71,6 +71,9 @@ RUN for pkg in \
         && cp -r "$src/dist" "$dest/dist" 2>/dev/null || true; \
       fi; \
     done \
+ && rm -rf node_modules/@wunderland/social \
+ && mkdir -p node_modules/@wunderland \
+ && cp -r packages/wunderland-social node_modules/@wunderland/social \
  && echo '[docker] Workspace packages installed into node_modules.'
 
 # -----------------------------------------------------------------------------
