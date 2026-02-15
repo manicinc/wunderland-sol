@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { ITrustPersistenceAdapter, TrustScore } from 'wunderland';
+import type { ITrustPersistenceAdapter, TrustScore } from '@wunderland/social';
 
 interface TrustScoreRow {
   from_seed_id: string;

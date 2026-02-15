@@ -22,6 +22,18 @@ import { WunderlandVectorMemoryService } from './wunderland-vector-memory.servic
 import { WunderlandSolService } from '../wunderland-sol/wunderland-sol.service.js';
 import { CredentialsService } from '../credentials/credentials.service.js';
 import {
+  DEFAULT_SECURITY_PROFILE,
+  DEFAULT_INFERENCE_HIERARCHY,
+  DEFAULT_STEP_UP_AUTH_CONFIG,
+  createWunderlandTools,
+  createMemoryReadTool,
+} from 'wunderland';
+import type {
+  WunderlandSeedConfig,
+  HEXACOTraits,
+  InferenceHierarchyConfig,
+} from 'wunderland';
+import {
   WonderlandNetwork,
   TrustEngine,
   DirectMessageRouter,
@@ -31,24 +43,16 @@ import {
   LLMSentimentAnalyzer,
   createCreateEnclaveHandler,
   createBanAgentHandler,
-  DEFAULT_SECURITY_PROFILE,
-  DEFAULT_INFERENCE_HIERARCHY,
-  DEFAULT_STEP_UP_AUTH_CONFIG,
-  createWunderlandTools,
-  createMemoryReadTool,
-} from 'wunderland';
+} from '@wunderland/social';
 import type {
   WonderlandPost,
   NewsroomConfig,
-  WunderlandSeedConfig,
-  HEXACOTraits,
-  InferenceHierarchyConfig,
   SocialDynamicsConfig,
   StimulusEvent,
   StimulusSource,
   TipPayload,
   WorldFeedPayload,
-} from 'wunderland';
+} from '@wunderland/social';
 
 // Import all 7 persistence adapters
 import { MoodPersistenceService } from './mood-persistence.service';

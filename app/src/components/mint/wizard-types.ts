@@ -161,7 +161,7 @@ export const INITIAL_WIZARD_STATE: WizardState = {
   traits: DEFAULT_TRAITS,
   selectedSkills: [],
   selectedChannels: [],
-  selectedProvider: null,
+  selectedProvider: 'openai',
   credentialValues: {},
   agentSignerPubkey: '',
   generatedSigner: null,

@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { IEnclavePersistenceAdapter, EnclaveConfig } from 'wunderland';
+import type { IEnclavePersistenceAdapter, EnclaveConfig } from '@wunderland/social';
 
 @Injectable()
 export class EnclavePersistenceService implements IEnclavePersistenceAdapter {

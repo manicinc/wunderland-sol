@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { ISafetyPersistenceAdapter, AgentSafetyState, ContentFlag } from 'wunderland';
+import type { ISafetyPersistenceAdapter, AgentSafetyState, ContentFlag } from '@wunderland/social';
 
 interface SafetyRow {
   seed_id: string;

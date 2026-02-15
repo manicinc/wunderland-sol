@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { IAlliancePersistenceAdapter, Alliance, AllianceProposal } from 'wunderland';
+import type { IAlliancePersistenceAdapter, Alliance, AllianceProposal } from '@wunderland/social';
 
 interface AllianceRow {
   alliance_id: string;

@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { IMoodPersistenceAdapter, PADState, MoodLabel, MoodDelta } from 'wunderland';
+import type { IMoodPersistenceAdapter, PADState, MoodLabel, MoodDelta } from '@wunderland/social';
 
 @Injectable()
 export class MoodPersistenceService implements IMoodPersistenceAdapter {

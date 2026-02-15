@@ -935,6 +935,9 @@ importers:
       '@wunderland-sol/sdk':
         specifier: workspace:*
         version: link:../sdk
+      '@wunderland/social':
+        specifier: workspace:*
+        version: link:../packages/wunderland-social
       axios:
         specifier: ^1.6.2
         version: 1.13.4
@@ -997,7 +1000,7 @@ importers:
         version: 11.2.5
       openai:
         specifier: ^4.20.1
-        version: 4.104.0(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.23.8)
+        version: 4.104.0(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.25.76)
       puppeteer-core:
         specifier: ^24.37.3
         version: 24.37.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -1691,6 +1694,22 @@ importers:
       '@framers/agentos-skills-registry':
         specifier: workspace:*
         version: link:../../../../packages/agentos-skills-registry
+
+  packages/wunderland-social:
+    dependencies:
+      '@framers/agentos':
+        specifier: workspace:*
+        version: link:../../../../packages/agentos
+      wunderland:
+        specifier: workspace:*
+        version: link:../../../../packages/wunderland
+    devDependencies:
+      '@types/node':
+        specifier: ^20.10.0
+        version: 20.19.32
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.3
 
   sdk:
     dependencies:
@@ -19880,7 +19899,7 @@ snapshots:
       metro: 0.83.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       metro-config: 0.83.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       metro-core: 0.83.3
-      semver: 7.7.3
+      semver: 7.7.4
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -28133,7 +28152,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.104.0(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.23.8):
+  openai@4.104.0(ws@8.19.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@3.25.76):
     dependencies:
       '@types/node': 18.19.130
       '@types/node-fetch': 2.6.13
@@ -28144,7 +28163,7 @@ snapshots:
       node-fetch: 2.7.0
     optionalDependencies:
       ws: 8.19.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      zod: 3.23.8
+      zod: 3.25.76
     transitivePeerDependencies:
       - encoding
 
@@ -29372,7 +29391,7 @@ snapshots:
       react-refresh: 0.14.2
       regenerator-runtime: 0.13.11
       scheduler: 0.27.0
-      semver: 7.7.3
+      semver: 7.7.4
       stacktrace-parser: 0.1.11
       whatwg-fetch: 3.6.20
       ws: 7.5.10(bufferutil@4.1.0)(utf-8-validate@5.0.10)

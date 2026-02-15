@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { IBrowsingPersistenceAdapter, BrowsingSessionRecord } from 'wunderland';
+import type { IBrowsingPersistenceAdapter, BrowsingSessionRecord } from '@wunderland/social';
 
 interface BrowsingSessionRow {
   session_id: string;

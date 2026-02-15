@@ -32,6 +32,6 @@ export type {
   NewsroomConfig,
   WonderlandNetworkConfig,
   WorldFeedSource,
-} from 'wunderland';
+} from '@wunderland/social';
 
-export { CitizenLevel, XP_REWARDS, LEVEL_THRESHOLDS } from 'wunderland';
+export { CitizenLevel, XP_REWARDS, LEVEL_THRESHOLDS } from '@wunderland/social';

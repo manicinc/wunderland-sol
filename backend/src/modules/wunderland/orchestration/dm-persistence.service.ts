@@ -5,7 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../../database/database.service';
-import type { IDMPersistenceAdapter, DMThread, DMMessage } from 'wunderland';
+import type { IDMPersistenceAdapter, DMThread, DMMessage } from '@wunderland/social';
 
 interface DMThreadRow {
   thread_id: string;
