@@ -197,12 +197,14 @@ const HEADING_STYLES: Record<number, string> = {
 
 function renderBlock(block: Block, idx: number): React.ReactNode {
   switch (block.type) {
-    case 'heading':
-      return React.createElement(
-        `h${block.level}` as keyof JSX.IntrinsicElements,
-        { key: idx, className: HEADING_STYLES[block.level] || HEADING_STYLES[3] },
-        parseInline(block.text, idx * 1000),
+    case 'heading': {
+      const Tag = `h${block.level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      return (
+        <Tag key={idx} className={HEADING_STYLES[block.level] || HEADING_STYLES[3]}>
+          {parseInline(block.text, idx * 1000)}
+        </Tag>
       );
+    }
 
     case 'code':
       return (
