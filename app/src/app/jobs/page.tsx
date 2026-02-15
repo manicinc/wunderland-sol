@@ -80,6 +80,40 @@ function getJobGithubIssueUrl(job: Job): string | null {
   return null;
 }
 
+function getJobGithubIssueNumber(job: Job): number | null {
+  if (!job.metadata) return null;
+  const req = job.metadata.requirements;
+  if (req && typeof req === 'object' && typeof (req as any).githubIssueNumber === 'number') {
+    return (req as any).githubIssueNumber;
+  }
+  // Try to extract from URL
+  const url = getJobGithubIssueUrl(job);
+  if (url) {
+    const match = url.match(/\/issues\/(\d+)/);
+    if (match) return parseInt(match[1]!, 10);
+  }
+  return null;
+}
+
+/** Strip markdown syntax for clean plaintext previews. */
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/^>\s*/gm, '')              // blockquotes
+    .replace(/```[\s\S]*?```/g, '')      // fenced code blocks
+    .replace(/`([^`]+)`/g, '$1')         // inline code
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1') // images
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // links
+    .replace(/\*\*(.+?)\*\*/g, '$1')    // bold
+    .replace(/\*([^*]+)\*/g, '$1')       // italic
+    .replace(/^#{1,6}\s+/gm, '')         // headings
+    .replace(/^[-*_]{3,}\s*$/gm, '')     // horizontal rules
+    .replace(/^[-*]\s+/gm, '• ')         // unordered lists
+    .replace(/^\d+\.\s+/gm, '')          // ordered lists
+    .replace(/\n{2,}/g, ' ')             // collapse multiple newlines
+    .replace(/\n/g, ' ')                 // remaining newlines → space
+    .trim();
+}
+
 export default function JobsPage() {
   return (
     <Suspense>
@@ -306,6 +340,7 @@ function JobsContent() {
           const isExpired = Boolean(deadline) && new Date(deadline as string) < new Date() && job.status === 'open';
           const category = getJobCategory(job);
           const githubUrl = getJobGithubIssueUrl(job);
+          const githubIssueNum = getJobGithubIssueNumber(job);
 
           return (
             <Link
@@ -332,7 +367,7 @@ function JobsContent() {
                     )}
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-                    {job.description || 'No description provided.'}
+                    {job.description ? stripMarkdown(job.description) : 'No description provided.'}
                   </p>
                 </div>
 
@@ -356,11 +391,15 @@ function JobsContent() {
                   {category}
                 </span>
                 {githubUrl && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[var(--text-secondary)]">
+                  <span
+                    role="link"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(githubUrl, '_blank', 'noopener,noreferrer'); }}
+                    className="inline-flex items-center gap-1 text-[10px] font-mono text-[var(--neon-cyan)] hover:underline cursor-pointer"
+                  >
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" className="opacity-70">
                       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
                     </svg>
-                    GitHub Bounty
+                    GitHub{githubIssueNum ? ` #${githubIssueNum}` : ' Bounty'}
                   </span>
                 )}
                 {deadline && <span>Due {new Date(deadline).toLocaleDateString()}</span>}
