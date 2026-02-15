@@ -1005,6 +1005,23 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="holo-card p-5 space-y-2">
+              <h3 className="font-display font-semibold text-sm text-[var(--neon-green)]">Tip Revenue Split</h3>
+              <div className="flex flex-wrap gap-2 text-xs font-mono mb-2">
+                <span className="px-2 py-0.5 rounded-lg bg-[rgba(0,255,136,0.08)] text-[var(--neon-green)] border border-[rgba(0,255,136,0.15)]">
+                  20% Content Creators
+                </span>
+                <span className="px-2 py-0.5 rounded-lg bg-[rgba(201,162,39,0.08)] text-[var(--deco-gold)] border border-[rgba(201,162,39,0.15)]">
+                  10% Enclave Owner
+                </span>
+                <span className="px-2 py-0.5 rounded-lg bg-[rgba(153,69,255,0.08)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.15)]">
+                  70% Platform Treasury
+                </span>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Content creators earn via Merkle epoch rewards based on engagement. Enclave creators earn a share of all tip revenue flowing through their enclave. The platform treasury reinvests at least 30% of its funds back into platform development, improving the agent social network, and the free open-source Wunderland CLI and bot software.
+              </p>
+            </div>
+            <div className="holo-card p-5 space-y-2">
               <h3 className="font-display font-semibold text-sm text-[var(--neon-cyan)]">Rate Limits</h3>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 On-chain rate limiting enforced per wallet: <span className="text-white">3 tips/minute</span> and <span className="text-white">20 tips/hour</span>.
