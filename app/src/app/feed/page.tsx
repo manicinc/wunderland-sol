@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect, useCallback, useMemo } from 'react';
+import { Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ProceduralAvatar } from '@/components/ProceduralAvatar';
@@ -100,6 +100,181 @@ function getDominantTraitColor(traits: Record<string, number> | undefined): stri
     }
   }
   return TRAIT_ACCENT_COLORS[dominant] || 'var(--neon-cyan)';
+}
+
+function EnclaveAutocomplete({
+  enclaves,
+  value,
+  onChange,
+}: {
+  enclaves: EnclaveInfo[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [highlightIdx, setHighlightIdx] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const filtered = useMemo(() => {
+    if (!query) return enclaves;
+    const q = query.toLowerCase();
+    return enclaves.filter(
+      (e) =>
+        e.name.toLowerCase().includes(q) ||
+        e.displayName.toLowerCase().includes(q) ||
+        (e.category ?? '').toLowerCase().includes(q),
+    );
+  }, [enclaves, query]);
+
+  useEffect(() => setHighlightIdx(0), [filtered.length]);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const select = (name: string) => {
+    onChange(name);
+    setQuery('');
+    setOpen(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!open) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter') {
+        setOpen(true);
+        e.preventDefault();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      setHighlightIdx((i) => Math.min(i + 1, filtered.length)); // +1 for "All" option
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      setHighlightIdx((i) => Math.max(i - 1, 0));
+      e.preventDefault();
+    } else if (e.key === 'Enter') {
+      if (highlightIdx === 0) select('');
+      else if (filtered[highlightIdx - 1]) select(filtered[highlightIdx - 1].name);
+      e.preventDefault();
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+      e.preventDefault();
+    }
+  };
+
+  const selectedLabel = value ? `e/${value}` : 'All Enclaves';
+
+  return (
+    <div ref={containerRef} className="relative">
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => {
+          setOpen((o) => !o);
+          setTimeout(() => inputRef.current?.focus(), 0);
+        }}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono cursor-pointer transition-all ${
+          value
+            ? 'bg-[rgba(153,69,255,0.12)] text-[var(--sol-purple)] border border-[rgba(153,69,255,0.25)]'
+            : 'bg-[var(--bg-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:border-[rgba(153,69,255,0.3)]'
+        }`}
+      >
+        <svg className="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        {selectedLabel}
+        <svg className={`w-3 h-3 opacity-40 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute right-0 top-full mt-1.5 w-64 z-50 rounded-xl border border-[var(--border-glass)] bg-[var(--bg-card)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl overflow-hidden">
+          {/* Search input */}
+          <div className="p-2 border-b border-[var(--border-glass)]">
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Search enclaves…"
+              className="w-full px-2.5 py-1.5 rounded-lg text-xs font-mono
+                bg-[var(--bg-glass)] border border-[var(--border-glass)]
+                text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]
+                focus:outline-none focus:border-[rgba(153,69,255,0.4)]
+                transition-all"
+            />
+          </div>
+
+          {/* Options list */}
+          <div className="max-h-56 overflow-y-auto overscroll-contain">
+            {/* All Enclaves option */}
+            <button
+              type="button"
+              onClick={() => select('')}
+              className={`w-full text-left px-3 py-2 text-xs font-mono transition-colors ${
+                highlightIdx === 0
+                  ? 'bg-[rgba(153,69,255,0.1)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-secondary)] hover:bg-[rgba(153,69,255,0.06)]'
+              } ${!value ? 'font-semibold text-[var(--sol-purple)]' : ''}`}
+            >
+              All Enclaves
+              <span className="ml-1 text-[var(--text-tertiary)]">({enclaves.length})</span>
+            </button>
+
+            {filtered.length === 0 && query && (
+              <div className="px-3 py-4 text-center text-[10px] text-[var(--text-tertiary)]">
+                No enclaves match &quot;{query}&quot;
+              </div>
+            )}
+
+            {filtered.map((e, i) => (
+              <button
+                key={e.name}
+                type="button"
+                onClick={() => select(e.name)}
+                className={`w-full text-left px-3 py-2 transition-colors ${
+                  highlightIdx === i + 1
+                    ? 'bg-[rgba(153,69,255,0.1)]'
+                    : 'hover:bg-[rgba(153,69,255,0.06)]'
+                } ${value === e.name ? 'border-l-2 border-[var(--sol-purple)]' : ''}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-xs font-mono ${value === e.name ? 'text-[var(--sol-purple)] font-semibold' : 'text-[var(--text-primary)]'}`}>
+                    e/{e.name}
+                  </span>
+                  {e.memberCount != null && e.memberCount > 0 && (
+                    <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
+                      {e.memberCount}m
+                    </span>
+                  )}
+                </div>
+                {e.description && (
+                  <p className="text-[10px] text-[var(--text-tertiary)] mt-0.5 line-clamp-1 leading-relaxed">
+                    {e.description}
+                  </p>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function FeedPage() {
@@ -440,23 +615,12 @@ function FeedContent() {
 
         <div className="flex-1" />
 
-        {/* Enclave filter */}
-        <select
+        {/* Enclave filter — autocomplete dropdown */}
+        <EnclaveAutocomplete
+          enclaves={enclaves}
           value={enclaveFilter}
-          onChange={(e) => setEnclaveFilter(e.target.value)}
-          className="px-3 py-1.5 rounded-lg text-xs font-mono
-            bg-[var(--bg-glass)] border border-[var(--border-glass)]
-            text-[var(--text-secondary)] cursor-pointer
-            focus:outline-none focus:border-[rgba(153,69,255,0.3)]
-            transition-all"
-        >
-          <option value="">All Enclaves</option>
-          {enclaves.map((e) => (
-            <option key={e.name} value={e.name}>
-              e/{e.name}
-            </option>
-          ))}
-        </select>
+          onChange={setEnclaveFilter}
+        />
 
         {/* Time filter */}
         <select
