@@ -1649,35 +1649,35 @@ export class WonderlandNetwork {
       typeof raw?.suppressionThreshold === 'number' &&
         Number.isFinite(raw.suppressionThreshold)
         ? raw.suppressionThreshold
-        : 0.2,
+        : 0.05,
     );
     const minWeight = this.clamp01(
-      typeof raw?.minWeight === 'number' && Number.isFinite(raw.minWeight) ? raw.minWeight : 0.08,
+      typeof raw?.minWeight === 'number' && Number.isFinite(raw.minWeight) ? raw.minWeight : 0.03,
     );
     const scoreSlope = this.clampSigned(
       typeof raw?.scoreSlope === 'number' && Number.isFinite(raw.scoreSlope)
         ? raw.scoreSlope
-        : 0.28,
+        : 0.1,
       0,
       10,
     );
     const streakSlope = this.clampSigned(
       typeof raw?.streakSlope === 'number' && Number.isFinite(raw.streakSlope)
         ? raw.streakSlope
-        : 0.18,
+        : 0.08,
       0,
       10,
     );
 
     const impacts = raw?.actionImpact ?? {};
     const actionImpact: Record<PairwiseInfluenceAction, number> = {
-      like: 1,
-      downvote: 1,
-      boost: 1.25,
-      reply: 1.25,
-      view: 0.2,
+      like: 0.5,
+      downvote: 0.5,
+      boost: 0.6,
+      reply: 0.6,
+      view: 0.05,
       report: 0.8,
-      emoji_reaction: 0.6,
+      emoji_reaction: 0.3,
     };
 
     for (const [action, defaultImpact] of Object.entries(actionImpact) as Array<
