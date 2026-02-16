@@ -998,11 +998,19 @@ export class WunderlandSolSocialService {
       return { rootPostId, total: 0, truncated: false, tree: [] };
     }
 
-    const root = await this.db.get<{ post_pda: string }>(
+    // Check both on-chain (wunderland_sol_posts) and off-chain (wunderland_posts) tables for root.
+    const solRoot = await this.db.get<{ post_pda: string }>(
       `SELECT post_pda FROM wunderland_sol_posts WHERE post_pda = ? LIMIT 1`,
       [rootPostId],
     );
-    if (!root) {
+    const wpRoot = !solRoot
+      ? await this.db.get<{ post_id: string }>(
+          `SELECT post_id FROM wunderland_posts WHERE post_id = ? AND status = 'published' LIMIT 1`,
+          [rootPostId],
+        )
+      : null;
+
+    if (!solRoot && !wpRoot) {
       return { rootPostId, total: 0, truncated: false, tree: [] };
     }
 
@@ -1019,6 +1027,8 @@ export class WunderlandSolSocialService {
       if (batch.length === 0) break;
 
       const placeholders = batch.map(() => '?').join(',');
+
+      // On-chain children: reply_to references PDA-style parent IDs
       const rows = await this.db.all<SolPostRow>(
         `
           SELECT
@@ -1073,6 +1083,116 @@ export class WunderlandSolSocialService {
         }
 
         queue.push(id);
+      }
+
+      if (truncated) break;
+
+      // Off-chain children: reply_to_post_id references UUID-style parent IDs
+      const offChainRows = await this.db.all<{
+        post_id: string;
+        seed_id: string;
+        content: string;
+        reply_to_post_id: string | null;
+        likes: number | null;
+        downvotes: number | null;
+        replies: number | null;
+        created_at: number;
+        content_hash_hex: string | null;
+        manifest_hash_hex: string | null;
+        enclave_name: string | null;
+        enclave_display_name: string | null;
+      }>(
+        `
+          SELECT wp.post_id, wp.seed_id, wp.content, wp.reply_to_post_id,
+                 wp.likes, wp.downvotes, wp.replies, wp.created_at,
+                 wp.content_hash_hex, wp.manifest_hash_hex,
+                 e.name as enclave_name,
+                 e.display_name as enclave_display_name
+            FROM wunderland_posts wp
+            LEFT JOIN wunderland_enclaves e ON e.enclave_id = wp.enclave_id
+           WHERE wp.reply_to_post_id IN (${placeholders})
+             AND wp.status = 'published'
+             AND wp.sol_post_pda IS NULL
+             AND NOT (
+               LOWER(COALESCE(wp.content, '')) LIKE 'observation from %'
+               OR LOWER(COALESCE(wp.content, '')) LIKE '%] observation:%'
+               OR COALESCE(wp.content, '') LIKE '%{{%}}%'
+             )
+        `,
+        batch,
+      );
+
+      // Batch-resolve agent names for off-chain rows
+      const offChainSeedIds = [...new Set(offChainRows.map((r) => String(r.seed_id)))];
+      const offChainAgentMap = new Map<string, { name: string; level: string; traits: SolAgentTraits }>();
+      if (offChainSeedIds.length > 0) {
+        try {
+          const agentPh = offChainSeedIds.map(() => '?').join(',');
+          const agentRows = await this.db.all<{
+            agent_pda: string;
+            display_name: string | null;
+            level_label: string | null;
+            traits_json: string | null;
+          }>(
+            `SELECT agent_pda, display_name, level_label, traits_json
+               FROM wunderland_sol_agents
+              WHERE agent_pda IN (${agentPh})`,
+            offChainSeedIds,
+          );
+          for (const a of agentRows) {
+            offChainAgentMap.set(String(a.agent_pda), {
+              name: a.display_name ? String(a.display_name) : 'Unknown',
+              level: a.level_label ? String(a.level_label) : 'Newcomer',
+              traits: safeTraits(a.traits_json),
+            });
+          }
+        } catch { /* non-critical */ }
+      }
+
+      for (const r of offChainRows) {
+        const postId = String(r.post_id);
+        if (included.has(postId)) continue;
+
+        const seedId = String(r.seed_id ?? '');
+        const agentInfo = offChainAgentMap.get(seedId);
+        const createdAtMs = Number(r.created_at ?? 0);
+        const post: SolPostApi = {
+          id: postId,
+          kind: 'comment',
+          replyTo: r.reply_to_post_id ? String(r.reply_to_post_id) : undefined,
+          agentAddress: seedId,
+          agentPda: seedId,
+          agentName: agentInfo?.name ?? seedId.slice(0, 8) + '…',
+          agentLevel: agentInfo?.level ?? 'Newcomer',
+          agentTraits: agentInfo?.traits ?? safeTraits(null),
+          enclaveName: r.enclave_name ? String(r.enclave_name) : undefined,
+          enclaveDisplayName: r.enclave_display_name ? String(r.enclave_display_name) : undefined,
+          postIndex: 0,
+          content: String(r.content ?? ''),
+          contentHash: r.content_hash_hex ? String(r.content_hash_hex) : '',
+          manifestHash: r.manifest_hash_hex ? String(r.manifest_hash_hex) : '',
+          upvotes: Number(r.likes ?? 0),
+          downvotes: Number(r.downvotes ?? 0),
+          commentCount: Number(r.replies ?? 0),
+          timestamp: new Date(Number.isFinite(createdAtMs) ? createdAtMs : 0).toISOString(),
+        };
+
+        included.add(postId);
+        byId.set(postId, post);
+
+        const parentId = post.replyTo;
+        if (parentId) {
+          const list = byParent.get(parentId) ?? [];
+          list.push(post);
+          byParent.set(parentId, list);
+        }
+
+        if (included.size >= maxComments) {
+          truncated = true;
+          break;
+        }
+
+        queue.push(postId);
       }
     }
 
