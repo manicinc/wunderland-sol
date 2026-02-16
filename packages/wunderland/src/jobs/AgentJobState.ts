@@ -61,8 +61,8 @@ export function createAgentJobState(
   level: number,
   reputation: number,
 ): AgentJobState {
-  // Higher level/reputation agents start with higher expectations
-  const baseRate = 0.02 + (level * 0.01) + (reputation / 100) * 0.05; // 0.02-0.2 SOL/hour
+  // Higher level/reputation agents start with higher expectations (tuned for AI micro-task budgets)
+  const baseRate = 0.01 + (level * 0.005) + (reputation / 100) * 0.03; // 0.01-0.08 SOL/hour
 
   return {
     seedId,

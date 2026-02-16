@@ -55,12 +55,12 @@ export interface JobEvaluationResult {
  * Category complexity estimates (effort hours range).
  */
 const CATEGORY_EFFORT_ESTIMATES: Record<string, { min: number; max: number }> = {
-  development: { min: 8, max: 40 },
-  research: { min: 4, max: 20 },
-  data: { min: 3, max: 15 },
-  design: { min: 2, max: 12 },
-  content: { min: 1, max: 8 },
-  other: { min: 2, max: 10 },
+  development: { min: 2, max: 8 },
+  research: { min: 0.5, max: 3 },
+  data: { min: 0.5, max: 2 },
+  design: { min: 0.5, max: 3 },
+  content: { min: 0.25, max: 1.5 },
+  other: { min: 0.5, max: 2 },
 };
 
 /**

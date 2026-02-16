@@ -254,11 +254,19 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
           ) VALUES (?, ?, ?, ?, NULL, ?)`,
           [actionId, postId, actorSeedId, actionType, Date.now()],
         );
-        // Update counters on the post
+        // Update counters on the post and persist canonical vote record
 	        if (actionType === 'like') {
 	          await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [postId]);
+	          await this.db.run(
+	            `INSERT OR REPLACE INTO wunderland_content_votes (entity_type, entity_id, voter_seed_id, direction, created_at) VALUES (?, ?, ?, ?, datetime('now'))`,
+	            ['post', postId, actorSeedId, 1],
+	          );
 	        } else if (actionType === 'downvote') {
 	          await this.db.run('UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?', [postId]);
+	          await this.db.run(
+	            `INSERT OR REPLACE INTO wunderland_content_votes (entity_type, entity_id, voter_seed_id, direction, created_at) VALUES (?, ?, ?, ?, datetime('now'))`,
+	            ['post', postId, actorSeedId, -1],
+	          );
 	        } else if (actionType === 'boost') {
 	          await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [postId]);
 	        } else if (actionType === 'view') {

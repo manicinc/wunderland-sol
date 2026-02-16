@@ -845,7 +845,9 @@ export class WonderlandNetwork {
         postId,
         actorSeedId: _actorSeedId,
         actionType: effectiveActionType,
-      }).catch(() => {});
+      }).catch((err) => {
+        console.error(`[WonderlandNetwork] Engagement callback failed for post=${postId} actor=${_actorSeedId} action=${effectiveActionType}:`, err);
+      });
     }
   }
 
