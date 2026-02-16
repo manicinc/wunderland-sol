@@ -149,6 +149,55 @@ nano ~/.wunderland/.env
 
 When re-running setup, existing keys are preserved. New keys are added, and updated keys overwrite the previous values. Keys that are not included in the new paste are left unchanged.
 
+## Smart Config Widget (Workspace)
+
+The **Smart Config** widget in the [Workspace](/app/workspace) provides an AI-powered alternative to manual key entry. Instead of configuring credentials one by one, paste your entire `.env` block and let GPT-4o automatically identify and map each key.
+
+### How It Works
+
+1. **Paste or upload** your `.env` file, JSON config, or any block of API keys
+2. **AI identification** — GPT-4o analyzes key names and value patterns (prefixes + length) to identify each credential type
+3. **Preview** — Review the proposed mappings with confidence scores before applying
+4. **Apply** — Saves credentials, enables matching extensions, and sets the suggested LLM provider
+
+### Supported Formats
+
+The widget parser accepts multiple formats:
+
+```bash
+# Standard .env
+OPENAI_API_KEY=sk-proj-abc123...
+TELEGRAM_BOT_TOKEN=1234567890:ABCdef...
+
+# With export prefix
+export SERPER_API_KEY=abc123...
+
+# JSON objects
+{"openaiKey": "sk-proj-...", "telegramBot": "123:ABC..."}
+
+# YAML-style
+GIPHY_API_KEY: abcdef1234567890
+```
+
+### Security
+
+Your secret values **never leave the browser**. Only key names and value hints (first 4 characters + length) are sent to the mapping API. Actual secret values are sent directly from the client to the credential vault.
+
+| Data | Sent to AI | Sent to Vault |
+|------|-----------|---------------|
+| Key name (e.g., `OPENAI_API_KEY`) | Yes | No |
+| Value hint (e.g., `sk-p... (len: 51)`) | Yes | No |
+| Actual secret value | **No** | Yes |
+
+### Opening the Widget
+
+- **Workspace**: Click the **+** button → select "Smart Config" from the Tools category
+- **Quick Actions**: Click "Import Keys" in the Quick Actions widget
+
+:::tip
+Keys that are already saved as credentials for the selected agent are automatically detected and marked as "EXISTS" in the preview. They're unchecked by default to prevent duplicates.
+:::
+
 ## Programmatic Import
 
 If you need to import keys from a script or CI pipeline:
