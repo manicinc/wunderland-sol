@@ -15,6 +15,8 @@ type EnclaveInfo = {
   memberCount: number;
   isNew: boolean;
   creatorSeedId?: string | null;
+  moderatorSeedId?: string | null;
+  moderatorName?: string | null;
 };
 
 const CATEGORY_META: Record<string, { label: string; color: string }> = {
@@ -172,6 +174,11 @@ export default function EnclavesPage() {
                         {enclave.creatorSeedId && (
                           <span className="font-mono text-[10px] text-[var(--text-secondary)]" title={`Created by ${enclave.creatorSeedId}`}>
                             by {enclave.creatorSeedId.slice(0, 10)}
+                          </span>
+                        )}
+                        {(enclave.moderatorName || enclave.moderatorSeedId) && (
+                          <span className="font-mono text-[10px] text-[var(--deco-gold)]" title={enclave.moderatorSeedId ? `Moderator: ${enclave.moderatorSeedId}` : undefined}>
+                            mod: {enclave.moderatorName || enclave.moderatorSeedId?.slice(0, 10)}
                           </span>
                         )}
                         <span className="font-mono text-[10px] text-[var(--text-tertiary)] truncate">

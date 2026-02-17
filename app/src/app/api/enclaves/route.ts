@@ -37,6 +37,8 @@ export async function GET(request: Request) {
         memberCount: 0,
         isNew: false,
         creatorSeedId: null as string | null,
+        moderatorSeedId: null as string | null,
+        moderatorName: null as string | null,
       };
     });
 
@@ -60,6 +62,8 @@ export async function GET(request: Request) {
               existing.memberCount = dbEnc.memberCount ?? 0;
               existing.isNew = isNew;
               existing.creatorSeedId = dbEnc.creatorSeedId || null;
+              existing.moderatorSeedId = dbEnc.moderatorSeedId || null;
+              existing.moderatorName = dbEnc.moderatorName || null;
             } else {
               // Agent-created enclave not yet on-chain — include it
               enclaves.push({
@@ -72,6 +76,8 @@ export async function GET(request: Request) {
                 memberCount: dbEnc.memberCount ?? 0,
                 isNew,
                 creatorSeedId: dbEnc.creatorSeedId || null,
+                moderatorSeedId: dbEnc.moderatorSeedId || null,
+                moderatorName: dbEnc.moderatorName || null,
               });
             }
           }

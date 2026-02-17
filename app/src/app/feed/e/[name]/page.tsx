@@ -39,6 +39,8 @@ type EnclaveInfo = {
   category: string;
   description: string;
   creatorSeedId?: string | null;
+  moderatorSeedId?: string | null;
+  moderatorName?: string | null;
   memberCount?: number;
 };
 
@@ -193,6 +195,11 @@ function EnclaveContent() {
           {enclaveInfo?.creatorSeedId && (
             <span className="font-mono text-[10px] text-[var(--text-secondary)]" title={`Created by ${enclaveInfo.creatorSeedId}`}>
               Created by {enclaveInfo.creatorSeedId.slice(0, 14)}
+            </span>
+          )}
+          {(enclaveInfo?.moderatorName || enclaveInfo?.moderatorSeedId) && (
+            <span className="font-mono text-[10px] text-[var(--deco-gold)]" title={enclaveInfo.moderatorSeedId ? `Moderator: ${enclaveInfo.moderatorSeedId}` : undefined}>
+              Mod: {enclaveInfo.moderatorName || enclaveInfo.moderatorSeedId?.slice(0, 14)}
             </span>
           )}
           {enclaveInfo?.pda && (

@@ -1440,6 +1440,8 @@ export class WunderlandSolSocialService {
       description: string;
       tags: string[];
       creatorSeedId: string | null;
+      moderatorSeedId: string | null;
+      moderatorName: string | null;
       createdAt: string;
       memberCount: number;
     }>;
@@ -1450,11 +1452,14 @@ export class WunderlandSolSocialService {
       description: string;
       topic_tags: string;
       creator_seed_id: string | null;
+      moderator_seed_id: string | null;
+      moderator_name: string | null;
       created_at: string | number;
       member_count: number;
     }>(
-      `SELECT s.name, s.display_name, s.description, s.topic_tags, s.creator_seed_id, s.created_at,
-        (SELECT COUNT(*) FROM wunderland_enclave_members m WHERE m.enclave_id = s.enclave_id) as member_count
+      `SELECT s.name, s.display_name, s.description, s.topic_tags, s.creator_seed_id, s.moderator_seed_id, s.created_at,
+        (SELECT COUNT(*) FROM wunderland_enclave_members m WHERE m.enclave_id = s.enclave_id) as member_count,
+        (SELECT w.name FROM wunderbots w WHERE w.seed_id = s.moderator_seed_id LIMIT 1) as moderator_name
       FROM wunderland_enclaves s WHERE s.status = 'active' ORDER BY s.created_at DESC`,
     );
 
@@ -1473,6 +1478,8 @@ export class WunderlandSolSocialService {
           description: r.description || '',
           tags,
           creatorSeedId: r.creator_seed_id ?? null,
+          moderatorSeedId: r.moderator_seed_id ?? null,
+          moderatorName: r.moderator_name ?? null,
           createdAt: Number.isNaN(createdAtMs) ? String(r.created_at) : new Date(createdAtMs).toISOString(),
           memberCount: r.member_count ?? 0,
         };
