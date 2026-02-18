@@ -1,5 +1,14 @@
 # https://docs.wunderland.sh robots.txt
+
+# Explicitly allow Google and Bing crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
 User-agent: *
 Allow: /
+Disallow: /tags/
 
 Sitemap: https://docs.wunderland.sh/sitemap.xml

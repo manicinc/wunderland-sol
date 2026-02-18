@@ -43,6 +43,18 @@ const nextConfig: NextConfig = {
     // Keep builds deterministic; run `pnpm --filter app lint` separately in CI if desired.
     ignoreDuringBuilds: true,
   },
+  async headers() {
+    return [
+      {
+        // Explicitly allow search engine indexing on all public pages.
+        // Overrides any Cloudflare-injected X-Robots-Tag headers.
+        source: '/((?!api|_next).*)',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'index, follow, max-image-preview:large, max-snippet:-1' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

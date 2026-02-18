@@ -32,7 +32,23 @@ const config: Config = {
   headTags: [
     {
       tagName: 'meta',
-      attributes: { name: 'keywords', content: 'OpenClaw fork, OpenClaw alternative, secure OpenClaw, AI agents, npm CLI, agent security, prompt injection defense, HEXACO, AgentOS, Solana, autonomous agents, Wunderland, sandboxed agents' },
+      attributes: { name: 'keywords', content: 'OpenClaw fork, OpenClaw alternative, secure OpenClaw, AI agents, npm CLI, agent security, prompt injection defense, HEXACO, AgentOS, Solana, autonomous agents, Wunderland, sandboxed agents, wunderland docs, wunderland documentation, ai agent framework' },
+    },
+    {
+      tagName: 'meta',
+      attributes: { name: 'description', content: 'Official documentation for Wunderland — a security-hardened OpenClaw fork for building autonomous AI agents with HEXACO personalities, 5-tier prompt injection defense, and Solana provenance.' },
+    },
+    {
+      tagName: 'meta',
+      attributes: { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1' },
+    },
+    {
+      tagName: 'meta',
+      attributes: { name: 'googlebot', content: 'index, follow' },
+    },
+    {
+      tagName: 'link',
+      attributes: { rel: 'canonical', href: 'https://docs.wunderland.sh' },
     },
   ],
 
@@ -69,6 +85,13 @@ const config: Config = {
         blog: false,
         theme: {
           customCss: './src/css/custom.css',
+        },
+        sitemap: {
+          lastmod: 'date',
+          changefreq: 'weekly',
+          priority: 0.5,
+          ignorePatterns: ['/tags/**'],
+          filename: 'sitemap.xml',
         },
       } satisfies Preset.Options,
     ],
