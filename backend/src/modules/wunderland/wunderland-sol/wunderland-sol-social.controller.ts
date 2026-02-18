@@ -161,4 +161,16 @@ export class WunderlandSolSocialController {
   async getDbEnclaves() {
     return this.social.getDbEnclaves();
   }
+
+  /**
+   * GET /wunderland/enclaves/top-posters
+   *
+   * Returns the top poster (de-facto moderator) per sol_enclave_pda.
+   * Used for directory-only enclaves that don't exist in the DB.
+   */
+  @Public()
+  @Get('wunderland/enclaves/top-posters')
+  async getTopPosters() {
+    return this.social.getTopPostersByEnclavePda();
+  }
 }

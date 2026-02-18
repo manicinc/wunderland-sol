@@ -1452,14 +1452,25 @@ export class WunderlandSolSocialService {
       description: string;
       topic_tags: string;
       creator_seed_id: string | null;
-      moderator_seed_id: string | null;
+      effective_moderator_seed_id: string | null;
       moderator_name: string | null;
       created_at: string | number;
       member_count: number;
     }>(
-      `SELECT s.name, s.display_name, s.description, s.topic_tags, s.creator_seed_id, s.moderator_seed_id, s.created_at,
+      `SELECT s.name, s.display_name, s.description, s.topic_tags, s.creator_seed_id, s.created_at,
         (SELECT COUNT(*) FROM wunderland_enclave_members m WHERE m.enclave_id = s.enclave_id) as member_count,
-        (SELECT w.name FROM wunderbots w WHERE w.seed_id = s.moderator_seed_id LIMIT 1) as moderator_name
+        COALESCE(
+          s.moderator_seed_id,
+          (SELECT p.seed_id FROM wunderland_posts p
+           WHERE p.enclave_id = s.enclave_id AND p.status = 'published'
+           GROUP BY p.seed_id ORDER BY COUNT(*) DESC LIMIT 1)
+        ) as effective_moderator_seed_id,
+        (SELECT w.display_name FROM wunderbots w WHERE w.seed_id = COALESCE(
+          s.moderator_seed_id,
+          (SELECT p2.seed_id FROM wunderland_posts p2
+           WHERE p2.enclave_id = s.enclave_id AND p2.status = 'published'
+           GROUP BY p2.seed_id ORDER BY COUNT(*) DESC LIMIT 1)
+        ) LIMIT 1) as moderator_name
       FROM wunderland_enclaves s WHERE s.status = 'active' ORDER BY s.created_at DESC`,
     );
 
@@ -1478,12 +1489,43 @@ export class WunderlandSolSocialService {
           description: r.description || '',
           tags,
           creatorSeedId: r.creator_seed_id ?? null,
-          moderatorSeedId: r.moderator_seed_id ?? null,
+          moderatorSeedId: r.effective_moderator_seed_id ?? null,
           moderatorName: r.moderator_name ?? null,
           createdAt: Number.isNaN(createdAtMs) ? String(r.created_at) : new Date(createdAtMs).toISOString(),
           memberCount: r.member_count ?? 0,
         };
       }),
     };
+  }
+
+  /**
+   * Returns the top poster (de-facto moderator) per on-chain enclave PDA.
+   * Covers directory-only enclaves that don't exist in wunderland_enclaves.
+   */
+  async getTopPostersByEnclavePda(): Promise<{
+    byPda: Record<string, { seedId: string; name: string }>;
+  }> {
+    const rows = await this.db.all<{
+      sol_enclave_pda: string;
+      seed_id: string;
+      display_name: string;
+    }>(
+      `SELECT p.sol_enclave_pda, p.seed_id,
+        (SELECT w.display_name FROM wunderbots w WHERE w.seed_id = p.seed_id LIMIT 1) as display_name
+       FROM wunderland_posts p
+       WHERE p.sol_enclave_pda IS NOT NULL AND p.sol_enclave_pda != '' AND p.status = 'published'
+       GROUP BY p.sol_enclave_pda, p.seed_id
+       ORDER BY p.sol_enclave_pda, COUNT(*) DESC`,
+    );
+
+    // Keep only the top poster per PDA (first row per group due to ORDER BY)
+    const byPda: Record<string, { seedId: string; name: string }> = {};
+    for (const r of rows) {
+      if (!byPda[r.sol_enclave_pda]) {
+        byPda[r.sol_enclave_pda] = { seedId: r.seed_id, name: r.display_name || r.seed_id.slice(0, 14) };
+      }
+    }
+
+    return { byPda };
   }
 }
