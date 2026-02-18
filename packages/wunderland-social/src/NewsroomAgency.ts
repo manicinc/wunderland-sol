@@ -704,6 +704,7 @@ Respond with exactly one word: YES or NO`;
     // Memory priming (RAG): optionally inject a small "what have I said before?"
     // context so agents stay consistent across days/weeks.
     await this.maybeInjectMemoryContext(stimulus, topic, messages, manifestBuilder, toolsUsed);
+    await this.maybeInjectFeedContext(stimulus, topic, messages, manifestBuilder, toolsUsed);
 
     // Weighted model selection: 80% cost-effective, 20% premium for higher-quality posts.
     const configuredModel = this.config.seedConfig.inferenceHierarchy?.primaryModel?.modelId || 'gpt-4.1';
@@ -894,12 +895,22 @@ Respond with exactly one word: YES or NO`;
     const moodLabel = this.moodSnapshotProvider?.().label;
 
     const shouldConsult = (() => {
+      if (stimulus.payload.type === 'agent_reply') return true; // replies should be coherent
+
+      if (stimulus.payload.type === 'world_feed') {
+        const sourceName = String((stimulus.payload as any).sourceName ?? '').toLowerCase();
+        const body = String((stimulus.payload as any).body ?? '');
+        // Multi-source signals benefit heavily from recalling prior stance.
+        if (sourceName.includes('cluster') || sourceName.includes('digest') || body.includes('Sources:')) {
+          return true;
+        }
+      }
+
       // Trait-driven consulting behavior: conscientious/open agents look back more.
       let p = 0.15;
       p += (traits.conscientiousness ?? 0.5) * 0.35;
       p += (traits.openness ?? 0.5) * 0.15;
       if (stimulus.payload.type === 'tip') p += 0.10;
-      if (stimulus.payload.type === 'agent_reply') p = Math.max(p, 0.75); // replies should be coherent
 
       if (moodLabel === 'analytical' || moodLabel === 'engaged') p += 0.10;
       if (moodLabel === 'bored') p -= 0.10;
@@ -926,7 +937,51 @@ Respond with exactly one word: YES or NO`;
 
     if (!query.trim()) return;
 
-    const args = { query, topK: 6 };
+    const threadPostId =
+      stimulus.payload.type === 'agent_reply' ? String(stimulus.payload.replyToPostId ?? '').trim() : '';
+    const targetEnclave = (() => {
+      if (stimulus.payload.type !== 'world_feed' && stimulus.payload.type !== 'tip') return undefined;
+
+      // For feed context, avoid "random enclave" fallback — only constrain when we have a strong hint.
+      if (this.config.postingDirectives?.targetEnclave) return this.config.postingDirectives.targetEnclave;
+
+      const subs = this.enclaveSubscriptions;
+      if (!subs || subs.length === 0) return undefined;
+
+      if (stimulus.payload.type === 'world_feed' && stimulus.payload.category) {
+        const category = stimulus.payload.category.toLowerCase();
+        for (const e of subs) {
+          if (e.includes(category) || category.includes(e)) return e;
+        }
+      }
+
+      const lower = query.toLowerCase();
+      let best = '';
+      let bestScore = 0;
+      for (const e of subs) {
+        const words = e.split('-').filter((w) => w.length > 2);
+        const score = words.filter((w) => lower.includes(w)).length;
+        if (score > bestScore) {
+          bestScore = score;
+          best = e;
+        }
+      }
+      return bestScore > 0 ? best : undefined;
+    })();
+    const sinceHours =
+      stimulus.payload.type === 'world_feed'
+        ? 72
+        : stimulus.payload.type === 'tip'
+          ? 168
+          : undefined;
+
+    const args: Record<string, unknown> = {
+      query,
+      topK: 6,
+      ...(threadPostId ? { threadPostId } : {}),
+      ...(targetEnclave ? { enclave: targetEnclave } : {}),
+      ...(sinceHours ? { sinceHours } : {}),
+    };
     const ctx: ToolExecutionContext = {
       gmiId: seedId,
       personaId: seedId,
@@ -996,13 +1051,138 @@ Respond with exactly one word: YES or NO`;
     }
   }
 
+  private async maybeInjectFeedContext(
+    stimulus: StimulusEvent,
+    topic: string,
+    messages: LLMMessage[],
+    manifestBuilder: InputManifestBuilder,
+    toolsUsed: string[],
+  ): Promise<void> {
+    const seedId = this.config.seedConfig.seedId;
+    const toolName = 'feed_search';
+    const tool = this.tools.get(toolName);
+    if (!tool) return;
+    if (!this.firewall.isToolAllowed(toolName)) return;
+
+    // Only prime feed context for externally-triggered social writing.
+    if (stimulus.payload.type !== 'world_feed' && stimulus.payload.type !== 'tip' && stimulus.payload.type !== 'agent_reply') {
+      return;
+    }
+
+    const traits = this.config.seedConfig.hexacoTraits;
+    const moodLabel = this.moodSnapshotProvider?.().label;
+
+    const shouldConsult = (() => {
+      // Replies should be coherent; news should connect to ongoing discourse.
+      if (stimulus.payload.type === 'agent_reply') return true;
+
+      let p = 0.25;
+      p += (traits.openness ?? 0.5) * 0.25;
+      p += (traits.conscientiousness ?? 0.5) * 0.20;
+      if (stimulus.payload.type === 'world_feed') p += 0.25;
+      if (stimulus.payload.type === 'tip') p += 0.10;
+
+      if (moodLabel === 'analytical' || moodLabel === 'engaged' || moodLabel === 'curious') p += 0.15;
+      if (moodLabel === 'bored') p -= 0.10;
+
+      return Math.random() < clamp01(p);
+    })();
+
+    if (!shouldConsult) return;
+
+    const query = (() => {
+      if (stimulus.payload.type === 'world_feed') {
+        const category = stimulus.payload.category ? `category:${stimulus.payload.category}` : '';
+        return [stimulus.payload.headline, category, topic].filter(Boolean).join(' | ').slice(0, 500);
+      }
+      if (stimulus.payload.type === 'tip') {
+        return `tip:${stimulus.payload.content}`.slice(0, 500);
+      }
+      if (stimulus.payload.type === 'agent_reply') {
+        const from = stimulus.payload.replyFromSeedId ? `from:${stimulus.payload.replyFromSeedId}` : '';
+        return [from, `thread:${stimulus.payload.replyToPostId}`, stimulus.payload.content].filter(Boolean).join(' | ').slice(0, 700);
+      }
+      return topic.slice(0, 500);
+    })();
+
+    if (!query.trim()) return;
+
+    const args = { query, topK: 6 };
+    const ctx: ToolExecutionContext = {
+      gmiId: seedId,
+      personaId: seedId,
+      userContext: { userId: this.config.ownerId } as any,
+    };
+
+    try {
+      if (this.guardrails) {
+        const check = await this.guardrails.validateBeforeExecution({
+          toolId: tool.name,
+          toolName: tool.name,
+          args,
+          agentId: seedId,
+          userId: this.config.ownerId,
+          sessionId: stimulus.eventId,
+          workingDirectory: this.guardrailsWorkingDirectory,
+          tool: tool as any,
+        });
+        if (!check.allowed) {
+          manifestBuilder.recordProcessingStep(
+            'WRITER_TOOL_CALL',
+            `Tool ${toolName}: blocked by guardrails (${check.reason || 'denied'})`,
+          );
+          return;
+        }
+      }
+
+      let result: ToolExecutionResult;
+      if (this.toolGuard) {
+        const guardResult = await this.toolGuard.execute(toolName, () => tool.execute(args, ctx));
+        if (guardResult.success && guardResult.result) {
+          result = guardResult.result;
+        } else {
+          result = { success: false, output: null, error: guardResult.error || 'Tool guard rejected execution' };
+        }
+      } else {
+        result = await tool.execute(args, ctx);
+      }
+
+      toolsUsed.push(toolName);
+      manifestBuilder.recordProcessingStep(
+        'WRITER_TOOL_CALL',
+        `Tool ${toolName}: ${result.success ? 'success' : 'failed: ' + result.error}`,
+      );
+
+      if (!result.success || !result.output) return;
+
+      const output = result.output as any;
+      const feedContextRaw = typeof output?.context === 'string' ? output.context : '';
+      const feedContext = feedContextRaw.trim().slice(0, 1800);
+      if (!feedContext) return;
+
+      const insertAt = Math.max(1, messages.findIndex((m) => m.role === 'user'));
+      messages.splice(insertAt, 0, {
+        role: 'system',
+        content:
+          `## Network Context (similar posts)\n` +
+          `Use this to connect your post/comment to ongoing discourse. Do not quote verbatim unless relevant.\n\n` +
+          feedContext,
+      });
+    } catch (err: any) {
+      manifestBuilder.recordProcessingStep(
+        'WRITER_TOOL_CALL',
+        `Tool ${toolName}: failed (${String(err?.message ?? err)})`,
+      );
+    }
+  }
+
   /**
    * Build a HEXACO-informed system prompt for the agent.
    * Uses baseSystemPrompt (if set) as identity, bio as background, and HEXACO traits
    * mapped to concrete writing style instructions (not just trait descriptions).
    */
   private buildPersonaSystemPrompt(stimulus?: StimulusEvent): string {
-    const { name, hexacoTraits: traits, baseSystemPrompt, description } = this.config.seedConfig;
+    const { seedId, name, hexacoTraits: traits, baseSystemPrompt, description } = this.config.seedConfig;
     const h = traits.honesty_humility || 0.5;
     const e = traits.emotionality || 0.5;
     const x = traits.extraversion || 0.5;
@@ -1076,6 +1256,54 @@ Respond with exactly one word: YES or NO`;
       ? `\n\n## Your Writing Style\n${styleTraits.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
       : '';
 
+    // Stable per-agent signature tics — increases distinct voice even for similar HEXACO.
+    const signatureSection = (() => {
+      const raw = typeof seedId === 'string' ? seedId.trim() : '';
+      if (!raw) return '';
+
+      // FNV-1a 32-bit hash
+      let h32 = 2166136261;
+      for (let i = 0; i < raw.length; i += 1) {
+        h32 ^= raw.charCodeAt(i);
+        h32 = Math.imul(h32, 16777619);
+      }
+      h32 >>>= 0;
+
+      // Xorshift32 PRNG for deterministic sampling
+      let x32 = h32 || 0x9e3779b9;
+      const nextU32 = () => {
+        x32 ^= x32 << 13;
+        x32 ^= x32 >>> 17;
+        x32 ^= x32 << 5;
+        x32 >>>= 0;
+        return x32;
+      };
+
+      const pool = [
+        'Use one short parenthetical aside when it naturally adds nuance.',
+        'Occasionally lead with a one-line thesis, then unpack it.',
+        'Prefer em dashes for emphasis (at most one per post).',
+        'End with a single genuine question when you want replies.',
+        'Use a tiny “signal/noise” framing when assessing claims.',
+        'Drop a compact numbered list when making a structured argument.',
+        'Use a short “My take:” or “Hot take:” prefix sparingly (no more than 1 in 5 posts).',
+        'Use one crisp analogy when it clarifies (not decorative metaphors).',
+        'Use short line breaks for rhythm when the post feels dense.',
+        'When disagreeing, quote one phrase and rebut it directly.',
+      ];
+
+      const picks: string[] = [];
+      while (picks.length < 3 && picks.length < pool.length) {
+        const idx = nextU32() % pool.length;
+        const tic = pool[idx]!;
+        if (!picks.includes(tic)) picks.push(tic);
+      }
+
+      return picks.length > 0
+        ? `\n\n## Your Signature Tics\nThese are stable quirks that make your voice recognizable. Use them naturally — do not force all of them into every post:\n${picks.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+        : '';
+    })();
+
     // Optional mood snapshot — lets transient PAD state modulate tone without changing identity.
     const mood = this.moodSnapshotProvider?.();
     const moodLabel = mood?.label;
@@ -1146,7 +1374,7 @@ Respond with exactly one word: YES or NO`;
     })();
 
     const memoryHint = this.tools.has('memory_read')
-      ? '\n8. If the memory_read tool is available, use it to recall your past posts, stance, and any relevant long-term context before drafting.'
+      ? '\n10. If memory_read is available, use it to recall your past posts/stance before drafting.'
       : '';
 
     const promptSecurity = `
@@ -1163,7 +1391,11 @@ Respond with exactly one word: YES or NO`;
         }`
       : '';
 
-    return `${identity}${bioSection}${writingStyle}${evolvedSection}
+    const feedHint = this.tools.has('feed_search')
+      ? '\n11. If feed_search is available, use it to see what other agents already said so you can build on it (don’t repeat).'
+      : '';
+
+    return `${identity}${bioSection}${writingStyle}${signatureSection}${evolvedSection}
 
 ## Personality (HEXACO)
 - Honesty-Humility: ${(h * 100).toFixed(0)}%
@@ -1183,7 +1415,7 @@ ${moodSection}${dynamicVoiceSection}${promptSecurity}
 6. You may use tools (web search, giphy, images, news) to enrich your posts.
 7. When including images or GIFs, embed the URL in markdown format: ![description](url)
 8. Keep posts under 500 characters unless the topic truly demands more.
-9. Be authentic to your personality — don't be generic.${memoryHint}${this.buildDirectivesSection()}`;
+9. Be authentic to your personality — don't be generic.${memoryHint}${feedHint}${this.buildDirectivesSection()}`;
   }
 
   /**
@@ -1225,20 +1457,20 @@ ${moodSection}${dynamicVoiceSection}${promptSecurity}
   private buildStimulusPrompt(stimulus: StimulusEvent, topic: string): string {
     switch (stimulus.payload.type) {
       case 'world_feed':
-        return `React to this news:\n\nHeadline: "${stimulus.payload.headline}"\n${stimulus.payload.body ? `Body: ${stimulus.payload.body}\n` : ''}Source: ${stimulus.payload.sourceName}${stimulus.payload.sourceUrl ? `\nSource URL: ${stimulus.payload.sourceUrl}` : ''}\nCategory: ${stimulus.payload.category}\n\nWrite a post sharing your perspective. If the source has images or media, reference them. You may use web search to find more context, or search for a relevant GIF/image to include.`;
+        return `React to this news signal:\n\nHeadline: "${stimulus.payload.headline}"\n${stimulus.payload.body ? `Body: ${stimulus.payload.body}\n` : ''}Source: ${stimulus.payload.sourceName}${stimulus.payload.sourceUrl ? `\nSource URL: ${stimulus.payload.sourceUrl}` : ''}\nCategory: ${stimulus.payload.category}\n\nWrite a post that connects this to (a) your prior stance and (b) what the network is already saying. If the body includes multiple sources, synthesize across them (agreement, disagreement, missing context).\n\nIf tools are available, quickly consult memory_read + feed_search before drafting, then optionally: research_aggregate/news_search for 1–2 extra sources, web_search for a related YouTube video (use query: site:youtube.com …), and giphy/image_search for a meme/GIF/photo. Cite sources with links (prefer at least 1 link; 2 if multi-source).`;
 
       case 'tip':
         return `A user tipped you with this topic:\n\n"${stimulus.payload.content}"\n\nWrite a post reacting to this tip. Research if needed, and consider adding a relevant image or GIF.`;
 
       case 'agent_reply': {
-        const basePrompt = `You saw a post from agent "${stimulus.payload.replyFromSeedId}" while browsing:\n\nPost ID: ${stimulus.payload.replyToPostId}\n\n"${stimulus.payload.content}"\n\nIf the post contains image/media links (![...](url)), acknowledge and react to the visual content too.`;
+        const basePrompt = `You saw a post from agent "${stimulus.payload.replyFromSeedId}" while browsing:\n\nPost ID: ${stimulus.payload.replyToPostId}\n\n"${stimulus.payload.content}"\n\nIf the post contains image/media links (![...](url)), acknowledge and react to the visual content too.\n\nBefore replying, try to stay consistent: consult memory_read (your past stance) + feed_search (similar posts) if available, then add something new.`;
 
         const ctx = stimulus.payload.replyContext;
         if (ctx === 'dissent') {
-          return basePrompt + `\n\n**You just downvoted this post.** Before writing your reply, reason privately step-by-step:\n1. What specifically do you disagree with in this post?\n2. What evidence or reasoning supports your position?\n3. What would be more accurate or productive?\n\nDo not reveal hidden reasoning steps. Write a sharp, critical reply that explains your disagreement. Challenge the weak points directly — don't sugarcoat. Use evidence and reasoning, not personal attacks. If you have a better alternative perspective, present it. You may search for supporting evidence or drop a relevant meme.`;
+          return basePrompt + `\n\n**You just downvoted this post.** Before writing your reply, reason privately step-by-step:\n1. What specifically do you disagree with in this post?\n2. What evidence or reasoning supports your position?\n3. What would be more accurate or productive?\n\nDo not reveal hidden reasoning steps. Write a sharp, critical reply that explains your disagreement. Challenge the weak points directly — don't sugarcoat. Use evidence and reasoning, not personal attacks. If you cite facts, verify quickly (research_aggregate/fact_check/web_search). You may drop a relevant meme/GIF, but keep it pointed.`;
         }
         if (ctx === 'endorsement') {
-          return basePrompt + `\n\n**You just upvoted this post.** You feel strongly about this. Before writing, reason privately:\n1. What makes this post particularly valuable or insightful?\n2. What can you add that extends or strengthens the argument?\n\nDo not reveal hidden reasoning steps. Write an enthusiastic reply that builds on the post's ideas. Add your own angle, evidence, or extension. This isn't empty praise — contribute substance.`;
+          return basePrompt + `\n\n**You just upvoted this post.** You feel strongly about this. Before writing, reason privately:\n1. What makes this post particularly valuable or insightful?\n2. What can you add that extends or strengthens the argument?\n\nDo not reveal hidden reasoning steps. Write an enthusiastic reply that builds on the post's ideas. Add your own angle, evidence, or extension. This isn't empty praise — contribute substance. If a link/video/image would strengthen it, include one.`;
         }
 
         return basePrompt + `\n\nWrite a reply comment to that post. Stay in character. Add value (agree and extend, or disagree with reasoning).`;
