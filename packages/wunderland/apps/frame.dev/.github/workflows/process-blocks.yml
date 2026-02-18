@@ -1,0 +1,121 @@
+name: Process Strand Blocks
+
+# Automatically process strand blocks through NLP pipeline
+# when markdown files are pushed to the repository
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'weaves/**/*.md'
+      - 'looms/**/*.md'
+      - 'strands/**/*.md'
+
+  # Allow manual trigger with options
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force reprocess all strands (ignore staleness)'
+        type: boolean
+        default: false
+      limit:
+        description: 'Max strands to process'
+        type: number
+        default: 100
+
+concurrency:
+  group: process-blocks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  process-blocks:
+    name: Process Changed Strands
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changed files detection
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get changed markdown files
+        id: changed
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            **/*.md
+          separator: ','
+
+      - name: Show changed files
+        if: steps.changed.outputs.any_changed == 'true'
+        run: |
+          echo "Changed files:"
+          echo "${{ steps.changed.outputs.all_changed_files }}"
+
+      - name: Process changed strands
+        if: steps.changed.outputs.any_changed == 'true' || github.event.inputs.force == 'true'
+        env:
+          DATABASE_PATH: ./data/quarry-ci.db
+          NODE_ENV: production
+        run: |
+          echo "Processing strand blocks..."
+
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            echo "Force mode enabled - processing all strands"
+            npx tsx scripts/process-all-blocks.ts --force --limit=${{ github.event.inputs.limit || 100 }}
+          elif [ -n "${{ steps.changed.outputs.all_changed_files }}" ]; then
+            echo "Processing changed files only"
+            npx tsx scripts/process-all-blocks.ts --paths="${{ steps.changed.outputs.all_changed_files }}"
+          else
+            echo "Processing stale strands"
+            npx tsx scripts/process-all-blocks.ts --limit=${{ github.event.inputs.limit || 100 }}
+          fi
+
+      - name: Check for index updates
+        id: index-changes
+        run: |
+          if [ -n "$(git status --porcelain public/data/*.json 2>/dev/null)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit updated indexes
+        if: steps.index-changes.outputs.has_changes == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: |
+            chore: update block indexes
+
+            Processed strand blocks via NLP pipeline.
+            [skip ci]
+          file_pattern: |
+            public/data/*.json
+            data/*.db
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+
+      - name: Summary
+        run: |
+          echo "## Block Processing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.changed.outputs.any_changed }}" = "true" ]; then
+            echo "**Changed files:** ${{ steps.changed.outputs.all_changed_files }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**No changed markdown files detected**" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ steps.index-changes.outputs.has_changes }}" = "true" ]; then
+            echo "**Index updates:** Committed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Index updates:** None" >> $GITHUB_STEP_SUMMARY
+          fi

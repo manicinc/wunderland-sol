@@ -1,0 +1,21 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureCard {
+  background: rgba(167, 139, 250, 0.04);
+  border: 1px solid rgba(167, 139, 250, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+  min-height: 180px;
+}
+
+.featureCard:hover {
+  border-color: rgba(167, 139, 250, 0.25);
+  transform: translateY(-2px);
+}

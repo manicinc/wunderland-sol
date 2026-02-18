@@ -1,0 +1,74 @@
+{
+  "id": "progress-tracker",
+  "name": "Progress Tracker",
+  "category": "personal",
+  "icon": "TrendingUp",
+  "description": "Track progress on any goal or project with visual progress bars, milestones, and check-in points. Perfect for long-term objectives.",
+  "shortDescription": "Visual progress tracking for goals",
+  "difficulty": "beginner",
+  "estimatedTime": "10 min",
+  "tags": ["progress", "goals", "milestones", "tracking", "achievements"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 85,
+  "defaultData": {
+    "contentType": "tracker"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Goal/Project Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "What are you tracking progress on?"
+    },
+    {
+      "name": "summary",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Describe your goal and why it matters"
+    },
+    {
+      "name": "targetDate",
+      "label": "Target Date",
+      "type": "date",
+      "required": false,
+      "placeholder": "When do you want to achieve this?"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Add tags for organization"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "targetDate", "progress", "status", "milestones"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: tracker\nprogress: 0\nstatus: in_progress\ntargetDate: {targetDate}\ncreated: {date}\nlastUpdated: {date}\n---\n\n# {title}\n\n{summary}\n\n## Overview\n\n| Metric | Value |\n|--------|-------|\n| **Start Date** | {date} |\n| **Target Date** | {targetDate} |\n| **Progress** | ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ 0% |\n| **Status** | 🟡 In Progress |\n| **Days Remaining** | - |\n\n---\n\n## Progress Visualization\n\n```\n[░░░░░░░░░░░░░░░░░░░░] 0% Complete\n\n0%        25%        50%        75%       100%\n|----------|----------|----------|----------|\n🔴                                          🎯\n```\n\n---\n\n## Milestones\n\n### Phase 1: Foundation (0-25%)\n- [ ] Milestone 1.1: Define success criteria\n- [ ] Milestone 1.2: Gather resources\n- [ ] Milestone 1.3: Create action plan\n\n### Phase 2: Building (25-50%)\n- [ ] Milestone 2.1: Complete first major task\n- [ ] Milestone 2.2: Reach halfway point\n- [ ] Milestone 2.3: Review and adjust\n\n### Phase 3: Momentum (50-75%)\n- [ ] Milestone 3.1: Overcome major obstacle\n- [ ] Milestone 3.2: See visible results\n- [ ] Milestone 3.3: Get feedback\n\n### Phase 4: Completion (75-100%)\n- [ ] Milestone 4.1: Final push\n- [ ] Milestone 4.2: Quality check\n- [ ] Milestone 4.3: 🎉 Goal achieved!\n\n---\n\n## Progress Log\n\n| Date | Progress | Notes |\n|------|----------|-------|\n| {date} | 0% | Started tracking |\n\n---\n\n## Weekly Check-ins\n\n### Week 1\n**Date:** {date}\n**Progress this week:** \n**Wins:**\n**Blockers:**\n**Focus for next week:**\n\n---\n\n## Reflections\n\n### What's driving progress?\n\n\n### What's slowing progress?\n\n\n### Adjustments needed?\n\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

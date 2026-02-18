@@ -1,0 +1,363 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-02-07T00:00:00.000Z",
+  "categories": {
+    "curated": [
+      "weather",
+      "github",
+      "slack-helper",
+      "discord-helper",
+      "notion",
+      "obsidian",
+      "summarize",
+      "coding-agent",
+      "healthcheck",
+      "spotify-player",
+      "trello",
+      "apple-notes",
+      "apple-reminders",
+      "1password",
+      "image-gen",
+      "whisper-transcribe",
+      "git"
+    ],
+    "community": []
+  },
+  "skills": {
+    "curated": [
+      {
+        "id": "com.framers.skill.weather",
+        "name": "weather",
+        "version": "1.0.0",
+        "path": "registry/curated/weather",
+        "description": "Look up current weather conditions, forecasts, and severe weather alerts for any location worldwide.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["weather", "forecast", "climate", "location"],
+        "metadata": {
+          "emoji": "\u2600\uFE0F"
+        }
+      },
+      {
+        "id": "com.framers.skill.github",
+        "name": "github",
+        "version": "1.0.0",
+        "path": "registry/curated/github",
+        "description": "Manage GitHub repositories, issues, pull requests, releases, and Actions workflows using the gh CLI.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["github", "gh", "issues", "pull-requests", "ci-cd", "code-review"],
+        "metadata": {
+          "emoji": "\uD83D\uDC19",
+          "primaryEnv": "GITHUB_TOKEN",
+          "requires": {
+            "bins": ["gh"]
+          },
+          "install": [
+            {
+              "id": "brew",
+              "kind": "brew",
+              "formula": "gh",
+              "bins": ["gh"],
+              "label": "Install GitHub CLI (brew)"
+            },
+            {
+              "id": "apt",
+              "kind": "apt",
+              "package": "gh",
+              "bins": ["gh"],
+              "os": ["linux"],
+              "label": "Install GitHub CLI (apt)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "com.framers.skill.slack-helper",
+        "name": "slack-helper",
+        "version": "1.0.0",
+        "path": "registry/curated/slack-helper",
+        "description": "Manage Slack workspaces, channels, messages, and integrations through the Slack API.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["slack", "messaging", "workspace", "notifications", "team-chat"],
+        "metadata": {
+          "emoji": "\uD83D\uDCAC",
+          "primaryEnv": "SLACK_BOT_TOKEN"
+        }
+      },
+      {
+        "id": "com.framers.skill.discord-helper",
+        "name": "discord-helper",
+        "version": "1.0.0",
+        "path": "registry/curated/discord-helper",
+        "description": "Manage Discord servers, channels, roles, and messages through the Discord API.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["discord", "messaging", "server", "moderation", "community"],
+        "metadata": {
+          "emoji": "\uD83C\uDFAE",
+          "primaryEnv": "DISCORD_BOT_TOKEN"
+        }
+      },
+      {
+        "id": "com.framers.skill.notion",
+        "name": "notion",
+        "version": "1.0.0",
+        "path": "registry/curated/notion",
+        "description": "Read, create, and manage pages, databases, and content blocks in Notion workspaces.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["notion", "wiki", "database", "notes", "project-management", "knowledge-base"],
+        "metadata": {
+          "emoji": "\uD83D\uDCD3",
+          "primaryEnv": "NOTION_API_KEY"
+        }
+      },
+      {
+        "id": "com.framers.skill.obsidian",
+        "name": "obsidian",
+        "version": "1.0.0",
+        "path": "registry/curated/obsidian",
+        "description": "Read, create, and manage notes, links, and metadata in Obsidian vaults via the local filesystem.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["obsidian", "markdown", "notes", "knowledge-graph", "zettelkasten", "pkm"],
+        "metadata": {
+          "emoji": "\uD83D\uDC8E"
+        }
+      },
+      {
+        "id": "com.framers.skill.summarize",
+        "name": "summarize",
+        "version": "1.0.0",
+        "path": "registry/curated/summarize",
+        "description": "Summarize text content, web pages, documents, and long-form articles into concise, structured summaries.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["summarization", "text-processing", "tldr", "reading", "content-analysis"],
+        "metadata": {
+          "emoji": "\uD83D\uDCDD"
+        }
+      },
+      {
+        "id": "com.framers.skill.coding-agent",
+        "name": "coding-agent",
+        "version": "1.0.0",
+        "path": "registry/curated/coding-agent",
+        "description": "Write, review, debug, refactor, and explain code across multiple programming languages and frameworks.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": [
+          "coding",
+          "programming",
+          "code-review",
+          "debugging",
+          "refactoring",
+          "development"
+        ],
+        "metadata": {
+          "emoji": "\uD83D\uDCBB"
+        }
+      },
+      {
+        "id": "com.framers.skill.healthcheck",
+        "name": "healthcheck",
+        "version": "1.0.0",
+        "path": "registry/curated/healthcheck",
+        "description": "Monitor health and availability of systems, services, APIs, and infrastructure endpoints.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["monitoring", "health", "uptime", "infrastructure", "diagnostics", "status"],
+        "metadata": {
+          "emoji": "\uD83C\uDFE5",
+          "requires": {
+            "anyBins": ["curl", "wget"]
+          }
+        }
+      },
+      {
+        "id": "com.framers.skill.spotify-player",
+        "name": "spotify-player",
+        "version": "1.0.0",
+        "path": "registry/curated/spotify-player",
+        "description": "Control Spotify playback, manage playlists, search music, and get recommendations via the Spotify API.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["spotify", "music", "playback", "playlists", "streaming", "audio"],
+        "metadata": {
+          "emoji": "\uD83C\uDFB5",
+          "primaryEnv": "SPOTIFY_CLIENT_ID"
+        }
+      },
+      {
+        "id": "com.framers.skill.trello",
+        "name": "trello",
+        "version": "1.0.0",
+        "path": "registry/curated/trello",
+        "description": "Manage Trello boards, lists, cards, checklists, and team workflows via the Trello API.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["trello", "kanban", "project-management", "boards", "tasks", "workflow"],
+        "metadata": {
+          "emoji": "\uD83D\uDCCB",
+          "primaryEnv": "TRELLO_API_KEY"
+        }
+      },
+      {
+        "id": "com.framers.skill.apple-notes",
+        "name": "apple-notes",
+        "version": "1.0.0",
+        "path": "registry/curated/apple-notes",
+        "description": "Create, read, search, and manage notes in Apple Notes using AppleScript and macOS automation.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["apple-notes", "macos", "notes", "applescript", "automation"],
+        "metadata": {
+          "emoji": "\uD83D\uDCF1",
+          "os": ["darwin"],
+          "requires": {
+            "bins": ["osascript"]
+          }
+        }
+      },
+      {
+        "id": "com.framers.skill.apple-reminders",
+        "name": "apple-reminders",
+        "version": "1.0.0",
+        "path": "registry/curated/apple-reminders",
+        "description": "Create, manage, and query reminders and lists in Apple Reminders using AppleScript and macOS automation.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["apple-reminders", "macos", "reminders", "tasks", "applescript", "automation"],
+        "metadata": {
+          "emoji": "\u2705",
+          "os": ["darwin"],
+          "requires": {
+            "bins": ["osascript"]
+          }
+        }
+      },
+      {
+        "id": "com.framers.skill.1password",
+        "name": "1password",
+        "version": "1.0.0",
+        "path": "registry/curated/1password",
+        "description": "Query and retrieve items from 1Password vaults using the 1Password CLI for secure credential access.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["1password", "passwords", "secrets", "vault", "credentials", "security"],
+        "metadata": {
+          "emoji": "\uD83D\uDD10",
+          "primaryEnv": "OP_SERVICE_ACCOUNT_TOKEN",
+          "requires": {
+            "bins": ["op"]
+          },
+          "install": [
+            {
+              "id": "brew",
+              "kind": "brew",
+              "formula": "1password-cli",
+              "bins": ["op"],
+              "label": "Install 1Password CLI (brew)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "com.framers.skill.image-gen",
+        "name": "image-gen",
+        "version": "1.0.0",
+        "path": "registry/curated/image-gen",
+        "description": "Generate images from text prompts using AI image generation APIs like DALL-E, Stable Diffusion, or Midjourney.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": [
+          "image-generation",
+          "ai-art",
+          "dall-e",
+          "stable-diffusion",
+          "creative",
+          "visual"
+        ],
+        "metadata": {
+          "emoji": "\uD83C\uDFA8",
+          "primaryEnv": "OPENAI_API_KEY"
+        }
+      },
+      {
+        "id": "com.framers.skill.whisper-transcribe",
+        "name": "whisper-transcribe",
+        "version": "1.0.0",
+        "path": "registry/curated/whisper-transcribe",
+        "description": "Transcribe audio and video files to text using OpenAI Whisper or compatible speech-to-text APIs.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["transcription", "whisper", "speech-to-text", "audio", "stt", "voice"],
+        "metadata": {
+          "emoji": "\uD83C\uDF99\uFE0F",
+          "primaryEnv": "OPENAI_API_KEY",
+          "requires": {
+            "anyBins": ["ffmpeg", "ffprobe"]
+          },
+          "install": [
+            {
+              "id": "brew-ffmpeg",
+              "kind": "brew",
+              "formula": "ffmpeg",
+              "bins": ["ffmpeg", "ffprobe"],
+              "label": "Install ffmpeg (brew)"
+            },
+            {
+              "id": "apt-ffmpeg",
+              "kind": "apt",
+              "package": "ffmpeg",
+              "bins": ["ffmpeg", "ffprobe"],
+              "os": ["linux"],
+              "label": "Install ffmpeg (apt)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "com.framers.skill.git",
+        "name": "git",
+        "version": "1.0.0",
+        "path": "registry/curated/git",
+        "description": "Work with Git repositories from the command line.",
+        "verified": true,
+        "verifiedAt": "2026-02-07T00:00:00.000Z",
+        "keywords": ["git", "vcs", "workflow"],
+        "metadata": {
+          "emoji": "\uD83E\uDDF0",
+          "requires": {
+            "bins": ["git"]
+          },
+          "install": [
+            {
+              "id": "brew",
+              "kind": "brew",
+              "formula": "git",
+              "bins": ["git"],
+              "label": "Install git (brew)"
+            },
+            {
+              "id": "apt",
+              "kind": "apt",
+              "package": "git",
+              "bins": ["git"],
+              "os": ["linux"],
+              "label": "Install git (apt)"
+            }
+          ]
+        }
+      }
+    ],
+    "community": []
+  },
+  "stats": {
+    "totalSkills": 17,
+    "curatedCount": 17,
+    "communityCount": 0
+  }
+}

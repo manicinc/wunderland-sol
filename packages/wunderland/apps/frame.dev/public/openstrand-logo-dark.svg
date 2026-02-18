@@ -1,0 +1,12 @@
+<svg viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Infinity Symbol - White for dark mode -->
+  <path d="M50 25c0 6.627-5.373 12-12 12-4.418 0-8.418-1.789-10.607-4.686C25.582 34.211 22.582 36 18 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c4.418 0 8.418 1.789 10.607 4.686C30.418 14.789 34.418 13 39 13c6.627 0 11 5.373 11 12z" 
+        fill="none" 
+        stroke="#ffffff" 
+        stroke-width="3"/>
+  
+  <!-- OpenStrand text - White for dark mode -->
+  <text x="60" y="32" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#ffffff">
+    OpenStrand
+  </text>
+</svg>

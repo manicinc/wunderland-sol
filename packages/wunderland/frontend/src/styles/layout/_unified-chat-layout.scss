@@ -1,0 +1,149 @@
+// File: frontend/src/styles/layout/_unified-chat-layout.scss
+/**
+ * @file _unified-chat-layout.scss
+ * @description Styles for the UnifiedChatLayout.vue component.
+ * Implements a flex column layout where the main content area scrolls,
+ * and the voice input section sticks to the bottom of this layout.
+ * @version 2.5.0 - Finalized sticky voice input positioning and dynamic padding.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+.unified-chat-layout-wrapper {
+  @apply relative flex flex-col w-full h-full overflow-hidden;
+  // Background is typically inherited from App.vue's main content area.
+  // If a specific background is needed for this layout, set it here.
+  // example: background-color: hsl(var(--color-bg-primary-h));
+
+  // CSS variables set by the component's script:
+  // --ephemeral-log-actual-height: Dynamically calculated height of the EphemeralChatLog.
+  // --voice-input-actual-height: Dynamically calculated height of the .unified-voice-input-section.
+
+  // Top padding to account for EphemeralChatLog (if visible) and safe area.
+  // EphemeralChatLog is part of the normal flow at the top if shown.
+  // padding-top: env(safe-area-inset-top, 0px);
+  // Side padding for the entire layout.
+  padding-top: var.$spacing-sm; // Space for log if needed
+  padding-left: var.$spacing-sm; // Standard side padding for layout
+  padding-right: var.$spacing-sm;
+  padding-bottom: var.$spacing-sm; // Space for sticky voice input
+  // padding-left: env(safe-area-inset-left, 0px);
+  // padding-right: env(safe-area-inset-right, 0px);
+  
+  // No global padding-bottom on the wrapper; managed by main content area for its sticky footer.
+}
+
+.unified-chat-background-effects {
+  @apply absolute inset-0 -z-10 overflow-hidden pointer-events-none; // Standard background effects styling
+  .fixed-holo-grid {
+    @apply absolute inset-0 opacity-5; // Very subtle
+    background-image:
+      linear-gradient(hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.2) 1px, transparent 1px);
+    background-size: 30px 30px; // Grid size
+    animation: holoGridScroll 120s linear infinite;
+  }
+  .orbit-container {
+    @apply absolute top-1/2 left-1/2 pointer-events-none;
+    animation-name: orbitPathRotation; // Defined in _animations.scss or global keyframes
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .orbiting-shape {
+    @apply absolute block;
+    animation-name: shapeTransformAndFade; // Defined in _animations.scss or global keyframes
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+}
+
+// Section for EphemeralChatLog, if rendered
+.unified-ephemeral-log-section {
+  @apply flex-shrink-0 relative z-10; // Sits above main content, below header if any
+  padding-left: var.$spacing-sm; // Align with side padding of wrapper
+  padding-right: var.$spacing-sm;
+  padding-top: var.$spacing-sm; // Space from top of layout wrapper
+  // Background for ephemeral log section if needed, or it's transparent
+  // background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.5);
+}
+
+// Main scrollable content area (for agent views, chat messages)
+.unified-main-content-area {
+  @apply flex-grow flex flex-col relative overflow-y-auto overflow-x-hidden min-h-0;
+  // Padding to prevent content from being overlapped by the sticky .unified-voice-input-section
+  // The --voice-input-actual-height variable is set by the UnifiedChatLayout.vue script.
+  padding-bottom: calc(var(--voice-input-actual-height, 80px) + #{var.$spacing-xs}); // Tightened gap
+  padding-left: var.$spacing-sm; // Standard side padding for content within this area
+  padding-right: var.$spacing-sm;
+
+  @include mixins.custom-scrollbar(
+    '--color-accent-interactive', 0.45, 0.7,
+    '--color-bg-primary', 0.15, // Track matches primary bg for subtlety
+    6px, var.$radius-sm
+  );
+
+  // On wider screens, content within might have its own max-width and centering.
+  // This container provides the scroll.
+  @media (min-width: var.$breakpoint-xl) {
+    padding-left: var.$spacing-md; // Reduced from lg
+    padding-right: var.$spacing-md; // Reduced from lg
+  }
+}
+
+// Voice Input Section - now sticky to the bottom of .unified-chat-layout-wrapper
+.unified-voice-input-section {
+  @apply flex-shrink-0 relative; // flex-shrink:0 is important
+  position: sticky;
+  bottom: 0; // Sticks to the bottom of .unified-chat-layout-wrapper
+  z-index: 20; // Above scrolled content within .unified-main-content-area
+
+  // The VoiceInput.vue component itself should have its own background and padding.
+  // This container provides the safe area padding at the very bottom.
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  // If VoiceInput panel needs to be inset from layout edges on wide screens,
+  // this is where that horizontal padding would also apply.
+  // VoiceInput.vue itself uses .layout-wide-screen for its internal centering.
+  // This container ensures the overall section respects layout padding.
+  padding-left: var.$spacing-sm;
+  padding-right: var.$spacing-sm;
+
+  @media (min-width: var.$breakpoint-xl) {
+    padding-left: var.$spacing-md; // Reduced from lg
+    padding-right: var.$spacing-md; // Reduced from lg
+  }
+
+  // Optional: Add a subtle separator line or shadow above the voice input area
+  // border-top: 1px solid hsla(var(--color-border-secondary-h), var(--color-border-secondary-s), var(--color-border-secondary-l), 0.1);
+  // box-shadow: 0 -2px 10px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.03);
+}
+
+.unified-voice-toolbar {
+  @apply flex w-full justify-end;
+  gap: var.$spacing-xs;
+  padding-bottom: var.$spacing-xs;
+}
+
+@media (min-width: var.$breakpoint-xl) {
+  .unified-voice-toolbar {
+    padding-bottom: var.$spacing-sm;
+  }
+}
+
+// Ensure keyframes like holoGridScroll, orbitPathRotation, shapeTransformAndFade are defined globally.
+// Example keyframes (should be in a global _animations.scss or similar):
+@keyframes holoGridScroll {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100px 100px; } // Adjust values for desired scroll speed/effect
+}
+@keyframes orbitPathRotation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes shapeTransformAndFade {
+  0% { transform: scale(0.8) rotate(0deg); opacity: var(--shape-start-opacity, 0.5); }
+  50% { transform: scale(1.2) rotate(180deg); opacity: var(--shape-mid-opacity, 0.8); }
+  100% { transform: scale(0.8) rotate(360deg); opacity: var(--shape-end-opacity, 0.5); }
+}

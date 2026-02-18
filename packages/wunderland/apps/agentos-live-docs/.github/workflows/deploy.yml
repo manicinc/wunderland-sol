@@ -1,0 +1,76 @@
+name: Deploy Docusaurus to GitHub Pages
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Mirror the monorepo layout so relative paths (../../packages/agentos) resolve
+      - name: Checkout agentos-live-docs
+        uses: actions/checkout@v4
+        with:
+          path: apps/agentos-live-docs
+
+      - name: Checkout agentos (source for docs + TypeDoc)
+        uses: actions/checkout@v4
+        with:
+          repository: framersai/agentos
+          path: packages/agentos
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout agentos-extensions (source for extension docs)
+        uses: actions/checkout@v4
+        with:
+          repository: framersai/agentos-extensions
+          path: packages/agentos-extensions
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/agentos-live-docs/package-lock.json
+
+      - name: Install agentos deps (for TypeDoc type resolution)
+        working-directory: packages/agentos
+        run: npm install --ignore-scripts
+
+      - name: Install docs site deps
+        working-directory: apps/agentos-live-docs
+        run: npm ci
+
+      - name: Build site
+        working-directory: apps/agentos-live-docs
+        run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/agentos-live-docs/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

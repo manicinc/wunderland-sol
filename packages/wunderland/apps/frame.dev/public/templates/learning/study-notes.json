@@ -1,0 +1,40 @@
+{
+  "id": "study-notes",
+  "name": "Study Notes",
+  "category": "learning",
+  "icon": "GraduationCap",
+  "description": "Organized notes for learning any topic with active recall and spaced repetition support",
+  "shortDescription": "Structured learning and note-taking",
+  "difficulty": "beginner",
+  "estimatedTime": "20 min",
+  "tags": ["study", "learning", "notes", "education"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 87,
+  "defaultData": {
+    "contentType": "notes"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, study, notes]\ncontentType: notes\ndifficulty: {difficulty}\ncourse: \"{course}\"\ndate: {date}\nreviewCount: 0\nlastReview: null\n---\n\n# {title}\n\n> {summary}\n\n## Meta\n\n| Attribute | Value |\n|-----------|-------|\n| **Course/Source** | {course} |\n| **Date** | {date} |\n| **Difficulty** | {difficulty} |\n| **Review Status** | 🆕 New |\n| **Confidence** | ░░░░░ 0/5 |\n\n## Overview\n\n### Why This Matters\n\nWhy is this topic important? How does it connect to the bigger picture?\n\n### Learning Objectives\n\nAfter studying this, I should be able to:\n\n- [ ] Objective 1: [specific, measurable]\n- [ ] Objective 2: [specific, measurable]\n- [ ] Objective 3: [specific, measurable]\n\n### Prerequisites\n\nWhat should I already know?\n\n- Concept 1: [[Link to notes]]\n- Concept 2: [[Link to notes]]\n\n## Key Concepts\n\n### Concept 1: [Name]\n\n**Definition:** Clear, concise definition in my own words.\n\n**Key Points:**\n- Point 1\n- Point 2\n- Point 3\n\n**Example:** Concrete illustration...\n\n**Analogy:** It's like...\n\n---\n\n### Concept 2: [Name]\n\n**Definition:** Clear, concise definition.\n\n**Key Points:**\n- Point 1\n- Point 2\n\n**Example:** Concrete illustration...\n\n**Common Misconception:** People often think... but actually...\n\n---\n\n### Concept 3: [Name]\n\n**Definition:** Clear, concise definition.\n\n**Formula/Rule:**\n```\nFormula or rule statement\n```\n\n**When to Apply:** Use this when...\n\n## Visual Summary\n\n### Diagram/Mind Map\n\n```\n                    [Central Concept]\n                          │\n           ┌──────────────┼──────────────┐\n           │              │              │\n      [Sub-topic 1]  [Sub-topic 2]  [Sub-topic 3]\n           │              │              │\n        [Detail]      [Detail]      [Detail]\n```\n\n### Comparison Table\n\n| Aspect | Concept A | Concept B |\n|--------|-----------|----------|\n| Definition | | |\n| Use Case | | |\n| Pros | | |\n| Cons | | |\n\n## Examples & Applications\n\n### Example 1: [Basic]\n\n**Problem/Scenario:** Description\n\n**Solution/Application:**\n```\nStep-by-step or code\n```\n\n**Why It Works:** Explanation\n\n### Example 2: [Intermediate]\n\n**Problem/Scenario:** Description\n\n**Solution/Application:** Steps...\n\n### Example 3: [Advanced]\n\n**Problem/Scenario:** Description\n\n**Solution/Application:** Steps...\n\n## Active Recall Questions\n\n*Test yourself! Hide answers, try to recall, then check.*\n\n### Recall Questions\n\n<details>\n<summary>Q1: What is [concept]?</summary>\n\n**Answer:** [Definition in your own words]\n\n</details>\n\n<details>\n<summary>Q2: How does [X] relate to [Y]?</summary>\n\n**Answer:** [Explanation of relationship]\n\n</details>\n\n<details>\n<summary>Q3: When would you use [concept]?</summary>\n\n**Answer:** [Use cases and criteria]\n\n</details>\n\n<details>\n<summary>Q4: What's the difference between [A] and [B]?</summary>\n\n**Answer:** [Comparison]\n\n</details>\n\n### Application Questions\n\n<details>\n<summary>Q5: Given [scenario], how would you apply [concept]?</summary>\n\n**Answer:** [Application steps]\n\n</details>\n\n## Common Mistakes\n\n| Mistake | Why It's Wrong | Correct Approach |\n|---------|----------------|------------------|\n| Mistake 1 | Explanation | How to do it right |\n| Mistake 2 | Explanation | How to do it right |\n\n## Connections\n\n### Related Topics\n\n- [[Related Topic 1]] - How it connects\n- [[Related Topic 2]] - How it connects\n- [[Related Topic 3]] - How it connects\n\n### Real-World Applications\n\n- Application 1: Where this is used in practice\n- Application 2: Industry/career relevance\n\n## Summary\n\n### TL;DR\n\n[2-3 sentence summary of the most important points]\n\n### Key Takeaways\n\n1. **Most Important:** [Point 1]\n2. **Remember:** [Point 2]\n3. **Don't Forget:** [Point 3]\n\n### One-Sentence Summary\n\n[The essence of this topic in one sentence]\n\n## Resources\n\n### Used for These Notes\n\n- Source 1: [Link/Citation]\n- Source 2: [Link/Citation]\n\n### For Further Learning\n\n- **Beginner:** [Resource]\n- **Intermediate:** [Resource]\n- **Advanced:** [Resource]\n- **Practice:** [Exercises/Problems]\n\n## Review Log\n\n| Date | Confidence | Notes | Next Review |\n|------|------------|-------|-------------|\n| {date} | 1/5 | Initial notes | +1 day |\n\n---\n\n*Notes created: {date} | Last reviewed: Never*\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

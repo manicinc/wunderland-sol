@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": false,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "types": ["node"],
+    "baseUrl": "./",
+    "paths": {
+      "@prisma/client": ["../packages/agentos/src/stubs/prismaClient.ts"],
+      "@framers/agentos/*": ["../packages/agentos/src/*"],
+      "@framers/agentos": ["../packages/agentos/src/index.ts"],
+      "@framers/sql-storage-adapter": ["../packages/sql-storage-adapter/src/index.ts"],
+      "@framers/sql-storage-adapter/*": ["../packages/sql-storage-adapter/src/*"],
+      "@framers/shared": ["../packages/shared/src/index.ts"],
+      "@framers/shared/*": ["../packages/shared/src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.d.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests/**",
+    "../frontend/**/*",
+    "../frontend",
+    "*.vue",
+    "**/*.vue",
+    "**/__tests__/**",
+    "**/*.spec.ts",
+    "src/integrations/agentos/guardrails/__tests__/**"
+  ],
+  "ts-node": {
+    "esm": true
+  }
+}

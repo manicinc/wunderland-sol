@@ -1,0 +1,66 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+.github/
+!.github/scripts/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Development/local files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+*.env
+*.env.local
+*.env.development
+*.env.test
+*.env.production
+.eslintrc
+.prettierrc
+.editorconfig
+
+# Build output (except dist/ which we need)
+coverage/
+tmp/
+.nyc_output/
+
+# Documentation
+README.md
+CONTRIBUTING.md
+docs/
+*.md
+
+# Test files
+test/
+__tests__/
+*.spec.js
+*.test.js
+
+# Logs
+logs/
+*.log
+
+# Dependency lock files (keep only package.json)
+yarn.lock
+package-lock.json
+# pnpm-lock.yaml  # keep lockfile for deterministic builds
+
+# Apps not needed in Docker builds (submodules that may be empty)
+apps/agentos-workbench/
+apps/codex/
+apps/frame.dev/
+apps/gitpaywidget/
+apps/agentos-live-docs/
+
+# Other unnecessary files
+.dockerignore
+Dockerfile*
+docker-compose*

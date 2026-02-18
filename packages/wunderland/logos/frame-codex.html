@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frame Codex - Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #14b8a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .control-group {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .control-group h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #333;
+        }
+        
+        .control-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #333;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        
+        .control-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+        
+        .control-group input[type="text"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: inherit;
+        }
+        
+        .control-group input[type="text"]:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .tab-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .tab-divider {
+            width: 1px;
+            height: 30px;
+            background: #e9ecef;
+            margin: 0 0.5rem;
+        }
+        
+        .color-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .layout-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .color-tab, .layout-tab {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-tab.active, .layout-tab.active {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        
+        .color-tab:hover, .layout-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            margin-bottom: 1rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        
+        .preview-box.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .preview-box.brand {
+            background: linear-gradient(135deg, #10b98120, #14b8a620);
+            border: 2px solid #10b98140;
+        }
+        
+        .preview-label {
+            font-size: 0.875rem;
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #10b981, #14b8a6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .download-btn.secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .download-btn.secondary:hover {
+            background: #dee2e6;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .download-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #666;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .icon-preview {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .icon-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .icon-preview.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .icon-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .layout-icon {
+            font-size: 18px;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Frame Codex</h1>
+            <p class="subtitle">Logo Export System</p>
+        </header>
+        
+        <!-- Primary Logo Section -->
+        <section class="section">
+            <h2>Primary Logo Variations</h2>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h3>Logo Components</h3>
+                    <label>
+                        <input type="checkbox" id="includeFrame" checked onchange="updateLogoDisplay(); updateVerticalDisplay()">
+                        Include "Frame" text
+                    </label>
+                    <label>
+                        <input type="checkbox" id="includeSubtitle" checked onchange="updateLogoDisplay(); updateVerticalDisplay()">
+                        Include subtitle
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Subtitle Text</h3>
+                    <input type="text" id="subtitleText" value="The knowledge API of humanity" placeholder="Enter subtitle text" oninput="updateLogoDisplay(); updateVerticalDisplay()">
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab-group layout-tabs">
+                    <button class="layout-tab active" onclick="setLayoutDirection('left')" data-layout="left">
+                        <span class="layout-icon">◧</span> Icon Left
+                    </button>
+                    <button class="layout-tab" onclick="setLayoutDirection('right')" data-layout="right">
+                        <span class="layout-icon">◨</span> Icon Right
+                    </button>
+                </div>
+                
+                <div class="tab-divider"></div>
+                
+                <div class="tab-group color-tabs">
+                    <button class="color-tab active" onclick="setActiveColor('black')" data-color="black">
+                        <span class="color-dot" style="background: #000"></span>
+                        Black
+                    </button>
+                    <button class="color-tab" onclick="setActiveColor('grey')" data-color="grey">
+                        <span class="color-dot" style="background: #9ca3af"></span>
+                        Grey
+                    </button>
+                    <button class="color-tab" onclick="setActiveColor('green')" data-color="green">
+                        <span class="color-dot" style="background: #10b981"></span>
+                        Green
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="380" height="120" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg" id="logoLight">
+                            <!-- Logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark">
+                        <svg width="380" height="120" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg" id="logoDark">
+                            <!-- Logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box brand">
+                        <svg width="380" height="120" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg" id="logoBrand">
+                            <!-- Logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Brand Background</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Vector Formats</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('primary')">Download SVG</button>
+                <button class="download-btn" onclick="downloadSVG('primary-dark')">Download SVG (Dark)</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Transparent Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 1)">PNG @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 2)">PNG @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 3)">PNG @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 4)">PNG @4x</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - White Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 1)">PNG White @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 2)">PNG White @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 3)">PNG White @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 4)">PNG White @4x</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Dark Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 1)">PNG Dark @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 2)">PNG Dark @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 3)">PNG Dark @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 4)">PNG Dark @4x</button>
+            </div>
+        </section>
+        
+        <!-- Icon/Favicon Section -->
+        <section class="section">
+            <h2>Icon / Favicon Variations</h2>
+            
+            <div class="icon-grid">
+                <div class="icon-preview">
+                    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon64">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label">64×64 Icon</div>
+                </div>
+                
+                <div class="icon-preview">
+                    <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon32">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label">32×32 Icon</div>
+                </div>
+                
+                <div class="icon-preview">
+                    <svg width="16" height="16" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon16">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label">16×16 Icon</div>
+                </div>
+                
+                <div class="icon-preview dark">
+                    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon64dark">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label" style="color: #e5e7eb">64×64 Dark</div>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Vector Format</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('icon')">Download Icon SVG</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Transparent Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 16)">16×16</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 32)">32×32</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64)">64×64</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128)">128×128</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256)">256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 512)">512×512</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 1024)">1024×1024</button>
+            </div>
+        </section>
+        
+        <!-- Vertical Style Section -->
+        <section class="section">
+            <h2>Vertical Style / Portrait Layout</h2>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h3>Vertical Components</h3>
+                    <label>
+                        <input type="checkbox" id="verticalIncludeFrame" checked onchange="updateVerticalDisplay()">
+                        Include "Frame" text
+                    </label>
+                    <label>
+                        <input type="checkbox" id="verticalIncludeSubtitle" checked onchange="updateVerticalDisplay()">
+                        Include subtitle
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Alignment</h3>
+                    <label>
+                        <input type="radio" name="verticalAlign" value="center" checked onchange="updateVerticalDisplay()">
+                        Center Aligned
+                    </label>
+                    <label>
+                        <input type="radio" name="verticalAlign" value="left" onchange="updateVerticalDisplay()">
+                        Left Aligned
+                    </label>
+                </div>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box" style="padding: 2rem;">
+                        <svg width="200" height="280" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" id="verticalLight">
+                            <!-- Vertical logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark" style="padding: 2rem;">
+                        <svg width="200" height="280" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" id="verticalDark">
+                            <!-- Vertical logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box brand" style="padding: 2rem;">
+                        <svg width="200" height="280" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" id="verticalBrand">
+                            <!-- Vertical logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Brand Background</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Vector Formats</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('vertical')">Download SVG</button>
+                <button class="download-btn" onclick="downloadSVG('vertical-dark')">Download SVG (Dark)</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Transparent Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 1)">PNG @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 2)">PNG @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 3)">PNG @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 4)">PNG @4x</button>
+            </div>
+            
+            <div class="download-section-title">Square Format - Ideal for App Icons</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('vertical-square', 'transparent', 256)">256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical-square', 'transparent', 512)">512×512</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical-square', 'transparent', 1024)">1024×1024</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical-square', 'white', 1024)">1024×1024 (White BG)</button>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Color configurations for the LOGO parts
+        const colors = {
+            black: {
+                icon: '#000000',
+                frame: '#000000',
+                codex: '#1f2937',
+                codexGradient1: '#111827',
+                codexGradient2: '#374151'
+            },
+            grey: {
+                icon: '#9ca3af',
+                frame: '#9ca3af',
+                codex: '#4b5563',
+                codexGradient1: '#374151',
+                codexGradient2: '#6b7280'
+            },
+            green: {
+                icon: '#10b981',
+                frame: '#10b981',
+                codex: '#059669',
+                codexGradient1: '#047857',
+                codexGradient2: '#10b981'
+            }
+        };
+        
+        let currentColor = 'black';
+        let currentLayout = 'left';
+        let includeFrame = true;
+        let includeSubtitle = true;
+        
+        // Generate the logo with smart positioning
+        function generateLogo(colorKey, isDark = false) {
+            const colorSet = colors[colorKey];
+            includeFrame = document.getElementById('includeFrame').checked;
+            includeSubtitle = document.getElementById('includeSubtitle').checked;
+            const subtitleText = document.getElementById('subtitleText').value;
+            
+            // Adjust colors for dark backgrounds
+            let iconColor = isDark ? '#ffffff' : colorSet.icon;
+            let frameColor = isDark ? '#ffffff' : colorSet.frame;
+            let subtitleColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(107,114,128,0.8)';
+            
+            // Create gradient for Codex
+            const gradientId = `codex-gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            
+            // Smart positioning based on layout direction
+            let iconX, frameX, codexX, subtitleX;
+            
+            if (currentLayout === 'left') {
+                // Icon on left (original layout)
+                iconX = 20;
+                frameX = 74;
+                codexX = includeFrame ? 177 : 74; // Added 2 more pixels (was 175)
+                subtitleX = includeFrame ? 74 : 74;
+                
+                if (!includeFrame) {
+                    iconX = includeSubtitle ? 20 : 70;
+                    codexX = includeSubtitle ? 74 : 130;
+                }
+            } else {
+                // Icon on right (text first, then graphic with proper spacing)
+                if (includeFrame) {
+                    frameX = 20;
+                    codexX = 123; // Added 2 more pixels
+                    iconX = 242; // Moved 8 pixels left (was 250)
+                    subtitleX = 20;
+                } else {
+                    codexX = 20;
+                    iconX = 137; // Moved 8 pixels left (was 145)
+                    subtitleX = 20;
+                }
+            }
+            
+            const subtitleElement = includeSubtitle && subtitleText ? 
+                `<text x="${subtitleX}" y="72" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="11" font-weight="400" fill="${subtitleColor}" letter-spacing="0.3">${subtitleText}</text>` : '';
+            
+            const frameElement = includeFrame ? 
+                `<text x="${frameX}" y="52" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="32" font-weight="700" fill="${frameColor}" letter-spacing="-0.5">Frame</text>` : '';
+            
+            // When standalone, make Codex bigger and bolder
+            const codexSize = includeFrame ? 32 : 34;
+            const codexWeight = includeFrame ? 500 : 600;
+            const codexLetterSpacing = includeFrame ? -0.3 : -0.2;
+            
+            const iconElement = `
+                <g transform="translate(${iconX}, ${currentLayout === 'right' ? 22 : 30})" filter="url(#shadow-${colorKey}-${isDark ? 'dark' : 'light'})">
+                    <!-- Back layer - shadow -->
+                    <rect x="3" y="3" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    <rect x="21" y="3" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    <rect x="3" y="21" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    <rect x="21" y="21" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    
+                    <!-- Mid layer -->
+                    <rect x="1.5" y="1.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    <rect x="19.5" y="1.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    <rect x="1.5" y="19.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    <rect x="19.5" y="19.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    
+                    <!-- Main layer -->
+                    <rect x="0" y="0" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    <rect x="18" y="0" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    <rect x="0" y="18" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    <rect x="18" y="18" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    
+                    <!-- Data flow lines -->
+                    <line x1="17" y1="8" x2="17" y2="26" stroke="white" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="8" y1="17" x2="26" y2="17" stroke="white" stroke-width="1.5" opacity="0.5"/>
+                </g>`;
+            
+            return `
+                <defs>
+                    <filter id="shadow-${colorKey}-${isDark ? 'dark' : 'light'}" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                        <feOffset dx="0" dy="4" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.2' : '0.15'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    
+                    <!-- Gradient for Codex with more interesting colors -->
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="0%">
+                        ${isDark ? 
+                            `<stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                             <stop offset="50%" style="stop-color:#f3f4f6;stop-opacity:1" />
+                             <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />` :
+                            `<stop offset="0%" style="stop-color:${colorSet.codexGradient1};stop-opacity:1" />
+                             <stop offset="50%" style="stop-color:${colorSet.codex};stop-opacity:1" />
+                             <stop offset="100%" style="stop-color:${colorSet.codexGradient2};stop-opacity:1" />`
+                        }
+                    </linearGradient>
+                </defs>
+                
+                <!-- Icon with improved depth -->
+                ${iconElement}
+                
+                <!-- Frame text (if included) -->
+                ${frameElement}
+                
+                <!-- Codex with regular case and gradient -->
+                <text x="${codexX}" y="52" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="${codexSize}" font-weight="${codexWeight}" fill="url(#${gradientId})" letter-spacing="${codexLetterSpacing}" opacity="0.95">Codex</text>
+                
+                <!-- Subtitle (if included) -->
+                ${subtitleElement}
+            `;
+        }
+        
+        // Generate icon
+        function generateIcon(colorKey, isDark = false) {
+            const iconColor = isDark ? '#ffffff' : colors[colorKey].icon;
+            
+            return `
+                <defs>
+                    <filter id="icon-shadow-${colorKey}-${isDark ? 'dark' : 'light'}" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="2" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.2' : '0.15'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <g transform="translate(14, 14)" filter="url(#icon-shadow-${colorKey}-${isDark ? 'dark' : 'light'})">
+                    <!-- Shadow layers -->
+                    <rect x="3" y="3" width="14" height="14" fill="${iconColor}" opacity="0.3" rx="1"/>
+                    <rect x="19" y="3" width="14" height="14" fill="${iconColor}" opacity="0.3" rx="1"/>
+                    <rect x="3" y="19" width="14" height="14" fill="${iconColor}" opacity="0.3" rx="1"/>
+                    <rect x="19" y="19" width="14" height="14" fill="${iconColor}" opacity="0.3" rx="1"/>
+                    
+                    <!-- Mid depth -->
+                    <rect x="1.5" y="1.5" width="14" height="14" fill="${iconColor}" opacity="0.5" rx="1"/>
+                    <rect x="17.5" y="1.5" width="14" height="14" fill="${iconColor}" opacity="0.5" rx="1"/>
+                    <rect x="1.5" y="17.5" width="14" height="14" fill="${iconColor}" opacity="0.5" rx="1"/>
+                    <rect x="17.5" y="17.5" width="14" height="14" fill="${iconColor}" opacity="0.5" rx="1"/>
+                    
+                    <!-- Main blocks -->
+                    <rect x="0" y="0" width="14" height="14" fill="${iconColor}" rx="1"/>
+                    <rect x="16" y="0" width="14" height="14" fill="${iconColor}" rx="1"/>
+                    <rect x="0" y="16" width="14" height="14" fill="${iconColor}" rx="1"/>
+                    <rect x="16" y="16" width="14" height="14" fill="${iconColor}" rx="1"/>
+                    
+                    <!-- Cross lines -->
+                    <line x1="15" y1="7" x2="15" y2="23" stroke="white" stroke-width="1" opacity="0.6"/>
+                    <line x1="7" y1="15" x2="23" y2="15" stroke="white" stroke-width="1" opacity="0.6"/>
+                </g>
+            `;
+        }
+        
+        // Generate vertical logo
+        function generateVerticalLogo(colorKey, isDark = false) {
+            const colorSet = colors[colorKey];
+            const includeFrame = document.getElementById('verticalIncludeFrame').checked;
+            const includeSubtitle = document.getElementById('verticalIncludeSubtitle').checked;
+            const subtitleText = document.getElementById('subtitleText').value;
+            const alignment = document.querySelector('input[name="verticalAlign"]:checked').value;
+            
+            // Adjust colors for dark backgrounds
+            let iconColor = isDark ? '#ffffff' : colorSet.icon;
+            let frameColor = isDark ? '#ffffff' : colorSet.frame;
+            let subtitleColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(107,114,128,0.8)';
+            
+            // Create gradient for Codex
+            const gradientId = `vertical-codex-gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            
+            // Positioning for vertical layout
+            const centerX = alignment === 'center' ? 100 : 30;
+            const iconX = alignment === 'center' ? 80 : 10;
+            let currentY = 30;
+            
+            // When Frame is gone, align Codex with icon's left edge
+            const textX = includeFrame ? centerX : 
+                (alignment === 'center' ? 100 : iconX); // Align with icon's left edge
+            
+            const iconElement = `
+                <g transform="translate(${iconX}, ${currentY})" filter="url(#shadow-vertical-${colorKey}-${isDark ? 'dark' : 'light'})">
+                    <!-- Back layer - shadow -->
+                    <rect x="3" y="3" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    <rect x="21" y="3" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    <rect x="3" y="21" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    <rect x="21" y="21" width="16" height="16" fill="${iconColor}" opacity="0.2" rx="1.5"/>
+                    
+                    <!-- Mid layer -->
+                    <rect x="1.5" y="1.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    <rect x="19.5" y="1.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    <rect x="1.5" y="19.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    <rect x="19.5" y="19.5" width="16" height="16" fill="${iconColor}" opacity="0.4" rx="1.5"/>
+                    
+                    <!-- Main layer -->
+                    <rect x="0" y="0" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    <rect x="18" y="0" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    <rect x="0" y="18" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    <rect x="18" y="18" width="16" height="16" fill="${iconColor}" rx="1.5"/>
+                    
+                    <!-- Data flow lines -->
+                    <line x1="17" y1="8" x2="17" y2="26" stroke="white" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="8" y1="17" x2="26" y2="17" stroke="white" stroke-width="1.5" opacity="0.5"/>
+                </g>`;
+            
+            currentY += 90;
+            
+            const frameElement = includeFrame ? 
+                `<text x="${centerX}" y="${currentY}" font-family="Inter, -apple-system, system-ui, sans-serif" 
+                    font-size="36" font-weight="700" fill="${frameColor}" letter-spacing="-0.5" 
+                    ${alignment === 'center' ? 'text-anchor="middle"' : ''}>Frame</text>` : '';
+            
+            if (includeFrame) currentY += 45;
+            
+            // Make Codex bigger and bolder when standalone (no Frame)
+            const codexSize = includeFrame ? 38 : 42;
+            const codexWeight = includeFrame ? 500 : 600;
+            
+            const codexElement = `<text x="${textX}" y="${currentY}" font-family="Inter, -apple-system, system-ui, sans-serif" 
+                font-size="${codexSize}" font-weight="${codexWeight}" fill="url(#${gradientId})" letter-spacing="-0.4" 
+                ${alignment === 'center' ? 'text-anchor="middle"' : ''}>Codex</text>`;
+            
+            if (includeSubtitle) currentY += 30;
+            
+            const subtitleLines = subtitleText ? subtitleText.split(' ') : [];
+            const line1 = subtitleLines.slice(0, Math.ceil(subtitleLines.length / 2)).join(' ');
+            const line2 = subtitleLines.slice(Math.ceil(subtitleLines.length / 2)).join(' ');
+            
+            const subtitleElement = includeSubtitle && subtitleText ? 
+                `<text x="${textX}" y="${currentY}" font-family="Inter, -apple-system, system-ui, sans-serif" 
+                    font-size="11" font-weight="400" fill="${subtitleColor}" letter-spacing="0.3" 
+                    ${alignment === 'center' ? 'text-anchor="middle"' : ''}>
+                    ${line1}
+                    ${line2 ? `<tspan x="${textX}" dy="14">${line2}</tspan>` : ''}
+                </text>` : '';
+            
+            return `
+                <defs>
+                    <filter id="shadow-vertical-${colorKey}-${isDark ? 'dark' : 'light'}" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                        <feOffset dx="0" dy="4" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.2' : '0.15'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    
+                    <!-- Gradient for Codex -->
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="0%">
+                        ${isDark ? 
+                            `<stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                             <stop offset="50%" style="stop-color:#f3f4f6;stop-opacity:1" />
+                             <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />` :
+                            `<stop offset="0%" style="stop-color:${colorSet.codexGradient1};stop-opacity:1" />
+                             <stop offset="50%" style="stop-color:${colorSet.codex};stop-opacity:1" />
+                             <stop offset="100%" style="stop-color:${colorSet.codexGradient2};stop-opacity:1" />`
+                        }
+                    </linearGradient>
+                </defs>
+                
+                ${iconElement}
+                ${frameElement}
+                ${codexElement}
+                ${subtitleElement}
+            `;
+        }
+        
+        // Update logo display
+        function updateLogoDisplay() {
+            document.getElementById('logoLight').innerHTML = generateLogo(currentColor, false);
+            document.getElementById('logoDark').innerHTML = generateLogo(currentColor, true);
+            document.getElementById('logoBrand').innerHTML = generateLogo(currentColor, false);
+            
+            updateIconDisplay();
+        }
+        
+        // Update icon display
+        function updateIconDisplay() {
+            document.getElementById('icon64').innerHTML = generateIcon(currentColor, false);
+            document.getElementById('icon32').innerHTML = generateIcon(currentColor, false);
+            document.getElementById('icon16').innerHTML = generateIcon(currentColor, false);
+            document.getElementById('icon64dark').innerHTML = generateIcon(currentColor, true);
+        }
+        
+        // Update vertical display
+        function updateVerticalDisplay() {
+            document.getElementById('verticalLight').innerHTML = generateVerticalLogo(currentColor, false);
+            document.getElementById('verticalDark').innerHTML = generateVerticalLogo(currentColor, true);
+            document.getElementById('verticalBrand').innerHTML = generateVerticalLogo(currentColor, false);
+        }
+        
+        // Set active color
+        function setActiveColor(color) {
+            currentColor = color;
+            
+            document.querySelectorAll('.color-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelector(`[data-color="${color}"]`).classList.add('active');
+            
+            updateLogoDisplay();
+            updateVerticalDisplay();
+        }
+        
+        // Set layout direction
+        function setLayoutDirection(direction) {
+            currentLayout = direction;
+            
+            document.querySelectorAll('.layout-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelector(`[data-layout="${direction}"]`).classList.add('active');
+            
+            updateLogoDisplay();
+            updateVerticalDisplay();
+        }
+        
+        // Download SVG
+        function downloadSVG(type) {
+            const includeFrame = document.getElementById('includeFrame').checked;
+            const includeSubtitle = document.getElementById('includeSubtitle').checked;
+            let svgContent, filename;
+            
+            if (type === 'primary') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="380" height="120" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg">
+${generateLogo(currentColor, false)}
+</svg>`;
+                filename = `${includeFrame ? 'frame-' : ''}codex-${currentColor}${currentLayout === 'right' ? '-icon-right' : ''}${includeSubtitle ? '' : '-no-subtitle'}.svg`;
+            } else if (type === 'primary-dark') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="380" height="120" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg">
+${generateLogo(currentColor, true)}
+</svg>`;
+                filename = `${includeFrame ? 'frame-' : ''}codex-${currentColor}-dark${currentLayout === 'right' ? '-icon-right' : ''}${includeSubtitle ? '' : '-no-subtitle'}.svg`;
+            } else if (type === 'vertical') {
+                const verticalIncludeFrame = document.getElementById('verticalIncludeFrame').checked;
+                const verticalIncludeSubtitle = document.getElementById('verticalIncludeSubtitle').checked;
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="280" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, false)}
+</svg>`;
+                filename = `${verticalIncludeFrame ? 'frame-' : ''}codex-vertical-${currentColor}${verticalIncludeSubtitle ? '' : '-no-subtitle'}.svg`;
+            } else if (type === 'vertical-dark') {
+                const verticalIncludeFrame = document.getElementById('verticalIncludeFrame').checked;
+                const verticalIncludeSubtitle = document.getElementById('verticalIncludeSubtitle').checked;
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="280" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, true)}
+</svg>`;
+                filename = `${verticalIncludeFrame ? 'frame-' : ''}codex-vertical-${currentColor}-dark${verticalIncludeSubtitle ? '' : '-no-subtitle'}.svg`;
+            } else {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+${generateIcon(currentColor, false)}
+</svg>`;
+                filename = `frame-codex-icon-${currentColor}.svg`;
+            }
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Download PNG
+        function downloadPNG(type, background, scale) {
+            const includeFrame = document.getElementById('includeFrame').checked;
+            const includeSubtitle = document.getElementById('includeSubtitle').checked;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            let svgContent, filename;
+            
+            if (type === 'primary') {
+                canvas.width = 380 * scale;
+                canvas.height = 120 * scale;
+                
+                const isDark = background === 'dark';
+                svgContent = `<svg width="${380 * scale}" height="${120 * scale}" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg">
+${generateLogo(currentColor, isDark)}
+</svg>`;
+                filename = `${includeFrame ? 'frame-' : ''}codex-${currentColor}-${background}${currentLayout === 'right' ? '-icon-right' : ''}${includeSubtitle ? '' : '-no-subtitle'}-${scale}x.png`;
+            } else if (type === 'vertical') {
+                canvas.width = 200 * scale;
+                canvas.height = 280 * scale;
+                
+                const isDark = background === 'dark';
+                const verticalIncludeFrame = document.getElementById('verticalIncludeFrame').checked;
+                const verticalIncludeSubtitle = document.getElementById('verticalIncludeSubtitle').checked;
+                svgContent = `<svg width="${200 * scale}" height="${280 * scale}" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, isDark)}
+</svg>`;
+                filename = `${verticalIncludeFrame ? 'frame-' : ''}codex-vertical-${currentColor}-${background}${verticalIncludeSubtitle ? '' : '-no-subtitle'}-${scale}x.png`;
+            } else if (type === 'vertical-square') {
+                canvas.width = scale;
+                canvas.height = scale;
+                
+                const isDark = background === 'dark';
+                const verticalIncludeFrame = document.getElementById('verticalIncludeFrame').checked;
+                const verticalIncludeSubtitle = document.getElementById('verticalIncludeSubtitle').checked;
+                // Use viewBox that centers the content in a square
+                svgContent = `<svg width="${scale}" height="${scale}" viewBox="-20 20 240 240" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, isDark)}
+</svg>`;
+                filename = `${verticalIncludeFrame ? 'frame-' : ''}codex-square-${currentColor}-${background}-${scale}x${scale}.png`;
+            } else {
+                canvas.width = scale;
+                canvas.height = scale;
+                
+                svgContent = `<svg width="${scale}" height="${scale}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+${generateIcon(currentColor, false)}
+</svg>`;
+                filename = `frame-codex-icon-${currentColor}-${scale}x${scale}.png`;
+            }
+            
+            // Fill background if needed
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (background === 'dark') {
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            // transparent = no fill
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob(function(pngBlob) {
+                    const a = document.createElement('a');
+                    const pngUrl = URL.createObjectURL(pngBlob);
+                    a.href = pngUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(pngUrl);
+                }, 'image/png');
+                
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLogoDisplay();
+            updateVerticalDisplay();
+        });
+    </script>
+</body>
+</html>

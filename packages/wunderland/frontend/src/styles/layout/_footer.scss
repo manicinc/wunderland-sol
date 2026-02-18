@@ -1,0 +1,262 @@
+// File: frontend/src/styles/layout/_footer.scss
+/**
+ * @file _footer.scss
+ * @description Styles for the main application footer (Footer.vue), implementing the
+ * "Ephemeral Harmony" theme. Features a refined, adaptive height, clear visual hierarchy,
+ * neo-holographic accents for interactive elements, and theme-aware styling.
+ * Ensures content fits appropriately and the footer remains visually appealing yet unobtrusive.
+ *
+ * @role Defines the visual appearance and layout of the global application footer.
+ * @dependencies `../abstracts/variables` (for spacing, breakpoints, z-indexes, colors),
+ * `../abstracts/mixins` (for glassmorphism, neomorphism, focus rings).
+ * @assumptions Footer.vue component structure matches the selectors used.
+ * CSS custom properties are set by the theme engine.
+ * Keyframe animations (e.g., subtlePulse) are defined in `_keyframes.scss`.
+ * @version 3.0.1 - Corrected SASS calculation for blur amount in glassmorphic-pane mixin call.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use '../components/buttons' as buttonsFile; // For button styling consistency
+
+.app-footer-ephemeral {
+  // --- Base Structure & Sizing ---
+  --footer-min-height: calc(#{var.$footer-height-default} * 0.9);
+  --footer-padding-y: #{var.$spacing-xs};
+  --footer-padding-x-mobile: #{var.$spacing-sm};
+  --footer-padding-x-desktop: #{var.$spacing-lg};
+  // Define a CSS variable for the footer's blur amount
+  // var.$default-blur-glass is '10px'. We want 10px * 0.6 = 6px.
+  --footer-blur-amount: #{10 * 0.6}px; // This will output 6px
+
+  min-height: var(--footer-min-height);
+  padding: var(--footer-padding-y) var(--footer-padding-x-mobile);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: calc(var.$z-index-sticky - 5);
+
+  // --- Appearance: Subtle Glassmorphism & Theming ---
+  @include mixins.glassmorphic-pane(
+    $bg-color-css-var-prefix: '--color-bg-primary',
+    $border-color-css-var-prefix: '--color-border-secondary',
+    $blur-amount-css-var: '--footer-blur-amount', // Pass the CSS variable name
+    $shadow-css-var: 'none',
+    // SCSS Fallbacks
+    $fb-bg-h: var.$default-color-bg-primary-h,
+    $fb-bg-s: var.$default-color-bg-primary-s,
+    $fb-bg-l: var.$default-color-bg-primary-l,
+    $fb-bg-a: 0.65,
+    $fb-border-h: var.$default-color-border-secondary-h,
+    $fb-border-s: var.$default-color-border-secondary-s,
+    $fb-border-l: var.$default-color-border-secondary-l,
+    $fb-border-a: 0.15,
+    $fb-blur: #{10 * 0.6}px, // SASS computed fallback: 6px
+    $fb-shadow: var.$scss-box-shadow-sm // A light shadow as fallback if --shadow-depth-none is not defined
+  );
+  border: none;
+  border-top: 1px solid hsla(var(--color-border-glass-h, var.$default-color-border-glass-h), var(--color-border-glass-s, var.$default-color-border-glass-s), var(--color-border-glass-l, var.$default-color-border-glass-l), calc(var(--color-border-glass-a, #{var.$default-color-border-glass-a}) * 0.4));
+  box-shadow: 0 -4px 20px hsla(var(--shadow-color-h, var.$default-shadow-color-h), var(--shadow-color-s, var.$default-shadow-color-s), var(--shadow-color-l, var.$default-shadow-color-l), 0.04);
+
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  font-size: var.$font-size-sm;
+
+  transition: background-color var.$duration-smooth var.$ease-out-quad,
+              border-color var.$duration-smooth var.$ease-out-quad,
+              color var.$duration-smooth var.$ease-out-quad;
+
+  @media (min-width: var.$breakpoint-md) {
+    padding: var(--footer-padding-y) var(--footer-padding-x-desktop);
+  }
+
+  .footer-content-wrapper-ephemeral {
+    width: 100%;
+    max-width: var.$site-max-width;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var.$spacing-xs / 2);
+  }
+
+  .footer-main-row-ephemeral {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var.$spacing-md;
+    padding: calc(var.$spacing-xs / 2) 0;
+  }
+
+  .footer-branding-ephemeral {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-sm;
+
+    .footer-logo-ephemeral {
+      width: 2rem;
+      height: 2rem;
+      opacity: 0.8;
+      transition: opacity var.$duration-quick, filter var.$duration-quick;
+      filter: drop-shadow(0 0 4px hsla(var(--color-logo-primary-h, var(--color-accent-primary-h)), var(--color-logo-primary-s, var(--color-accent-primary-s)), var(--color-logo-primary-l, var(--color-accent-primary-l)), 0.4));
+      &:hover {
+        opacity: 1;
+        filter: drop-shadow(0 0 7px hsla(var(--color-logo-primary-h, var(--color-accent-primary-h)), var(--color-logo-primary-s, var(--color-accent-primary-s)), var(--color-logo-primary-l, var(--color-accent-primary-l)), 0.6));
+      }
+    }
+
+    .brand-text-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.3;
+
+      .brand-title-ephemeral {
+        font-family: var(--font-family-display, var.$font-family-display);
+        font-size: var.$font-size-sm;
+        font-weight: 600;
+        color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), calc(var(--color-text-secondary-l) + 10%));
+        letter-spacing: 0.01em;
+      }
+      .brand-powered-by-ephemeral {
+        font-size: 0.7rem;
+        color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), calc(var(--color-text-muted-l) + 5%));
+        a {
+          font-weight: 500;
+          color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), calc(var(--color-text-muted-l) + 15%));
+          &:hover {
+            color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l));
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  .footer-status-actions-ephemeral {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-sm;
+  }
+
+  .api-status-indicator-ephemeral {
+    display: inline-flex;
+    align-items: center;
+    padding: var.$spacing-xs calc(var.$spacing-sm - 2px);
+    border-radius: var.$radius-md;
+    background-color: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.6);
+    border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.25);
+    font-size: calc(var.$font-size-xs * 0.95);
+    line-height: 1;
+    @include mixins.neomorphic-inset(
+      $fill-color-var-prefix: '--color-bg-tertiary', $fb-fill-a: 0.6,
+      $blur: 3px, $distance: 1px, $shadow-opacity-var: '--shadow-opacity-soft', $radius: var.$radius-md
+    );
+
+    .icon { width: 1rem; height: 1rem; margin-right: calc(var.$spacing-xs * 0.8); }
+    .status-text { /* Color dynamically applied by :class in Vue component */ }
+    .status-dot {
+      width: 9px; height: 9px; border-radius: var.$radius-full;
+      margin-left: var.$spacing-xs;
+      box-shadow: 0 0 5px 1px currentColor;
+      animation: pulseStatus 2s var.$ease-in-out-sine infinite;
+    }
+  }
+
+  .footer-action-button-ephemeral {
+    @include buttonsFile.btn-ghost;
+    padding: calc(var.$spacing-xs + 1px) var.$spacing-sm !important;
+    border-radius: var.$radius-md !important;
+    font-size: var.$font-size-xs;
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), calc(var(--color-text-muted-l) + 10%));
+    gap: var.$spacing-xs;
+
+    .icon { width: 1.05rem; height: 1.05rem; opacity: 0.75; }
+
+    &:hover, &.active {
+      background-color: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.15) !important;
+      color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l)) !important;
+      border-color: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3);
+      box-shadow: 0 0 8px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.2);
+      .icon { opacity: 1; transform: scale(1.05); }
+    }
+    &:active { transform: scale(0.96); }
+  }
+
+  .footer-attributions-ephemeral {
+    width: 100%;
+    text-align: center;
+    font-size: calc(var.$font-size-xs * 0.9);
+    padding: calc(var.$spacing-xs / 2) 0;
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), calc(var(--color-text-muted-l) + 15%));
+    font-family: var(--font-mono, var.$font-family-mono);
+    letter-spacing: 0.025em;
+    opacity: 0.7;
+    border-top: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.08);
+    margin-top: var.$spacing-xs;
+
+    a {
+      color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), calc(var(--color-text-muted-l) + 20%));
+      text-decoration: none;
+      border-bottom: 1px dotted hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.3);
+      &:hover {
+        color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l));
+        border-bottom-color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.5);
+      }
+    }
+  }
+}
+
+.logs-panel-wrapper-ephemeral {
+  position: fixed;
+  bottom: var(--footer-min-height);
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(400px, 60vw, 900px);
+  max-height: 40vh;
+  z-index: calc(var.$z-index-sticky - 2);
+  pointer-events: none;
+
+  .logs-display-card-ephemeral {
+    @include mixins.glassmorphic-pane(
+      $bg-color-css-var-prefix: '--color-bg-tertiary',
+      $border-color-css-var-prefix: '--color-border-glass',
+      $blur-amount-css-var: var.$default-blur-glass, // Using direct variable for CSS var name
+      $shadow-css-var: '--shadow-depth-xl',
+      $fb-bg-a: 0.9,
+      $fb-border-a: 0.45,
+      $fb-blur: var.$default-blur-glass // Fallback if CSS var not defined
+    );
+    border-radius: var.$radius-xl var.$radius-xl 0 0;
+    overflow: hidden;
+    pointer-events: auto;
+  }
+}
+
+@keyframes slideInUpFromBottomLogs {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slideOutDownLogs {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(30px) scale(0.97); }
+}
+
+.slide-up-fade-logs-enter-active {
+  animation: slideInUpFromBottomLogs var.$duration-movement var.$ease-out-expo;
+}
+.slide-up-fade-logs-leave-active {
+  animation: slideOutDownLogs var.$duration-smooth var.$ease-in-expo forwards;
+}
+
+// Ensure pulseStatus keyframe is defined if used by .status-dot
+// This should ideally be in _keyframes.scss
+@keyframes pulseStatus {
+  0%, 100% { box-shadow: 0 0 5px 1px currentColor; opacity: 0.7; }
+  50% { box-shadow: 0 0 10px 3px currentColor; opacity: 1; }
+}

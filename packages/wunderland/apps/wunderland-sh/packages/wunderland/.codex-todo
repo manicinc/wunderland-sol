@@ -1,0 +1,4 @@
+1. [x] Replace sqliteMemoryAdapter usage in backend/server.ts with MemoryStoreAdapter and remove legacy file
+2. [x] Provide ambient type declarations for @framers/sql-storage-adapter to satisfy backend TypeScript (via tsconfig path fix)
+3. [ ] Resolve residual implicit-any and control flow issues flagged in backend build
+4. [ ] Add targeted tests for createDatabase env detection and adapter fallbacks

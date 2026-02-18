@@ -1,0 +1,6 @@
+id: openstrand-playbooks
+title: Operating Playbooks
+summary: Practical guides for indexing, publishing, and deploying Codex/OpenStrand sites.
+tags: [playbook, ops]
+defaultStrand: indexing
+

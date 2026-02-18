@@ -1,0 +1,25 @@
+{
+  "name": "@gitpaywidget/sdk",
+  "version": "0.1.0-alpha.0",
+  "description": "Client-side SDK for embedding GitPayWidget on any static site.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "build": "pnpm run clean && tsc -p tsconfig.json && node ../../.github/scripts/fix-esm-imports.js dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "rimraf": "^6.0.1"
+  }
+}

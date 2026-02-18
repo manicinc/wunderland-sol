@@ -1,0 +1,247 @@
+# Cloudflare Pages redirects for quarry.space domain
+# These rewrites map quarry.space paths to /quarry/* paths in the static export
+#
+# NOTE: Cloudflare Pages _redirects does NOT support domain-specific rules!
+# The https://domain.com/path format is IGNORED. Use simple /path format only.
+#
+# Route structure:
+# - Static assets (sitemap.xml, robots.txt) served directly from root
+# - Marketing pages at root: /about, /faq, /privacy, /waitlist, etc.
+# - Feature pages under /app/: /app/write, /app/reflect, /app/plan, etc.
+
+# ============================================
+# STATIC SEO FILES (these exist in public/ and should be served as-is)
+# No rewrite needed - Cloudflare serves static files automatically
+# ============================================
+
+
+# ============================================
+# ROOT & LANDING
+# ============================================
+https://quarry.space/ /quarry/landing/ 200
+https://www.quarry.space/ /quarry/landing/ 200
+https://quarry.space/landing /quarry/landing/ 200
+https://quarry.space/landing/* /quarry/landing/:splat 200
+https://www.quarry.space/landing /quarry/landing/ 200
+https://www.quarry.space/landing/* /quarry/landing/:splat 200
+
+# ============================================
+# MARKETING/INFO PAGES (stay at root)
+# ============================================
+https://quarry.space/about /quarry/about/ 200
+https://quarry.space/faq /quarry/faq/ 200
+https://quarry.space/privacy /quarry/privacy/ 200
+https://quarry.space/waitlist /quarry/waitlist/ 200
+https://quarry.space/api /quarry/api/ 200
+https://quarry.space/api-docs /quarry/api-docs/ 200
+https://quarry.space/api-playground /quarry/api-playground/ 200
+https://quarry.space/architecture /quarry/architecture/ 200
+https://quarry.space/self-host /quarry/self-host/ 200
+https://quarry.space/changelog /quarry/changelog/ 200
+https://quarry.space/costs /quarry/costs/ 200
+https://quarry.space/canvas-showcase /quarry/canvas-showcase/ 200
+
+https://www.quarry.space/about /quarry/about/ 200
+https://www.quarry.space/faq /quarry/faq/ 200
+https://www.quarry.space/privacy /quarry/privacy/ 200
+https://www.quarry.space/waitlist /quarry/waitlist/ 200
+https://www.quarry.space/api /quarry/api/ 200
+https://www.quarry.space/api-docs /quarry/api-docs/ 200
+https://www.quarry.space/api-playground /quarry/api-playground/ 200
+https://www.quarry.space/architecture /quarry/architecture/ 200
+https://www.quarry.space/self-host /quarry/self-host/ 200
+https://www.quarry.space/changelog /quarry/changelog/ 200
+https://www.quarry.space/costs /quarry/costs/ 200
+https://www.quarry.space/canvas-showcase /quarry/canvas-showcase/ 200
+
+# ============================================
+# MAIN APP ENTRY (SPA)
+# ============================================
+https://quarry.space/app /quarry/app/ 200
+https://www.quarry.space/app /quarry/app/ 200
+
+# ============================================
+# FEATURE PAGES (under /app/)
+# ============================================
+
+# Core features
+https://quarry.space/app/write /quarry/write/ 200
+https://quarry.space/app/reflect /quarry/reflect/ 200
+https://quarry.space/app/plan /quarry/plan/ 200
+
+# Navigation/browsing
+https://quarry.space/app/dashboard /quarry/dashboard/ 200
+https://quarry.space/app/browse /quarry/browse/ 200
+https://quarry.space/app/search /quarry/search/ 200
+https://quarry.space/app/graph /quarry/graph/ 200
+https://quarry.space/app/new /quarry/new/ 200
+
+# Learning & knowledge
+https://quarry.space/app/learn /quarry/learn/ 200
+https://quarry.space/app/spiral-path /quarry/spiral-path/ 200
+https://quarry.space/app/research /quarry/research/ 200
+https://quarry.space/app/suggestions /quarry/suggestions/ 200
+
+# Organization
+https://quarry.space/app/collections /quarry/collections/ 200
+https://quarry.space/app/collections/* /quarry/collections/:splat 200
+https://quarry.space/app/tags /quarry/tags/ 200
+https://quarry.space/app/supertags /quarry/supertags/ 200
+https://quarry.space/app/templates /quarry/templates/ 200
+
+# Tracking & analytics
+https://quarry.space/app/analytics /quarry/analytics/ 200
+https://quarry.space/app/activity /quarry/activity/ 200
+https://quarry.space/app/evolution /quarry/evolution/ 200
+
+# Settings & misc
+https://quarry.space/app/settings /quarry/settings/ 200
+https://quarry.space/app/batch-generate /quarry/batch-generate/ 200
+
+# Dynamic exploration routes
+https://quarry.space/app/explore/* /quarry/explore/:splat 200
+
+# www variants for feature pages
+https://www.quarry.space/app/write /quarry/write/ 200
+https://www.quarry.space/app/reflect /quarry/reflect/ 200
+https://www.quarry.space/app/plan /quarry/plan/ 200
+https://www.quarry.space/app/dashboard /quarry/dashboard/ 200
+https://www.quarry.space/app/browse /quarry/browse/ 200
+https://www.quarry.space/app/search /quarry/search/ 200
+https://www.quarry.space/app/graph /quarry/graph/ 200
+https://www.quarry.space/app/new /quarry/new/ 200
+https://www.quarry.space/app/learn /quarry/learn/ 200
+https://www.quarry.space/app/spiral-path /quarry/spiral-path/ 200
+https://www.quarry.space/app/research /quarry/research/ 200
+https://www.quarry.space/app/suggestions /quarry/suggestions/ 200
+https://www.quarry.space/app/collections /quarry/collections/ 200
+https://www.quarry.space/app/collections/* /quarry/collections/:splat 200
+https://www.quarry.space/app/tags /quarry/tags/ 200
+https://www.quarry.space/app/supertags /quarry/supertags/ 200
+https://www.quarry.space/app/templates /quarry/templates/ 200
+https://www.quarry.space/app/analytics /quarry/analytics/ 200
+https://www.quarry.space/app/activity /quarry/activity/ 200
+https://www.quarry.space/app/evolution /quarry/evolution/ 200
+https://www.quarry.space/app/settings /quarry/settings/ 200
+https://www.quarry.space/app/batch-generate /quarry/batch-generate/ 200
+https://www.quarry.space/app/explore/* /quarry/explore/:splat 200
+
+# ============================================
+# CATCH-ALL FOR APP ROUTES
+# ============================================
+# Any other /app/* paths → /quarry/*
+https://quarry.space/app/* /quarry/:splat 200
+https://www.quarry.space/app/* /quarry/:splat 200
+
+# ============================================
+# REDIRECTS FOR WRONG APP PATHS AT ROOT
+# ============================================
+# Redirect app pages accessed at root to /app/ prefix
+https://quarry.space/new https://quarry.space/app/new 301
+https://quarry.space/write https://quarry.space/app/write 301
+https://quarry.space/reflect https://quarry.space/app/reflect 301
+https://quarry.space/plan https://quarry.space/app/plan 301
+https://quarry.space/dashboard https://quarry.space/app/dashboard 301
+https://quarry.space/browse https://quarry.space/app/browse 301
+https://quarry.space/search https://quarry.space/app/search 301
+https://quarry.space/graph https://quarry.space/app/graph 301
+https://quarry.space/learn https://quarry.space/app/learn 301
+https://quarry.space/research https://quarry.space/app/research 301
+https://quarry.space/settings https://quarry.space/app/settings 301
+https://quarry.space/analytics https://quarry.space/app/analytics 301
+https://quarry.space/collections https://quarry.space/app/collections 301
+https://quarry.space/tags https://quarry.space/app/tags 301
+https://quarry.space/templates https://quarry.space/app/templates 301
+
+https://www.quarry.space/new https://www.quarry.space/app/new 301
+https://www.quarry.space/write https://www.quarry.space/app/write 301
+https://www.quarry.space/reflect https://www.quarry.space/app/reflect 301
+https://www.quarry.space/plan https://www.quarry.space/app/plan 301
+https://www.quarry.space/dashboard https://www.quarry.space/app/dashboard 301
+https://www.quarry.space/browse https://www.quarry.space/app/browse 301
+https://www.quarry.space/search https://www.quarry.space/app/search 301
+https://www.quarry.space/graph https://www.quarry.space/app/graph 301
+https://www.quarry.space/learn https://www.quarry.space/app/learn 301
+https://www.quarry.space/research https://www.quarry.space/app/research 301
+https://www.quarry.space/settings https://www.quarry.space/app/settings 301
+https://www.quarry.space/analytics https://www.quarry.space/app/analytics 301
+https://www.quarry.space/collections https://www.quarry.space/app/collections 301
+https://www.quarry.space/tags https://www.quarry.space/app/tags 301
+https://www.quarry.space/templates https://www.quarry.space/app/templates 301
+
+# ============================================
+# STATIC ASSETS - SERVE DIRECTLY (NO REWRITE)
+# ============================================
+# These rules MUST come before the catch-all to prevent
+# static assets from being rewritten to /quarry/:path/
+# which would cause 404 errors for WASM, JS, CSS, etc.
+
+# WebAssembly binaries (esbuild, sql.js, onnx, etc.)
+https://quarry.space/*.wasm /:splat.wasm 200
+https://www.quarry.space/*.wasm /:splat.wasm 200
+
+# JavaScript and CSS bundles
+https://quarry.space/*.js /:splat.js 200
+https://www.quarry.space/*.js /:splat.js 200
+https://quarry.space/*.css /:splat.css 200
+https://www.quarry.space/*.css /:splat.css 200
+
+# JSON files (manifests, configs, etc.)
+https://quarry.space/*.json /:splat.json 200
+https://www.quarry.space/*.json /:splat.json 200
+
+# Images
+https://quarry.space/*.png /:splat.png 200
+https://www.quarry.space/*.png /:splat.png 200
+https://quarry.space/*.jpg /:splat.jpg 200
+https://www.quarry.space/*.jpg /:splat.jpg 200
+https://quarry.space/*.jpeg /:splat.jpeg 200
+https://www.quarry.space/*.jpeg /:splat.jpeg 200
+https://quarry.space/*.gif /:splat.gif 200
+https://www.quarry.space/*.gif /:splat.gif 200
+https://quarry.space/*.svg /:splat.svg 200
+https://www.quarry.space/*.svg /:splat.svg 200
+https://quarry.space/*.webp /:splat.webp 200
+https://www.quarry.space/*.webp /:splat.webp 200
+https://quarry.space/*.ico /:splat.ico 200
+https://www.quarry.space/*.ico /:splat.ico 200
+
+# Fonts
+https://quarry.space/*.woff /:splat.woff 200
+https://www.quarry.space/*.woff /:splat.woff 200
+https://quarry.space/*.woff2 /:splat.woff2 200
+https://www.quarry.space/*.woff2 /:splat.woff2 200
+https://quarry.space/*.ttf /:splat.ttf 200
+https://www.quarry.space/*.ttf /:splat.ttf 200
+https://quarry.space/*.otf /:splat.otf 200
+https://www.quarry.space/*.otf /:splat.otf 200
+https://quarry.space/*.eot /:splat.eot 200
+https://www.quarry.space/*.eot /:splat.eot 200
+
+# Other assets
+https://quarry.space/*.xml /:splat.xml 200
+https://www.quarry.space/*.xml /:splat.xml 200
+https://quarry.space/*.txt /:splat.txt 200
+https://www.quarry.space/*.txt /:splat.txt 200
+https://quarry.space/*.pdf /:splat.pdf 200
+https://www.quarry.space/*.pdf /:splat.pdf 200
+https://quarry.space/*.mp3 /:splat.mp3 200
+https://www.quarry.space/*.mp3 /:splat.mp3 200
+https://quarry.space/*.mp4 /:splat.mp4 200
+https://www.quarry.space/*.mp4 /:splat.mp4 200
+https://quarry.space/*.webm /:splat.webm 200
+https://www.quarry.space/*.webm /:splat.webm 200
+https://quarry.space/*.ogg /:splat.ogg 200
+https://www.quarry.space/*.ogg /:splat.ogg 200
+https://quarry.space/*.bin /:splat.bin 200
+https://www.quarry.space/*.bin /:splat.bin 200
+https://quarry.space/*.onnx /:splat.onnx 200
+https://www.quarry.space/*.onnx /:splat.onnx 200
+
+# Next.js static assets
+https://quarry.space/_next/* /_next/:splat 200
+https://www.quarry.space/_next/* /_next/:splat 200
+
+# Catch-all for root marketing pages (less specific, comes last)
+https://quarry.space/:path /quarry/:path/ 200
+https://www.quarry.space/:path /quarry/:path/ 200

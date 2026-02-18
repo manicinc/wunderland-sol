@@ -1,0 +1,71 @@
+# Auto-Categorization Configuration
+# This file configures the automatic categorization of strands from inbox
+
+# Enable/disable auto-categorization
+enabled: true
+
+# Confidence threshold for auto-move (0.0 - 1.0)
+# Strands with confidence >= threshold will be auto-moved
+confidence_threshold: 0.8
+
+# Auto-merge PRs that meet the confidence threshold
+auto_merge_enabled: true
+
+# Use LLM for strands that don't meet confidence threshold
+# LLM will suggest category with human approval
+use_llm_fallback: true
+
+# Path where new strands land by default
+inbox_path: weaves/inbox/
+
+# Paths to exclude from category matching
+excluded_paths:
+  - weaves/inbox/
+  - weaves/.templates/
+  - weaves/.archive/
+
+# Known category mappings (keywords -> paths)
+# These supplement the built-in NLP categorization
+category_hints:
+  tutorials:
+    path: weaves/wiki/tutorials/
+    keywords:
+      - tutorial
+      - guide
+      - how-to
+      - walkthrough
+      - step-by-step
+
+  reference:
+    path: weaves/wiki/reference/
+    keywords:
+      - api
+      - reference
+      - documentation
+      - spec
+
+  concepts:
+    path: weaves/wiki/concepts/
+    keywords:
+      - concept
+      - theory
+      - architecture
+      - design pattern
+
+  best-practices:
+    path: weaves/wiki/best-practices/
+    keywords:
+      - best practice
+      - recommendation
+      - guideline
+
+# Notification settings
+notifications:
+  # Post comment on PR when categorization is suggested
+  post_comment: true
+  # Add labels for review status
+  add_labels: true
+  # Label for strands needing human review
+  needs_triage_label: needs-triage
+  # Label for auto-categorized strands
+  auto_categorized_label: auto-categorized

@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "Registrazione in corso...",
+    "processing": "Elaborazione della voce...",
+    "transcribing": "Trascrizione dell'audio...",
+    "listening": "In ascolto...",
+    "speakNow": "Parla ora",
+    "clickToSpeak": "Fai clic per parlare",
+    "stopRecording": "Interrompi registrazione",
+    "microphoneAccess": "È necessario l'accesso al microfono",
+    "noSpeechDetected": "Nessuna voce rilevata",
+    "transcriptionComplete": "Trascrizione completata"
+  },
+  "chat": {
+    "thinking": "Sto riflettendo...",
+    "generating": "Generazione della risposta...",
+    "messageEmpty": "Il messaggio non può essere vuoto",
+    "sendMessage": "Invia messaggio",
+    "newChat": "Nuova chat",
+    "clearHistory": "Cancella cronologia",
+    "typingIndicator": "L'IA sta scrivendo...",
+    "copyCode": "Copia codice",
+    "codeCopied": "Codice copiato negli appunti",
+    "retry": "Riprova",
+    "regenerate": "Rigenera risposta"
+  },
+  "modes": {
+    "coding": "Domande e risposte di programmazione",
+    "codingDesc": "Ottieni aiuto per domande di programmazione ed esempi di codice",
+    "systemDesign": "Progettazione di sistemi",
+    "systemDesignDesc": "Progetta architetture e crea diagrammi",
+    "meetingSummary": "Riepilogo riunione",
+    "meetingSummaryDesc": "Riassumi le riunioni ed evidenzia i punti chiave",
+    "general": "Generale",
+    "generalDesc": "Conversazioni e domande generiche"
+  },
+  "cost": {
+    "title": "Utilizzo API",
+    "current": "Sessione corrente",
+    "total": "Utilizzo totale",
+    "threshold": "Soglia di costo",
+    "warning": "Soglia di costo prossima",
+    "exceeded": "Soglia di costo superata",
+    "reset": "Reimposta contatore"
+  },
+  "settings": {
+    "speechRecognition": "Riconoscimento vocale",
+    "whisperAPI": "API Whisper",
+    "browserSpeech": "Voce del browser",
+    "textToSpeech": "Sintesi vocale",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "TTS del browser",
+    "apiKeys": "Chiavi API",
+    "openAIKey": "Chiave API OpenAI",
+    "anthropicKey": "Chiave API Anthropic",
+    "modelPreferences": "Preferenze del modello",
+    "costLimits": "Limiti di costo",
+    "sessionLimit": "Limite di sessione",
+    "dailyLimit": "Limite giornaliero",
+    "monthlyLimit": "Limite mensile"
+  }
+}

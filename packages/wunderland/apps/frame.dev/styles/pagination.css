@@ -1,0 +1,399 @@
+/**
+ * Pagination Styles
+ * @module styles/pagination
+ *
+ * CSS for paginated document view mode.
+ * Supports letter and A4 page sizes with print-friendly styles.
+ */
+
+/* ============================================================================
+   PAGINATED VIEW
+   ========================================================================== */
+
+.paginated-view {
+  /* Container for paginated content */
+  width: 100%;
+  background: #f5f5f5;
+  padding: 2rem 0;
+  min-height: 100vh;
+}
+
+.paginated-content {
+  /* Content wrapper in paginated mode */
+  max-width: none;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* ============================================================================
+   PAGE STYLING
+   ========================================================================== */
+
+.paginated-view .page {
+  /* Individual page */
+  width: 8.5in;
+  min-height: 11in;
+  padding: 1in;
+  margin: 0 auto 2rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  page-break-after: always;
+  page-break-inside: avoid;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* A4 page size variant */
+.paginated-view.page-size-a4 .page {
+  width: 8.27in;
+  min-height: 11.69in;
+  padding: 1in 0.79in;
+}
+
+/* Last page - no margin bottom */
+.paginated-view .page:last-child {
+  margin-bottom: 0;
+}
+
+/* Page number indicator */
+.paginated-view .page::after {
+  content: attr(data-page-number);
+  position: absolute;
+  bottom: 0.5in;
+  right: 1in;
+  font-size: 10pt;
+  color: #666;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+/* ============================================================================
+   TYPOGRAPHY IN PAGES
+   ========================================================================== */
+
+.paginated-view .page {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12pt;
+  line-height: 1.6;
+  color: #000;
+}
+
+.paginated-view .page h1,
+.paginated-view .page h2,
+.paginated-view .page h3,
+.paginated-view .page h4,
+.paginated-view .page h5,
+.paginated-view .page h6 {
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  page-break-after: avoid;
+  orphans: 3;
+  widows: 3;
+}
+
+.paginated-view .page h1 {
+  font-size: 24pt;
+  margin-top: 0;
+}
+
+.paginated-view .page h2 {
+  font-size: 18pt;
+}
+
+.paginated-view .page h3 {
+  font-size: 14pt;
+}
+
+.paginated-view .page h4,
+.paginated-view .page h5,
+.paginated-view .page h6 {
+  font-size: 12pt;
+}
+
+.paginated-view .page p {
+  margin: 0 0 1em 0;
+  orphans: 3;
+  widows: 3;
+}
+
+/* ============================================================================
+   CODE BLOCKS
+   ========================================================================== */
+
+.paginated-view .page pre,
+.paginated-view .page code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10pt;
+}
+
+.paginated-view .page pre {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0.75em;
+  overflow-x: auto;
+  page-break-inside: avoid;
+  margin: 1em 0;
+}
+
+.paginated-view .page code {
+  background: #f5f5f5;
+  padding: 0.125em 0.25em;
+  border-radius: 3px;
+}
+
+.paginated-view .page pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* ============================================================================
+   LISTS
+   ========================================================================== */
+
+.paginated-view .page ul,
+.paginated-view .page ol {
+  margin: 0 0 1em 0;
+  padding-left: 2em;
+}
+
+.paginated-view .page li {
+  margin: 0.25em 0;
+}
+
+/* ============================================================================
+   BLOCKQUOTES
+   ========================================================================== */
+
+.paginated-view .page blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid #ddd;
+  background: #f9f9f9;
+  font-style: italic;
+  page-break-inside: avoid;
+}
+
+/* ============================================================================
+   TABLES
+   ========================================================================== */
+
+.paginated-view .page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  page-break-inside: avoid;
+}
+
+.paginated-view .page th,
+.paginated-view .page td {
+  border: 1px solid #ddd;
+  padding: 0.5em;
+  text-align: left;
+}
+
+.paginated-view .page th {
+  background: #f5f5f5;
+  font-weight: bold;
+}
+
+/* ============================================================================
+   IMAGES
+   ========================================================================== */
+
+.paginated-view .page img {
+  max-width: 100%;
+  height: auto;
+  page-break-inside: avoid;
+  margin: 1em 0;
+}
+
+.paginated-view .page figure {
+  page-break-inside: avoid;
+  margin: 1em 0;
+}
+
+/* ============================================================================
+   HORIZONTAL RULES
+   ========================================================================== */
+
+.paginated-view .page hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 2em 0;
+  page-break-after: avoid;
+}
+
+/* ============================================================================
+   LINKS
+   ========================================================================== */
+
+.paginated-view .page a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.paginated-view .page a:hover {
+  color: #004499;
+}
+
+/* ============================================================================
+   PAGE BREAK UTILITIES
+   ========================================================================== */
+
+.page-break-before {
+  page-break-before: always;
+}
+
+.page-break-after {
+  page-break-after: always;
+}
+
+.no-break,
+.keep-together {
+  page-break-inside: avoid;
+}
+
+.orphans-3 {
+  orphans: 3;
+}
+
+.widows-3 {
+  widows: 3;
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ========================================================================== */
+
+@media print {
+  .paginated-view {
+    background: white;
+    padding: 0;
+  }
+
+  .paginated-view .page {
+    box-shadow: none;
+    margin: 0;
+    page-break-after: always;
+  }
+
+  .paginated-view .page:last-child {
+    page-break-after: auto;
+  }
+
+  .paginated-view .page::after {
+    /* Page numbers handled by browser in print */
+    display: none;
+  }
+
+  /* Hide UI elements in print */
+  .view-mode-toggle,
+  .toolbar,
+  .sidebar {
+    display: none !important;
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE (for smaller screens)
+   ========================================================================== */
+
+@media screen and (max-width: 8.5in) {
+  .paginated-view .page {
+    width: 100%;
+    min-height: auto;
+    margin: 0 0 1rem 0;
+    box-shadow: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .paginated-view.page-size-a4 .page {
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  .paginated-view {
+    background: #1a1a1a;
+  }
+
+  .paginated-view .page {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .paginated-view .page h1,
+  .paginated-view .page h2,
+  .paginated-view .page h3,
+  .paginated-view .page h4,
+  .paginated-view .page h5,
+  .paginated-view .page h6 {
+    color: #fff;
+  }
+
+  .paginated-view .page pre {
+    background: #1a1a1a;
+    border-color: #444;
+  }
+
+  .paginated-view .page code {
+    background: #1a1a1a;
+  }
+
+  .paginated-view .page blockquote {
+    background: #333;
+    border-left-color: #555;
+  }
+
+  .paginated-view .page th {
+    background: #333;
+  }
+
+  .paginated-view .page td,
+  .paginated-view .page th {
+    border-color: #444;
+  }
+
+  .paginated-view .page hr {
+    border-top-color: #444;
+  }
+
+  .paginated-view .page a {
+    color: #4da6ff;
+  }
+
+  .paginated-view .page a:hover {
+    color: #80bfff;
+  }
+
+  .paginated-view .page::after {
+    color: #999;
+  }
+}
+
+/* ============================================================================
+   ANIMATION
+   ========================================================================== */
+
+.paginated-view .page {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.communications.telegram",
+  "name": "Telegram Bot Extension",
+  "version": "1.0.0",
+  "description": "Professional Telegram Bot API integration for AgentOS agents",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": ["telegram", "bot", "messaging", "communications", "chat", "channels"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["communications", "integrations"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "telegramSendMessage",
+      "displayName": "Send Telegram Message",
+      "description": "Send a message to a Telegram chat or channel",
+      "entry": "./dist/tools/sendMessage.js"
+    },
+    {
+      "kind": "tool",
+      "id": "telegramSendPhoto",
+      "displayName": "Send Telegram Photo",
+      "description": "Send a photo with optional caption to a Telegram chat",
+      "entry": "./dist/tools/sendPhoto.js"
+    },
+    {
+      "kind": "tool",
+      "id": "telegramSendDocument",
+      "displayName": "Send Telegram Document",
+      "description": "Send a document file to a Telegram chat",
+      "entry": "./dist/tools/sendDocument.js"
+    },
+    {
+      "kind": "tool",
+      "id": "telegramManageChat",
+      "displayName": "Manage Telegram Chat",
+      "description": "Get chat info, pin messages, or manage chat settings",
+      "entry": "./dist/tools/manageChat.js"
+    },
+    {
+      "kind": "tool",
+      "id": "telegramPollMessages",
+      "displayName": "Poll Telegram Messages",
+      "description": "Retrieve recent messages from a chat for context",
+      "entry": "./dist/tools/pollMessages.js"
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "telegram.botToken": {
+        "type": "string",
+        "description": "Telegram Bot API token from @BotFather",
+        "secret": true
+      },
+      "telegram.defaultParseMode": {
+        "type": "string",
+        "enum": ["Markdown", "HTML", "MarkdownV2"],
+        "default": "Markdown",
+        "description": "Default message parsing mode"
+      },
+      "telegram.pollingInterval": {
+        "type": "number",
+        "default": 1000,
+        "minimum": 100,
+        "maximum": 10000,
+        "description": "Polling interval in milliseconds"
+      },
+      "telegram.maxRetries": {
+        "type": "number",
+        "default": 3,
+        "minimum": 0,
+        "maximum": 10,
+        "description": "Maximum retry attempts for failed requests"
+      }
+    }
+  },
+  "features": [
+    "Send text messages with formatting (Markdown/HTML)",
+    "Send photos, documents, and media",
+    "Manage chat settings and pins",
+    "Poll messages for context awareness",
+    "Rate limiting and retry logic",
+    "Environment variable support for credentials"
+  ]
+}

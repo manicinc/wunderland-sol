@@ -1,0 +1,257 @@
+{
+  "version": "1.0.0",
+  "routing": {
+    "reviewEveryNTurns": 6,
+    "forceReviewOnCompaction": true,
+    "defaultPresetId": "general_concise",
+    "defaultPresetByMode": {
+      "general": "general_concise",
+      "v_agent": "general_deep",
+      "nerf_agent": "general_concise",
+      "coding": "coding_default",
+      "coding_assistant": "coding_default",
+      "system_designer": "coding_system_design",
+      "system_design": "coding_system_design",
+      "meeting": "meeting_summary",
+      "meeting_summarizer": "meeting_summary",
+      "diary": "diary_default",
+      "diary_agent": "diary_default",
+      "tutor": "tutor_default",
+      "tutor_agent": "tutor_default",
+      "coding_interviewer": "coding_interviewer"
+    }
+  },
+  "presets": [
+    {
+      "id": "general_concise",
+      "label": "General (Concise)",
+      "basePromptKey": "nerf_chat",
+      "addonPromptKeys": ["_meta/concise"],
+      "description": "Fast, direct answers. Good for short questions."
+    },
+    {
+      "id": "general_deep",
+      "label": "General (Deep Dive)",
+      "basePromptKey": "v_default_assistant",
+      "addonPromptKeys": ["_meta/deep_dive"],
+      "description": "Thorough analysis and structured exploration."
+    },
+    {
+      "id": "general_planner",
+      "label": "General (Planner)",
+      "basePromptKey": "v_default_assistant",
+      "addonPromptKeys": ["_meta/planner"],
+      "description": "Planning-oriented assistant for multi-step work."
+    },
+    {
+      "id": "coding_default",
+      "label": "Coding (Default)",
+      "basePromptKey": "coding",
+      "addonPromptKeys": [],
+      "description": "Code-first problem solving, debugging, and explanations."
+    },
+    {
+      "id": "coding_system_design",
+      "label": "Coding (System Design)",
+      "basePromptKey": "system_design",
+      "addonPromptKeys": [],
+      "description": "Architecture trade-offs, diagrams, scalability."
+    },
+    {
+      "id": "coding_audit",
+      "label": "Coding (Audit/Review)",
+      "basePromptKey": "lc_audit_aide",
+      "addonPromptKeys": ["_meta/reviewer"],
+      "description": "Deeper audits and reviews (LeetCode-style, correctness, complexity)."
+    },
+    {
+      "id": "coding_interviewer",
+      "label": "Coding (Interviewer)",
+      "basePromptKey": "coding_interviewer",
+      "addonPromptKeys": [],
+      "description": "Interview-style prompting and evaluation."
+    },
+    {
+      "id": "meeting_summary",
+      "label": "Meeting Summary",
+      "basePromptKey": "meeting",
+      "addonPromptKeys": [],
+      "description": "Structured notes with action items."
+    },
+    {
+      "id": "diary_default",
+      "label": "Diary",
+      "basePromptKey": "diary",
+      "addonPromptKeys": [],
+      "description": "Reflective journaling companion."
+    },
+    {
+      "id": "tutor_default",
+      "label": "Tutor",
+      "basePromptKey": "tutor",
+      "addonPromptKeys": [],
+      "description": "Teaching-oriented explanations with exercises."
+    }
+  ],
+  "sentimentTracking": {
+    "_doc": "Sentiment-aware metaprompt presets. Set 'enabled: true' in a persona's sentimentTracking config to activate. These define ready-to-use configurations you can reference.",
+    "profiles": {
+      "off": {
+        "label": "Off (Default)",
+        "description": "No sentiment analysis. Turn-interval self-reflection still works.",
+        "config": { "enabled": false }
+      },
+      "basic": {
+        "label": "Basic (Lexicon, frustration + confusion only)",
+        "description": "Fast lexicon-based analysis (~10-50ms). Detects frustration and confusion. Recommended for most use cases.",
+        "config": {
+          "enabled": true,
+          "method": "lexicon_based",
+          "historyWindow": 10,
+          "frustrationThreshold": -0.3,
+          "satisfactionThreshold": 0.3,
+          "consecutiveTurnsForTrigger": 2,
+          "presets": ["frustration_recovery", "confusion_clarification"]
+        }
+      },
+      "standard": {
+        "label": "Standard (Lexicon, all presets)",
+        "description": "Fast lexicon-based analysis with all 5 emotion presets active.",
+        "config": {
+          "enabled": true,
+          "method": "lexicon_based",
+          "historyWindow": 10,
+          "frustrationThreshold": -0.3,
+          "satisfactionThreshold": 0.3,
+          "consecutiveTurnsForTrigger": 2,
+          "presets": ["all"]
+        }
+      },
+      "advanced": {
+        "label": "Advanced (LLM-based, all presets)",
+        "description": "LLM-based sentiment analysis (~500-1000ms). Higher accuracy but costs tokens. All presets active.",
+        "config": {
+          "enabled": true,
+          "method": "llm",
+          "historyWindow": 15,
+          "frustrationThreshold": -0.25,
+          "satisfactionThreshold": 0.25,
+          "consecutiveTurnsForTrigger": 2,
+          "presets": ["all"]
+        }
+      },
+      "tutor": {
+        "label": "Tutor (sensitive, all presets)",
+        "description": "Lower thresholds for educational contexts. Detects frustration early.",
+        "config": {
+          "enabled": true,
+          "method": "lexicon_based",
+          "historyWindow": 10,
+          "frustrationThreshold": -0.2,
+          "satisfactionThreshold": 0.2,
+          "consecutiveTurnsForTrigger": 1,
+          "presets": [
+            "frustration_recovery",
+            "confusion_clarification",
+            "satisfaction_reinforcement"
+          ]
+        }
+      }
+    },
+    "defaultProfileByMode": {
+      "general": "off",
+      "coding": "off",
+      "tutor": "tutor",
+      "tutor_agent": "tutor",
+      "diary": "basic",
+      "diary_agent": "basic",
+      "v_agent": "standard",
+      "meeting": "off"
+    }
+  },
+  "memoryCompaction": {
+    "_doc": "Rolling memory compaction profiles. Used by AgentOS (rollingSummary) and the legacy /api/chat ConversationCompactionService. Default is ON via `defaultProfile: \"standard\"` to prevent context-window blowups in long chats. Set `defaultProfile: \"off\"` to disable globally, or use `defaultProfileByMode` to selectively disable for certain modes/personas. Legacy env vars (MEMORY_COMPACTION_*) can still override in emergencies.",
+    "profiles": {
+      "off": {
+        "enabled": false
+      },
+      "standard": {
+        "enabled": true,
+        "promptKey": "memory_compactor_v2_json",
+        "modelId": "openai/gpt-4o-mini",
+        "cooldownMs": 60000,
+        "tailTurnsToKeep": 12,
+        "minTurnsToSummarize": 12,
+        "maxTurnsToSummarizePerPass": 48,
+        "maxSummaryTokens": 900
+      }
+    },
+    "defaultProfile": "standard",
+    "defaultProfileByMode": {}
+  },
+  "rules": [
+    {
+      "id": "general_deep_if_long_or_complex",
+      "priority": 90,
+      "modes": ["general"],
+      "minMessageChars": 420,
+      "presetId": "general_deep"
+    },
+    {
+      "id": "general_deep_if_keywords",
+      "priority": 85,
+      "modes": ["general"],
+      "anyKeywords": [
+        "architecture",
+        "system design",
+        "trade-off",
+        "threat model",
+        "rfc",
+        "deep dive"
+      ],
+      "presetId": "general_deep"
+    },
+    {
+      "id": "general_planner_if_keywords",
+      "priority": 83,
+      "modes": ["general"],
+      "anyKeywords": [
+        "plan",
+        "roadmap",
+        "milestones",
+        "next steps",
+        "implementation plan",
+        "project plan"
+      ],
+      "presetId": "general_planner"
+    },
+    {
+      "id": "coding_audit_if_keywords",
+      "priority": 80,
+      "modes": ["coding"],
+      "anyKeywords": ["audit", "review", "prove", "correctness", "leetcode", "edge cases"],
+      "presetId": "coding_audit"
+    },
+    {
+      "id": "coding_system_design_if_keywords",
+      "priority": 75,
+      "modes": ["coding"],
+      "anyKeywords": [
+        "system design",
+        "architecture",
+        "scalability",
+        "throughput",
+        "latency",
+        "multi-tenant"
+      ],
+      "presetId": "coding_system_design"
+    },
+    {
+      "id": "general_concise_if_short",
+      "priority": 50,
+      "modes": ["general"],
+      "maxMessageChars": 180,
+      "presetId": "general_concise"
+    }
+  ]
+}

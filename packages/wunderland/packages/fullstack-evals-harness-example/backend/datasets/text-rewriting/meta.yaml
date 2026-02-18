@@ -1,0 +1,5 @@
+name: Text Rewriting
+description: >
+  Mixed passages for rewriting evaluation (synthetic + a few sourced excerpts:
+  arXiv and public-domain literature). Tests whether models preserve meaning
+  while improving clarity and readability.

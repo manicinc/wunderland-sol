@@ -1,0 +1,100 @@
+name: Build and publish AgentOS docs
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [publish-docs]
+
+permissions:
+  contents: write
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+
+      - name: Checkout agentos source
+        uses: actions/checkout@v4
+        with:
+          repository: framersai/agentos
+          path: agentos
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies (agentos)
+        working-directory: agentos
+        run: pnpm install --frozen-lockfile
+
+      - name: Export static chrome from agentos.sh
+        working-directory: agentos/apps/agentos.sh
+        run: node scripts/export-static-chrome.mjs
+          
+      - name: Build agentos.sh (to generate compiled CSS)
+        working-directory: agentos/apps/agentos.sh
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: pnpm build
+
+      - name: Copy chrome assets + compiled CSS to docs repo root
+        run: |
+          cp agentos/apps/agentos.sh/static-doc-shell/*.html .
+          cp agentos/apps/agentos.sh/styles/tokens.css .
+          cp agentos/apps/agentos.sh/.next/static/css/*.css ./site.css || true
+
+      - name: Generate TypeDoc (preferred script)
+        working-directory: agentos
+        continue-on-error: true
+        run: |
+          pnpm --filter @framers/agentos run docs || pnpm run docs || echo "No docs script"
+
+      - name: Generate TypeDoc (fallback direct)
+        working-directory: agentos
+        if: always()
+        run: |
+          if [ ! -d "docs" ]; then
+            pnpm add -D typedoc
+            npx typedoc --out docs ./packages/agentos/src/index.ts || true
+          fi
+
+      - name: Sync output into site
+        run: |
+          rm -rf docs
+          if [ -d agentos/docs ]; then
+            cp -r agentos/docs ./docs
+          elif [ -d agentos/packages/agentos/docs ]; then
+            cp -r agentos/packages/agentos/docs ./docs
+          else
+            echo "No docs output found; keeping placeholder."
+          fi
+          
+      - name: Install wrap script dependencies
+        run: pnpm install --no-frozen-lockfile
+        
+      - name: Wrap TypeDoc pages with AgentOS chrome
+        run: pnpm run wrap
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "Framers Bot"
+          git config user.email "team@frame.dev"
+          if [ -n "$(git status --porcelain docs)" ]; then
+            git add docs
+            git commit -m "docs: publish from agentos ${GITHUB_SHA}"
+            git push origin HEAD:master
+          else
+            echo "No docs changes to publish."
+          fi
+
+

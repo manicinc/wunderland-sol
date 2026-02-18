@@ -1,0 +1,638 @@
+/**
+ * Terminal Theme - 80s/90s Retro Computer Aesthetics
+ * CRT monitors, phosphor glow, scan lines, analog controls
+ */
+
+/* Import retro fonts */
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&display=swap');
+
+/* Terminal Light Theme (Amber Phosphor) - Improved Readability */
+html.terminal-light {
+  /* Color palette - softer amber for better eye comfort */
+  --terminal-bg: #0a0805;
+  --terminal-surface: #100c08;
+  --terminal-surface-2: #181410;
+  --terminal-border: #d49a30;
+  --terminal-text: #e8b84a;
+  --terminal-text-dim: #a87828;
+  --terminal-text-bright: #f5d060;
+  --terminal-accent: #f0c048;
+  --terminal-accent-dim: #b88830;
+  --terminal-error: #e84040;
+  --terminal-warning: #e8a020;
+  --terminal-info: #50c8c8;
+  --terminal-success: #50c850;
+
+  /* Phosphor glow colors - reduced for readability */
+  --glow-color: #d49a3040;
+  --glow-color-bright: #f0c04860;
+  --scan-line-color: #d49a3008;
+
+  /* Font stack */
+  --terminal-font: 'IBM Plex Mono', 'Menlo', 'Consolas', monospace;
+  --terminal-font-size: 15px;
+  --terminal-line-height: 1.6;
+}
+
+/* Terminal Dark Theme (Green Phosphor) - Improved Readability */
+html.terminal-dark {
+  /* Color palette - softer green for better eye comfort */
+  --terminal-bg: #050a08;
+  --terminal-surface: #0a100d;
+  --terminal-surface-2: #101812;
+  --terminal-border: #30b868;
+  --terminal-text: #48d080;
+  --terminal-text-dim: #289858;
+  --terminal-text-bright: #60e898;
+  --terminal-accent: #50d888;
+  --terminal-accent-dim: #30a060;
+  --terminal-error: #e84848;
+  --terminal-warning: #e8a830;
+  --terminal-info: #48c8d0;
+  --terminal-success: #48d070;
+
+  /* Phosphor glow colors - reduced for readability */
+  --glow-color: #30b86830;
+  --glow-color-bright: #50d88850;
+  --scan-line-color: #30b86806;
+
+  /* Font stack */
+  --terminal-font: 'IBM Plex Mono', 'Menlo', 'Consolas', monospace;
+  --terminal-font-size: 15px;
+  --terminal-line-height: 1.6;
+}
+
+/* Global Terminal Styles */
+html.terminal-light,
+html.terminal-dark {
+  background: var(--terminal-bg) !important;
+}
+
+html.terminal-light body,
+html.terminal-dark body {
+  background: var(--terminal-bg) !important;
+  color: var(--terminal-text) !important;
+  font-family: var(--terminal-font) !important;
+  font-size: var(--terminal-font-size) !important;
+  line-height: var(--terminal-line-height) !important;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Terminal Headers - cleaner, less glow */
+html.terminal-light h1,
+html.terminal-light h2,
+html.terminal-light h3,
+html.terminal-light h4,
+html.terminal-light h5,
+html.terminal-light h6,
+html.terminal-dark h1,
+html.terminal-dark h2,
+html.terminal-dark h3,
+html.terminal-dark h4,
+html.terminal-dark h5,
+html.terminal-dark h6 {
+  color: var(--terminal-text-bright) !important;
+  text-shadow: 0 0 6px var(--glow-color) !important;
+  letter-spacing: 0.01em;
+  font-weight: 600 !important;
+}
+
+/* Specific header sizes for readability */
+html.terminal-light h1, html.terminal-dark h1 { font-size: 1.875rem !important; }
+html.terminal-light h2, html.terminal-dark h2 { font-size: 1.5rem !important; }
+html.terminal-light h3, html.terminal-dark h3 { font-size: 1.25rem !important; }
+html.terminal-light h4, html.terminal-dark h4 { font-size: 1.125rem !important; }
+
+/* Terminal Links - cleaner hover */
+html.terminal-light a,
+html.terminal-dark a {
+  color: var(--terminal-accent) !important;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+html.terminal-light a:hover,
+html.terminal-dark a:hover {
+  border-bottom-color: var(--terminal-accent);
+  text-shadow: 0 0 3px var(--glow-color);
+}
+
+/* Terminal Navigation and Headers */
+html.terminal-light header,
+html.terminal-dark header,
+html.terminal-light nav,
+html.terminal-dark nav {
+  background: var(--terminal-bg) !important;
+  border-color: var(--terminal-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+html.terminal-light .border-b,
+html.terminal-dark .border-b {
+  border-bottom: 2px solid var(--terminal-border) !important;
+}
+
+/* Terminal Buttons Override - ALL SQUARE BORDERS */
+html.terminal-light button,
+html.terminal-dark button,
+html.terminal-light .btn-primary,
+html.terminal-dark .btn-primary,
+html.terminal-light a.inline-flex,
+html.terminal-dark a.inline-flex {
+  background: transparent !important;
+  border: 2px solid var(--terminal-border) !important;
+  color: var(--terminal-text) !important;
+  border-radius: 0 !important;
+  font-family: inherit !important;
+  transition: all 0.2s;
+  box-shadow: none !important;
+}
+
+html.terminal-light button:hover,
+html.terminal-dark button:hover,
+html.terminal-light a.inline-flex:hover,
+html.terminal-dark a.inline-flex:hover {
+  background: var(--terminal-accent) !important;
+  color: #000000 !important;
+  box-shadow: 0 0 20px var(--glow-color) !important;
+}
+
+/* Force square borders on ALL elements in terminal mode */
+html.terminal-light *,
+html.terminal-dark * {
+  border-radius: 0 !important;
+}
+
+html.terminal-light .rounded,
+html.terminal-light .rounded-md,
+html.terminal-light .rounded-lg,
+html.terminal-light .rounded-xl,
+html.terminal-light .rounded-full,
+html.terminal-light .rounded-2xl,
+html.terminal-dark .rounded,
+html.terminal-dark .rounded-md,
+html.terminal-dark .rounded-lg,
+html.terminal-dark .rounded-xl,
+html.terminal-dark .rounded-full,
+html.terminal-dark .rounded-2xl {
+  border-radius: 0 !important;
+}
+
+/* Terminal Cards */
+html.terminal-light .bg-white,
+html.terminal-light .bg-gray-50,
+html.terminal-light .paper-card,
+html.terminal-dark .bg-white,
+html.terminal-dark .bg-gray-50,
+html.terminal-dark .paper-card {
+  background: var(--terminal-bg) !important;
+  border: 2px solid var(--terminal-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Terminal Inputs */
+html.terminal-light input,
+html.terminal-light textarea,
+html.terminal-light select,
+html.terminal-dark input,
+html.terminal-dark textarea,
+html.terminal-dark select {
+  background: #000000 !important;
+  border: 1px solid var(--terminal-border) !important;
+  color: var(--terminal-text) !important;
+  border-radius: 0 !important;
+  font-family: inherit !important;
+}
+
+html.terminal-light input:focus,
+html.terminal-light textarea:focus,
+html.terminal-light select:focus,
+html.terminal-dark input:focus,
+html.terminal-dark textarea:focus,
+html.terminal-dark select:focus {
+  outline: none !important;
+  border-color: var(--terminal-text-bright) !important;
+  box-shadow: 0 0 10px var(--glow-color) !important;
+}
+
+/* CRT Screen Effect Container */
+.crt-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.7;
+}
+
+/* Scan Lines Effect */
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 48%,
+    var(--scan-line-color) 50%,
+    transparent 52%,
+    transparent 100%
+  );
+  background-size: 100% 4px;
+  animation: scan-lines 8s linear infinite;
+}
+
+/* Screen flicker effect */
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--terminal-bg);
+  opacity: 0;
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes scan-lines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.03; }
+  50% { opacity: 0.01; }
+  100% { opacity: 0.03; }
+}
+
+/* CRT Screen Curvature */
+.crt-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 
+    inset 0 0 40px rgba(0, 0, 0, 0.5),
+    0 0 100px var(--glow-color);
+}
+
+/* Phosphor Text Glow */
+.terminal-text {
+  text-shadow: 
+    0 0 2px var(--glow-color),
+    0 0 5px var(--glow-color),
+    0 0 10px var(--glow-color);
+  letter-spacing: 0.05em;
+}
+
+/* Blinking Cursor */
+.terminal-cursor {
+  display: inline-block;
+  width: 10px;
+  height: 20px;
+  background: var(--terminal-text);
+  animation: blink-cursor 1s step-end infinite;
+  box-shadow: 0 0 10px var(--glow-color-bright);
+}
+
+@keyframes blink-cursor {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Retro Button Styles */
+.terminal-button {
+  position: relative;
+  padding: 10px 20px;
+  background: linear-gradient(
+    to bottom,
+    var(--terminal-surface-2) 0%,
+    var(--terminal-surface) 100%
+  );
+  border: 2px solid var(--terminal-border);
+  border-radius: 4px;
+  color: var(--terminal-text);
+  font-family: var(--terminal-font);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 0 var(--terminal-bg),
+    0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-button:hover {
+  transform: translateY(1px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 3px 0 var(--terminal-bg),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-button:active {
+  transform: translateY(3px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 0 var(--terminal-bg),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-button.primary {
+  background: linear-gradient(
+    to bottom,
+    var(--terminal-accent) 0%,
+    var(--terminal-accent-dim) 100%
+  );
+  color: var(--terminal-bg);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* LED Indicator Lights */
+.led {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.led.on {
+  animation: led-glow 1s ease-in-out infinite alternate;
+}
+
+.led.red { background: #ff0040; --led-glow: #ff004080; }
+.led.green { background: #00ff00; --led-glow: #00ff0080; }
+.led.amber { background: #ffb000; --led-glow: #ffb00080; }
+.led.blue { background: #00ffff; --led-glow: #00ffff80; }
+
+@keyframes led-glow {
+  from { box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(255, 255, 255, 0.2),
+    0 0 5px var(--led-glow);
+  }
+  to { box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(255, 255, 255, 0.2),
+    0 0 20px var(--led-glow);
+  }
+}
+
+/* Toggle Switch */
+.terminal-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  background: var(--terminal-surface);
+  border: 2px solid var(--terminal-border);
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 
+    inset 0 2px 5px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.terminal-switch-handle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(
+    to bottom,
+    #666 0%,
+    #444 100%
+  );
+  border-radius: 3px;
+  transition: transform 0.2s ease;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.terminal-switch.on .terminal-switch-handle {
+  transform: translateX(30px);
+  background: linear-gradient(
+    to bottom,
+    var(--terminal-accent) 0%,
+    var(--terminal-accent-dim) 100%
+  );
+}
+
+/* VU Meter */
+.vu-meter {
+  position: relative;
+  width: 200px;
+  height: 40px;
+  background: var(--terminal-surface);
+  border: 2px solid var(--terminal-border);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.vu-meter-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    #00ff00 0%,
+    #00ff00 70%,
+    #ffff00 85%,
+    #ff0000 100%
+  );
+  width: 0%;
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 10px var(--glow-color);
+}
+
+.vu-meter-marks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+}
+
+.vu-meter-mark {
+  flex: 1;
+  height: 100%;
+  border-left: 1px solid var(--terminal-border);
+}
+
+/* ASCII Frame */
+.ascii-frame {
+  border: none;
+  padding: 20px;
+  margin: 20px 0;
+  position: relative;
+  background: var(--terminal-surface);
+}
+
+.ascii-frame::before {
+  content: '╔══════════════════════════════════════╗';
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--terminal-text-dim);
+  font-family: var(--terminal-font);
+  line-height: 1;
+}
+
+.ascii-frame::after {
+  content: '╚══════════════════════════════════════╝';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  color: var(--terminal-text-dim);
+  font-family: var(--terminal-font);
+  line-height: 1;
+}
+
+/* Terminal Input Field */
+.terminal-input {
+  background: var(--terminal-bg);
+  border: 2px solid var(--terminal-border);
+  color: var(--terminal-text);
+  font-family: var(--terminal-font);
+  padding: 10px;
+  width: 100%;
+  outline: none;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-input:focus {
+  border-color: var(--terminal-accent);
+  box-shadow: 
+    inset 0 2px 5px rgba(0, 0, 0, 0.5),
+    0 0 10px var(--glow-color);
+}
+
+/* Loading Bar */
+.terminal-loading {
+  width: 100%;
+  height: 30px;
+  background: var(--terminal-surface);
+  border: 2px solid var(--terminal-border);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.terminal-loading-bar {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--terminal-accent),
+    var(--terminal-accent) 10px,
+    var(--terminal-accent-dim) 10px,
+    var(--terminal-accent-dim) 20px
+  );
+  animation: loading-scroll 1s linear infinite;
+}
+
+@keyframes loading-scroll {
+  0% { transform: translateX(-20px); }
+  100% { transform: translateX(0); }
+}
+
+/* Matrix Rain Effect (for backgrounds) */
+.matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+/* Terminal prompt */
+.terminal-prompt::before {
+  content: '> ';
+  color: var(--terminal-accent);
+  font-weight: bold;
+}
+
+/* Code blocks in terminal style */
+html.terminal-light pre,
+html.terminal-dark pre {
+  background: var(--terminal-bg) !important;
+  border: 2px solid var(--terminal-border);
+  border-radius: 4px;
+  padding: 15px;
+  overflow-x: auto;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+html.terminal-light code,
+html.terminal-dark code {
+  font-family: var(--terminal-font) !important;
+  color: var(--terminal-text) !important;
+  text-shadow: 0 0 3px var(--glow-color);
+}
+
+/* Scrollbar styling */
+html.terminal-light ::-webkit-scrollbar,
+html.terminal-dark ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html.terminal-light ::-webkit-scrollbar-track,
+html.terminal-dark ::-webkit-scrollbar-track {
+  background: var(--terminal-surface);
+  border: 1px solid var(--terminal-border);
+}
+
+html.terminal-light ::-webkit-scrollbar-thumb,
+html.terminal-dark ::-webkit-scrollbar-thumb {
+  background: var(--terminal-border);
+  border-radius: 2px;
+}
+
+html.terminal-light ::-webkit-scrollbar-thumb:hover,
+html.terminal-dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--terminal-text-dim);
+}
+
+/* Selection color */
+html.terminal-light ::selection,
+html.terminal-dark ::selection {
+  background: var(--terminal-accent);
+  color: var(--terminal-bg);
+}
+
+/* Focus outlines */
+html.terminal-light :focus,
+html.terminal-dark :focus {
+  outline: 2px solid var(--terminal-accent);
+  outline-offset: 2px;
+}

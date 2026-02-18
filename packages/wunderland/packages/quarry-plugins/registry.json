@@ -1,0 +1,88 @@
+{
+  "version": "1.0.0",
+  "updated": "2025-01-01T00:00:00Z",
+  "plugins": [
+    {
+      "id": "com.quarry.pomodoro-timer",
+      "name": "Pomodoro Timer",
+      "version": "1.0.0",
+      "description": "A simple pomodoro timer widget for focused work sessions",
+      "author": "Quarry Team",
+      "authorUrl": "https://quarry.frame.dev",
+      "type": "widget",
+      "position": "sidebar",
+      "verified": true,
+      "featured": true,
+      "downloads": 0,
+      "rating": 0,
+      "tags": ["productivity", "timer", "focus"],
+      "cdnUrl": "https://cdn.frame.dev/plugins/pomodoro-timer",
+      "repoUrl": "https://github.com/quarry-plugins/quarry-plugins/tree/main/plugins/pomodoro-timer",
+      "minQuarryVersion": "1.0.0"
+    },
+    {
+      "id": "com.quarry.citation-manager",
+      "name": "Citation Manager",
+      "version": "1.0.0",
+      "description": "Manage academic citations with [@key] syntax and BibTeX support",
+      "author": "Quarry Team",
+      "authorUrl": "https://quarry.frame.dev",
+      "type": "renderer",
+      "position": "sidebar",
+      "verified": true,
+      "featured": true,
+      "downloads": 0,
+      "rating": 0,
+      "tags": ["academic", "citations", "research", "bibtex"],
+      "cdnUrl": "https://cdn.frame.dev/plugins/citation-manager",
+      "repoUrl": "https://github.com/quarry-plugins/quarry-plugins/tree/main/plugins/citation-manager",
+      "minQuarryVersion": "1.0.0"
+    },
+    {
+      "id": "com.quarry.custom-callouts",
+      "name": "Custom Callouts",
+      "version": "1.0.0",
+      "description": "Add beautiful callout blocks with :::type[title] syntax",
+      "author": "Quarry Team",
+      "authorUrl": "https://quarry.frame.dev",
+      "type": "renderer",
+      "position": "content",
+      "verified": true,
+      "featured": true,
+      "downloads": 0,
+      "rating": 0,
+      "tags": ["markdown", "callouts", "styling"],
+      "cdnUrl": "https://cdn.frame.dev/plugins/custom-callouts",
+      "repoUrl": "https://github.com/quarry-plugins/quarry-plugins/tree/main/plugins/custom-callouts",
+      "minQuarryVersion": "1.0.0"
+    }
+  ],
+  "themes": [],
+  "categories": [
+    {
+      "id": "productivity",
+      "name": "Productivity",
+      "description": "Tools to help you stay focused and productive"
+    },
+    {
+      "id": "academic",
+      "name": "Academic",
+      "description": "Plugins for research and academic writing"
+    },
+    {
+      "id": "markdown",
+      "name": "Markdown",
+      "description": "Extend markdown with custom syntax"
+    },
+    {
+      "id": "visualization",
+      "name": "Visualization",
+      "description": "Charts, graphs, and visual tools"
+    },
+    {
+      "id": "integration",
+      "name": "Integration",
+      "description": "Connect with external services"
+    }
+  ]
+}

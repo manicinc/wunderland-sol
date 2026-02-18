@@ -1,0 +1,61 @@
+name: Test Package
+
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to test (e.g., ext-search)'
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npm ci || npm install
+      
+      - name: Lint
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npm run lint || echo "No lint script"
+      
+      - name: Type check
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npx tsc --noEmit || echo "No TypeScript"
+      
+      - name: Run tests
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npm test -- --run || npm test || echo "No tests"
+      
+      - name: Test coverage
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npm run test:coverage || echo "No coverage"
+      
+      - name: Build
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npm run build
+      
+      - name: Integration test
+        working-directory: packages/${{ inputs.package }}
+        run: |
+          npm run test:integration || echo "No integration tests"

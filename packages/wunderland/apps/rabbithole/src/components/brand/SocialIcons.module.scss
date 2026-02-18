@@ -1,0 +1,41 @@
+$rh-gold: #c9a227;
+$rh-gold-light: #e8d48a;
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  background: transparent;
+  transition: all 0.25s ease;
+
+  &:hover {
+    color: $rh-gold;
+    background: rgba($rh-gold, 0.08);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+:global(html.light) {
+  .socialLink {
+    color: rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      color: darken($rh-gold, 10%);
+      background: rgba($rh-gold, 0.1);
+    }
+  }
+}

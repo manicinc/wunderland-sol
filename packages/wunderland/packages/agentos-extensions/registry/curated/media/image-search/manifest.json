@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.media.image-search",
+  "name": "Image Search Extension",
+  "version": "1.0.0",
+  "description": "Search for stock photos from Pexels, Unsplash, and Pixabay with automatic fallback",
+  "author": { "name": "Frame.dev" },
+  "license": "MIT",
+  "keywords": ["images", "photos", "pexels", "unsplash", "pixabay", "stock"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["media"],
+  "extensions": [
+    { "kind": "tool", "id": "image_search", "displayName": "Image Search", "entry": "./dist/tools/imageSearch.js" }
+  ],
+  "configuration": {
+    "properties": {
+      "pexels.apiKey": { "type": "string", "secret": true },
+      "unsplash.apiKey": { "type": "string", "secret": true },
+      "pixabay.apiKey": { "type": "string", "secret": true }
+    }
+  }
+}

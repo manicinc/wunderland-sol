@@ -1,0 +1,138 @@
+/**
+ * Footer styles
+ */
+
+$rh-gold: #c9a227;
+
+.footer {
+  padding: 3rem 0 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--color-void, #030305);
+  position: relative;
+
+  // Holographic gradient top border
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00f5ff 25%, #ff00f5 50%, #ffd700 75%, transparent);
+    opacity: 0.3;
+  }
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+}
+
+.brand {
+  flex-shrink: 0;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.04);
+  margin: 1.5rem 0;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+.links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #505068);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: color 0.25s ease;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: $rh-gold;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    color: $rh-gold;
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.copyright {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #505068);
+  margin: 0;
+}
+
+:global(html.light) {
+  .footer {
+    background: #f8f6f2;
+    border-top-color: rgba(0, 0, 0, 0.06);
+
+    &::before {
+      background: linear-gradient(90deg, transparent, #8b6914 25%, #c9a227 50%, #e8d48a 75%, transparent);
+      opacity: 0.2;
+    }
+  }
+
+  .divider {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  .link {
+    color: rgba(0, 0, 0, 0.4);
+
+    &:hover {
+      color: darken($rh-gold, 10%);
+    }
+  }
+
+  .copyright {
+    color: rgba(0, 0, 0, 0.35);
+  }
+}

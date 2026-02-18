@@ -1,0 +1,176 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.integrations.telegram",
+  "name": "Telegram Bot Extension",
+  "version": "1.0.0",
+  "description": "Professional Telegram Bot API integration for AgentOS - send messages, manage groups, handle callbacks",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": ["telegram", "bot", "messaging", "chat", "communication", "integration"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["communication", "integration"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "telegramSendMessage",
+      "displayName": "Send Telegram Message",
+      "description": "Send formatted text messages to Telegram chats",
+      "entry": "./dist/tools/sendMessage.js",
+      "schema": {
+        "input": {
+          "type": "object",
+          "required": ["chatId", "text"],
+          "properties": {
+            "chatId": { "type": ["string", "number"] },
+            "text": { "type": "string" },
+            "parseMode": { "type": "string", "enum": ["Markdown", "HTML"] }
+          }
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "id": "telegramSendPhoto",
+      "displayName": "Send Telegram Photo",
+      "description": "Send photos with captions to Telegram chats",
+      "entry": "./dist/tools/sendPhoto.js",
+      "schema": {
+        "input": {
+          "type": "object",
+          "required": ["chatId", "photo"],
+          "properties": {
+            "chatId": { "type": ["string", "number"] },
+            "photo": { "type": "string" },
+            "caption": { "type": "string" }
+          }
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "id": "telegramSendDocument",
+      "displayName": "Send Telegram Document",
+      "description": "Send documents and files to Telegram chats",
+      "entry": "./dist/tools/sendDocument.js",
+      "schema": {
+        "input": {
+          "type": "object",
+          "required": ["chatId", "document"],
+          "properties": {
+            "chatId": { "type": ["string", "number"] },
+            "document": { "type": "string" },
+            "filename": { "type": "string" }
+          }
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "id": "telegramGetChatInfo",
+      "displayName": "Get Telegram Chat Info",
+      "description": "Retrieve information about a Telegram chat",
+      "entry": "./dist/tools/getChatInfo.js",
+      "schema": {
+        "input": {
+          "type": "object",
+          "required": ["chatId"],
+          "properties": {
+            "chatId": { "type": ["string", "number"] },
+            "includeMemberCount": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "id": "telegramManageGroup",
+      "displayName": "Manage Telegram Group",
+      "description": "Perform admin actions in Telegram groups",
+      "entry": "./dist/tools/manageGroup.js",
+      "schema": {
+        "input": {
+          "type": "object",
+          "required": ["chatId", "action"],
+          "properties": {
+            "chatId": { "type": ["string", "number"] },
+            "action": { "type": "string", "enum": ["pinMessage", "unpinMessage", "setDescription", "setTitle"] }
+          }
+        }
+      }
+    },
+    {
+      "kind": "tool",
+      "id": "telegramHandleCallback",
+      "displayName": "Handle Telegram Callback",
+      "description": "Handle callback queries from inline keyboards",
+      "entry": "./dist/tools/handleCallback.js",
+      "schema": {
+        "input": {
+          "type": "object",
+          "required": ["callbackQueryId"],
+          "properties": {
+            "callbackQueryId": { "type": "string" },
+            "text": { "type": "string" },
+            "showAlert": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  ],
+  "features": [
+    "Send messages, photos, and documents",
+    "Manage groups (pin, descriptions, titles)",
+    "Handle inline keyboard callbacks",
+    "Flexible bot token configuration (env vars)",
+    "Rate limiting and queue management",
+    "Webhook and polling support",
+    "Markdown and HTML formatting"
+  ],
+  "configuration": {
+    "properties": {
+      "telegram.botToken": {
+        "type": "string",
+        "description": "Telegram Bot API token",
+        "secret": true
+      },
+      "telegram.botTokenEnv": {
+        "type": "string",
+        "default": "TELEGRAM_BOT_TOKEN",
+        "description": "Environment variable name for bot token"
+      },
+      "telegram.webhookUrl": {
+        "type": "string",
+        "description": "Webhook URL for receiving updates"
+      },
+      "telegram.pollingInterval": {
+        "type": "number",
+        "default": 300,
+        "description": "Polling interval in milliseconds"
+      },
+      "telegram.parseMode": {
+        "type": "string",
+        "enum": ["Markdown", "HTML"],
+        "default": "Markdown",
+        "description": "Default message parse mode"
+      },
+      "telegram.rateLimit.maxRequests": {
+        "type": "number",
+        "default": 30,
+        "description": "Maximum requests per window"
+      },
+      "telegram.rateLimit.windowMs": {
+        "type": "number",
+        "default": 1000,
+        "description": "Rate limit window in milliseconds"
+      }
+    }
+  }
+}

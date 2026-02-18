@@ -1,0 +1,92 @@
+{
+  "colors": {
+    "bgPrimary": "#1a1b26",
+    "bgSecondary": "#24283b",
+    "bgTertiary": "#414868",
+    "bgPaper": "#1f2335",
+    "bgOverlay": "rgba(0, 0, 0, 0.7)",
+    
+    "textPrimary": "#c0caf5",
+    "textSecondary": "#a9b1d6",
+    "textMuted": "#565f89",
+    "textInverse": "#1a1b26",
+    
+    "accent": "#7aa2f7",
+    "accentHover": "#89b4fa",
+    "accentMuted": "#3d59a1",
+    
+    "success": "#9ece6a",
+    "warning": "#e0af68",
+    "error": "#f7768e",
+    "info": "#7dcfff",
+    
+    "border": "#414868",
+    "borderMuted": "#3b4261",
+    "borderFocus": "#7aa2f7",
+    
+    "syntax": {
+      "keyword": "#bb9af7",
+      "string": "#9ece6a",
+      "number": "#ff9e64",
+      "comment": "#565f89",
+      "function": "#7aa2f7",
+      "variable": "#c0caf5",
+      "operator": "#89ddff"
+    }
+  },
+  
+  "typography": {
+    "fontFamily": {
+      "sans": "\"Inter\", system-ui, -apple-system, sans-serif",
+      "serif": "\"Merriweather\", Georgia, serif",
+      "mono": "\"JetBrains Mono\", \"Fira Code\", monospace"
+    },
+    "fontSize": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "base": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem"
+    },
+    "fontWeight": {
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeight": {
+      "tight": 1.25,
+      "normal": 1.5,
+      "relaxed": 1.75
+    }
+  },
+  
+  "spacing": {
+    "unit": 4,
+    "scale": [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48, 64]
+  },
+  
+  "effects": {
+    "borderRadius": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "0.75rem",
+      "full": "9999px"
+    },
+    "shadow": {
+      "none": "none",
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.3)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.4)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.5)"
+    },
+    "transition": {
+      "fast": "150ms ease",
+      "normal": "200ms ease",
+      "slow": "300ms ease"
+    }
+  }
+}
+

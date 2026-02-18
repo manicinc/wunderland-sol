@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "録音中...",
+    "processing": "音声を処理しています...",
+    "transcribing": "音声を書き起こしています...",
+    "listening": "待機中...",
+    "speakNow": "話してください",
+    "clickToSpeak": "クリックして話す",
+    "stopRecording": "録音を停止",
+    "microphoneAccess": "マイクへのアクセスが必要です",
+    "noSpeechDetected": "音声が検出されませんでした",
+    "transcriptionComplete": "書き起こしが完了しました"
+  },
+  "chat": {
+    "thinking": "考えています...",
+    "generating": "回答を生成しています...",
+    "messageEmpty": "メッセージを入力してください",
+    "sendMessage": "メッセージを送信",
+    "newChat": "新しいチャット",
+    "clearHistory": "履歴をクリア",
+    "typingIndicator": "AIが入力中...",
+    "copyCode": "コードをコピー",
+    "codeCopied": "コードをクリップボードにコピーしました",
+    "retry": "再試行",
+    "regenerate": "回答を再生成"
+  },
+  "modes": {
+    "coding": "コーディングQ&A",
+    "codingDesc": "プログラミングの質問やコード例について支援を受ける",
+    "systemDesign": "システム設計",
+    "systemDesignDesc": "アーキテクチャを設計し、ダイアグラムを作成する",
+    "meetingSummary": "会議サマリー",
+    "meetingSummaryDesc": "会議を要約し、要点を抽出する",
+    "general": "一般",
+    "generalDesc": "一般的な会話と質問"
+  },
+  "cost": {
+    "title": "API利用状況",
+    "current": "現在のセッション",
+    "total": "累計利用",
+    "threshold": "コスト閾値",
+    "warning": "コスト閾値に近づいています",
+    "exceeded": "コスト閾値を超えました",
+    "reset": "カウンターをリセット"
+  },
+  "settings": {
+    "speechRecognition": "音声認識",
+    "whisperAPI": "Whisper API",
+    "browserSpeech": "ブラウザ音声",
+    "textToSpeech": "音声合成",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "ブラウザTTS",
+    "apiKeys": "APIキー",
+    "openAIKey": "OpenAI APIキー",
+    "anthropicKey": "Anthropic APIキー",
+    "modelPreferences": "モデル設定",
+    "costLimits": "コスト上限",
+    "sessionLimit": "セッション上限",
+    "dailyLimit": "1日の上限",
+    "monthlyLimit": "1か月の上限"
+  }
+}

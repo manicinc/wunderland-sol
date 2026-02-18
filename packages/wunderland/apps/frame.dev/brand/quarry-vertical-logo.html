@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarry Logo - Export</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:wght@400;500;600&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 3rem;
+        }
+        
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 400;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .subtitle {
+            font-size: 0.875rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #999;
+        }
+        
+        .preview {
+            padding: 3rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 220px;
+        }
+        
+        .preview.dark { background: #0F0F0F; }
+        .preview.light { background: #FFFFFF; }
+        
+        .btn-group { display: flex; gap: 0.5rem; }
+        
+        .btn {
+            padding: 0.5rem 0.75rem;
+            background: #1A7F4B;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn:hover { background: #156B3E; }
+        .btn.secondary { background: #e5e5e5; color: #333; }
+        .btn.secondary:hover { background: #d5d5d5; }
+        .btn.dark-btn { background: #C93A3A; }
+        .btn.dark-btn:hover { background: #A82E2E; }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quarry</h1>
+    <p class="subtitle">Logo Export · SVG & PNG</p>
+    
+    <div class="grid">
+        <!-- Light Mode (Green) -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Light · Green</span>
+                <div class="btn-group">
+                    <button class="btn secondary" onclick="downloadPNG('light')">PNG</button>
+                    <button class="btn" onclick="downloadSVG('light')">SVG</button>
+                </div>
+            </div>
+            <div class="preview light">
+                <svg width="120" height="100" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="translate(22, 4)">
+                        <polygon points="0,0 34,0 30,30 0,26" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.5"/>
+                        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#22A55D" stroke="#1D9050" stroke-width="0.5"/>
+                        <polygon points="0,26 30,30 26,60 0,60" fill="#2DB86A" stroke="#28A35F" stroke-width="0.5"/>
+                        <polygon points="30,30 42,30 46,60 26,60" fill="#4FCA85" stroke="#45B577" stroke-width="0.5"/>
+                        <polygon points="42,30 76,22 76,60 46,60" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.5"/>
+                    </g>
+                    <text x="60" y="88" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" fill="#1a1a1a" text-anchor="middle">Quarry</text>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Dark Mode (Red) -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Dark · Red</span>
+                <div class="btn-group">
+                    <button class="btn secondary" onclick="downloadPNG('dark')">PNG</button>
+                    <button class="btn dark-btn" onclick="downloadSVG('dark')">SVG</button>
+                </div>
+            </div>
+            <div class="preview dark">
+                <svg width="120" height="100" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="translate(22, 4)">
+                        <polygon points="0,0 34,0 30,30 0,26" fill="#C93A3A" stroke="#A82E2E" stroke-width="0.5"/>
+                        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#E05555" stroke="#C94848" stroke-width="0.5"/>
+                        <polygon points="0,26 30,30 26,60 0,60" fill="#E87070" stroke="#D06363" stroke-width="0.5"/>
+                        <polygon points="30,30 42,30 46,60 26,60" fill="#F09090" stroke="#D88080" stroke-width="0.5"/>
+                        <polygon points="42,30 76,22 76,60 46,60" fill="#F5B0B0" stroke="#DDA0A0" stroke-width="0.5"/>
+                    </g>
+                    <text x="60" y="88" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" fill="#F5F5F5" text-anchor="middle">Quarry</text>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Mono Light -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Mono · Light</span>
+                <div class="btn-group">
+                    <button class="btn secondary" onclick="downloadPNG('mono-light')">PNG</button>
+                    <button class="btn" onclick="downloadSVG('mono-light')">SVG</button>
+                </div>
+            </div>
+            <div class="preview light">
+                <svg width="120" height="100" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="translate(22, 4)">
+                        <polygon points="0,0 34,0 30,30 0,26" fill="#1a1a1a" stroke="#111" stroke-width="0.5"/>
+                        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#3d3d3d" stroke="#2d2d2d" stroke-width="0.5"/>
+                        <polygon points="0,26 30,30 26,60 0,60" fill="#555555" stroke="#454545" stroke-width="0.5"/>
+                        <polygon points="30,30 42,30 46,60 26,60" fill="#777777" stroke="#676767" stroke-width="0.5"/>
+                        <polygon points="42,30 76,22 76,60 46,60" fill="#999999" stroke="#898989" stroke-width="0.5"/>
+                    </g>
+                    <text x="60" y="88" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" fill="#1a1a1a" text-anchor="middle">Quarry</text>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Mono Dark -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Mono · Dark</span>
+                <div class="btn-group">
+                    <button class="btn secondary" onclick="downloadPNG('mono-dark')">PNG</button>
+                    <button class="btn" onclick="downloadSVG('mono-dark')">SVG</button>
+                </div>
+            </div>
+            <div class="preview dark">
+                <svg width="120" height="100" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="translate(22, 4)">
+                        <polygon points="0,0 34,0 30,30 0,26" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.5"/>
+                        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.5"/>
+                        <polygon points="0,26 30,30 26,60 0,60" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.5"/>
+                        <polygon points="30,30 42,30 46,60 26,60" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.5"/>
+                        <polygon points="42,30 76,22 76,60 46,60" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.5"/>
+                    </g>
+                    <text x="60" y="88" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" fill="#F5F5F5" text-anchor="middle">Quarry</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">Downloaded!</div>
+    
+    <script>
+        const svgs = {
+            'light': `<svg width="480" height="400" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="100" fill="#FFFFFF"/>
+    <g transform="translate(22, 4)">
+        <polygon points="0,0 34,0 30,30 0,26" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.5"/>
+        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#22A55D" stroke="#1D9050" stroke-width="0.5"/>
+        <polygon points="0,26 30,30 26,60 0,60" fill="#2DB86A" stroke="#28A35F" stroke-width="0.5"/>
+        <polygon points="30,30 42,30 46,60 26,60" fill="#4FCA85" stroke="#45B577" stroke-width="0.5"/>
+        <polygon points="42,30 76,22 76,60 46,60" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.5"/>
+    </g>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="26" font-weight="400" fill="#1a1a1a" text-anchor="middle">Quarry</text>
+</svg>`,
+            'dark': `<svg width="480" height="400" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="100" fill="#0F0F0F"/>
+    <g transform="translate(22, 4)">
+        <polygon points="0,0 34,0 30,30 0,26" fill="#C93A3A" stroke="#A82E2E" stroke-width="0.5"/>
+        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#E05555" stroke="#C94848" stroke-width="0.5"/>
+        <polygon points="0,26 30,30 26,60 0,60" fill="#E87070" stroke="#D06363" stroke-width="0.5"/>
+        <polygon points="30,30 42,30 46,60 26,60" fill="#F09090" stroke="#D88080" stroke-width="0.5"/>
+        <polygon points="42,30 76,22 76,60 46,60" fill="#F5B0B0" stroke="#DDA0A0" stroke-width="0.5"/>
+    </g>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="26" font-weight="400" fill="#F5F5F5" text-anchor="middle">Quarry</text>
+</svg>`,
+            'mono-light': `<svg width="480" height="400" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="100" fill="#FFFFFF"/>
+    <g transform="translate(22, 4)">
+        <polygon points="0,0 34,0 30,30 0,26" fill="#1a1a1a" stroke="#111" stroke-width="0.5"/>
+        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#3d3d3d" stroke="#2d2d2d" stroke-width="0.5"/>
+        <polygon points="0,26 30,30 26,60 0,60" fill="#555555" stroke="#454545" stroke-width="0.5"/>
+        <polygon points="30,30 42,30 46,60 26,60" fill="#777777" stroke="#676767" stroke-width="0.5"/>
+        <polygon points="42,30 76,22 76,60 46,60" fill="#999999" stroke="#898989" stroke-width="0.5"/>
+    </g>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="26" font-weight="400" fill="#1a1a1a" text-anchor="middle">Quarry</text>
+</svg>`,
+            'mono-dark': `<svg width="480" height="400" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="100" fill="#0F0F0F"/>
+    <g transform="translate(22, 4)">
+        <polygon points="0,0 34,0 30,30 0,26" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.5"/>
+        <polygon points="34,0 76,0 76,22 42,30 30,30" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.5"/>
+        <polygon points="0,26 30,30 26,60 0,60" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.5"/>
+        <polygon points="30,30 42,30 46,60 26,60" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.5"/>
+        <polygon points="42,30 76,22 76,60 46,60" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.5"/>
+    </g>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="26" font-weight="400" fill="#F5F5F5" text-anchor="middle">Quarry</text>
+</svg>`
+        };
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+        
+        function downloadSVG(type) {
+            const svg = `<?xml version="1.0" encoding="UTF-8"?>\n${svgs[type]}`;
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `quarry-logo-${type}.svg`;
+            a.click();
+            showToast('Downloaded SVG');
+        }
+        
+        function downloadPNG(type) {
+            const scale = 4;
+            const width = 120 * scale;
+            const height = 100 * scale;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            const svgBlob = new Blob([svgs[type]], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, width, height);
+                URL.revokeObjectURL(url);
+                
+                canvas.toBlob(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `quarry-logo-${type}@4x.png`;
+                    a.click();
+                    showToast('Downloaded PNG @4x');
+                }, 'image/png');
+            };
+            
+            img.src = url;
+        }
+    </script>
+</body>
+</html>

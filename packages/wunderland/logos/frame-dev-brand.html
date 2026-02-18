@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frame - Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #000000, #0055ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .color-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .color-tab {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-tab.active {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        
+        .color-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            margin-bottom: 1rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        
+        .preview-box.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .preview-box.black { background: #000; }
+        .preview-box.blue { background: #0055ff; }
+        .preview-box.green { background: #00C896; }
+        .preview-box.purple { background: #7C3AED; }
+        .preview-box.coral { background: #FF6B6B; }
+        .preview-box.navy { background: #1e293b; }
+        
+        .preview-label {
+            font-size: 0.875rem;
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #000, #333);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .download-btn.primary {
+            background: linear-gradient(135deg, #0055ff, #0044cc);
+        }
+        
+        .download-btn.secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .download-btn.secondary:hover {
+            background: #dee2e6;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .usage-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .usage-item {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .usage-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #0055ff;
+        }
+        
+        .usage-item p {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            color: #0055ff;
+        }
+        
+        .tagline-control {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .tagline-control label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #333;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .tagline-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #0055ff;
+        }
+        
+        .tagline-options {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .tagline-select {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .tagline-select select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        
+        .custom-tagline-input {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .custom-tagline-input input[type="text"] {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            flex-grow: 1;
+        }
+        
+        .custom-tagline-input input[type="text"]:focus {
+            outline: none;
+            border-color: #0055ff;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .icon-preview {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .icon-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .icon-preview.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .icon-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .download-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #666;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .font-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .font-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .font-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .font-preview {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+
+        .css-code {
+            background: #1a1a1a;
+            color: #00ff88;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Frame</h1>
+            <p class="subtitle">Logo Export System</p>
+        </header>
+        
+        <!-- Primary Logo Section -->
+        <section class="section">
+            <h2>Primary Logo Variations</h2>
+            
+            <div class="tagline-control">
+                <label>
+                    <input type="checkbox" id="includeTagline" checked onchange="updateLogoDisplay()">
+                    Include tagline
+                </label>
+                <div class="tagline-options" id="taglineOptions">
+                    <div class="tagline-select">
+                        <label for="taglineSelect">Preset:</label>
+                        <select id="taglineSelect" onchange="updateTaglineSelection()">
+                            <option value="Infrastructure for agentic AI">Infrastructure for agentic AI</option>
+                            <option value="Framing the intelligent web">Framing the intelligent web</option>
+                            <option value="Organizing intelligence">Organizing intelligence</option>
+                            <option value="AI infrastructure, simplified">AI infrastructure, simplified</option>
+                            <option value="Denoising the web">Denoising the web</option>
+                            <option value="custom">Custom tagline...</option>
+                        </select>
+                    </div>
+                    <div class="custom-tagline-input" id="customTaglineDiv" style="display: none;">
+                        <label for="customTagline">Custom:</label>
+                        <input type="text" id="customTagline" placeholder="Enter your tagline" oninput="updateLogoDisplay()">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="color-tabs">
+                <button class="color-tab active" onclick="setActiveColor('black')" data-color="black">
+                    <span class="color-dot" style="background: #000"></span>
+                    Classic Black
+                </button>
+                <button class="color-tab" onclick="setActiveColor('blue')" data-color="blue">
+                    <span class="color-dot" style="background: #0055ff"></span>
+                    Electric Blue
+                </button>
+                <button class="color-tab" onclick="setActiveColor('green')" data-color="green">
+                    <span class="color-dot" style="background: #00C896"></span>
+                    Emerald
+                </button>
+                <button class="color-tab" onclick="setActiveColor('purple')" data-color="purple">
+                    <span class="color-dot" style="background: #7C3AED"></span>
+                    Deep Purple
+                </button>
+                <button class="color-tab" onclick="setActiveColor('coral')" data-color="coral">
+                    <span class="color-dot" style="background: #FF6B6B"></span>
+                    Coral
+                </button>
+                <button class="color-tab" onclick="setActiveColor('navy')" data-color="navy">
+                    <span class="color-dot" style="background: #1e293b"></span>
+                    Navy
+                </button>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box" id="primaryLogoLight">
+                        <svg width="320" height="120" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" id="primaryLogoLightSVG">
+                            <!-- Logo content will be dynamically updated -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark" id="primaryLogoDark">
+                        <svg width="320" height="120" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" id="primaryLogoDarkSVG">
+                            <!-- Logo content will be dynamically updated -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Vector Formats</div>
+            <div class="download-grid">
+                <button class="download-btn primary" onclick="downloadSVG('primary')">Download SVG</button>
+                <button class="download-btn" onclick="downloadSVG('primary-dark')">SVG (Dark)</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Transparent Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 1)">PNG @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 2)">PNG @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 3)">PNG @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 4)">PNG @4x</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - White Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 1)">PNG White @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 2)">PNG White @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 3)">PNG White @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 4)">PNG White @4x</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Dark Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 1)">PNG Dark @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 2)">PNG Dark @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 3)">PNG Dark @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 4)">PNG Dark @4x</button>
+            </div>
+        </section>
+        
+        <!-- Icon/Favicon Section -->
+        <section class="section">
+            <h2>Icon / Favicon Variations</h2>
+            
+            <div class="color-tabs">
+                <button class="color-tab active" onclick="setActiveIconColor('black')" data-icon-color="black">
+                    <span class="color-dot" style="background: #000"></span>
+                    Black
+                </button>
+                <button class="color-tab" onclick="setActiveIconColor('blue')" data-icon-color="blue">
+                    <span class="color-dot" style="background: #0055ff"></span>
+                    Blue
+                </button>
+                <button class="color-tab" onclick="setActiveIconColor('green')" data-icon-color="green">
+                    <span class="color-dot" style="background: #00C896"></span>
+                    Green
+                </button>
+                <button class="color-tab" onclick="setActiveIconColor('purple')" data-icon-color="purple">
+                    <span class="color-dot" style="background: #7C3AED"></span>
+                    Purple
+                </button>
+                <button class="color-tab" onclick="setActiveIconColor('coral')" data-icon-color="coral">
+                    <span class="color-dot" style="background: #FF6B6B"></span>
+                    Coral
+                </button>
+                <button class="color-tab" onclick="setActiveIconColor('navy')" data-icon-color="navy">
+                    <span class="color-dot" style="background: #1e293b"></span>
+                    Navy
+                </button>
+            </div>
+            
+            <div class="icon-grid">
+                <div class="icon-preview" id="icon64">
+                    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Icon content will be dynamically updated -->
+                    </svg>
+                    <div class="icon-label">64×64 Icon</div>
+                </div>
+                
+                <div class="icon-preview" id="icon32">
+                    <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Icon content will be dynamically updated -->
+                    </svg>
+                    <div class="icon-label">32×32 Favicon</div>
+                </div>
+                
+                <div class="icon-preview" id="icon16">
+                    <svg width="16" height="16" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Icon content will be dynamically updated -->
+                    </svg>
+                    <div class="icon-label">16×16 Favicon</div>
+                </div>
+                
+                <div class="icon-preview dark" id="icon64dark">
+                    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Icon content will be dynamically updated -->
+                    </svg>
+                    <div class="icon-label" style="color: #999">64×64 Dark</div>
+                </div>
+                
+                <div class="icon-preview dark" id="icon32dark">
+                    <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Icon content will be dynamically updated -->
+                    </svg>
+                    <div class="icon-label" style="color: #999">32×32 Dark</div>
+                </div>
+            </div>
+            
+            <h3>Download Icons</h3>
+            
+            <div class="download-section-title">Vector Format</div>
+            <div class="download-grid">
+                <button class="download-btn primary" onclick="downloadSVG('icon')">Download Icon SVG</button>
+            </div>
+            
+            <div class="download-section-title">Standard Sizes (Transparent Background)</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 16)">16×16</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 32)">32×32</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64)">64×64</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128)">128×128</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256)">256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 512)">512×512</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 1024)">1024×1024</button>
+            </div>
+            
+            <div class="download-section-title">High Resolution (Retina @2x)</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 32, 2)">32×32 @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64, 2)">64×64 @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128, 2)">128×128 @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256, 2)">256×256 @2x</button>
+            </div>
+            
+            <div class="download-section-title">With Backgrounds</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'white', 512)">512×512 (White)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'dark', 512)">512×512 (Dark)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'brand', 512)">512×512 (Brand)</button>
+            </div>
+            
+            <div class="download-section-title">Favicon Package</div>
+            <div class="download-grid">
+                <button class="download-btn primary" onclick="downloadFaviconPackage()">Download Favicon.ico</button>
+                <button class="download-btn" onclick="downloadAppleTouchIcon()">Apple Touch Icon</button>
+            </div>
+        </section>
+        
+        <!-- Typography & CSS Information -->
+        <section class="section">
+            <h2>Typography & Implementation</h2>
+            
+            <div class="font-section">
+                <h3>Font Information</h3>
+                <div class="font-grid">
+                    <div class="font-item">
+                        <div class="font-preview">Frame</div>
+                        <p><strong>Font Family:</strong> Inter</p>
+                        <p><strong>Weight:</strong> 700 (Bold)</p>
+                        <p><strong>Size:</strong> 44px</p>
+                        <p><strong>Letter Spacing:</strong> -0.02em</p>
+                    </div>
+                    
+                    <div class="font-item">
+                        <div class="font-preview" style="font-size: 1rem; font-weight: 400;">Infrastructure for agentic AI</div>
+                        <p><strong>Tagline Font:</strong> Inter</p>
+                        <p><strong>Weight:</strong> 400 (Regular)</p>
+                        <p><strong>Size:</strong> 12px</p>
+                        <p><strong>Letter Spacing:</strong> 0.05em</p>
+                    </div>
+                </div>
+                
+                <h3>CSS Implementation</h3>
+                <div class="css-code">/* Frame Logo Styles */
+.frame-logo {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 700;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+}
+
+.frame-tagline {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+/* Color Variables */
+:root {
+    --frame-black: #000000;
+    --frame-blue: #0055ff;
+    --frame-green: #00C896;
+    --frame-purple: #7C3AED;
+    --frame-coral: #FF6B6B;
+    --frame-navy: #1e293b;
+}</div>
+                
+                <h3>Font CDN Links</h3>
+                <div class="css-code">&lt;!-- Google Fonts --&gt;
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"&gt;</div>
+            </div>
+        </section>
+        
+        <!-- Usage Guidelines -->
+        <section class="section">
+            <h2>Usage Guidelines</h2>
+            
+            <div class="usage-section">
+                <div class="usage-grid">
+                    <div class="usage-item">
+                        <h4>Minimum Size</h4>
+                        <p>Primary logo: <code>140px</code> width<br>
+                        Icon: <code>16px</code> minimum</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Clear Space</h4>
+                        <p>Maintain clear space equal to the height of the icon frame around the logo</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Color Usage</h4>
+                        <p>Use monochrome variations to match your brand context. Never modify the colors.</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Documentation</h4>
+                        <p>Use black or blue variant for technical documentation and developer resources</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Marketing</h4>
+                        <p>Use colored variants (green, purple, coral) for marketing materials and social media</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Enterprise</h4>
+                        <p>Use navy or black variant for enterprise and corporate communications</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Color configurations
+        const colors = {
+            black: { fill: '#000000', name: 'black' },
+            blue: { fill: '#0055ff', name: 'blue' },
+            green: { fill: '#00C896', name: 'green' },
+            purple: { fill: '#7C3AED', name: 'purple' },
+            coral: { fill: '#FF6B6B', name: 'coral' },
+            navy: { fill: '#1e293b', name: 'navy' }
+        };
+        
+        let currentColor = 'black';
+        let currentIconColor = 'black';
+        let includeTagline = true;
+        let currentTagline = 'Infrastructure for agentic AI';
+        let isCustomTagline = false;
+        
+        // Function to generate Frame logo SVG
+        function generateFrameLogo(color, isDark = false, includeTag = true) {
+            const fillColor = isDark ? '#ffffff' : colors[color].fill;
+            const taglineColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)';
+            
+            // Calculate proper centering
+            // Total logo width: icon(50) + gap(10) + text(~95) = ~155px
+            // To center in 320px: start at (320-155)/2 = 82.5
+            const logoStartX = 82.5;
+            const iconX = logoStartX + 25; // Icon center (25px from start)
+            const textX = logoStartX + 60;  // Text start (after 50px icon + 10px gap)
+            
+            // Vertical positioning
+            const mainY = includeTag ? 48 : 60;
+            const textY = mainY + 5; // Text baseline
+            const taglineY = mainY + 25; // Tagline closer to logo
+            
+            // Left-align tagline to start at the F in Frame
+            // Text starts at 142.5, so tagline starts there too
+            const taglineX = 142.5;
+            
+            const taglineText = includeTag ? 
+                `<text x="${taglineX}" y="${taglineY}" font-family="Inter" font-size="11" font-weight="400" fill="${taglineColor}" text-anchor="start" letter-spacing="0.3">${currentTagline}</text>` 
+                : '';
+            
+            // Use a subtle gray border for light backgrounds, white for dark
+            const borderColor = isDark ? '#ffffff' : '#e0e0e0';
+            const innerStrokeColor = '#ffffff';
+            
+            return `
+                <defs>
+                    <filter id="shadow-${color}${isDark ? '-dark' : ''}" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                        <feOffset dx="0" dy="4" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.2' : '0.15'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <!-- Icon with border -->
+                <g transform="translate(${iconX}, ${mainY})" filter="url(#shadow-${color}${isDark ? '-dark' : ''})">
+                    <!-- Outer border rect -->
+                    <rect x="-25" y="-28" width="50" height="56" fill="${colors[color].fill}" stroke="${borderColor}" stroke-width="2"/>
+                    <!-- Inner white stroke for contrast -->
+                    <rect x="-23" y="-26" width="46" height="52" fill="none" stroke="${innerStrokeColor}" stroke-width="2" opacity="0.5"/>
+                    <!-- Left spine highlight -->
+                    <rect x="-25" y="-28" width="10" height="56" fill="${innerStrokeColor}" opacity="0.15"/>
+                    <!-- Vertical divider lines -->
+                    <line x1="-15" y1="-28" x2="-15" y2="28" stroke="${innerStrokeColor}" stroke-width="2"/>
+                    <line x1="5" y1="-28" x2="5" y2="28" stroke="${innerStrokeColor}" stroke-width="2"/>
+                    <!-- Horizontal center line -->
+                    <line x1="-25" y1="0" x2="25" y2="0" stroke="${innerStrokeColor}" stroke-width="2"/>
+                </g>
+                <!-- Text -->
+                <text x="${textX}" y="${textY}" font-family="Inter" font-size="42" font-weight="700" fill="${fillColor}">Frame</text>
+                <!-- Tagline centered -->
+                ${taglineText}
+            `;
+        }
+        
+        // Function to generate Frame icon SVG
+        function generateFrameIcon(color, isDark = false) {
+            // Use a subtle gray border for light backgrounds, white for dark
+            const borderColor = isDark ? '#ffffff' : '#d0d0d0';
+            const innerStrokeColor = '#ffffff';
+            
+            return `
+                <rect width="64" height="64" fill="${isDark ? '#1a1a1a' : 'transparent'}"/>
+                <g transform="translate(32, 32)">
+                    <!-- Outer border rect -->
+                    <rect x="-20" y="-22" width="40" height="44" fill="${colors[color].fill}" stroke="${borderColor}" stroke-width="2"/>
+                    <!-- Inner white stroke for contrast -->
+                    <rect x="-18" y="-20" width="36" height="40" fill="none" stroke="${innerStrokeColor}" stroke-width="1.5" opacity="0.5"/>
+                    <!-- Left spine highlight -->
+                    <rect x="-20" y="-22" width="8" height="44" fill="${innerStrokeColor}" opacity="0.15"/>
+                    <!-- Vertical divider lines -->
+                    <line x1="-12" y1="-22" x2="-12" y2="22" stroke="${innerStrokeColor}" stroke-width="1.8"/>
+                    <line x1="4" y1="-22" x2="4" y2="22" stroke="${innerStrokeColor}" stroke-width="1.8"/>
+                    <!-- Horizontal center line -->
+                    <line x1="-20" y1="0" x2="20" y2="0" stroke="${innerStrokeColor}" stroke-width="1.8"/>
+                </g>
+            `;
+        }
+        
+        // Update tagline selection
+        function updateTaglineSelection() {
+            const selectValue = document.getElementById('taglineSelect').value;
+            const customDiv = document.getElementById('customTaglineDiv');
+            
+            if (selectValue === 'custom') {
+                customDiv.style.display = 'flex';
+                isCustomTagline = true;
+                currentTagline = document.getElementById('customTagline').value || 'Enter your tagline';
+            } else {
+                customDiv.style.display = 'none';
+                isCustomTagline = false;
+                currentTagline = selectValue;
+            }
+            
+            updateLogoDisplay();
+        }
+        
+        // Update logo display
+        function updateLogoDisplay() {
+            includeTagline = document.getElementById('includeTagline').checked;
+            document.getElementById('taglineOptions').style.display = includeTagline ? 'flex' : 'none';
+            
+            if (includeTagline && isCustomTagline) {
+                currentTagline = document.getElementById('customTagline').value || 'Enter your tagline';
+            } else if (includeTagline && !isCustomTagline) {
+                const selectValue = document.getElementById('taglineSelect').value;
+                if (selectValue !== 'custom') {
+                    currentTagline = selectValue;
+                }
+            }
+            
+            // Update preview SVGs
+            document.getElementById('primaryLogoLightSVG').innerHTML = generateFrameLogo(currentColor, false, includeTagline);
+            document.getElementById('primaryLogoDarkSVG').innerHTML = generateFrameLogo(currentColor, true, includeTagline);
+        }
+        
+        // Set active color for primary logo
+        function setActiveColor(color) {
+            currentColor = color;
+            
+            // Update tabs
+            document.querySelectorAll('.color-tab[data-color]').forEach(tab => {
+                if (tab.dataset.color === color) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update logo display
+            updateLogoDisplay();
+        }
+        
+        // Set active color for icons
+        function setActiveIconColor(color) {
+            currentIconColor = color;
+            
+            // Update icon tabs
+            document.querySelectorAll('.color-tab[data-icon-color]').forEach(tab => {
+                if (tab.dataset.iconColor === color) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update icon displays
+            updateIconDisplays();
+        }
+        
+        // Update icon displays
+        function updateIconDisplays() {
+            document.querySelector('#icon64 svg').innerHTML = generateFrameIcon(currentIconColor, false);
+            document.querySelector('#icon32 svg').innerHTML = generateFrameIcon(currentIconColor, false);
+            document.querySelector('#icon16 svg').innerHTML = generateFrameIcon(currentIconColor, false);
+            document.querySelector('#icon64dark svg').innerHTML = generateFrameIcon(currentIconColor, true);
+            document.querySelector('#icon32dark svg').innerHTML = generateFrameIcon(currentIconColor, true);
+        }
+        
+        // Download SVG function
+        function downloadSVG(type) {
+            let svgContent;
+            let filename;
+            
+            if (type === 'primary') {
+                svgContent = '<?xml version="1.0" encoding="UTF-8"?>\n<svg width="320" height="120" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateFrameLogo(currentColor, false, includeTagline) + '</svg>';
+                filename = `frame-logo-${currentColor}${includeTagline ? '' : '-no-tagline'}.svg`;
+            } else if (type === 'primary-dark') {
+                svgContent = '<?xml version="1.0" encoding="UTF-8"?>\n<svg width="320" height="120" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateFrameLogo(currentColor, true, includeTagline) + '</svg>';
+                filename = `frame-logo-${currentColor}-dark${includeTagline ? '' : '-no-tagline'}.svg`;
+            } else if (type === 'icon') {
+                svgContent = '<?xml version="1.0" encoding="UTF-8"?>\n<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateFrameIcon(currentIconColor, false) + '</svg>';
+                filename = `frame-icon-${currentIconColor}.svg`;
+            }
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Download PNG function
+        function downloadPNG(type, background, scale, multiplier = 1) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            let svgContent, baseWidth, baseHeight, filename;
+            
+            if (type === 'primary') {
+                baseWidth = 320;
+                baseHeight = 120;
+                canvas.width = baseWidth * scale;
+                canvas.height = baseHeight * scale;
+                
+                const isDark = background === 'dark';
+                svgContent = '<svg width="' + (baseWidth * scale) + '" height="' + (baseHeight * scale) + 
+                           '" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateFrameLogo(currentColor, isDark, includeTagline) + '</svg>';
+                filename = `frame-logo-${currentColor}-${background}${includeTagline ? '' : '-no-tagline'}-${scale}x.png`;
+            } else if (type === 'icon') {
+                // For icons, scale is the size in pixels
+                canvas.width = scale * multiplier;
+                canvas.height = scale * multiplier;
+                
+                svgContent = '<svg width="' + (scale * multiplier) + '" height="' + (scale * multiplier) + 
+                           '" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateFrameIcon(currentIconColor, background === 'dark') + '</svg>';
+                filename = `frame-icon-${currentIconColor}-${scale}x${scale}${multiplier > 1 ? '@' + multiplier + 'x' : ''}.png`;
+            }
+            
+            // Fill background if needed
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (background === 'dark') {
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (background === 'brand') {
+                ctx.fillStyle = colors[currentIconColor].fill;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob(function(pngBlob) {
+                    const a = document.createElement('a');
+                    const pngUrl = URL.createObjectURL(pngBlob);
+                    a.href = pngUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(pngUrl);
+                }, 'image/png');
+                
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+        
+        // Download favicon package
+        function downloadFaviconPackage() {
+            // This would typically generate a multi-resolution ICO file
+            // For now, we'll download the 32x32 PNG
+            downloadPNG('icon', 'transparent', 32);
+        }
+        
+        // Download Apple Touch Icon
+        function downloadAppleTouchIcon() {
+            downloadPNG('icon', 'brand', 180);
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLogoDisplay();
+            updateIconDisplays();
+        });
+    </script>
+</body>
+</html>

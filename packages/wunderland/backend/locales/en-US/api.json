@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "Recording...",
+    "processing": "Processing voice...",
+    "transcribing": "Transcribing audio...",
+    "listening": "Listening...",
+    "speakNow": "Speak now",
+    "clickToSpeak": "Click to speak",
+    "stopRecording": "Stop recording",
+    "microphoneAccess": "Microphone access required",
+    "noSpeechDetected": "No speech detected",
+    "transcriptionComplete": "Transcription complete"
+  },
+  "chat": {
+    "thinking": "Thinking...",
+    "generating": "Generating response...",
+    "messageEmpty": "Message cannot be empty",
+    "sendMessage": "Send message",
+    "newChat": "New chat",
+    "clearHistory": "Clear history",
+    "typingIndicator": "AI is typing...",
+    "copyCode": "Copy code",
+    "codeCopied": "Code copied to clipboard",
+    "retry": "Retry",
+    "regenerate": "Regenerate response"
+  },
+  "modes": {
+    "coding": "Coding Q&A",
+    "codingDesc": "Get help with programming questions and code examples",
+    "systemDesign": "System Design",
+    "systemDesignDesc": "Design architecture and create diagrams",
+    "meetingSummary": "Meeting Summary",
+    "meetingSummaryDesc": "Summarize meetings and extract key points",
+    "general": "General",
+    "generalDesc": "General conversation and questions"
+  },
+  "cost": {
+    "title": "API Usage",
+    "current": "Current Session",
+    "total": "Total Usage",
+    "threshold": "Cost Threshold",
+    "warning": "Approaching cost limit",
+    "exceeded": "Cost limit exceeded",
+    "reset": "Reset Counter"
+  },
+  "settings": {
+    "speechRecognition": "Speech Recognition",
+    "whisperAPI": "Whisper API",
+    "browserSpeech": "Browser Speech",
+    "textToSpeech": "Text to Speech",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "Browser TTS",
+    "apiKeys": "API Keys",
+    "openAIKey": "OpenAI API Key",
+    "anthropicKey": "Anthropic API Key",
+    "modelPreferences": "Model Preferences",
+    "costLimits": "Cost Limits",
+    "sessionLimit": "Session Limit",
+    "dailyLimit": "Daily Limit",
+    "monthlyLimit": "Monthly Limit"
+  }
+}

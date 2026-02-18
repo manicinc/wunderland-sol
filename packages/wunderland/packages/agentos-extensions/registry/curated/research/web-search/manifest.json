@@ -1,0 +1,65 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.research.web-search",
+  "name": "Web Search Extension",
+  "version": "1.1.0",
+  "description": "Professional web search, research aggregation, and fact-checking capabilities for AgentOS",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": ["search", "web", "research", "fact-check", "serper", "serpapi", "brave"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["productivity", "research"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "web_search",
+      "displayName": "Web Search",
+      "description": "Search the web for information",
+      "entry": "./dist/tools/webSearch.js"
+    },
+    {
+      "kind": "tool",
+      "id": "research_aggregate",
+      "displayName": "Research Aggregator",
+      "description": "Aggregate research from multiple searches",
+      "entry": "./dist/tools/researchAggregator.js"
+    },
+    {
+      "kind": "tool",
+      "id": "fact_check",
+      "displayName": "Fact Checker",
+      "description": "Verify facts across multiple sources",
+      "entry": "./dist/tools/factCheck.js"
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "search.provider": {
+        "type": "string",
+        "enum": ["serper", "serpapi", "brave", "duckduckgo"],
+        "default": "duckduckgo",
+        "description": "Search API provider to use"
+      },
+      "search.apiKey": {
+        "type": "string",
+        "description": "API key for the search provider",
+        "secret": true
+      },
+      "search.rateLimit": {
+        "type": "number",
+        "default": 5,
+        "minimum": 1,
+        "maximum": 20,
+        "description": "Maximum requests per second"
+      }
+    }
+  }
+}

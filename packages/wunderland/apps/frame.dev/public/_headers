@@ -1,0 +1,62 @@
+# Cloudflare Pages Headers
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Static assets - aggressive caching (1 year, immutable)
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts - aggressive caching
+/_next/static/media/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# CSS chunks - aggressive caching
+/_next/static/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# JS chunks - aggressive caching
+/_next/static/chunks/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images and media - aggressive caching
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# WASM files - aggressive caching
+/*.wasm
+  Cache-Control: public, max-age=31536000, immutable
+
+# Landing page - moderate caching for freshness
+/quarry/landing/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# Security headers for all routes
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+
+
+

@@ -1,0 +1,83 @@
+// File: frontend/src/styles/abstracts/theme-engine.scss
+/**
+ * @version 3.1.1 - Simplified Terminus theme IDs in registry.
+ */
+@use 'sass:map';
+@use './theme-definitions' as themes; // Provides $VCA_THEME_DEFINITIONS
+
+$theme-registry: (
+  'sakura-sunset':    ('is-dark': true,  'map': map.get(themes.$VCA_THEME_DEFINITIONS, 'sakura-sunset')),
+  'twilight-neo':     ('is-dark': true,  'map': map.get(themes.$VCA_THEME_DEFINITIONS, 'twilight-neo')),
+  'aurora-daybreak':  ('is-dark': false, 'map': map.get(themes.$VCA_THEME_DEFINITIONS, 'aurora-daybreak')),
+  'warm-embrace':     ('is-dark': false, 'map': map.get(themes.$VCA_THEME_DEFINITIONS, 'warm-embrace')),
+  'terminus-dark':    ('is-dark': true,  'map': map.get(themes.$VCA_THEME_DEFINITIONS, 'terminus-dark')),  // <-- UPDATED ID
+  'terminus-light':   ('is-dark': false, 'map': map.get(themes.$VCA_THEME_DEFINITIONS, 'terminus-light')) // <-- UPDATED ID
+);
+
+// Aliases - update or remove Terminus aliases if the main IDs are now simple enough.
+// If you keep aliases, ensure they point to the new main IDs.
+$theme-aliases: (
+  'ephemeral-holo-dark':    'twilight-neo',
+  'aurora-light':           'aurora-daybreak',
+  'legacy-warm-embrace':    'warm-embrace',
+  'legacy-twilight-neo':    'twilight-neo',
+  'magenta-mystic':         'sakura-sunset',
+  'her-pink':               'sakura-sunset',
+  'midnight-dark':          'twilight-neo',
+  'default-dark':           'sakura-sunset',
+  'default-light':          'aurora-daybreak'
+  // Removed 'retro-terminus-dark' and 'retro-terminus-light' from aliases as they are now primary IDs.
+  // You can add new aliases if needed, e.g., 'retro-dark': 'terminus-dark'
+);
+
+@mixin apply-theme($theme-map-arg) {
+  @if type-of($theme-map-arg) == 'map' {
+    @each $prop, $val in $theme-map-arg {
+      #{$prop}: #{$val};
+    }
+  } @else {
+    @warn "Invalid theme map passed to apply-theme mixin. Expected a map, got #{type-of($theme-map-arg)}.";
+  }
+}
+
+$default-theme-name: 'sakura-sunset'; // Ensure this ID exists in $theme-registry
+
+:root {
+  $default-theme-meta: map.get($theme-registry, $default-theme-name);
+  @if $default-theme-meta and map.get($default-theme-meta, 'map') {
+    @include apply-theme(map.get($default-theme-meta, 'map'));
+    color-scheme: if(map.get($default-theme-meta, 'is-dark'), dark, light);
+  } @else {
+    @warn "Default theme '#{$default-theme-name}' not found or map is invalid in theme registry. Check configuration.";
+  }
+}
+
+@each $theme-id, $theme-meta in $theme-registry {
+  @if map.has-key($theme-meta, 'map') and type-of(map.get($theme-meta, 'map')) == 'map' {
+    html[data-theme='#{$theme-id}'] {
+      @include apply-theme(map.get($theme-meta, 'map'));
+      color-scheme: if(map.get($theme-meta, 'is-dark'), dark, light);
+    }
+  } @else {
+     @warn "Theme map for '#{$theme-id}' is missing or invalid in $theme-registry. CSS variables will not be generated for this theme.";
+  }
+}
+
+@each $alias-name, $target-theme-name in $theme-aliases {
+  @if map.has-key($theme-registry, $target-theme-name) {
+    $target-meta-data: map.get($theme-registry, $target-theme-name);
+    @if $target-meta-data and map.has-key($target-meta-data, 'map') and type-of(map.get($target-meta-data, 'map')) == 'map' {
+      $target-theme-map: map.get($target-meta-data, 'map');
+      $is-target-dark: map.get($target-meta-data, 'is-dark');
+
+      html[data-theme='#{$alias-name}'] {
+        @include apply-theme($target-theme-map);
+        color-scheme: if($is-target-dark, dark, light);
+      }
+    } @else {
+       @warn "Target theme '#{$target-theme-name}' for alias '#{$alias-name}' has an invalid map. Alias cannot be applied.";
+    }
+  } @else {
+    @warn "Theme alias target '#{$target-theme-name}' for alias '#{$alias-name}' not found in main theme registry.";
+  }
+}

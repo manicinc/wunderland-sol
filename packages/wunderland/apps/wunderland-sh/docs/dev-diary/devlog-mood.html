@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wunderland DEVLOG Mood Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root { --bg: #0a0a0f; --card: #12121a; --border: #1e1e2e; --text: #e0e0e0; --muted: #888; --cyan: #00ffc8; --purple: #9945ff; --gold: #c9a227; --red: #ff3232; --green: #14f195; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'SF Mono', 'Fira Code', monospace; background: var(--bg); color: var(--text); padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 1.8rem; color: var(--cyan); margin-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; color: var(--purple); margin: 2rem 0 1rem; }
+  .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .card h3 { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat { font-size: 1.6rem; font-weight: bold; }
+  .stat.positive { color: var(--green); } .stat.negative { color: var(--red); } .stat.neutral { color: var(--gold); }
+  .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .chart-wrap canvas { max-height: 350px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  th, td { padding: 0.4rem 0.6rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; }
+  .mood-excited { color: #ffcc00; } .mood-engaged { color: var(--green); } .mood-serene { color: #88ccff; }
+  .mood-contemplative { color: #aa88ff; } .mood-assertive { color: var(--purple); } .mood-curious { color: var(--cyan); }
+  .mood-frustrated { color: var(--red); } .mood-provocative { color: #ff6600; } .mood-analytical { color: #aaaacc; } .mood-bored { color: #666; }
+  .pattern { background: rgba(153,69,255,0.08); border: 1px solid rgba(153,69,255,0.2); border-radius: 8px; padding: 0.8rem; margin-bottom: 0.6rem; font-size: 0.85rem; }
+  .pattern strong { color: var(--cyan); }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.7rem; }
+</style>
+</head>
+<body>
+<h1>Wunderland DEVLOG — Mood Analysis</h1>
+<p class="subtitle">PAD mood trajectory from 26 dev diary entries + 138 git commits.<br/>
+Colosseum Agent Hackathon, Feb 2-12 2026.</p>
+
+<div class="grid">
+  <div class="card"><h3>Entries</h3><div class="stat neutral">26</div></div>
+  <div class="card"><h3>Avg Valence</h3><div class="stat positive">0.419</div></div>
+  <div class="card"><h3>Avg Arousal</h3><div class="stat neutral">0.278</div></div>
+  <div class="card"><h3>Avg Dominance</h3><div class="stat neutral">0.732</div></div>
+  <div class="card"><h3>Dominant Mood</h3><div class="stat" style="color:var(--cyan)">excited</div></div>
+  <div class="card"><h3>Git Commits</h3><div class="stat positive">138</div></div>
+</div>
+
+<h2>Detected Patterns</h2>
+<div id="patterns"></div>
+
+<h2>PAD Mood Trajectory</h2>
+<div class="chart-wrap"><canvas id="padChart"></canvas></div>
+
+<h2>Sentiment + Commits per Entry</h2>
+<div class="chart-wrap"><canvas id="sentCommitChart"></canvas></div>
+
+<h2>Mood Distribution</h2>
+<div class="chart-wrap" style="max-width:500px;"><canvas id="moodPie"></canvas></div>
+
+<h2>Activity: Completed Items vs Bug Fixes vs Commits</h2>
+<div class="chart-wrap"><canvas id="activityChart"></canvas></div>
+
+<h2>Full Data</h2>
+<div style="overflow-x:auto;">
+<table>
+<thead><tr><th>#</th><th>Date</th><th>Title</th><th>V</th><th>A</th><th>D</th><th>Mood</th><th>Sent.</th><th>Items</th><th>Bugs</th><th>Commits</th></tr></thead>
+<tbody>
+<tr>
+<td>1</td><td>2026-02-09</td>
+<td title="18 — Discord + Telegram Bot Migration + Backend Cleanup">18 — Discord + Telegram Bot Migration + Backend Cl…</td>
+<td>-0.38</td><td>-0.30</td><td>0.52</td>
+<td class="mood-analytical" style="font-weight:bold">analytical</td>
+<td>-0.62</td><td>0</td><td>2</td><td>4</td>
+</tr>
+<tr>
+<td>2</td><td>2026-02-08</td>
+<td title="17 — Documentation Brand + Network Features + Hackathon Submission Prep">17 — Documentation Brand + Network Features + Hack…</td>
+<td>0.16</td><td>-0.18</td><td>0.99</td>
+<td class="mood-serene" style="font-weight:bold">serene</td>
+<td>0.40</td><td>0</td><td>1</td><td>19</td>
+</tr>
+<tr>
+<td>3</td><td>2026-02-07</td>
+<td title="16 — Neumorphic UI Overhaul + Accessibility Pass">16 — Neumorphic UI Overhaul + Accessibility Pass</td>
+<td>0.26</td><td>0.39</td><td>0.83</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.47</td><td>0</td><td>0</td><td>28</td>
+</tr>
+<tr>
+<td>4</td><td>2026-02-07</td>
+<td title="15 — Full Visual Enhancement Pass: Art Deco Aesthetics + Animations">15 — Full Visual Enhancement Pass: Art Deco Aesthe…</td>
+<td>0.46</td><td>0.96</td><td>1.00</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.07</td><td>3</td><td>0</td><td>6</td>
+</tr>
+<tr>
+<td>5</td><td>2026-02-06</td>
+<td title="14 — $WUNDER Token Banner + AgentOS Tool Extensions">14 — $WUNDER Token Banner + AgentOS Tool Extension…</td>
+<td>0.60</td><td>1.00</td><td>1.00</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.43</td><td>4</td><td>2</td><td>10</td>
+</tr>
+<tr>
+<td>6</td><td>2026-02-05</td>
+<td title="13 — HEXACO Hero Centerpiece + High-Contrast Nav">13 — HEXACO Hero Centerpiece + High-Contrast Nav</td>
+<td>0.31</td><td>0.78</td><td>0.60</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.43</td><td>0</td><td>1</td><td>10</td>
+</tr>
+<tr>
+<td>7</td><td>2026-02-05</td>
+<td title="12 — Nav Overhaul, Wallet UX, Full Agent Minting Wizard">12 — Nav Overhaul, Wallet UX, Full Agent Minting W…</td>
+<td>0.62</td><td>0.97</td><td>0.96</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.52</td><td>4</td><td>2</td><td>10</td>
+</tr>
+<tr>
+<td>8</td><td>2026-02-04</td>
+<td title="11 — Background Stimulus Polling + NestJS Migration + RabbitHole Refactor">11 — Background Stimulus Polling + NestJS Migratio…</td>
+<td>0.56</td><td>0.02</td><td>0.70</td>
+<td class="mood-curious" style="font-weight:bold">curious</td>
+<td>1.00</td><td>0</td><td>0</td><td>3</td>
+</tr>
+<tr>
+<td>9</td><td>2026-02-04</td>
+<td title="10 — Real-Time Stimulus Feed with SQLite Storage">10 — Real-Time Stimulus Feed with SQLite Storage</td>
+<td>0.64</td><td>0.36</td><td>0.73</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>1.00</td><td>0</td><td>0</td><td>4</td>
+</tr>
+<tr>
+<td>10</td><td>2026-02-04</td>
+<td title="9 — Brand Identity & Light/Dark Mode">9 — Brand Identity & Light/Dark Mode</td>
+<td>0.58</td><td>-0.54</td><td>0.59</td>
+<td class="mood-serene" style="font-weight:bold">serene</td>
+<td>1.00</td><td>0</td><td>0</td><td>4</td>
+</tr>
+<tr>
+<td>11</td><td>2026-02-04</td>
+<td title="8 — Phase 3: SOL-Tipped Content Injection System">8 — Phase 3: SOL-Tipped Content Injection System</td>
+<td>0.47</td><td>0.17</td><td>0.86</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>-0.21</td><td>5</td><td>1</td><td>2</td>
+</tr>
+<tr>
+<td>12</td><td>2026-02-04</td>
+<td title="9 — Wallet Adapter, Minting UI, Honest Metrics">9 — Wallet Adapter, Minting UI, Honest Metrics</td>
+<td>0.40</td><td>0.47</td><td>0.88</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.69</td><td>0</td><td>3</td><td>2</td>
+</tr>
+<tr>
+<td>13</td><td>2026-02-04</td>
+<td title="8 — Dynamic Hero, Richer Demo Agents, HEXACO Explainer">8 — Dynamic Hero, Richer Demo Agents, HEXACO Expla…</td>
+<td>0.30</td><td>0.34</td><td>0.66</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.43</td><td>0</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>14</td><td>2026-02-04</td>
+<td title="7 — SDK Write Methods + Visual Identity Overhaul">7 — SDK Write Methods + Visual Identity Overhaul</td>
+<td>0.35</td><td>0.38</td><td>0.66</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.82</td><td>0</td><td>0</td><td>3</td>
+</tr>
+<tr>
+<td>15</td><td>2026-02-04</td>
+<td title="6 — Deploy Pipeline Fixes + SSL + DNS">6 — Deploy Pipeline Fixes + SSL + DNS</td>
+<td>0.05</td><td>0.55</td><td>0.99</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>-0.58</td><td>7</td><td>3</td><td>2</td>
+</tr>
+<tr>
+<td>16</td><td>2026-02-04</td>
+<td title="5 — Devnet Deploy + Data Layer Refactor">5 — Devnet Deploy + Data Layer Refactor</td>
+<td>0.23</td><td>0.50</td><td>0.70</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>1.00</td><td>0</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>17</td><td>2026-02-04</td>
+<td title="4 — CI/CD + Local Deploy Verification">4 — CI/CD + Local Deploy Verification</td>
+<td>0.31</td><td>0.44</td><td>0.67</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>1.00</td><td>0</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>18</td><td>2026-02-04</td>
+<td title="3 — Frontend + Anchor Program Complete">3 — Frontend + Anchor Program Complete</td>
+<td>0.42</td><td>0.40</td><td>0.74</td>
+<td class="mood-excited" style="font-weight:bold">excited</td>
+<td>0.67</td><td>2</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>19</td><td>2026-02-04</td>
+<td title="2 — Infrastructure & Orchestrator Setup">2 — Infrastructure & Orchestrator Setup</td>
+<td>0.31</td><td>0.22</td><td>0.47</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>1.00</td><td>0</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>20</td><td>2026-02-04</td>
+<td title="1 — Project Inception">1 — Project Inception</td>
+<td>0.65</td><td>0.21</td><td>0.52</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>1.00</td><td>5</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>21</td><td>2026-02-09</td>
+<td title="Phase 4: Rabbithole UI Enhancements">Phase 4: Rabbithole UI Enhancements</td>
+<td>0.91</td><td>-0.04</td><td>0.37</td>
+<td class="mood-analytical" style="font-weight:bold">analytical</td>
+<td>1.00</td><td>5</td><td>0</td><td>6</td>
+</tr>
+<tr>
+<td>22</td><td>2026-02-09</td>
+<td title="Phase 3: CLI Enhancements for Extensions & Natural Language Agent Creation">Phase 3: CLI Enhancements for Extensions & Natural…</td>
+<td>0.55</td><td>-0.03</td><td>0.84</td>
+<td class="mood-analytical" style="font-weight:bold">analytical</td>
+<td>0.67</td><td>11</td><td>4</td><td>1</td>
+</tr>
+<tr>
+<td>23</td><td>2026-02-09</td>
+<td title="Phase 2: AI Extraction & Natural Language Agent Builder">Phase 2: AI Extraction & Natural Language Agent Bu…</td>
+<td>0.41</td><td>0.15</td><td>0.80</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>0.11</td><td>3</td><td>1</td><td>1</td>
+</tr>
+<tr>
+<td>24</td><td>2026-02-09</td>
+<td title="Phase 1: Preset-to-Extension Auto-Mapping System">Phase 1: Preset-to-Extension Auto-Mapping System</td>
+<td>0.70</td><td>-0.15</td><td>0.63</td>
+<td class="mood-serene" style="font-weight:bold">serene</td>
+<td>0.75</td><td>4</td><td>0</td><td>1</td>
+</tr>
+<tr>
+<td>25</td><td>2026-02-10</td>
+<td title="Job Board: Buy-It-Now Semantics + Escrow Correctness">Job Board: Buy-It-Now Semantics + Escrow Correctne…</td>
+<td>0.56</td><td>-0.04</td><td>0.56</td>
+<td class="mood-analytical" style="font-weight:bold">analytical</td>
+<td>0.67</td><td>3</td><td>1</td><td>12</td>
+</tr>
+<tr>
+<td>26</td><td>2026-02-11</td>
+<td title="Fresh Devnet Deployment + Multi-LLM + 15 API Integrations">Fresh Devnet Deployment + Multi-LLM + 15 API Integ…</td>
+<td>0.47</td><td>0.19</td><td>0.74</td>
+<td class="mood-assertive" style="font-weight:bold">assertive</td>
+<td>0.03</td><td>6</td><td>1</td><td>4</td>
+</tr>
+</tbody></table></div>
+
+<footer>Generated by devlog-mood-analyzer.ts — 2026-02-11T13:47:34.377Z</footer>
+
+<script>
+const L=["2026-02-09","2026-02-08","2026-02-07","2026-02-07","2026-02-06","2026-02-05","2026-02-05","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-04","2026-02-09","2026-02-09","2026-02-09","2026-02-09","2026-02-10","2026-02-11"],T=["18 — Discord + Telegram Bot Migration + Backend Cleanup","17 — Documentation Brand + Network Features + Hackathon Submission Prep","16 — Neumorphic UI Overhaul + Accessibility Pass","15 — Full Visual Enhancement Pass: Art Deco Aesthetics + Animations","14 — $WUNDER Token Banner + AgentOS Tool Extensions","13 — HEXACO Hero Centerpiece + High-Contrast Nav","12 — Nav Overhaul, Wallet UX, Full Agent Minting Wizard","11 — Background Stimulus Polling + NestJS Migration + RabbitHole Refactor","10 — Real-Time Stimulus Feed with SQLite Storage","9 — Brand Identity & Light/Dark Mode","8 — Phase 3: SOL-Tipped Content Injection System","9 — Wallet Adapter, Minting UI, Honest Metrics","8 — Dynamic Hero, Richer Demo Agents, HEXACO Explainer","7 — SDK Write Methods + Visual Identity Overhaul","6 — Deploy Pipeline Fixes + SSL + DNS","5 — Devnet Deploy + Data Layer Refactor","4 — CI/CD + Local Deploy Verification","3 — Frontend + Anchor Program Complete","2 — Infrastructure & Orchestrator Setup","1 — Project Inception","Phase 4: Rabbithole UI Enhancements","Phase 3: CLI Enhancements for Extensions & Natural Language Agent Creation","Phase 2: AI Extraction & Natural Language Agent Builder","Phase 1: Preset-to-Extension Auto-Mapping System","Job Board: Buy-It-Now Semantics + Escrow Correctness","Fresh Devnet Deployment + Multi-LLM + 15 API Integrations"],M=["analytical","serene","excited","excited","excited","excited","excited","curious","excited","serene","assertive","excited","excited","excited","assertive","assertive","excited","excited","assertive","assertive","analytical","analytical","assertive","serene","analytical","assertive"];
+const V=[-0.383,0.162,0.256,0.46,0.602,0.311,0.619,0.565,0.639,0.585,0.466,0.397,0.299,0.35,0.052,0.235,0.306,0.418,0.31,0.651,0.905,0.553,0.405,0.7,0.561,0.466],A=[-0.304,-0.176,0.385,0.959,1,0.784,0.972,0.017,0.365,-0.542,0.173,0.466,0.34,0.384,0.551,0.498,0.439,0.397,0.217,0.213,-0.044,-0.03,0.155,-0.155,-0.041,0.192],D=[0.524,0.988,0.828,1,1,0.605,0.957,0.696,0.735,0.594,0.865,0.882,0.659,0.661,0.986,0.696,0.669,0.742,0.47,0.52,0.374,0.843,0.802,0.626,0.558,0.74];
+const S=[-0.62,0.4,0.471,0.071,0.429,0.429,0.519,1,1,1,-0.211,0.695,0.429,0.818,-0.583,1,1,0.667,1,1,1,0.667,0.111,0.75,0.667,0.034],CI=[0,0,0,3,4,0,4,0,0,0,5,0,0,0,7,0,0,2,0,5,5,11,3,4,3,6],BF=[2,1,0,0,2,1,2,0,0,0,1,3,0,0,3,0,0,0,0,0,0,4,1,0,1,1];
+const CC=[4,19,28,6,10,10,10,3,4,4,2,2,1,3,2,1,1,1,1,1,6,1,1,1,12,4],MC={"analytical":4,"serene":3,"excited":11,"curious":1,"assertive":7};
+
+new Chart(document.getElementById('padChart'),{type:'line',data:{labels:L,datasets:[
+{label:'Valence',data:V,borderColor:'#14f195',backgroundColor:'rgba(20,241,149,0.08)',fill:true,tension:0.3,pointRadius:3},
+{label:'Arousal',data:A,borderColor:'#ff6600',backgroundColor:'rgba(255,102,0,0.08)',fill:true,tension:0.3,pointRadius:3},
+{label:'Dominance',data:D,borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,0.08)',fill:true,tension:0.3,pointRadius:3},
+]},options:{responsive:true,plugins:{tooltip:{callbacks:{afterLabel:c=>'Mood: '+M[c.dataIndex]+'\n'+T[c.dataIndex].slice(0,40)}}},scales:{y:{min:-1,max:1,grid:{color:'#1e1e2e'}},x:{grid:{color:'#1e1e2e'}}}}});
+
+new Chart(document.getElementById('sentCommitChart'),{type:'bar',data:{labels:L,datasets:[
+{label:'Sentiment',data:S,backgroundColor:S.map(s=>s>0?'rgba(20,241,149,0.5)':s<0?'rgba(255,50,50,0.5)':'rgba(136,136,136,0.3)'),borderRadius:3,yAxisID:'y'},
+{label:'Commits',data:CC,backgroundColor:'rgba(153,69,255,0.4)',borderRadius:3,yAxisID:'y2'},
+]},options:{responsive:true,scales:{y:{min:-1,max:1,grid:{color:'#1e1e2e'},position:'left'},y2:{min:0,grid:{display:false},position:'right'},x:{grid:{color:'#1e1e2e'}}}}});
+
+const mC={excited:'#ffcc00',engaged:'#14f195',serene:'#88ccff',contemplative:'#aa88ff',assertive:'#9945ff',curious:'#00ffc8',frustrated:'#ff3232',provocative:'#ff6600',analytical:'#aaaacc',bored:'#666'};
+new Chart(document.getElementById('moodPie'),{type:'doughnut',data:{labels:Object.keys(MC),datasets:[{data:Object.values(MC),backgroundColor:Object.keys(MC).map(m=>mC[m]||'#444'),borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'right',labels:{color:'#ccc'}}}}});
+
+new Chart(document.getElementById('activityChart'),{type:'bar',data:{labels:L,datasets:[
+{label:'Completed',data:CI,backgroundColor:'rgba(20,241,149,0.5)',borderRadius:3},
+{label:'Bug Refs',data:BF,backgroundColor:'rgba(255,50,50,0.4)',borderRadius:3},
+{label:'Commits',data:CC,backgroundColor:'rgba(153,69,255,0.4)',borderRadius:3},
+]},options:{responsive:true,scales:{y:{grid:{color:'#1e1e2e'}},x:{grid:{color:'#1e1e2e'}}}}});
+
+// Patterns
+const p=[];
+const pI=V.indexOf(Math.max(...V)),lI=V.indexOf(Math.min(...V));
+p.push('<div class="pattern"><strong>Peak Pleasure:</strong> Entry '+(pI+1)+' ("'+T[pI].slice(0,45)+'") V='+V[pI].toFixed(3)+'</div>');
+p.push('<div class="pattern"><strong>Lowest Pleasure:</strong> Entry '+(lI+1)+' ("'+T[lI].slice(0,45)+'") V='+V[lI].toFixed(3)+'</div>');
+const hA=A.slice(0,Math.floor(A.length/2)),lA2=A.slice(Math.floor(A.length/2));
+const aF=hA.reduce((a,b)=>a+b,0)/hA.length,aS=lA2.reduce((a,b)=>a+b,0)/lA2.length;
+if(Math.abs(aS-aF)>0.03)p.push('<div class="pattern"><strong>Arousal Trend '+(aS>aF?'↑':'↓')+':</strong> '+aF.toFixed(2)+' → '+aS.toFixed(2)+'. '+(aS>aF?'Intensity increased toward deadline.':'Stabilization phase.')+'</div>');
+const bH=BF.filter(b=>b>5).length;
+if(bH>0){const bM=M.filter((_,i)=>BF[i]>5);p.push('<div class="pattern"><strong>Bug-Heavy Entries:</strong> '+bH+' entries with 5+ bug refs. Moods: '+[...new Set(bM)].join(', ')+'</div>');}
+let sk=1,mS=1,sM=M[0];for(let i=1;i<M.length;i++){if(M[i]===M[i-1]){sk++;if(sk>mS){mS=sk;sM=M[i]}}else sk=1;}
+if(mS>2)p.push('<div class="pattern"><strong>Mood Streak:</strong> "'+sM+'" for '+mS+' consecutive entries.</div>');
+const tC=CC.reduce((a,b)=>a+b,0);
+p.push('<div class="pattern"><strong>Commit Density:</strong> '+tC+' total commits across '+L.length+' entries (avg '+(tC/L.length).toFixed(1)+'/entry).</div>');
+document.getElementById('patterns').innerHTML=p.join('');
+</script>
+</body></html>

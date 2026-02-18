@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "Une erreur inconnue est survenue",
+    "tryAgain": "Veuillez réessayer plus tard",
+    "contactSupport": "Si le problème persiste, merci de contacter le support"
+  },
+  "network": {
+    "offline": "Vous semblez être hors ligne",
+    "timeout": "La requête a expiré",
+    "serverError": "Erreur du serveur",
+    "connectionFailed": "Échec de la connexion"
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Adresse e-mail invalide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins {{min}} caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "invalidFormat": "Format invalide",
+    "numberOnly": "Doit être un nombre",
+    "minLength": "Doit contenir au moins {{min}} caractères",
+    "maxLength": "Ne doit pas dépasser {{max}} caractères"
+  },
+  "auth": {
+    "unauthorized": "Accès non autorisé",
+    "sessionExpired": "Votre session a expiré",
+    "invalidCredentials": "E-mail ou mot de passe incorrect",
+    "accountLocked": "Le compte a été verrouillé",
+    "emailNotVerified": "Veuillez vérifier votre adresse e-mail",
+    "tokenInvalid": "Jeton invalide ou expiré"
+  },
+  "api": {
+    "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard",
+    "notFound": "Ressource introuvable",
+    "methodNotAllowed": "Méthode non autorisée",
+    "serverError": "Erreur interne du serveur",
+    "badRequest": "Requête invalide",
+    "forbidden": "Accès refusé"
+  },
+  "file": {
+    "tooLarge": "La taille du fichier dépasse la limite",
+    "invalidType": "Type de fichier invalide",
+    "uploadFailed": "Échec du téléversement",
+    "notFound": "Fichier introuvable"
+  }
+}

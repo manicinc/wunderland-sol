@@ -1,0 +1,43 @@
+/**
+ * Widget Plugin Styles Template
+ *
+ * Add your custom CSS here.
+ * Tailwind classes are available in the component itself.
+ */
+
+/* Example: Custom widget container styles */
+.my-widget {
+  transition: all 0.2s ease;
+}
+
+.my-widget:hover {
+  transform: translateY(-1px);
+}
+
+/* Example: Loading animation */
+@keyframes widget-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.widget-loading {
+  animation: widget-pulse 1.5s infinite;
+}
+
+/* Example: Dark mode specific styles */
+@media (prefers-color-scheme: dark) {
+  .my-widget {
+    --widget-accent: #60a5fa;
+  }
+}
+
+/* Example: Print styles */
+@media print {
+  .my-widget {
+    display: none;
+  }
+}

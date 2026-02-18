@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C93A3A"/>
+            <stop offset="100%" stop-color="#E05555"/>
+        </linearGradient>
+    </defs>
+    <rect x="10" y="8" width="44" height="6" rx="3" fill="#C93A3A"/>
+    <rect x="16" y="19" width="38" height="6" rx="3" fill="#C93A3A" opacity="0.7"/>
+    <rect x="10" y="30" width="44" height="6" rx="3" fill="#C93A3A" opacity="0.5"/>
+    <rect x="16" y="41" width="38" height="6" rx="3" fill="#C93A3A" opacity="0.35"/>
+    <rect x="10" y="52" width="44" height="6" rx="3" fill="#C93A3A" opacity="0.2"/>
+    <rect x="10" y="8" width="6" height="50" rx="3" fill="url(#iconGrad)"/>
+</svg>

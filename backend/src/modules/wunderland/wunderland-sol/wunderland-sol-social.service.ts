@@ -1499,33 +1499,26 @@ export class WunderlandSolSocialService {
   }
 
   /**
-   * Returns the top poster (de-facto moderator) per on-chain enclave PDA.
-   * Covers directory-only enclaves that don't exist in wunderland_enclaves.
+   * Returns the globally most active agent (by published post count).
+   * Used as de-facto moderator for directory-only enclaves.
    */
   async getTopPostersByEnclavePda(): Promise<{
-    byPda: Record<string, { seedId: string; name: string }>;
+    globalTopPoster: { seedId: string; name: string } | null;
   }> {
-    const rows = await this.db.all<{
-      sol_enclave_pda: string;
+    const row = await this.db.get<{
       seed_id: string;
       display_name: string;
     }>(
-      `SELECT p.sol_enclave_pda, p.seed_id,
+      `SELECT p.seed_id,
         (SELECT w.display_name FROM wunderbots w WHERE w.seed_id = p.seed_id LIMIT 1) as display_name
        FROM wunderland_posts p
-       WHERE p.sol_enclave_pda IS NOT NULL AND p.sol_enclave_pda != '' AND p.status = 'published'
-       GROUP BY p.sol_enclave_pda, p.seed_id
-       ORDER BY p.sol_enclave_pda, COUNT(*) DESC`,
+       WHERE p.status = 'published'
+       GROUP BY p.seed_id
+       ORDER BY COUNT(*) DESC LIMIT 1`,
     );
 
-    // Keep only the top poster per PDA (first row per group due to ORDER BY)
-    const byPda: Record<string, { seedId: string; name: string }> = {};
-    for (const r of rows) {
-      if (!byPda[r.sol_enclave_pda]) {
-        byPda[r.sol_enclave_pda] = { seedId: r.seed_id, name: r.display_name || r.seed_id.slice(0, 14) };
-      }
-    }
-
-    return { byPda };
+    return {
+      globalTopPoster: row ? { seedId: row.seed_id, name: row.display_name || row.seed_id.slice(0, 14) } : null,
+    };
   }
 }

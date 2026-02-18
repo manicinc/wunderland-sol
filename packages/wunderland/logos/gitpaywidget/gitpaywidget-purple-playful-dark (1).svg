@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+                    <linearGradient id="gradient-purple-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="card-gradient-purple-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#581c87;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.9" />
+                    </linearGradient>
+                    
+                    <linearGradient id="shimmer-purple-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:transparent;stop-opacity:0" />
+                        <stop offset="50%" style="stop-color:white;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:transparent;stop-opacity:0" />
+                    </linearGradient>
+                    
+                    <filter id="shadow-purple" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="3" result="offsetblur"/>
+                        <feFlood flood-color="#ffffff" flood-opacity="0.1"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <g filter="url(#shadow-purple)">
+                    
+                <g transform="translate(25, 35)">
+                    <ellipse cx="32" cy="45" rx="28" ry="3" fill="rgba(255,255,255,0.1)"/>
+                    
+                    <g transform="rotate(-12 32 25)">
+                        <rect x="0" y="0" width="64" height="42" 
+                              fill="url(#card-gradient-purple-dark)" 
+                              stroke="#8b5cf6"
+                              stroke-width="2.5"
+                              rx="7" ry="7"
+                              stroke-dasharray=""
+                              opacity="0.95"/>
+                        
+                        <rect x="0" y="0" width="64" height="42" 
+                              fill="url(#shimmer-purple-dark)" 
+                              rx="7" ry="7"
+                              opacity="0.3"/>
+                        
+                        <g transform="translate(10, 8)">
+                            <rect x="0" y="0" width="14" height="10" 
+                                  fill="#fbbf24" 
+                                  rx="1.5"
+                                  opacity="0.8"/>
+                            <path d="M2 2 L12 2 M2 4 L12 4 M2 6 L12 6 M2 8 L12 8" 
+                                  stroke="#1a1a1a" 
+                                  stroke-width="0.5" 
+                                  opacity="0.4"/>
+                            <rect x="5" y="3" width="4" height="4" 
+                                  fill="#fbbf24" 
+                                  opacity="0.6"/>
+                        </g>
+                        
+                        <rect x="0" y="26" width="64" height="7" 
+                              fill="rgba(255,255,255,0.2)" 
+                              opacity="0.4"/>
+                        <rect x="0" y="28" width="64" height="3" 
+                              fill="rgba(255,255,255,0.1)" 
+                              opacity="0.3"/>
+                        
+                        <g transform="translate(10, 18)">
+                            <circle cx="0" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            <circle cx="4" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            <circle cx="8" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            <circle cx="12" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            
+                            <circle cx="18" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            <circle cx="22" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            <circle cx="26" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                            <circle cx="30" cy="0" r="1" fill="#fff" opacity="0.4"/>
+                        </g>
+                        
+                        <g transform="translate(48, 8)">
+                            <path d="M0 8 Q3 6, 3 4 T6 2" 
+                                  stroke="#fff" 
+                                  stroke-width="1.5" 
+                                  fill="none" 
+                                  opacity="0.6"/>
+                            <path d="M2 6 Q4 5, 4 4 T6 3" 
+                                  stroke="#fff" 
+                                  stroke-width="1.5" 
+                                  fill="none" 
+                                  opacity="0.4"/>
+                        </g>
+                        
+                        <g transform="translate(32, 10)">
+                            <circle cx="0" cy="0" r="8" 
+                                    fill="rgba(255,255,255,0.1)" 
+                                    opacity="0.5"/>
+                            <text x="0" y="3" 
+                                  font-family="'Caveat', cursive" 
+                                  font-size="12" 
+                                  font-weight="700" 
+                                  fill="#fff"
+                                  text-anchor="middle">$</text>
+                        </g>
+                        
+                        <ellipse cx="50" cy="35" rx="6" ry="4" 
+                                 fill="url(#gradient-purple-dark)" 
+                                 opacity="0.3"/>
+                    </g>
+                    
+                    
+                        <circle cx="70" cy="15" r="2" fill="#fbbf24" opacity="0.4"/>
+                        <circle cx="74" cy="20" r="1.5" fill="#ec4899" opacity="0.3"/>
+                        <circle cx="68" cy="22" r="1" fill="#fbbf24" opacity="0.2"/>
+                        
+                        <path d="M-5 35 Q-2 33, 0 35 T5 35" 
+                              stroke="#8b5cf6" 
+                              stroke-width="1" 
+                              fill="none" 
+                              opacity="0.3"/>
+                    
+                </g>
+                    
+                <g transform="translate(105, 55)">
+                    <text font-family="'Caveat', cursive" 
+                          font-size="36" 
+                          font-weight="700" 
+                          fill="#ffffff"
+                          letter-spacing="-1">
+                        <tspan fill="#8b5cf6">GitPay</tspan><tspan fill="#ec4899">Widget</tspan>
+                    </text>
+                </g>
+                </g>
+                
+            
+</svg>

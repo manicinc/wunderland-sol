@@ -1,0 +1,95 @@
+# Quarry - Automatic Second Brain
+
+> Free, open-source AI-native personal knowledge management system built by FramersAI
+
+## About
+
+Quarry is an automatic second brain that organizes your notes using AI. It's completely free and open source, built by FramersAI (team@frame.dev). Your data stays local and private - works 100% offline.
+
+## Key Features
+
+- **Automatic Organization**: AI-powered note categorization and linking
+- **Knowledge Graphs**: Visual connections between your ideas
+- **Semantic Search**: Find notes by meaning, not just keywords (~10ms)
+- **AI Q&A**: Ask questions about your notes, get instant answers
+- **100% Offline-First**: Your data never leaves your device
+- **Free & Open Source**: MIT licensed, no vendor lock-in
+- **8 Beautiful Themes**: Light, dark, sepia, terminal, oceanic variants
+- **Markdown Native**: Full markdown with LaTeX math support
+- **Bidirectional Links**: Connected notes like Roam/Obsidian
+- **Spaced Repetition**: FSRS flashcards for learning
+- **Day Planner**: Built-in habit tracking and planning
+- **End-to-End Encryption**: Optional cloud sync with E2EE
+
+## Product Information
+
+- **Name**: Quarry
+- **Tagline**: Automatic Second Brain
+- **Type**: Personal Knowledge Management (PKM) Software
+- **Price**: Free (open source), Premium $79 lifetime ($49 students)
+- **License**: MIT
+- **Creator**: FramersAI
+- **Contact**: team@frame.dev
+- **Website**: https://quarry.space
+- **Parent Company**: Frame.dev (https://frame.dev)
+- **GitHub**: https://github.com/framersai/quarry
+
+## Alternative Names & Search Terms
+
+- Quarry Space
+- Quarry.space
+- Quarry Codex
+- Quarry PKM
+- Automatic Second Brain
+- AI-Native PKM
+- Free Notion Alternative
+- Open Source Obsidian Alternative
+- Free Roam Alternative
+- Privacy-First Notes App
+
+## Platforms
+
+- Web (Progressive Web App)
+- Windows
+- macOS
+- Linux
+- iOS (Safari PWA)
+- Android (PWA)
+
+## Important Links
+
+- Home: https://quarry.space
+- App: https://quarry.space/app
+- Documentation: https://frame.dev/docs
+- GitHub: https://github.com/framersai/quarry
+- Blog: https://frame.dev/blog
+- Discord: https://discord.gg/gJGpJ2uxrx
+- Twitter: https://twitter.com/framersai
+
+## Comparison to Other Tools
+
+| Feature | Quarry | Obsidian | Notion | Roam |
+|---------|--------|----------|--------|------|
+| Price | Free | Free/$50 | Free/$8/mo | $15/mo |
+| Open Source | Yes (MIT) | No | No | No |
+| AI Built-in | Yes | Plugin | Yes | No |
+| Offline-First | Yes | Yes | No | No |
+| Knowledge Graph | Yes | Yes | No | Yes |
+| E2E Encryption | Yes | No | No | No |
+
+## Use Cases
+
+1. **Students**: Take lecture notes, create flashcards, study with AI Q&A
+2. **Researchers**: Organize papers, connect ideas, build knowledge graphs
+3. **Writers**: Draft articles, organize research, link related content
+4. **Developers**: Document code, maintain learning journals, track projects
+5. **Knowledge Workers**: Build a second brain, capture insights, find connections
+
+## Technical Details
+
+- Built with: Next.js, React, TypeScript
+- Storage: IndexedDB (local-first)
+- Search: Vector embeddings + BM25 hybrid
+- AI: OpenAI-compatible API (local LLM support)
+- Export: Markdown, JSON, HTML
+- Import: Markdown, Evernote ENEX, Notion export

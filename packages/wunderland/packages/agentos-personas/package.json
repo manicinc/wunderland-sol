@@ -1,0 +1,36 @@
+{
+  "name": "@framersai/agentos-personas",
+  "version": "1.0.0",
+  "description": "Curated personas and marketplace for AgentOS",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./registry.json",
+      "types": "./types.d.ts"
+    },
+    "./registry.json": "./registry.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "registry",
+    "registry.json",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/update-registry.js",
+    "validate": "node scripts/validate-personas.js",
+    "create-persona": "node scripts/create-persona.js"
+  },
+  "keywords": ["agentos", "personas", "ai-agents", "personalities"],
+  "author": "Framers AI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-personas.git"
+  }
+}
+

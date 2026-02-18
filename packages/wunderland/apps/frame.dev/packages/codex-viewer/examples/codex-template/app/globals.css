@@ -1,0 +1,25 @@
+:root {
+  --paper-base: #fdfbf6;
+  --paper-grain: rgba(15, 23, 42, 0.02);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--paper-base);
+}
+
+.bg-paper {
+  background-color: var(--paper-base);
+  background-image: radial-gradient(var(--paper-grain) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+code {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+

@@ -1,0 +1,17 @@
+# Extension Code Owners
+# These users will be automatically requested for review
+
+# Global owners
+* @framersai/agentos-core
+
+# Extension-specific owners
+/packages/ext-search/ @framersai/search-maintainers
+/packages/ext-template/ @framersai/agentos-core
+
+# CI/CD and infrastructure
+/.github/ @framersai/devops
+/scripts/ @framersai/devops
+
+# Documentation
+*.md @framersai/docs
+/docs/ @framersai/docs

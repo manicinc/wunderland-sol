@@ -1,0 +1,16 @@
+packages:
+  - "sdk"
+  - "app"
+  - "backend"
+  - "scripts"
+  - "docs-site"
+  # Local packages (standalone / Docker builds)
+  - "packages/*"
+  - "packages/agentos-extensions/registry/curated/system/*"
+  - "packages/agentos-extensions/registry/curated/research/*"
+  - "packages/agentos-extensions/registry/curated/media/*"
+  # Parent monorepo packages (when used as submodule — resolved first if both exist)
+  - "../../packages/*"
+  - "../../packages/agentos-extensions/registry/curated/system/*"
+  - "../../packages/agentos-extensions/registry/curated/research/*"
+  - "../../packages/agentos-extensions/registry/curated/media/*"

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quarry - Gumroad Banner</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #111;
+    }
+
+    .banner {
+      width: 1280px;
+      height: 720px;
+      background: linear-gradient(155deg, #fafdfb 0%, #f2f8f4 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Accent bar */
+    .accent-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, #1A7F4B 0%, #22A55D 40%, #7DDBA3 100%);
+    }
+
+    /* Main content */
+    .main {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 880px;
+      height: 100%;
+      padding: 48px 48px 48px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Logo */
+    .logo-row {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .logo-icon {
+      align-self: center;
+    }
+
+    .wordmark {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 36px;
+      font-weight: 400;
+      color: #1a1a1a;
+      letter-spacing: -0.01em;
+    }
+
+    .by-frame {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(26, 26, 26, 0.4);
+      letter-spacing: 0.01em;
+    }
+
+    /* Headline */
+    .headline {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 68px;
+      font-weight: 400;
+      color: #0a0a0a;
+      line-height: 1;
+      letter-spacing: -0.035em;
+      margin-bottom: 20px;
+    }
+
+    .headline-accent {
+      color: #1A7F4B;
+    }
+
+    /* Subhead */
+    .subhead {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 620px;
+    }
+
+    /* Feature list */
+    .features {
+      display: flex;
+      gap: 64px;
+      margin-bottom: 40px;
+    }
+
+    .features-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #222;
+    }
+
+    .feature-item span {
+      white-space: nowrap;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(145deg, #1A7F4B 0%, #22A55D 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(26, 127, 75, 0.25);
+    }
+
+    .feature-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 12px;
+    }
+
+    .url-main {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A7F4B;
+      letter-spacing: -0.01em;
+    }
+
+    .github {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: #777;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .github svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+    }
+
+    .separator {
+      color: #bbb;
+      font-size: 10px;
+    }
+
+    .oss {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: #777;
+    }
+
+    /* Pricing panel */
+    .pricing-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 100%;
+      background: #1A7F4B;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .price-badge {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    .price-label {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .price-old {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 32px;
+      color: rgba(255,255,255,0.4);
+      text-decoration: line-through;
+    }
+
+    .price-current {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 96px;
+      font-weight: 400;
+      color: white;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .price-type {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 36px;
+    }
+
+    .divider {
+      width: 56px;
+      height: 1px;
+      background: rgba(255,255,255,0.2);
+      margin-bottom: 36px;
+    }
+
+    .perks {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .perk {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .perk svg {
+      width: 18px;
+      height: 18px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .student-note {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .student-note strong {
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <div class="accent-bar"></div>
+
+    <div class="main">
+      <div class="logo-row">
+        <svg class="logo-icon" width="52" height="52" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(7, 12)">
+            <polygon points="0,0 22,0 19,19 0,17" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.5"/>
+            <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#22A55D" stroke="#1D9050" stroke-width="0.5"/>
+            <polygon points="0,17 19,19 17,39 0,39" fill="#2DB86A" stroke="#28A35F" stroke-width="0.5"/>
+            <polygon points="19,19 27,19 30,39 17,39" fill="#4FCA85" stroke="#45B577" stroke-width="0.5"/>
+            <polygon points="27,19 50,14 50,39 30,39" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.5"/>
+          </g>
+        </svg>
+        <span class="wordmark">Quarry</span>
+        <span class="by-frame">by Frame.dev</span>
+      </div>
+
+      <h1 class="headline">Self-<span class="headline-accent">organizing.</span></h1>
+
+      <p class="subhead">
+        The notetaking app that organizes itself. Domain-aware intelligence for science, medicine, tech, finance, journaling, storytelling, and more—auto-generates tags, backlinks, summaries, and categories the moment you save. Works entirely offline. Full manual control easily whenever you want it.
+      </p>
+
+      <div class="features">
+        <div class="features-col">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 7h.01M17 3H7a4 4 0 00-4 4v10l4.5-4.5a2 2 0 012.83 0L17 19a4 4 0 004-4V7a4 4 0 00-4-4z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="7" cy="7" r="1.5" fill="white"/>
+              </svg>
+            </div>
+            <span>Auto-Tagging</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="4" width="16" height="16" rx="2" stroke="white" stroke-width="1.5"/>
+                <path d="M8 9h8M8 12h6M8 15h4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Auto-Summaries</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+                <path d="M12 8c-2 1.5-2 3 0 4s2 2.5 0 4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Spiral Learning</span>
+          </div>
+        </div>
+        <div class="features-col">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M7 17L17 7M17 7H9M17 7v8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 7l10 10M7 7h8M7 7v8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              </svg>
+            </div>
+            <span>Smart Backlinks</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="14" height="10" rx="2" stroke="white" stroke-width="1.5"/>
+                <rect x="7" y="9" width="14" height="10" rx="2" stroke="white" stroke-width="1.5" fill="#1A7F4B"/>
+                <path d="M11 14h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Flashcards & Quizzes</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="3" width="14" height="18" rx="2" stroke="white" stroke-width="1.5"/>
+                <circle cx="12" cy="17" r="1" fill="white"/>
+                <path d="M9 6h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>100% Offline</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="url-main">frame.dev/quarry</span>
+        <span class="separator">•</span>
+        <div class="github">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          github.com/framersai
+        </div>
+        <span class="separator">•</span>
+        <span class="oss">Open source version available</span>
+      </div>
+    </div>
+
+    <div class="pricing-panel">
+      <div class="price-badge">Limited Launch</div>
+      
+      <span class="price-label">Lifetime Access</span>
+      <span class="price-old">$79</span>
+      <span class="price-current">$49</span>
+      <span class="price-type">one-time payment</span>
+
+      <div class="divider"></div>
+
+      <div class="perks">
+        <div class="perk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Own forever
+        </div>
+        <div class="perk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          All future updates
+        </div>
+        <div class="perk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          No subscription
+        </div>
+      </div>
+
+      <p class="student-note">
+        <strong>Student pricing:</strong> $49 forever
+      </p>
+    </div>
+  </div>
+</body>
+</html>

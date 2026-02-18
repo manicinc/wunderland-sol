@@ -1,0 +1,56 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# IMAGES & MEDIA LOOM
+# ═══════════════════════════════════════════════════════════════════════════════
+# Demonstrates image-based styling (thumbnail, cover, background)
+
+name: Images & Media
+description: Using images for thumbnails, covers, and backgrounds
+
+style:
+  # Custom icon for media content
+  icon: Image
+  
+  # Orange/amber accent for media theme
+  accentColor: "#f59e0b"
+  backgroundColor: "#fffbeb"
+  
+  # Thumbnail URL (small icon, 64x64 recommended)
+  # thumbnail: "https://example.com/icon.png"
+  
+  # Cover image (wide banner, 1200x400 recommended)
+  # coverImage: "https://example.com/cover.jpg"
+  
+  # Background image with opacity overlay
+  # backgroundImage: "https://example.com/bg.jpg"
+  # backgroundOpacity: 0.2
+  
+  darkText: true
+
+metadata:
+  difficulty: intermediate
+  estimatedTime: 10
+  tags:
+    - images
+    - media
+    - backgrounds
+    - thumbnails
+
+order: 3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

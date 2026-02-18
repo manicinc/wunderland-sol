@@ -1,0 +1,4 @@
+name: Summarization
+description: >
+  News-style and research-style passages for summarization evaluation.
+  Tests whether models produce accurate, concise, and faithful summaries.

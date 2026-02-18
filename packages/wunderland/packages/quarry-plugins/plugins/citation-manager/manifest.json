@@ -1,0 +1,40 @@
+{
+  "id": "com.quarry.citation-manager",
+  "name": "Citation Manager",
+  "version": "1.0.0",
+  "description": "Manage academic citations with BibTeX support. Add citations to your strands using [@key] syntax.",
+  "author": "Quarry Team",
+  "authorUrl": "https://frame.dev",
+  "minQuarryVersion": "1.0.0",
+  "main": "main.js",
+  "styles": "styles.css",
+  "type": "renderer",
+  "license": "MIT",
+  "keywords": ["citations", "bibtex", "academic", "references"],
+  "settings": {
+    "citationStyle": {
+      "type": "select",
+      "default": "apa",
+      "label": "Citation Style",
+      "description": "How to format citations in text",
+      "options": [
+        { "value": "apa", "label": "APA (Author, Year)" },
+        { "value": "mla", "label": "MLA (Author Page)" },
+        { "value": "chicago", "label": "Chicago (Footnote)" },
+        { "value": "ieee", "label": "IEEE [Number]" }
+      ]
+    },
+    "showTooltips": {
+      "type": "boolean",
+      "default": true,
+      "label": "Show Tooltips",
+      "description": "Show full citation on hover"
+    },
+    "autoNumber": {
+      "type": "boolean",
+      "default": false,
+      "label": "Auto-number Citations",
+      "description": "Automatically number citations in order of appearance"
+    }
+  }
+}

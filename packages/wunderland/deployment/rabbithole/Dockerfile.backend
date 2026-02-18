@@ -1,0 +1,92 @@
+# syntax=docker/dockerfile:1
+
+# NestJS backend — monorepo build (needs workspace deps like @framers/agentos).
+
+FROM node:22-bookworm-slim AS builder
+
+# Native deps for better-sqlite3 and other native modules.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ ca-certificates git \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /repo
+
+# Use the repo-pinned pnpm version.
+RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+
+# Copy the full workspace (filtered by .dockerignore).
+COPY . .
+
+# Install deps and build backend + its workspace deps.
+RUN pnpm install --no-frozen-lockfile --shamefully-hoist
+
+# Clean stale dist artifacts from any prior build / submodule state.
+RUN rm -rf packages/agentos/dist packages/agentos-extensions-registry/dist
+
+# Build leaf deps first, then agentos, then the tool extensions that wunderland
+# statically imports, then wunderland + SDK, then the backend.
+# NOTE: channel/integration extensions (telegram, discord, etc.) are NOT built
+# here — they have pending type migrations and are loaded lazily at runtime.
+RUN pnpm --filter @framers/shared build \
+ && pnpm --filter @framers/sql-storage-adapter build \
+ && pnpm --filter @framers/agentos build \
+ && pnpm --filter @framers/agentos-extensions-registry build \
+ && pnpm --filter @framers/agentos-ext-cli-executor build \
+ && pnpm --filter @framers/agentos-ext-web-search build \
+ && pnpm --filter @framers/agentos-ext-web-browser build \
+ && pnpm --filter @framers/agentos-ext-giphy build \
+ && pnpm --filter @framers/agentos-ext-image-search build \
+ && pnpm --filter @framers/agentos-ext-voice-synthesis build \
+ && pnpm --filter @framers/agentos-ext-news-search build \
+ && pnpm --filter @framers/agentos-ext-skills build \
+ && pnpm --filter wunderland build \
+ && pnpm --filter @wunderland-sol/sdk build \
+ && pnpm --filter voice-chat-assistant-backend build
+
+# Prune devDependencies from node_modules to reduce image size.
+# Using --shamefully-hoist means everything is in the root node_modules.
+RUN pnpm prune --prod --no-optional 2>/dev/null || true
+
+# -----------------------------------------------------------------------------
+
+FROM node:22-bookworm-slim
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+# Copy the full repo with built artifacts and pruned node_modules.
+# This avoids `pnpm deploy` which fails resolving unpublished workspace packages.
+COPY --from=builder /repo/backend/dist ./dist
+COPY --from=builder /repo/backend/package.json ./package.json
+COPY --from=builder /repo/node_modules ./node_modules
+
+# Copy workspace packages that are symlinked from node_modules.
+# pnpm creates symlinks like @framers/shared -> ../../packages/shared
+# These point outside /app, so we need the actual source directories.
+COPY --from=builder /repo/packages/shared ./packages/shared
+COPY --from=builder /repo/packages/agentos ./packages/agentos
+COPY --from=builder /repo/packages/agentos-extensions ./packages/agentos-extensions
+COPY --from=builder /repo/packages/agentos-extensions-registry ./packages/agentos-extensions-registry
+COPY --from=builder /repo/packages/agentos-ext-skills ./packages/agentos-ext-skills
+COPY --from=builder /repo/packages/agentos-skills-registry ./packages/agentos-skills-registry
+COPY --from=builder /repo/packages/sql-storage-adapter ./packages/sql-storage-adapter
+COPY --from=builder /repo/packages/wunderland ./packages/wunderland
+COPY --from=builder /repo/packages/codex-extensions ./packages/codex-extensions
+COPY --from=builder /repo/packages/theme-tokens ./packages/theme-tokens
+
+# pnpm prune may replace workspace symlinks with npm registry versions.
+# Force node_modules/@framers/* and wunderland to point to our copied workspace packages.
+RUN rm -rf node_modules/@framers/shared node_modules/@framers/agentos \
+      node_modules/@framers/agentos-extensions-registry node_modules/@framers/agentos-ext-skills \
+      node_modules/@framers/sql-storage-adapter node_modules/wunderland \
+  && ln -s ../../packages/shared node_modules/@framers/shared \
+  && ln -s ../../packages/agentos node_modules/@framers/agentos \
+  && ln -s ../../packages/agentos-extensions-registry node_modules/@framers/agentos-extensions-registry \
+  && ln -s ../../packages/agentos-ext-skills node_modules/@framers/agentos-ext-skills \
+  && ln -s ../../packages/sql-storage-adapter node_modules/@framers/sql-storage-adapter \
+  && ln -s ../packages/wunderland node_modules/wunderland
+
+EXPOSE 3001
+
+CMD ["node", "dist/src/main.js"]

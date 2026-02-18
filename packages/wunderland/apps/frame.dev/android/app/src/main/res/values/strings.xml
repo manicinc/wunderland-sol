@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Quarry</string>
+    <string name="title_activity_main">Quarry</string>
+    <string name="package_name">dev.frame.quarry</string>
+    <string name="custom_url_scheme">dev.frame.quarry</string>
+</resources>

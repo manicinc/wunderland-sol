@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "녹음 중...",
+    "processing": "음성을 처리하는 중...",
+    "transcribing": "오디오를 텍스트로 변환하는 중...",
+    "listening": "청취 중...",
+    "speakNow": "지금 말씀하세요",
+    "clickToSpeak": "클릭하여 말하기",
+    "stopRecording": "녹음 중지",
+    "microphoneAccess": "마이크 접근 권한이 필요합니다",
+    "noSpeechDetected": "음성이 감지되지 않았습니다",
+    "transcriptionComplete": "전사가 완료되었습니다"
+  },
+  "chat": {
+    "thinking": "생각 중...",
+    "generating": "응답을 생성하는 중...",
+    "messageEmpty": "메시지를 입력해야 합니다",
+    "sendMessage": "메시지 보내기",
+    "newChat": "새 채팅",
+    "clearHistory": "기록 지우기",
+    "typingIndicator": "AI가 입력 중...",
+    "copyCode": "코드 복사",
+    "codeCopied": "코드가 클립보드에 복사되었습니다",
+    "retry": "다시 시도",
+    "regenerate": "응답 다시 생성"
+  },
+  "modes": {
+    "coding": "코딩 Q&A",
+    "codingDesc": "프로그래밍 질문과 코드 예제에 대한 도움을 받으세요",
+    "systemDesign": "시스템 설계",
+    "systemDesignDesc": "아키텍처를 설계하고 다이어그램을 작성하세요",
+    "meetingSummary": "회의 요약",
+    "meetingSummaryDesc": "회의를 요약하고 핵심 사항을 정리하세요",
+    "general": "일반",
+    "generalDesc": "일반적인 대화와 질문"
+  },
+  "cost": {
+    "title": "API 사용량",
+    "current": "현재 세션",
+    "total": "총 사용량",
+    "threshold": "비용 한도",
+    "warning": "비용 한도가 곧 도달합니다",
+    "exceeded": "비용 한도를 초과했습니다",
+    "reset": "카운터 초기화"
+  },
+  "settings": {
+    "speechRecognition": "음성 인식",
+    "whisperAPI": "Whisper API",
+    "browserSpeech": "브라우저 음성",
+    "textToSpeech": "TTS (텍스트 음성 변환)",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "브라우저 TTS",
+    "apiKeys": "API 키",
+    "openAIKey": "OpenAI API 키",
+    "anthropicKey": "Anthropic API 키",
+    "modelPreferences": "모델 설정",
+    "costLimits": "비용 한도",
+    "sessionLimit": "세션 한도",
+    "dailyLimit": "일일 한도",
+    "monthlyLimit": "월별 한도"
+  }
+}

@@ -1,0 +1,16 @@
+# Replace Google API keys
+regex:AIza[0-9A-Za-z\-_]{35}===>REDACTED_GOOGLE_API_KEY
+
+# Replace Google OAuth Client IDs
+regex:[0-9]+-[a-z0-9\-]+\.apps\.googleusercontent\.com===>REDACTED_GOOGLE_OAUTH_CLIENT_ID
+
+# Replace common Google OAuth Client Secrets
+regex:GOCSPX-[A-Za-z0-9\-_]+===>REDACTED_GOOGLE_OAUTH_CLIENT_SECRET
+regex:(?i)(GOOGLE_CLIENT_SECRET[\"'=:\\s]*)([A-Za-z0-9_\-]+)===>\1REDACTED_GOOGLE_OAUTH_CLIENT_SECRET
+
+# Redact passwords in Postgres connection strings (postgres:// or postgresql://)
+regex:(postgres(?:ql)?://[^:@\s/]+):[^@:\s]+@===>\1:REDACTED@
+
+# Redact passwords in Redis URLs
+regex:(redis://):[^@\s]+@===>\1:REDACTED@
+

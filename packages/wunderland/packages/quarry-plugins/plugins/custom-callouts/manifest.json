@@ -1,0 +1,34 @@
+{
+  "id": "com.quarry.custom-callouts",
+  "name": "Custom Callouts",
+  "version": "1.0.0",
+  "description": "Add beautiful callout blocks to your markdown. Use :::tip, :::warning, :::danger, :::info, and :::note syntax.",
+  "author": "Quarry Team",
+  "authorUrl": "https://frame.dev",
+  "minQuarryVersion": "1.0.0",
+  "main": "main.js",
+  "styles": "styles.css",
+  "type": "renderer",
+  "license": "MIT",
+  "keywords": ["callouts", "admonitions", "alerts", "markdown"],
+  "settings": {
+    "showIcons": {
+      "type": "boolean",
+      "default": true,
+      "label": "Show Icons",
+      "description": "Display icons in callout headers"
+    },
+    "collapsible": {
+      "type": "boolean",
+      "default": false,
+      "label": "Collapsible Callouts",
+      "description": "Allow callouts to be collapsed/expanded"
+    },
+    "defaultCollapsed": {
+      "type": "boolean",
+      "default": false,
+      "label": "Collapsed by Default",
+      "description": "Start callouts in collapsed state (requires Collapsible)"
+    }
+  }
+}

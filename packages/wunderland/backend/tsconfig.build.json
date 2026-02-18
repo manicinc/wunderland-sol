@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "strict": false,
+    "paths": {
+      "@prisma/client": ["../packages/agentos/dist/stubs/prismaClient.d.ts"],
+      "@framers/shared": ["../packages/shared/dist/index.d.ts"],
+      "@framers/shared/*": ["../packages/shared/dist/*"],
+      "@framers/agentos": ["../packages/agentos/dist/index.d.ts"],
+      "@framers/agentos/*": ["../packages/agentos/dist/*"],
+      "@framers/sql-storage-adapter": ["../packages/sql-storage-adapter/dist/index.d.ts"],
+      "@framers/sql-storage-adapter/*": ["../packages/sql-storage-adapter/dist/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests/**",
+    "../frontend/**/*",
+    "../frontend",
+    "../packages/agentos/dist",
+    "../packages/agentos/dist/**/*",
+    "*.vue",
+    "**/*.vue",
+    "**/__tests__/**",
+    "**/*.spec.ts",
+    "src/integrations/agentos/guardrails/__tests__/**"
+  ]
+}

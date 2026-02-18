@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "Si è verificato un errore sconosciuto",
+    "tryAgain": "Riprova più tardi",
+    "contactSupport": "Se il problema persiste, contatta l'assistenza"
+  },
+  "network": {
+    "offline": "Sembra che tu sia offline",
+    "timeout": "La richiesta è scaduta",
+    "serverError": "Errore del server",
+    "connectionFailed": "Connessione non riuscita"
+  },
+  "validation": {
+    "required": "Questo campo è obbligatorio",
+    "invalidEmail": "Indirizzo e-mail non valido",
+    "passwordTooShort": "La password deve contenere almeno {{min}} caratteri",
+    "passwordMismatch": "Le password non coincidono",
+    "invalidFormat": "Formato non valido",
+    "numberOnly": "È consentito solo un numero",
+    "minLength": "Deve contenere almeno {{min}} caratteri",
+    "maxLength": "Non deve superare {{max}} caratteri"
+  },
+  "auth": {
+    "unauthorized": "Accesso non autorizzato",
+    "sessionExpired": "La tua sessione è scaduta",
+    "invalidCredentials": "E-mail o password errati",
+    "accountLocked": "L'account è stato bloccato",
+    "emailNotVerified": "Verifica la tua e-mail",
+    "tokenInvalid": "Token non valido o scaduto"
+  },
+  "api": {
+    "rateLimited": "Troppe richieste. Riprova più tardi",
+    "notFound": "Risorsa non trovata",
+    "methodNotAllowed": "Metodo non consentito",
+    "serverError": "Errore interno del server",
+    "badRequest": "Richiesta non valida",
+    "forbidden": "Accesso negato"
+  },
+  "file": {
+    "tooLarge": "Il file supera la dimensione consentita",
+    "invalidType": "Tipo di file non valido",
+    "uploadFailed": "Caricamento non riuscito",
+    "notFound": "File non trovato"
+  }
+}

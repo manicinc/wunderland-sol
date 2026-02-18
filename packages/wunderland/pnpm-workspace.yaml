@@ -1,0 +1,37 @@
+packages:
+  - backend
+  - frontend
+  - packages/*
+  # agentos-extensions curated packages (needed for workspace linking + local dev)
+  - packages/agentos-extensions/registry/curated/auth
+  - packages/agentos-extensions/registry/curated/research/web-search
+  - packages/agentos-extensions/registry/curated/research/web-browser
+  - packages/agentos-extensions/registry/curated/integrations/telegram
+  - packages/agentos-extensions/registry/curated/communications/telegram-bot
+  - packages/agentos-extensions/registry/curated/system/cli-executor
+  - packages/agentos-extensions/registry/curated/media/giphy
+  - packages/agentos-extensions/registry/curated/media/image-search
+  - packages/agentos-extensions/registry/curated/media/voice-synthesis
+  - packages/agentos-extensions/registry/curated/research/news-search
+  - packages/agentos-extensions/registry/curated/channels/telegram
+  - packages/agentos-extensions/registry/curated/channels/whatsapp
+  - packages/agentos-extensions/registry/curated/channels/discord
+  - packages/agentos-extensions/registry/curated/channels/slack
+  - packages/agentos-extensions/registry/curated/channels/webchat
+  - packages/agentos-extensions/registry/curated/provenance/anchor-providers
+  - packages/agentos-extensions/registry/curated/provenance/wunderland-tip-ingestion
+  - apps/*
+  - apps/**
+  - codex-extensions
+  # apps/wunderland-sh can be a nested workspace on its own; exclude its vendored deps
+  - '!apps/wunderland-sh/packages/**'
+  - '!packages/codex-viewer/**'
+  - '!apps/frame.dev/packages/codex-viewer/**'
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@swc/core'
+  - better-sqlite3
+  - esbuild
+  - unrs-resolver
+  - vue-demi

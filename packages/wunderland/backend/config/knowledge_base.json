@@ -1,0 +1,55 @@
+{
+  "knowledgeBase": [
+    {
+      "id": "platform_overview",
+      "type": "general_info",
+      "tags": ["platform", "introduction", "overview", "voice coding assistant", "vca"],
+      "content": "The Voice Coding Assistant (VCA) is a real-time, voice-driven web application designed to assist users with coding queries, system design, meeting summaries, and interactive learning. It leverages advanced AI models to provide responses, generate code, and create diagrams.",
+      "metadata": {
+        "version_info": "Applies to VCA v1.x",
+        "audience": "general_users"
+      }
+    },
+    {
+      "id": "core_features",
+      "type": "feature_list",
+      "tags": ["features", "capabilities", "vca"],
+      "content": "Key features include: Voice Recognition (Browser Web Speech & OpenAI Whisper), Multiple AI Agent Modes (Coding, System Design, Tutor, Diary, Meeting Summary), Code Highlighting, Mermaid Diagram Generation, Cost Tracking, Dark/Light Theme, and a Responsive Design.",
+      "metadata": {
+        "last_updated": "2025-05-26"
+      }
+    },
+    {
+      "id": "agent_general_assistant",
+      "type": "agent_description",
+      "tags": ["agent", "general assistant", "chat"],
+      "content": "The General Assistant is your versatile AI companion for a wide range of questions and tasks. It can provide information, engage in conversation, and help with general queries.",
+      "metadata": {
+        "default_model_preference": "gpt-4o-mini"
+      }
+    },
+    {
+      "id": "agent_coding_assistant",
+      "type": "agent_description",
+      "tags": ["agent", "coding assistant", "programming", "code", "debug"],
+      "content": "The Coding Assistant helps with programming problems, understanding code, debugging issues, and learning coding concepts. It can provide code examples and explanations for various languages.",
+      "metadata": {
+        "preferred_languages_supported": ["Python", "JavaScript", "TypeScript", "Java", "C++", "Go", "Rust"]
+      }
+    },
+    {
+      "id": "usage_tips_voice_input",
+      "type": "user_guide_section",
+      "tags": ["tips", "voice input", "stt", "best practices"],
+      "content": "For best voice recognition results: \n1. Speak clearly and at a moderate pace. \n2. Minimize background noise. \n3. Use a quality microphone if possible. \n4. If using Whisper API mode, short pauses are generally fine. For Browser Web Speech, longer continuous speech might be split automatically.",
+      "metadata": {}
+    },
+    {
+      "id": "contact_support_info",
+      "type": "faq",
+      "tags": ["support", "contact", "help", "issue"],
+      "content": "If you encounter issues or have questions, please refer to the project's GitHub repository issues section. For critical problems, contact the administrator if this is a deployed instance.",
+      "metadata": {}
+    }
+  ]
+}

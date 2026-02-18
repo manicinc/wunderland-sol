@@ -1,0 +1,40 @@
+{
+  "id": "story-outline",
+  "name": "Story Outline",
+  "category": "creative",
+  "icon": "BookOpen",
+  "description": "Plan your fiction story with plot structure, characters, and themes",
+  "shortDescription": "Structured plot and story planning",
+  "difficulty": "intermediate",
+  "estimatedTime": "30 min",
+  "tags": ["story", "fiction", "writing", "plot", "narrative"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 85,
+  "defaultData": {
+    "contentType": "creative"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, fiction, story]\ncontentType: creative\ngenre: \"{genre}\"\nwordCountTarget: {wordCount}\n---\n\n# {title}\n\n> {summary}\n\n## Story Metadata\n\n| Attribute | Value |\n|-----------|-------|\n| Genre | {genre} |\n| Target Length | {wordCount} words |\n| POV | First/Third/Omniscient |\n| Tense | Past/Present |\n| Tone | Dark/Light/Mixed |\n\n## Logline\n\n*One sentence that captures the essence of your story:*\n\nWhen [INCITING INCIDENT], a [PROTAGONIST] must [OBJECTIVE], or else [STAKES].\n\n## Premise\n\n**The Hook:** What makes this story unique?\n\n**Central Question:** What question does the story explore?\n\n**Theme:** What deeper meaning does it convey?\n\n## Characters\n\n### Protagonist: [Name]\n\n- **Role:** Main character\n- **Want:** External goal\n- **Need:** Internal growth needed\n- **Flaw:** What holds them back\n- **Arc:** How they change\n\n### Antagonist: [Name]\n\n- **Role:** Primary opposition\n- **Motivation:** Why they oppose\n- **Method:** How they oppose\n- **Humanity:** What makes them complex\n\n### Supporting Characters\n\n| Character | Role | Relationship to Protagonist |\n|-----------|------|-----------------------------|\n| [Name] | Mentor/Ally/Friend | Description |\n| [Name] | Love Interest | Description |\n| [Name] | Comic Relief | Description |\n\n## Setting\n\n### World\n\n- **Time Period:** When\n- **Location:** Where\n- **Atmosphere:** Feel/mood\n- **Rules:** What's different from our world\n\n### Key Locations\n\n1. **[Location Name]:** Description and significance\n2. **[Location Name]:** Description and significance\n3. **[Location Name]:** Description and significance\n\n## Plot Structure\n\n### Act 1: Setup (25%)\n\n**Opening Image:** First impression of the world\n\n**Ordinary World:** Life before the story begins\n\n**Inciting Incident:** What disrupts normality\n\n**Debate/Refusal:** Protagonist's hesitation\n\n**First Plot Point:** Commitment to the journey\n\n### Act 2A: Rising Action (25%)\n\n**Fun & Games:** Exploring the new situation\n\n**B-Story:** Subplot introduction (often relationship)\n\n**Midpoint:** Major revelation or shift\n\n### Act 2B: Complications (25%)\n\n**Bad Guys Close In:** Escalating obstacles\n\n**All Is Lost:** Lowest point\n\n**Dark Night of the Soul:** Protagonist's despair\n\n### Act 3: Resolution (25%)\n\n**Break Into Three:** New plan/resolve\n\n**Climax:** Final confrontation\n\n**Resolution:** New equilibrium\n\n**Final Image:** Mirror of opening, showing change\n\n## Scene List\n\n### Act 1 Scenes\n\n| # | Scene | Purpose | POV | Setting |\n|---|-------|---------|-----|----------|\n| 1 | [Description] | Hook reader | Protag | Location |\n| 2 | [Description] | Establish normal | Protag | Location |\n| 3 | [Description] | Inciting incident | Protag | Location |\n\n### Act 2 Scenes\n\n| # | Scene | Purpose | POV | Setting |\n|---|-------|---------|-----|----------|\n| 4 | [Description] | Rising action | Protag | Location |\n| 5 | [Description] | Complication | Protag | Location |\n\n### Act 3 Scenes\n\n| # | Scene | Purpose | POV | Setting |\n|---|-------|---------|-----|----------|\n| X | [Description] | Climax | Protag | Location |\n| X | [Description] | Resolution | Protag | Location |\n\n## Themes & Motifs\n\n### Central Theme\n\n**Theme:** [One word: Love, Power, Identity, etc.]\n\n**Thesis:** What does your story say about this theme?\n\n### Recurring Motifs\n\n- **Symbol 1:** Meaning and appearances\n- **Symbol 2:** Meaning and appearances\n- **Symbol 3:** Meaning and appearances\n\n## Conflict Layers\n\n| Type | Description |\n|------|-------------|\n| **Internal** | Protagonist vs. Self |\n| **Interpersonal** | Protagonist vs. Character |\n| **External** | Protagonist vs. World/Society |\n| **Cosmic** | Protagonist vs. Fate/Nature |\n\n## Research Notes\n\n- Topic needing research\n- Historical accuracy checks\n- Technical details to verify\n\n## Inspiration & References\n\n- Similar works: [Title] - what to learn from it\n- Visual inspiration: [Reference]\n- Tone reference: [Work that captures desired feel]\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

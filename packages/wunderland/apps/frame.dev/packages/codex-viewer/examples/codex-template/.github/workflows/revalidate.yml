@@ -1,0 +1,28 @@
+name: Revalidate Codex Strands
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'weaves/**'
+
+jobs:
+  revalidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke revalidate endpoint
+        env:
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          CODEX_ENDPOINT: ${{ vars.CODEX_REVALIDATE_ENDPOINT }}
+        run: |
+          if [ -z "$REVALIDATE_SECRET" ] || [ -z "$CODEX_ENDPOINT" ]; then
+            echo "Missing CODEX_REVALIDATE_ENDPOINT or REVALIDATE_SECRET"
+            exit 1
+          fi
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"secret\":\"$REVALIDATE_SECRET\"}" \
+            "$CODEX_ENDPOINT"
+
+

@@ -1,0 +1,77 @@
+{
+  "name": "@framers/agentos-ext-telegram",
+  "version": "1.1.0",
+  "description": "Telegram Bot API integration for AgentOS - send messages, manage groups, handle callbacks",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src test --ext .ts",
+    "lint:fix": "eslint src test --ext .ts --fix",
+    "clean": "rm -rf dist coverage",
+    "docs": "typedoc --out docs src/index.ts"
+  },
+  "keywords": [
+    "agentos",
+    "extension",
+    "telegram",
+    "bot",
+    "messaging",
+    "chat",
+    "integration"
+  ],
+  "author": {
+    "name": "Framers AI",
+    "email": "team@frame.dev",
+    "url": "https://frame.dev"
+  },
+  "contributors": [
+    {
+      "name": "Johnny Dunn",
+      "email": "johnnyfived@protonmail.com",
+      "url": "https://github.com/jddunn"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions",
+    "directory": "registry/curated/integrations/telegram"
+  },
+  "files": [
+    "dist",
+    "manifest.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@framers/agentos": "^0.1.0"
+  },
+  "dependencies": {
+    "telegraf": "^4.15.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "dotenv": "^16.3.0"
+  },
+  "devDependencies": {
+    "@framers/agentos": "^0.1.0",
+    "@types/node": "^20.0.0",
+    "@types/node-telegram-bot-api": "^0.64.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "typedoc": "^0.25.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

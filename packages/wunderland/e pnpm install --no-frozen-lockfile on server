@@ -1,0 +1,36 @@
+[33mcommit c7319ff931d756e279b0b04965d20b49a1a24309[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: jddunn <johnnyfived@protonmail.com>
+Date:   Fri Nov 14 11:48:27 2025 -0800
+
+    chore(theme-tokens): restore workspace CSS tokens and align with agentos.sh
+
+M	.gitmodules
+M	CONFIGURATION.md
+M	IMPROVEMENTS_SUMMARY.md
+M	INDEXEDDB_INTEGRATION_SUMMARY.md
+M	README.md
+R100	apps/agentos-client	apps/agentos-workbench
+M	apps/agentos.sh
+M	backend/server.ts
+M	docs/ARCHITECTURE.md
+M	docs/CLIENT_STORAGE_AND_EXPORTS.md
+A	docs/DOCUMENTATION_STANDARDS.md
+A	docs/EXTENSION_ARCHITECTURE_FINAL.md
+A	docs/EXTENSION_REFACTORING_PLAN.md
+A	docs/EXTENSION_SYSTEM_STATUS.md
+A	docs/FINAL_VERIFICATION_CHECKLIST.md
+A	docs/IMPLEMENTATION_COMPLETE.md
+A	docs/MISSION_ACCOMPLISHED.md
+A	docs/POST_REFACTOR_TODO.md
+A	docs/REFACTOR_COMPLETE_SUMMARY.md
+M	package.json
+A	packages/agentos-personas/README.md
+A	packages/agentos-personas/docs/CREATING_PERSONAS.md
+A	packages/agentos-personas/package.json
+A	packages/agentos-personas/registry.json
+D	packages/theme-tokens/README.md
+M	packages/theme-tokens/css/tokens.css
+M	packages/theme-tokens/package.json
+D	packages/theme-tokens/src/theme.ts
+M	scripts/mirror-subtrees.sh
+M	scripts/split_submodules.sh

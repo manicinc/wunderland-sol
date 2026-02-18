@@ -1,0 +1,30 @@
+{
+  "welcome": {
+    "subject": "Voice Chat Assistant에 오신 것을 환영합니다",
+    "greeting": "{{name}}님, 안녕하세요",
+    "body": "Voice Chat Assistant를 이용해 주셔서 감사합니다. 계정이 성공적으로 생성되었습니다.",
+    "action": "시작하기",
+    "footer": "궁금한 사항이 있으시면 언제든지 문의해 주세요."
+  },
+  "passwordReset": {
+    "subject": "비밀번호를 재설정하세요",
+    "greeting": "{{name}}님, 안녕하세요",
+    "body": "비밀번호 재설정 요청을 받았습니다. 아래 링크를 클릭하여 새 비밀번호를 설정해 주세요.",
+    "action": "비밀번호 재설정",
+    "expire": "이 링크는 {{hours}}시간 후에 만료됩니다.",
+    "ignore": "요청하신 적이 없다면 이 메일을 무시해 주세요."
+  },
+  "verification": {
+    "subject": "이메일 주소를 확인해 주세요",
+    "greeting": "{{name}}님, 안녕하세요",
+    "body": "등록을 완료하려면 이메일 주소 확인을 진행해 주세요.",
+    "action": "이메일 확인",
+    "expire": "이 링크는 {{hours}}시간 후에 만료됩니다."
+  },
+  "notification": {
+    "subject": "새로운 알림이 있습니다",
+    "greeting": "{{name}}님, 안녕하세요",
+    "body": "새로운 알림이 도착했습니다.",
+    "action": "알림 확인"
+  }
+}

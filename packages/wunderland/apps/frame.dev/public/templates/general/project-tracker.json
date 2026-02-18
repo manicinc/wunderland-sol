@@ -1,0 +1,92 @@
+{
+  "id": "project-tracker",
+  "name": "Project Tracker",
+  "category": "general",
+  "icon": "FolderKanban",
+  "description": "Comprehensive project management with tasks, deadlines, milestones, and status tracking. Keep everything organized in one place.",
+  "shortDescription": "Full project management template",
+  "difficulty": "intermediate",
+  "estimatedTime": "15 min",
+  "tags": ["project", "management", "tasks", "deadlines", "kanban", "organize"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 90,
+  "defaultData": {
+    "contentType": "project"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Project Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "What is the project called?"
+    },
+    {
+      "name": "summary",
+      "label": "Project Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "What is this project about?"
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "select",
+      "required": false,
+      "placeholder": "Select status",
+      "options": ["planning", "in_progress", "on_hold", "completed", "cancelled"],
+      "defaultValue": "planning"
+    },
+    {
+      "name": "priority",
+      "label": "Priority",
+      "type": "select",
+      "required": false,
+      "placeholder": "Select priority",
+      "options": ["low", "medium", "high", "critical"],
+      "defaultValue": "medium"
+    },
+    {
+      "name": "dueDate",
+      "label": "Due Date",
+      "type": "date",
+      "required": false,
+      "placeholder": "Project deadline"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Categorize this project"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "status", "priority", "dueDate", "progress"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: project\nstatus: {status}\npriority: {priority}\ndueDate: {dueDate}\nprogress: 0\ncreated: {date}\nlastUpdated: {date}\n---\n\n# {title}\n\n{summary}\n\n## Project Overview\n\n| Field | Value |\n|-------|-------|\n| **Status** | 🟡 {status} |\n| **Priority** | {priority} |\n| **Progress** | ⬜⬜⬜⬜⬜ 0% |\n| **Start Date** | {date} |\n| **Due Date** | {dueDate} |\n| **Owner** | @you |\n\n---\n\n## 📋 Task Board\n\n### 📥 Backlog\n- [ ] Task to be planned\n\n### 🔜 To Do\n- [ ] Next priority task 1\n- [ ] Next priority task 2\n\n### 🔄 In Progress\n- [ ] Currently working on...\n\n### ✅ Done\n- [x] Example completed task\n\n### 🚫 Blocked\n- [ ] ⚠️ Blocked task (reason: ...)\n\n---\n\n## 🎯 Milestones\n\n- [ ] **M1:** Project kickoff _(Due: {date})_\n- [ ] **M2:** First deliverable _(Due: TBD)_\n- [ ] **M3:** Review checkpoint _(Due: TBD)_\n- [ ] **M4:** Final delivery _(Due: {dueDate})_\n\n---\n\n## 📊 Weekly Progress\n\n### Week of {date}\n\n**Completed:**\n- Item 1\n\n**In Progress:**\n- Item 2\n\n**Blocked:**\n- None\n\n**Next Week:**\n- Item 3\n\n---\n\n## 📝 Notes & Decisions\n\n### Key Decisions\n| Date | Decision | Rationale |\n|------|----------|------------|\n| {date} | Project started | Initial setup |\n\n### Open Questions\n- [ ] Question 1?\n- [ ] Question 2?\n\n---\n\n## 🔗 Resources\n\n- [Link to resource 1]()\n- [Link to resource 2]()\n\n---\n\n## 📅 Timeline\n\n```\n{date} ────────────────────────────── {dueDate}\n   │                                      │\n   ▼                                      ▼\n[Start] ─ [M1] ─ [M2] ─ [M3] ─ [M4] ─ [End]\n```\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

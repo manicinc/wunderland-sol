@@ -1,0 +1,219 @@
+// File: frontend/src/styles/views/_private-home.scss
+/**
+ * @file _private-home.scss
+ * @description Styles specific to the PrivateHome view.
+ * Focuses on responsive layout, thematic background, and providing a clear structure
+ * for either a dashboard placeholder or agent-specific content views.
+ * Utilizes global SCSS variables and mixins.
+ * @version 1.2.0 - Added flex-grow for root, refined padding/margins, improved prose styles.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+// Assuming these are used if PrivateHome directly includes buttons or cards not part of sub-components.
+// @use '../components/buttons' as buttonsFile;
+@use '../components/cards' as cardsFile; // Used for .has-framed-content
+
+// Root container for the PrivateHome view
+.private-home-view-ephemeral {
+  display: flex;          // Enable flex behavior for its children
+  flex-direction: column; // Stack children vertically
+  flex-grow: 1;           // CRITICAL: Allows this view to fill the space given by App.vue's main content area
+  height: 100%;           // Ensures it tries to use all of the parent's height if parent is also flex item
+  width: 100%;
+  background-color: hsl(
+    var(--color-bg-primary-h, #{var.$default-color-bg-primary-h}),
+    var(--color-bg-primary-s, #{var.$default-color-bg-primary-s}),
+    var(--color-bg-primary-l, #{var.$default-color-bg-primary-l})
+  );
+  overflow: hidden;       // This view itself should not scroll; UnifiedChatLayout inside it will manage scrolling.
+}
+
+// Styles for the dashboard placeholder content (when no agent content is primary)
+.private-dashboard-placeholder-ephemeral {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-grow: 1; // Takes available space if it's the main displayed content
+  width: 100%;
+  padding: var.$spacing-lg var.$spacing-md; // Responsive padding
+
+  .dashboard-content-wrapper { // Added wrapper for better control over text block width
+    width: 100%;
+    max-width: 580px; // Max width for the placeholder's text content
+    @media (min-width: var.$breakpoint-sm) {
+      max-width: 680px;
+    }
+    @media (min-width: var.$breakpoint-md) {
+      max-width: 780px;
+    }
+  }
+
+  .dashboard-icon-ephemeral { // Styles for the icon (e.g., ShieldCheckIcon)
+    width: clamp(calc( (#{var.$spacing-xl}) * 1.5), 10vw, calc( (#{var.$spacing-xl}) * 2.5 )); // Responsive icon size    margin-bottom: var.$spacing-lg;
+    color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+    filter: drop-shadow(0 5px 15px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.25));
+  }
+  .dashboard-title-ephemeral {
+    color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+font-size: clamp(calc( (#{var.$font-size-xl}) * 1.2), 4vw, calc( (#{var.$font-size-display-default}) * 0.9 )); // Responsive title    font-weight: 700; // Bold title
+    margin-bottom: var.$spacing-sm;
+  }
+  .dashboard-subtitle-ephemeral {
+    color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+    font-size: clamp(#{var.$font-size-base-default}, 2.5vw, #{var.$font-size-lg}); // Responsive subtitle
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+  .btn.btn-secondary-ephemeral { // Assuming .btn and .btn-secondary-ephemeral provide base button styles
+    margin-top: var.$spacing-xl; // More space above the button
+    padding: var.$spacing-sm calc(#{var.$spacing-md} * 1.5); // Generous padding for primary action
+    font-size: var.$font-size-base-default;
+  }
+}
+
+// Wrapper for MainContentView when it's the primary content
+// This class is on MainContentView.vue's root element when used in PrivateHome or PublicHome.
+.main-content-view-wrapper-ephemeral {
+  height: 100%; // Expects to fill its container within private-home-view-ephemeral
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Wrapper itself shouldn't scroll; its child (.content-renderer-container-ephemeral) will.
+
+  // Default state: content is not in a distinct "card" or "frame"
+  &:not(.has-framed-content) {
+    // Padding is applied to .content-renderer-container-ephemeral inside for scrolling content
+  }
+
+  // Framed content: applies card styling to this wrapper
+  &.has-framed-content {
+    @include cardsFile.card-base-styles; // Assumes this mixin provides base structure (e.g., border-radius)
+    @include cardsFile.card-glass-look;   // Assumes this mixin provides glassmorphic appearance
+    margin: var.$spacing-sm;              // Margin for the frame on mobile
+    // No direct padding here; padding is for the scrollable child.
+    // The card styles should handle background.
+    overflow: hidden; // Crucial for child with border-radius and overflow:auto to not show scrollbars over rounded corners
+
+    @media (min-width: var.$breakpoint-md) {
+      margin: var.$spacing-md; // Larger margin for the frame on bigger screens
+    }
+
+    // The direct child of .has-framed-content is expected to be the scrollable area.
+    // This would typically be .content-renderer-container-ephemeral if MainContentView is structured this way.
+    > .content-renderer-container-ephemeral, // Target if directly child
+    > *:first-child:not(.content-renderer-container-ephemeral) .content-renderer-container-ephemeral { // Target if nested
+      height: 100%; // Fill the frame
+      width: 100%;
+      overflow-y: auto; // Make this child scrollable
+      @include mixins.custom-scrollbar(
+        '--color-accent-interactive', 0.4, 0.65, // Thumb
+        '--color-bg-card-frame-track', 0.1, // Track (needs --color-bg-card-frame-track-h/s/l defined, or use a more generic one)
+        6px, var.$radius-md // Width, radius (match card's inner radius if applicable)
+      );
+      // Internal padding for the scrollable content within the frame
+      padding: var.$spacing-md;
+      @media (min-width: var.$breakpoint-sm) {
+        padding: var.$spacing-lg;
+      }
+    }
+  }
+}
+
+// Actual container for rendered content (markdown, custom components etc.)
+// This is expected to be a child of .main-content-view-wrapper-ephemeral.
+.content-renderer-container-ephemeral {
+  flex-grow: 1; // Takes up available space in its parent (either directly in wrapper or within a frame)
+  // overflow-y: auto; // Moved to .main-content-view-wrapper-ephemeral.has-framed-content > :first-child OR to .main-content-view-wrapper-ephemeral:not(.has-framed-content) directly if it's the scroll container.
+  // If :not(.has-framed-content), then MainContentView's root needs to be the scroll container:
+  .main-content-view-wrapper-ephemeral:not(.has-framed-content) & {
+      overflow-y: auto;
+      padding: var.$spacing-sm; // Padding for non-framed content directly in the renderer
+      @media (min-width: var.$breakpoint-sm) { padding: var.$spacing-md; }
+      @media (min-width: var.$breakpoint-lg) { padding: var.$spacing-lg; }
+      @include mixins.custom-scrollbar(
+        '--color-accent-interactive', 0.4, 0.65,
+        '--color-bg-primary', 0.1, // Track for non-framed content
+        6px, var.$radius-sm
+      );
+  }
+
+  display: flex; // Allows content like .prose to be centered if it has margin auto
+  flex-direction: column; // Stack content vertically
+}
+
+// Prose styling for markdown content within the content renderer
+.prose-ephemeral.content-renderer-ephemeral, // If .prose is applied directly to the renderer
+.content-renderer-container-ephemeral .prose-ephemeral { // If .prose is a child
+  width: 100%;
+  max-width: 85ch; // Increased slightly for better line length with some fonts
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: var.$spacing-md;    // Ensure vertical spacing for prose blocks
+  padding-bottom: var.$spacing-xl; // Ample space at the bottom
+
+  h1, h2, h3, h4, h5, h6 {
+    color: hsl(var(--color-text-heading-h, var.$default-color-text-primary-h), var(--color-text-heading-s, var.$default-color-text-primary-s), var(--color-text-heading-l, var.$default-color-text-primary-l));
+    font-family: var.$font-family-display; // Use display font for headings
+    font-weight: 600; // Default heading weight
+  }
+  p, li, blockquote {
+    color: hsl(var(--color-text-secondary-h, var.$default-color-text-secondary-h), var(--color-text-secondary-s, var.$default-color-text-secondary-s), var(--color-text-secondary-l, var.$default-color-text-secondary-l));
+    font-size: calc(#{var.$font-size-base-default} * 1.035); // Fine-tuned base size for prose
+    line-height: 1.75; // Increased for readability
+    margin-bottom: var.$spacing-md;
+  }
+  a {
+    color: hsl(var(--color-accent-interactive-h, var.$default-color-accent-interactive-h), var(--color-accent-interactive-s, var.$default-color-accent-interactive-s), var(--color-accent-interactive-l, var.$default-color-accent-interactive-l));
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1.5px solid hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.35);
+    transition: color var.$duration-quick, border-color var.$duration-quick;
+    &:hover {
+      color: hsl(var(--color-accent-primary-light-h, var.$default-color-accent-primary-light-h), var(--color-accent-primary-light-s, var.$default-color-accent-primary-light-s), var(--color-accent-primary-light-l, var.$default-color-accent-primary-light-l));
+      border-bottom-color: hsla(var(--color-accent-primary-light-h), var(--color-accent-primary-light-s), var(--color-accent-primary-light-l), 0.6);
+    }
+  }
+  // Add styles for code blocks, blockquotes, lists etc. as needed, ensuring they use theme variables.
+  pre, code {
+    font-family: var.$font-family-mono;
+    background-color: hsl(var(--color-bg-code-block-h, var.$default-color-bg-code-block-h), var(--color-bg-code-block-s, var.$default-color-bg-code-block-s), var(--color-bg-code-block-l, var.$default-color-bg-code-block-l), var(--color-bg-code-block-a, var.$default-color-bg-code-block-a));
+    color: hsl(var(--color-text-code-block-h, var.$default-color-text-code-block-h), var(--color-text-code-block-s, var.$default-color-text-code-block-s), var(--color-text-code-block-l, var.$default-color-text-code-block-l), var(--color-text-code-block-a, var.$default-color-text-code-block-a));
+    border-radius: var.$radius-md;
+    padding: var.$spacing-sm var.$spacing-md;
+  }
+  code:not(pre > code) { // Inline code
+    padding: 0.2em 0.4em;
+    font-size: 0.875em;
+    background-color: hsl(var(--color-bg-code-inline-h, var.$default-color-bg-code-inline-h), var(--color-bg-code-inline-s, var.$default-color-bg-code-inline-s), var(--color-bg-code-inline-l, var.$default-color-bg-code-inline-l), var(--color-bg-code-inline-a, var.$default-color-bg-code-inline-a));
+    color: hsl(var(--color-text-code-inline-h, var.$default-color-text-code-inline-h), var(--color-text-code-inline-s, var.$default-color-text-code-inline-s), var(--color-text-code-inline-l, var.$default-color-text-code-inline-l), var(--color-text-code-inline-a, var.$default-color-text-code-inline-a));
+    border-radius: var.$radius-sm;
+  }
+  blockquote {
+    border-left: 3px solid hsl(var(--color-border-interactive-h), var(--color-border-interactive-s), var(--color-border-interactive-l));
+    padding-left: var.$spacing-md;
+    margin-left: 0;
+    font-style: italic;
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  }
+}
+
+// Generic loading placeholder if used within PrivateHome's main content
+.loading-placeholder-ephemeral {
+  // Styles as per PublicHome, ensure thematic colors
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding: var.$spacing-lg;
+  .loading-text-ephemeral {
+    color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+    margin-top: var.$spacing-md;
+  }
+  .loading-spinner-ephemeral {
+    color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  }
+}

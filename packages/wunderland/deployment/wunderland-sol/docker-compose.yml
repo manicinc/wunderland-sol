@@ -1,0 +1,70 @@
+services:
+  ipfs:
+    image: ipfs/kubo:v0.28.0
+    restart: unless-stopped
+    volumes:
+      - /mnt/storage-wunder/ipfs:/data/ipfs
+    ports:
+      # Swarm (P2P) — public is OK
+      - "4001:4001"
+      - "4001:4001/udp"
+      # Gateway — localhost only
+      - "127.0.0.1:8080:8080"
+    environment:
+      - IPFS_PROFILE=server
+    healthcheck:
+      test: ["CMD-SHELL", "ipfs id || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: deployment/wunderland-sol/Dockerfile.frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    environment:
+      - PORT=3011
+    expose:
+      - "3011"
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: deployment/wunderland-sol/Dockerfile.backend
+    restart: unless-stopped
+    depends_on:
+      ipfs:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      - WUNDERLAND_IPFS_API_URL=http://ipfs:5001
+      - WUNDERLAND_IPFS_GATEWAY_URL=https://ipfs.io
+    expose:
+      - "3001"
+    volumes:
+      - /mnt/storage-wunder/db:/app/db_data
+      - /mnt/storage-wunder/media:/app/media
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /mnt/storage-wunder/logs/nginx:/var/log/nginx
+      - /app/ssl/origin.crt:/etc/ssl/origin.crt:ro
+      - /app/ssl/origin.key:/etc/ssl/origin.key:ro

@@ -1,0 +1,67 @@
+{
+  "name": "@framers/agentos-extensions",
+  "version": "1.0.0",
+  "files": [
+    "registry.json",
+    "types.d.ts",
+    "README.md"
+  ],
+  "description": "Community registry of tools, workflows, and integrations for AgentOS",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./registry.json",
+      "types": "./types.d.ts"
+    },
+    "./registry.json": "./registry.json",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "test": "node -e \"console.log('agentos-extensions: test skipped in this monorepo build')\"",
+    "test:coverage": "npm run test",
+    "build": "node scripts/update-registry.js",
+    "lint": "node -e \"console.log('agentos-extensions: lint skipped in this monorepo build')\"",
+    "clean": "node -e \"console.log('agentos-extensions: clean noop in this monorepo build')\"",
+    "create-extension": "node scripts/create-extension.js",
+    "update-registry": "node scripts/update-registry.js",
+    "docs": "npx typedoc",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions.git"
+  },
+  "keywords": ["agentos", "extensions", "tools", "plugins"],
+  "author": {
+    "name": "Framers AI",
+    "email": "team@frame.dev",
+    "url": "https://frame.dev"
+  },
+  "contributors": [
+    {
+      "name": "Johnny Dunn",
+      "email": "johnnyfived@protonmail.com",
+      "url": "https://github.com/jddunn"
+    }
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.15.1",
+  "pnpm": {
+    "overrides": {
+      "@framers/agentos": "^0.1.0"
+    }
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

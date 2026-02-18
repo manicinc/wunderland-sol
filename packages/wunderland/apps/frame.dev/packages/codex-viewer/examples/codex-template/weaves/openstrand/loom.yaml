@@ -1,0 +1,10 @@
+id: openstrand-weave
+title: OpenStrand Knowledge Fabric
+summary: Core primitives, schemas, and playbooks for the OpenStrand analog OS.
+tags: [openstrand, codex, schema]
+curators:
+  - name: Frame.dev
+    contact: team@frame.dev
+defaultStrand: overview
+lastUpdated: 2025-11-16
+

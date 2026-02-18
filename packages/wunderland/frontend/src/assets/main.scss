@@ -1,0 +1,159 @@
+// File: frontend/src/assets/main.scss
+/**
+ * @file main.scss
+ * @description Main SCSS entry point for the "Ephemeral Harmony" design system.
+ * This file orchestrates the import of all SCSS partials, establishing
+ * a structured and maintainable styling foundation for the application.
+ */
+
+// 1. Abstracts
+// Import foundational SCSS tools: variables, functions (if any), mixins, and theme definitions.
+// These do not output CSS on their own but are used by other SCSS files.
+@use '../styles/abstracts/variables' as var; // Aliased for potential direct use, though primarily for configuration.
+@use '../styles/abstracts/mixins';
+@use '../styles/abstracts/theme-definitions';
+
+// 2. Theme Engine
+// Applies the theme definitions to generate CSS custom properties.
+@use '../styles/abstracts/theme-engine';
+
+// 3. Base Styles
+// Global resets, base typography, and default element styling.
+@use '../styles/base/reset';
+@use '../styles/base/typography';
+@use '../styles/base/global';
+
+// 4. Layout Styles
+// Styles for major layout containers and structure (e.g., header, footer, main app layout).
+@use '../styles/layout/app';
+@use '../styles/layout/header';
+@use '../styles/layout/footer';
+@use '../styles/layout/unified-chat-layout'; // Styles for the unified chat page layout.
+
+// 5. Animations & Transitions
+// Global keyframe animations and transition utility classes.
+@use '../styles/animations/keyframes';
+@use '../styles/animations/transitions';
+
+// 6. Component Styles
+// Individual UI component styles, organized by component name or category.
+@use '../styles/components/buttons';
+@use '../styles/components/cards';
+@use '../styles/components/forms';
+@use '../styles/components/modals';
+@use '../styles/components/voice-input';
+@use '../styles/components/toasts';
+@use '../styles/components/loading-overlay';
+@use '../styles/components/diagram-viewer';
+@use '../styles/components/message';
+@use '../styles/components/ephemeral-chat-log';
+@use '../styles/components/voice-controls-dropdown';
+@use '../styles/components/dropdowns'; // General dropdown styles
+@use '../styles/components/chat-window';
+
+// Agent-specific component styles
+@use '../styles/components/agents/agent-chat-log';
+@use '../styles/components/agents/agent-hub';
+@use '../styles/components/agents/agent-card';
+@use '../styles/components/compact-message-renderer'; // Styles for the compact message display.
+// Note: Styles for individual Agent Views (e.g., CodingAgentView) are typically scoped within their .vue files using <style lang="postcss">.
+
+// 7. View-Specific Styles
+// Styles for specific pages or views if they don't fit into components.
+@use '../styles/views/public-home';
+@use '../styles/views/private-home';
+@use '../styles/views/about-page';
+@use '../styles/views/settings-page';
+
+
+// 8. Utility Classes
+// Helper classes for common styling adjustments (e.g., spacing, alignment, visibility).
+@use '../styles/utilities/helpers';
+
+// 9. Tailwind CSS Directives
+// Integration of Tailwind CSS. The order relative to custom styles can be important.
+// Placing them here allows custom base styles to be established first,
+// and then Tailwind's base, components, and utilities are layered on top.
+// For advanced @layer usage with Tailwind, consult Tailwind documentation.
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// 10. Print Styles (Optional)
+// Dedicated styles for print media, if needed.
+// @use '../styles/base/print';
+
+.transition-theme {
+  transition: background-color var(--duration-smooth) var(--ease-out-quad),
+              color var(--duration-smooth) var(--ease-out-quad),
+              border-color var(--duration-smooth) var(--ease-out-quad),
+              box-shadow var(--duration-smooth) var(--ease-out-quad);
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--color-text-muted) 8%, transparent);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-text-muted) 16%, transparent) 45%,
+    color-mix(in oklab, var(--color-text-muted) 12%, transparent) 55%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+.custom-scrollbar-futuristic {
+  &::-webkit-scrollbar {
+    width: 0.375rem;
+    height: 0.375rem;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: hsla(var(--neutral-hue, 220), 20%, 20%, 0.3);
+    border-radius: 9999px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: hsla(var(--agent-interviewer-accent-hue), calc(var(--agent-interviewer-accent-saturation) + 15%), calc(var(--agent-interviewer-accent-lightness) + 10%), 0.6);
+    border-radius: 9999px;
+    border: 1px solid hsla(var(--neutral-hue, 220), 20%, 15%, 0.5);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: hsla(var(--agent-interviewer-accent-hue), calc(var(--agent-interviewer-accent-saturation) + 15%), calc(var(--agent-interviewer-accent-lightness) + 10%), 0.8);
+  }
+  scrollbar-width: thin;
+  scrollbar-color: hsla(var(--agent-interviewer-accent-hue), calc(var(--agent-interviewer-accent-saturation) + 15%), calc(var(--agent-interviewer-accent-lightness) + 10%), 0.6) hsla(var(--neutral-hue, 220), 20%, 20%, 0.3);
+}
+/* Custom Scrollbar for Nerf */
+.nerf-scrollbar {
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: hsla(var(--neutral-hue, 220), 15%, 15%, 0.3);
+    border-radius: 9999px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: hsla(var(--agent-nerf-accent-hue), var(--agent-nerf-accent-saturation), var(--agent-nerf-accent-lightness), 0.6);
+    border-radius: 9999px;
+    border: 2px solid hsla(var(--neutral-hue, 220), 15%, 15%, 0.3);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--agent-nerf-accent-color);
+  }
+  scrollbar-width: auto;
+  scrollbar-color: hsla(var(--agent-nerf-accent-hue), var(--agent-nerf-accent-saturation), var(--agent-nerf-accent-lightness), 0.6) hsla(var(--neutral-hue, 220), 15%, 15%, 0.3);
+}

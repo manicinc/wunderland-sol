@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Root dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # Each extension package
+  - package-ecosystem: "npm"
+    directory: "/packages/ext-search"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ext-search"
+    commit-message:
+      prefix: "chore(ext-search)"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/ext-template"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ext-template"
+    commit-message:
+      prefix: "chore(ext-template)"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(ci)"

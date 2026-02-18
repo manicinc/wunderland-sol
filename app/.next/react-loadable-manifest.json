@@ -1,0 +1,21 @@
+{
+  "../../../../node_modules/.pnpm/@solana+wallet-adapter-solflare@0.6.32_@solana+web3.js@1.98.4_bufferutil@4.1.0_encoding_b553fb43ed9d46ef814a8a8afc57a95c/node_modules/@solana/wallet-adapter-solflare/lib/esm/adapter.js -> @solflare-wallet/sdk": {
+    "id": 1638,
+    "files": [
+      "static/chunks/1638.f40cf289033f186c.js"
+    ]
+  },
+  "../../../../node_modules/.pnpm/@solana+wallet-adapter-solflare@0.6.32_@solana+web3.js@1.98.4_bufferutil@4.1.0_encoding_b553fb43ed9d46ef814a8a8afc57a95c/node_modules/@solana/wallet-adapter-solflare/lib/esm/metamask/wallet.js -> @solflare-wallet/metamask-sdk": {
+    "id": 9466,
+    "files": [
+      "static/chunks/9466.dfc4c6aedfd7246c.js"
+    ]
+  },
+  "app/rewards/page.tsx -> @/lib/wunderland-program": {
+    "id": 2991,
+    "files": [
+      "static/chunks/5129-6d28d6a8eeabdcf2.js",
+      "static/chunks/2991-9e2e05e3ecb451f2.js"
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "id": "com.yourname.my-widget",
+  "name": "My Widget Plugin",
+  "version": "1.0.0",
+  "description": "A sample widget plugin for Quarry",
+  "author": "Your Name",
+  "authorUrl": "https://yoursite.com",
+  "minQuarryVersion": "1.0.0",
+  "main": "main.js",
+  "styles": "styles.css",
+  "type": "widget",
+  "position": "sidebar",
+  "settings": {
+    "showHeader": {
+      "type": "boolean",
+      "default": true,
+      "label": "Show Header",
+      "description": "Display the widget header"
+    },
+    "refreshInterval": {
+      "type": "number",
+      "default": 30,
+      "label": "Refresh Interval",
+      "description": "How often to refresh data (seconds)"
+    },
+    "displayMode": {
+      "type": "select",
+      "default": "compact",
+      "label": "Display Mode",
+      "description": "How to display the widget",
+      "options": ["compact", "expanded", "minimal"]
+    }
+  }
+}

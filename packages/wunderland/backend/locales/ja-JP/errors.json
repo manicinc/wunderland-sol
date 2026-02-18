@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "不明なエラーが発生しました",
+    "tryAgain": "しばらくしてからもう一度お試しください",
+    "contactSupport": "問題が解決しない場合はサポートまでご連絡ください"
+  },
+  "network": {
+    "offline": "オフラインのようです",
+    "timeout": "リクエストがタイムアウトしました",
+    "serverError": "サーバーエラーが発生しました",
+    "connectionFailed": "接続に失敗しました"
+  },
+  "validation": {
+    "required": "この項目は必須です",
+    "invalidEmail": "メールアドレスの形式が正しくありません",
+    "passwordTooShort": "パスワードは最低 {{min}} 文字必要です",
+    "passwordMismatch": "パスワードが一致しません",
+    "invalidFormat": "形式が正しくありません",
+    "numberOnly": "数字のみ入力してください",
+    "minLength": "{{min}} 文字以上で入力してください",
+    "maxLength": "{{max}} 文字以内で入力してください"
+  },
+  "auth": {
+    "unauthorized": "認証されていないアクセスです",
+    "sessionExpired": "セッションの有効期限が切れました",
+    "invalidCredentials": "メールアドレスまたはパスワードが正しくありません",
+    "accountLocked": "アカウントがロックされています",
+    "emailNotVerified": "メールアドレスの確認を完了してください",
+    "tokenInvalid": "トークンが無効または期限切れです"
+  },
+  "api": {
+    "rateLimited": "リクエストが多すぎます。しばらくしてから再度お試しください",
+    "notFound": "リソースが見つかりません",
+    "methodNotAllowed": "使用できないメソッドです",
+    "serverError": "サーバー内部でエラーが発生しました",
+    "badRequest": "不正なリクエストです",
+    "forbidden": "アクセスが拒否されました"
+  },
+  "file": {
+    "tooLarge": "ファイルサイズが上限を超えています",
+    "invalidType": "サポートされていないファイル形式です",
+    "uploadFailed": "ファイルのアップロードに失敗しました",
+    "notFound": "ファイルが見つかりません"
+  }
+}

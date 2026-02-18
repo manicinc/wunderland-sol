@@ -1,0 +1,33 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-exploration" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ccfbf1"/>
+      <stop offset="100%" style="stop-color:#99f6e4"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg-exploration)"/>
+  <!-- Compass body -->
+  <circle cx="200" cy="200" r="100" fill="#fafaf9" stroke="#78716c" stroke-width="4"/>
+  <circle cx="200" cy="200" r="90" fill="#f5f5f4" stroke="#a3a3a3" stroke-width="1"/>
+  <!-- Compass directions -->
+  <text x="200" y="135" font-family="Georgia, serif" font-size="20" fill="#1f2937" text-anchor="middle" font-weight="bold">N</text>
+  <text x="200" y="285" font-family="Georgia, serif" font-size="16" fill="#6b7280" text-anchor="middle">S</text>
+  <text x="125" y="207" font-family="Georgia, serif" font-size="16" fill="#6b7280" text-anchor="middle">W</text>
+  <text x="275" y="207" font-family="Georgia, serif" font-size="16" fill="#6b7280" text-anchor="middle">E</text>
+  <!-- Compass needle -->
+  <polygon points="200,130 190,200 200,210 210,200" fill="#ef4444"/>
+  <polygon points="200,270 190,200 200,190 210,200" fill="#d1d5db"/>
+  <!-- Center pivot -->
+  <circle cx="200" cy="200" r="10" fill="#78716c"/>
+  <circle cx="200" cy="200" r="5" fill="#d1d5db"/>
+  <!-- Tick marks -->
+  <line x1="200" y1="115" x2="200" y2="125" stroke="#78716c" stroke-width="2"/>
+  <line x1="200" y1="275" x2="200" y2="285" stroke="#78716c" stroke-width="2"/>
+  <line x1="115" y1="200" x2="125" y2="200" stroke="#78716c" stroke-width="2"/>
+  <line x1="275" y1="200" x2="285" y2="200" stroke="#78716c" stroke-width="2"/>
+  <!-- Decorative stars -->
+  <circle cx="80" cy="80" r="4" fill="#fbbf24"/>
+  <circle cx="330" cy="100" r="3" fill="#fbbf24"/>
+  <circle cx="90" cy="320" r="3.5" fill="#fbbf24"/>
+  <circle cx="320" cy="300" r="4" fill="#fbbf24"/>
+</svg>

@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "Es ist ein unbekannter Fehler aufgetreten",
+    "tryAgain": "Bitte versuche es später erneut",
+    "contactSupport": "Wenn das Problem weiterhin besteht, wende dich bitte an den Support"
+  },
+  "network": {
+    "offline": "Es scheint, als wärst du offline",
+    "timeout": "Zeitüberschreitung bei der Anfrage",
+    "serverError": "Serverfehler",
+    "connectionFailed": "Verbindung fehlgeschlagen"
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich",
+    "invalidEmail": "Ungültige E-Mail-Adresse",
+    "passwordTooShort": "Das Passwort muss mindestens {{min}} Zeichen lang sein",
+    "passwordMismatch": "Die Passwörter stimmen nicht überein",
+    "invalidFormat": "Ungültiges Format",
+    "numberOnly": "Es sind nur Zahlen erlaubt",
+    "minLength": "Mindestens {{min}} Zeichen erforderlich",
+    "maxLength": "Maximal {{max}} Zeichen erlaubt"
+  },
+  "auth": {
+    "unauthorized": "Unberechtigter Zugriff",
+    "sessionExpired": "Deine Sitzung ist abgelaufen",
+    "invalidCredentials": "Ungültige E-Mail-Adresse oder Passwort",
+    "accountLocked": "Das Konto wurde gesperrt",
+    "emailNotVerified": "Bitte bestätige deine E-Mail-Adresse",
+    "tokenInvalid": "Ungültiges oder abgelaufenes Token"
+  },
+  "api": {
+    "rateLimited": "Zu viele Anfragen. Bitte versuche es später erneut",
+    "notFound": "Ressource nicht gefunden",
+    "methodNotAllowed": "Methode nicht erlaubt",
+    "serverError": "Interner Serverfehler",
+    "badRequest": "Ungültige Anfrage",
+    "forbidden": "Zugriff verweigert"
+  },
+  "file": {
+    "tooLarge": "Die Datei überschreitet die Größenbeschränkung",
+    "invalidType": "Ungültiger Dateityp",
+    "uploadFailed": "Upload fehlgeschlagen",
+    "notFound": "Datei nicht gefunden"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "Aufnahme läuft...",
+    "processing": "Stimme wird verarbeitet...",
+    "transcribing": "Audio wird transkribiert...",
+    "listening": "Höre zu...",
+    "speakNow": "Jetzt sprechen",
+    "clickToSpeak": "Zum Sprechen klicken",
+    "stopRecording": "Aufnahme stoppen",
+    "microphoneAccess": "Mikrofonzugriff erforderlich",
+    "noSpeechDetected": "Keine Sprache erkannt",
+    "transcriptionComplete": "Transkription abgeschlossen"
+  },
+  "chat": {
+    "thinking": "Denke nach...",
+    "generating": "Antwort wird generiert...",
+    "messageEmpty": "Nachricht darf nicht leer sein",
+    "sendMessage": "Nachricht senden",
+    "newChat": "Neuer Chat",
+    "clearHistory": "Verlauf löschen",
+    "typingIndicator": "KI schreibt...",
+    "copyCode": "Code kopieren",
+    "codeCopied": "Code in Zwischenablage kopiert",
+    "retry": "Erneut versuchen",
+    "regenerate": "Antwort neu generieren"
+  },
+  "modes": {
+    "coding": "Coding-Fragen & Antworten",
+    "codingDesc": "Hilfe bei Programmierfragen und Codebeispielen erhalten",
+    "systemDesign": "Systementwurf",
+    "systemDesignDesc": "Architekturen entwerfen und Diagramme erstellen",
+    "meetingSummary": "Meeting-Zusammenfassung",
+    "meetingSummaryDesc": "Meetings zusammenfassen und Kernpunkte herausarbeiten",
+    "general": "Allgemein",
+    "generalDesc": "Allgemeine Gespräche und Fragen"
+  },
+  "cost": {
+    "title": "API-Nutzung",
+    "current": "Aktuelle Sitzung",
+    "total": "Gesamtnutzung",
+    "threshold": "Kostenlimit",
+    "warning": "Kostenlimit wird bald erreicht",
+    "exceeded": "Kostenlimit überschritten",
+    "reset": "Zähler zurücksetzen"
+  },
+  "settings": {
+    "speechRecognition": "Spracherkennung",
+    "whisperAPI": "Whisper-API",
+    "browserSpeech": "Browser-Spracherkennung",
+    "textToSpeech": "Text-zu-Sprache",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "Browser-TTS",
+    "apiKeys": "API-Schlüssel",
+    "openAIKey": "OpenAI-API-Schlüssel",
+    "anthropicKey": "Anthropic-API-Schlüssel",
+    "modelPreferences": "Modellpräferenzen",
+    "costLimits": "Kostenlimits",
+    "sessionLimit": "Sitzungslimit",
+    "dailyLimit": "Tageslimit",
+    "monthlyLimit": "Monatslimit"
+  }
+}

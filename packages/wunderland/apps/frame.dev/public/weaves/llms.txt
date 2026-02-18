@@ -1,0 +1,92 @@
+# Quarry - AI Agent Instructions
+
+> This file helps AI coding assistants understand the Quarry knowledge base structure.
+
+## Overview
+
+Quarry uses the **OpenStrand** schema to organize knowledge. Files are markdown (.md) with YAML frontmatter.
+
+## Directory Structure
+
+```
+weaves/                    # Top-level knowledge universes
+├── {weave-name}/          # A knowledge domain (e.g., "wiki", "notes", "projects")
+│   └── looms/             # Subdirectories within a weave
+│       └── {loom-name}/   # A module/category
+│           └── strands/   # Atomic knowledge files
+│               └── *.md   # Individual markdown documents
+```
+
+## File Format
+
+Every strand (markdown file) should have YAML frontmatter:
+
+```yaml
+---
+title: "Document Title"
+description: "Brief description"
+tags: ["tag1", "tag2"]
+created: "2024-01-15"
+updated: "2024-01-20"
+status: "published"  # draft | published | archived
+---
+
+# Content starts here
+
+Your markdown content...
+```
+
+## Creating New Strands
+
+1. Navigate to the appropriate `weaves/{weave}/looms/{loom}/strands/` directory
+2. Create a new `.md` file with kebab-case naming (e.g., `my-new-topic.md`)
+3. Add required frontmatter (title, description, tags)
+4. Write content in markdown
+
+## Naming Conventions
+
+- **Weaves**: lowercase, single word (e.g., `wiki`, `notes`, `projects`)
+- **Looms**: lowercase, kebab-case (e.g., `getting-started`, `api-reference`)
+- **Strands**: lowercase, kebab-case (e.g., `installation-guide.md`)
+
+## Supported Frontmatter Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| title | string | Yes | Display title |
+| description | string | Yes | Brief summary |
+| tags | string[] | No | Categorization tags |
+| created | date | No | Creation date (ISO 8601) |
+| updated | date | No | Last modified date |
+| status | enum | No | draft, published, archived |
+| author | string | No | Author name |
+| related | string[] | No | Paths to related strands |
+
+## Reading Content
+
+- All content is in standard markdown format
+- Images are relative to the strand location or in a shared `assets/` folder
+- Internal links use relative paths: `[Link](../other-loom/strands/file.md)`
+
+## Editing Guidelines
+
+- Preserve existing frontmatter when editing
+- Update the `updated` field when making changes
+- Keep content focused - one concept per strand
+- Use descriptive titles and tags for discoverability
+
+## API Endpoints (if running locally)
+
+- `GET /api/content/tree` - Get full directory tree
+- `GET /api/content/strand?path={path}` - Get strand content
+- `POST /api/content/strand` - Create new strand
+- `PUT /api/content/strand` - Update strand
+
+## More Information
+
+- Schema reference: `docs/schema-reference.md`
+- Architecture: `docs/openstrand-architecture.md`
+- Contributing: `docs/contributing/how-to-submit.md`
+
+
+

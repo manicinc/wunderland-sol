@@ -1,0 +1,82 @@
+{
+  "id": "reference",
+  "name": "Reference / API Documentation",
+  "category": "technical",
+  "icon": "Code",
+  "description": "Technical reference documentation for APIs, functions, or systems",
+  "shortDescription": "Structured technical documentation",
+  "difficulty": "intermediate",
+  "estimatedTime": "15 min",
+  "tags": ["reference", "api", "documentation", "technical"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 85,
+  "defaultData": {
+    "contentType": "reference"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Reference Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "Function name, API endpoint, etc."
+    },
+    {
+      "name": "summary",
+      "label": "Brief Description",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "What does this do?"
+    },
+    {
+      "name": "version",
+      "label": "Version",
+      "type": "text",
+      "required": false,
+      "placeholder": "e.g., v1.0, 2.3.1"
+    },
+    {
+      "name": "status",
+      "label": "Status",
+      "type": "select",
+      "required": false,
+      "options": ["stable", "beta", "deprecated", "experimental"],
+      "defaultValue": "stable"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Language, framework, category"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title", "summary"],
+    "optional": ["tags", "version", "status", "contentType", "language", "framework"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: reference\nversion: \"{version}\"\nstatus: {status}\n---\n\n# {title}\n\n> {summary}\n\n**Status:** {status} | **Version:** {version}\n\n## Overview\n\nBrief explanation of what this is and when to use it.\n\n## Syntax\n\n```\nsignature or usage pattern\n```\n\n## Parameters\n\n| Parameter | Type | Required | Default | Description |\n|-----------|------|----------|---------|-------------|\n| `param1` | `string` | Yes | - | Description of param1 |\n| `param2` | `number` | No | `0` | Description of param2 |\n| `param3` | `object` | No | `{}` | Description of param3 |\n\n### Parameter Details\n\n#### `param1`\n\nDetailed explanation of the first parameter:\n- Accepted values\n- Constraints\n- Edge cases\n\n#### `param2`\n\nDetailed explanation...\n\n## Return Value\n\n| Type | Description |\n|------|-------------|\n| `ReturnType` | What is returned and when |\n\n### Return Value Structure\n\n```json\n{\n  \"field1\": \"description\",\n  \"field2\": 123,\n  \"nested\": {\n    \"subfield\": \"value\"\n  }\n}\n```\n\n## Errors\n\n| Error Code | Message | Cause | Resolution |\n|------------|---------|-------|------------|\n| `E001` | Error message | Why it happens | How to fix |\n| `E002` | Error message | Why it happens | How to fix |\n\n## Examples\n\n### Basic Usage\n\n```\n// Simple example\ncode here\n```\n\n**Output:**\n```\nresult\n```\n\n### Advanced Usage\n\n```\n// More complex example\ncode here\n```\n\n### Error Handling\n\n```\n// How to handle errors\ntry {\n  code here\n} catch (error) {\n  handle error\n}\n```\n\n## Best Practices\n\n✅ **Do:**\n- Recommendation 1\n- Recommendation 2\n\n❌ **Don't:**\n- Anti-pattern 1\n- Anti-pattern 2\n\n## Performance Considerations\n\n- Time complexity: O(n)\n- Space complexity: O(1)\n- Caching behavior: Description\n\n## Compatibility\n\n| Platform/Version | Support |\n|------------------|----------|\n| Platform 1 | ✅ Full |\n| Platform 2 | ⚠️ Partial |\n| Platform 3 | ❌ None |\n\n## Changelog\n\n| Version | Changes |\n|---------|---------|\n| 1.0.0 | Initial release |\n| 1.1.0 | Added feature X |\n\n## See Also\n\n- [[Related Reference 1]]\n- [[Related Reference 2]]\n- [External Documentation](#)\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

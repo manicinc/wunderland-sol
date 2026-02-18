@@ -1,0 +1,23 @@
+{
+  "name": "fullstack-evals-harness-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lightweight eval harness for running AI graders against test cases",
+  "author": "Johnny Dunn",
+  "scripts": {
+    "dev": "concurrently -n be,fe -c blue,green \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "build-all": "npm run backend:build && npm run frontend:build",
+    "start-all": "concurrently -n be,fe -c blue,green \"npm run backend:start\" \"npm run frontend:start\"",
+    "backend:dev": "npm --prefix backend run start:dev",
+    "backend:build": "npm --prefix backend run build",
+    "backend:start": "npm --prefix backend run start:prod",
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:start": "npm --prefix frontend run start",
+    "test": "npm --prefix backend run test",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

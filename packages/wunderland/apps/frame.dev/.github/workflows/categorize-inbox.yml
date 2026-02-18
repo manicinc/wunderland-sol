@@ -1,0 +1,227 @@
+name: Auto-Categorize Inbox Strands
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'weaves/inbox/**/*.md'
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      file_path:
+        description: 'Path to specific file to categorize'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  categorize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need history to detect changed files
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get changed files
+        id: changed-files
+        if: github.event_name == 'push'
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            weaves/inbox/**/*.md
+
+      - name: Set files to process
+        id: files
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.file_path }}" ]; then
+            echo "files=${{ inputs.file_path }}" >> $GITHUB_OUTPUT
+          else
+            echo "files=${{ steps.changed-files.outputs.all_changed_files }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Categorize strands
+        id: categorize
+        if: steps.files.outputs.files != ''
+        run: |
+          mkdir -p .categorization-results
+
+          for file in ${{ steps.files.outputs.files }}; do
+            echo "Processing: $file"
+
+            # Run categorization script
+            result=$(npx tsx scripts/categorize-strand.ts "$file" 2>&1) || true
+            echo "$result" > ".categorization-results/$(basename "$file" .md).json"
+
+            # Parse result
+            action=$(echo "$result" | jq -r '.action // "error"')
+            suggested_path=$(echo "$result" | jq -r '.suggestion.path // ""')
+            confidence=$(echo "$result" | jq -r '.suggestion.confidence // 0')
+            reasoning=$(echo "$result" | jq -r '.suggestion.reasoning // ""')
+
+            echo "Action: $action, Path: $suggested_path, Confidence: $confidence"
+
+            # Store for later steps
+            echo "action_${file//\//_}=$action" >> $GITHUB_OUTPUT
+            echo "path_${file//\//_}=$suggested_path" >> $GITHUB_OUTPUT
+            echo "confidence_${file//\//_}=$confidence" >> $GITHUB_OUTPUT
+          done
+
+      - name: Create move PRs for high-confidence categorizations
+        if: steps.files.outputs.files != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in ${{ steps.files.outputs.files }}; do
+            result_file=".categorization-results/$(basename "$file" .md).json"
+
+            if [ ! -f "$result_file" ]; then
+              echo "No result for $file, skipping"
+              continue
+            fi
+
+            action=$(jq -r '.action' "$result_file")
+            suggested_path=$(jq -r '.suggestion.path' "$result_file")
+            confidence=$(jq -r '.suggestion.confidence' "$result_file")
+            reasoning=$(jq -r '.suggestion.reasoning' "$result_file")
+            alternatives=$(jq -r '.suggestion.alternatives // [] | map("- \(.path) (\(.confidence | . * 100 | floor)%): \(.reasoning)") | join("\n")' "$result_file")
+
+            filename=$(basename "$file")
+
+            if [ "$action" == "auto-move" ]; then
+              echo "Creating auto-move PR for $file -> $suggested_path"
+
+              # Create branch
+              branch_name="auto-categorize/$(basename "$file" .md)-$(date +%s)"
+              git checkout -b "$branch_name"
+
+              # Create target directory if needed
+              mkdir -p "$suggested_path"
+
+              # Move file
+              git mv "$file" "${suggested_path}${filename}"
+
+              # Commit
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              confidence_pct=$(echo "$confidence * 100" | bc)
+              git commit -m "chore(codex): auto-categorize $filename to $suggested_path" \
+                -m "Confidence: ${confidence_pct}%" \
+                -m "Reasoning: $reasoning" \
+                -m "Auto-categorized by GitHub Actions"
+
+              # Push and create PR
+              git push -u origin "$branch_name"
+
+              confidence_pct=$(echo "$confidence * 100" | bc)
+              pr_body=$(cat <<'EOFPR'
+              ## Auto-Categorization
+
+              **File:** \`$file\`
+              **Suggested Path:** \`$suggested_path\`
+              **Confidence:** ${confidence_pct}%
+
+              ### Reasoning
+              $reasoning
+
+              ### Alternatives
+              $alternatives
+
+              ---
+              *This PR was automatically created by the auto-categorization workflow.*
+              *Confidence threshold: 80%*
+              EOFPR
+              )
+
+              gh pr create \
+                --title "Auto-categorize: $filename -> $suggested_path" \
+                --body "$pr_body" \
+                --label "auto-categorized" \
+                --base main
+
+              # Auto-merge if enabled
+              pr_number=$(gh pr list --head "$branch_name" --json number -q '.[0].number')
+              if [ -n "$pr_number" ]; then
+                gh pr merge "$pr_number" --auto --squash
+              fi
+
+              # Return to main branch
+              git checkout main
+
+            elif [ "$action" == "suggest" ]; then
+              echo "Adding suggestion comment for $file"
+
+              # Find existing PR or issue for this file
+              # For now, create an issue with the suggestion
+              confidence_pct=$(echo "$confidence * 100" | bc)
+              issue_body=$(cat <<'EOFISSUE'
+              ## Categorization Suggestion
+
+              **File:** \`$file\`
+              **Suggested Path:** \`$suggested_path\`
+              **Confidence:** ${confidence_pct}%
+
+              ### Reasoning
+              $reasoning
+
+              ### Alternatives
+              $alternatives
+
+              ### Action Required
+              Please review and manually move this file to the appropriate location, or approve one of the suggested paths.
+
+              ---
+              *Confidence below auto-move threshold (80%). Manual review required.*
+              EOFISSUE
+              )
+
+              gh issue create \
+                --title "Categorization suggestion: $filename" \
+                --body "$issue_body" \
+                --label "needs-triage"
+
+            else
+              echo "File $file needs manual triage (action: $action)"
+
+              analysis=$(jq -r '.suggestion.reasoning // "No analysis available"' "$result_file")
+              triage_body=$(cat <<'EOFTRIAGE'
+              ## Manual Triage Required
+
+              **File:** \`$file\`
+
+              This strand could not be automatically categorized. Please review and place in the appropriate location.
+
+              ### Analysis
+              $analysis
+
+              ---
+              *Auto-categorization could not determine a suitable category.*
+              EOFTRIAGE
+              )
+
+              gh issue create \
+                --title "Needs triage: $filename" \
+                --body "$triage_body" \
+                --label "needs-triage"
+            fi
+          done
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf .categorization-results
+          git checkout main 2>/dev/null || true

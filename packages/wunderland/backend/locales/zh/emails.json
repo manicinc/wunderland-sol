@@ -1,0 +1,30 @@
+{
+  "welcome": {
+    "subject": "欢迎加入 Voice Chat Assistant",
+    "greeting": "{{name}} 您好",
+    "body": "感谢您使用 Voice Chat Assistant。您的账户已成功创建。",
+    "action": "立即开始",
+    "footer": "如有任何问题，请随时与我们联系。"
+  },
+  "passwordReset": {
+    "subject": "重置您的密码",
+    "greeting": "{{name}} 您好",
+    "body": "我们收到了您重置密码的请求。请点击下方链接创建新密码。",
+    "action": "重置密码",
+    "expire": "该链接将在 {{hours}} 小时后失效。",
+    "ignore": "如果您未发起此请求，请忽略此邮件。"
+  },
+  "verification": {
+    "subject": "请验证您的邮箱",
+    "greeting": "{{name}} 您好",
+    "body": "请验证您的邮箱地址以完成注册。",
+    "action": "验证邮箱",
+    "expire": "该链接将在 {{hours}} 小时后失效。"
+  },
+  "notification": {
+    "subject": "您有新的通知",
+    "greeting": "{{name}} 您好",
+    "body": "您收到一条新的通知。",
+    "action": "查看通知"
+  }
+}

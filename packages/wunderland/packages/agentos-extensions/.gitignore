@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.log
+.env
+.env.local
+coverage/
+*.tsbuildinfo
+.DS_Store
+package-lock.json
+
+# Build artifacts (each package builds to its own dist/)
+**/src/**/*.d.ts
+**/src/**/*.d.ts.map
+**/src/**/*.js
+**/src/**/*.js.map

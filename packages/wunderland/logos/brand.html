@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentOS - Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            min-height: 100vh;
+            color: #F1F5F9;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+        
+        .subtitle {
+            color: #94A3B8;
+            font-size: 1.125rem;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.05em;
+        }
+        
+        .section {
+            background: linear-gradient(135deg, #1E293B, #334155);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #F1F5F9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        h2::before {
+            content: '🧠';
+            font-size: 1.5rem;
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #CBD5E1;
+            font-weight: 600;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-box {
+            background: linear-gradient(135deg, #0F172A, #1E293B);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 1rem;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .preview-box:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .preview-box:hover {
+            border-color: #8B5CF6;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        .preview-box.light {
+            background: #F8FAFC;
+            border-color: #E2E8F0;
+        }
+        
+        .preview-box.gradient {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+            border: 2px solid rgba(139, 92, 246, 0.4);
+        }
+        
+        .preview-label {
+            font-size: 0.875rem;
+            color: #94A3B8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .download-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .download-btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .download-btn.secondary {
+            background: rgba(99, 102, 241, 0.1);
+            color: #A5B4FC;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        .download-btn.secondary:hover {
+            background: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+        }
+        
+        .usage-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .usage-item {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .usage-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #A5B4FC;
+            margin-top: 0;
+        }
+        
+        .usage-item p {
+            font-size: 0.875rem;
+            color: #94A3B8;
+        }
+        
+        code {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: #A5B4FC;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .font-section {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .font-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .font-item {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .font-preview {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+            color: #F1F5F9;
+        }
+        
+        .css-code {
+            background: #0F172A;
+            color: #10B981;
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.813rem;
+            line-height: 1.6;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .download-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #94A3B8;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .subtitle-control {
+            margin-bottom: 1.5rem;
+        }
+        
+        .subtitle-control label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #94A3B8;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .subtitle-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #6366F1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AgentOS</h1>
+            <p class="subtitle">// Adaptive AI Orchestration Platform</p>
+        </header>
+        
+        <!-- Primary Logo Section -->
+        <section class="section">
+            <h2>Primary Logo</h2>
+            
+            <div class="subtitle-control">
+                <label>
+                    <input type="checkbox" id="includeSubtitle" checked onchange="updateLogoDisplay()">
+                    Include tagline
+                </label>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" id="logo-dark">
+                          <defs>
+                            <linearGradient id="agentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+                              <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                            </linearGradient>
+                          </defs>
+                          <g id="icon">
+                            <circle cx="30" cy="40" r="6" fill="url(#agentGradient)" opacity="1"/>
+                            <circle cx="15" cy="25" r="4" fill="#6366F1" opacity="0.8"/>
+                            <circle cx="45" cy="25" r="4" fill="#8B5CF6" opacity="0.8"/>
+                            <circle cx="50" cy="45" r="4" fill="#EC4899" opacity="0.8"/>
+                            <circle cx="30" cy="58" r="4" fill="#06B6D4" opacity="0.8"/>
+                            <circle cx="10" cy="45" r="4" fill="#6366F1" opacity="0.8"/>
+                            <line x1="30" y1="40" x2="15" y2="25" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="45" y2="25" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="50" y2="45" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="30" y2="58" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="10" y2="45" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="15" y1="25" x2="45" y2="25" stroke="#6366F1" stroke-width="1" opacity="0.3"/>
+                            <line x1="10" y1="45" x2="50" y2="45" stroke="#8B5CF6" stroke-width="1" opacity="0.3"/>
+                            <circle cx="30" cy="40" r="12" fill="none" stroke="url(#agentGradient)" stroke-width="0.5" opacity="0.3"/>
+                            <circle cx="30" cy="40" r="18" fill="none" stroke="url(#agentGradient)" stroke-width="0.3" opacity="0.2"/>
+                          </g>
+                          <text x="70" y="45" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="32" font-weight="600" fill="#F1F5F9">Agent<tspan fill="url(#agentGradient)">OS</tspan></text>
+                          <text x="70" y="62" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="400" fill="#94A3B8" letter-spacing="0.5">Adaptive AI Orchestration Platform</text>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box light">
+                        <svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg" id="logo-light">
+                          <defs>
+                            <linearGradient id="agentGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+                              <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                            </linearGradient>
+                          </defs>
+                          <g id="icon">
+                            <circle cx="30" cy="40" r="6" fill="url(#agentGradientLight)" opacity="1"/>
+                            <circle cx="15" cy="25" r="4" fill="#6366F1" opacity="0.8"/>
+                            <circle cx="45" cy="25" r="4" fill="#8B5CF6" opacity="0.8"/>
+                            <circle cx="50" cy="45" r="4" fill="#EC4899" opacity="0.8"/>
+                            <circle cx="30" cy="58" r="4" fill="#06B6D4" opacity="0.8"/>
+                            <circle cx="10" cy="45" r="4" fill="#6366F1" opacity="0.8"/>
+                            <line x1="30" y1="40" x2="15" y2="25" stroke="url(#agentGradientLight)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="45" y2="25" stroke="url(#agentGradientLight)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="50" y2="45" stroke="url(#agentGradientLight)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="30" y2="58" stroke="url(#agentGradientLight)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="30" y1="40" x2="10" y2="45" stroke="url(#agentGradientLight)" stroke-width="1.5" opacity="0.6"/>
+                            <line x1="15" y1="25" x2="45" y2="25" stroke="#6366F1" stroke-width="1" opacity="0.3"/>
+                            <line x1="10" y1="45" x2="50" y2="45" stroke="#8B5CF6" stroke-width="1" opacity="0.3"/>
+                            <circle cx="30" cy="40" r="12" fill="none" stroke="url(#agentGradientLight)" stroke-width="0.5" opacity="0.3"/>
+                            <circle cx="30" cy="40" r="18" fill="none" stroke="url(#agentGradientLight)" stroke-width="0.3" opacity="0.2"/>
+                          </g>
+                          <text x="70" y="45" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="32" font-weight="600" fill="#1F2937">Agent<tspan fill="url(#agentGradientLight)">OS</tspan></text>
+                          <text x="70" y="62" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="400" fill="#6B7280" letter-spacing="0.5">Adaptive AI Orchestration Platform</text>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+            </div>
+            
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('primary')"><span>Download SVG</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 1)"><span>PNG 1x</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 2)"><span>PNG 2x</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 4)"><span>PNG 4x</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'light', 2)"><span>Light BG</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 2)"><span>Dark BG</span></button>
+            </div>
+        </section>
+        
+        <!-- Icon/Favicon Section -->
+        <section class="section">
+            <h2>Icon / Favicon</h2>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                          <defs>
+                            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+                              <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="centerGradient">
+                              <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#6366F1;stop-opacity:0.8" />
+                            </radialGradient>
+                          </defs>
+                          <g id="icon-mark">
+                            <circle cx="32" cy="32" r="8" fill="url(#centerGradient)"/>
+                            <circle cx="32" cy="12" r="5" fill="#6366F1" opacity="0.9"/>
+                            <circle cx="48" cy="20" r="5" fill="#8B5CF6" opacity="0.9"/>
+                            <circle cx="48" cy="44" r="5" fill="#EC4899" opacity="0.9"/>
+                            <circle cx="32" cy="52" r="5" fill="#06B6D4" opacity="0.9"/>
+                            <circle cx="16" cy="44" r="5" fill="#8B5CF6" opacity="0.9"/>
+                            <circle cx="16" cy="20" r="5" fill="#6366F1" opacity="0.9"/>
+                            <path d="M 32 32 L 32 12" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 48 20" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 48 44" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 32 52" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 16 44" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 16 20" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+                            <circle cx="32" cy="32" r="24" fill="none" stroke="url(#iconGradient)" stroke-width="1" opacity="0.3" stroke-dasharray="2 4"/>
+                          </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">64×64 Icon</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box gradient">
+                        <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                          <defs>
+                            <linearGradient id="iconGradient32" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+                              <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                            </linearGradient>
+                            <radialGradient id="centerGradient32">
+                              <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#6366F1;stop-opacity:0.8" />
+                            </radialGradient>
+                          </defs>
+                          <g id="icon-mark">
+                            <circle cx="32" cy="32" r="8" fill="url(#centerGradient32)"/>
+                            <circle cx="32" cy="12" r="5" fill="#6366F1" opacity="0.9"/>
+                            <circle cx="48" cy="20" r="5" fill="#8B5CF6" opacity="0.9"/>
+                            <circle cx="48" cy="44" r="5" fill="#EC4899" opacity="0.9"/>
+                            <circle cx="32" cy="52" r="5" fill="#06B6D4" opacity="0.9"/>
+                            <circle cx="16" cy="44" r="5" fill="#8B5CF6" opacity="0.9"/>
+                            <circle cx="16" cy="20" r="5" fill="#6366F1" opacity="0.9"/>
+                            <path d="M 32 32 L 32 12" stroke="url(#iconGradient32)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 48 20" stroke="url(#iconGradient32)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 48 44" stroke="url(#iconGradient32)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 32 52" stroke="url(#iconGradient32)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 16 44" stroke="url(#iconGradient32)" stroke-width="2" opacity="0.7"/>
+                            <path d="M 32 32 L 16 20" stroke="url(#iconGradient32)" stroke-width="2" opacity="0.7"/>
+                            <circle cx="32" cy="32" r="24" fill="none" stroke="url(#iconGradient32)" stroke-width="1" opacity="0.3" stroke-dasharray="2 4"/>
+                          </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">32×32 Favicon</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="16" height="16" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                          <defs>
+                            <linearGradient id="iconGradient16" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+                              <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                              <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                            </linearGradient>
+                          </defs>
+                          <g id="icon-mark">
+                            <circle cx="32" cy="32" r="10" fill="url(#iconGradient16)"/>
+                            <circle cx="32" cy="12" r="6" fill="#6366F1"/>
+                            <circle cx="48" cy="20" r="6" fill="#8B5CF6"/>
+                            <circle cx="48" cy="44" r="6" fill="#EC4899"/>
+                            <circle cx="32" cy="52" r="6" fill="#06B6D4"/>
+                            <circle cx="16" cy="44" r="6" fill="#8B5CF6"/>
+                            <circle cx="16" cy="20" r="6" fill="#6366F1"/>
+                          </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">16×16 Favicon</p>
+                </div>
+            </div>
+            
+            <h3>Download Options</h3>
+            
+            <div class="download-section-title">Vector Formats</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('icon')"><span>Download SVG</span></button>
+            </div>
+            
+            <div class="download-section-title">Raster Formats</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 16)"><span>16×16</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 32)"><span>32×32</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64)"><span>64×64</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128)"><span>128×128</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256)"><span>256×256</span></button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 512)"><span>512×512</span></button>
+            </div>
+        </section>
+        
+        <!-- Typography & CSS Information -->
+        <section class="section">
+            <h2>Typography & Implementation</h2>
+            
+            <div class="font-section">
+                <h3>🔤 Font Specifications</h3>
+                <div class="font-grid">
+                    <div class="font-item">
+                        <div class="font-preview" style="font-weight: 600;">AgentOS</div>
+                        <p><strong>Font Family:</strong> Inter</p>
+                        <p><strong>Weight:</strong> 600 (Semi-Bold)</p>
+                        <p><strong>Size:</strong> 32px</p>
+                        <p><strong>Color:</strong> #1F2937 (light) / #F1F5F9 (dark)</p>
+                        <p><strong>Accent:</strong> Gradient on "OS"</p>
+                    </div>
+                    
+                    <div class="font-item">
+                        <div class="font-preview" style="font-weight: 400; font-size: 1.125rem; font-family: 'JetBrains Mono', monospace;">// Adaptive AI Orchestration</div>
+                        <p><strong>Tagline Font:</strong> JetBrains Mono</p>
+                        <p><strong>Weight:</strong> 400 (Regular)</p>
+                        <p><strong>Size:</strong> 11px</p>
+                        <p><strong>Letter Spacing:</strong> 0.5px</p>
+                        <p><strong>Color:</strong> #6B7280 (light) / #94A3B8 (dark)</p>
+                    </div>
+                </div>
+                
+                <h3>💻 CSS Variables</h3>
+                <div class="css-code">/* AgentOS Design System */
+:root {
+  /* Primary Colors - Neural Network Theme */
+  --agentos-indigo: #6366F1;
+  --agentos-purple: #8B5CF6;
+  --agentos-pink: #EC4899;
+  --agentos-cyan: #06B6D4;
+  
+  /* Gradients */
+  --agentos-gradient: linear-gradient(135deg, #6366F1, #8B5CF6, #EC4899);
+  --agentos-gradient-subtle: linear-gradient(135deg, #6366F120, #8B5CF620, #EC489920);
+  
+  /* Typography */
+  --agentos-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --agentos-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Weights */
+  --agentos-weight-regular: 400;
+  --agentos-weight-medium: 500;
+  --agentos-weight-semibold: 600;
+  --agentos-weight-bold: 700;
+  --agentos-weight-extrabold: 800;
+  
+  /* Dark Theme Colors */
+  --agentos-bg-dark: #0F172A;
+  --agentos-bg-dark-secondary: #1E293B;
+  --agentos-text-dark: #F1F5F9;
+  --agentos-text-dark-muted: #94A3B8;
+  
+  /* Light Theme Colors */
+  --agentos-bg-light: #F8FAFC;
+  --agentos-text-light: #1F2937;
+  --agentos-text-light-muted: #6B7280;
+}
+
+/* Logo Implementation */
+.agentos-logo {
+  font-family: var(--agentos-font-primary);
+  font-weight: var(--agentos-weight-semibold);
+  font-size: 2rem;
+  color: var(--agentos-text-dark);
+}
+
+.agentos-logo .accent {
+  background: var(--agentos-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--agentos-bg-dark);
+    color: var(--agentos-text-dark);
+  }
+}
+
+/* Neural Network Animation */
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+.neural-pulse {
+  animation: pulse 2s infinite;
+}</div>
+                
+                <h3>📦 Import Instructions</h3>
+                <div class="css-code">&lt;!-- Google Fonts --&gt;
+&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"&gt;
+
+&lt;!-- Favicon --&gt;
+&lt;link rel="icon" type="image/svg+xml" href="/agentos-icon.svg"&gt;
+&lt;link rel="alternate icon" href="/favicon.ico"&gt;</div>
+            </div>
+        </section>
+        
+        <!-- Usage Guidelines -->
+        <section class="section">
+            <h2>Brand Guidelines</h2>
+            
+            <div class="usage-section">
+                <div class="usage-grid">
+                    <div class="usage-item">
+                        <h3>📏 Minimum Size</h3>
+                        <p>Primary logo: <code>160px</code> width<br>
+                        Icon: <code>16px</code> minimum</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h3>⬜ Clear Space</h3>
+                        <p>Maintain clear space equal to the height of the central node around all sides</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h3>🎨 Color Usage</h3>
+                        <p>Use gradient version as primary. Single color (#6366F1) for monochrome contexts</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h3>🖥️ Applications</h3>
+                        <p>Icon for system tray, IDE extensions, CLI tools. Full logo for documentation, marketing</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h3>🔧 Development</h3>
+                        <p>Use SVG for web/electron. PNG for native apps. Maintain neural network metaphor</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h3>❌ Don'ts</h3>
+                        <p>Don't rotate the neural network. Don't change node colors. Keep connections visible</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Track subtitle preference
+        let includeSubtitle = true;
+        
+        // Function to update logo display
+        function updateLogoDisplay() {
+            includeSubtitle = document.getElementById('includeSubtitle').checked;
+            const subtitleElements = document.querySelectorAll('.preview-box text[y="62"]');
+            subtitleElements.forEach(el => {
+                el.style.display = includeSubtitle ? 'block' : 'none';
+            });
+        }
+        
+        // Primary logo SVG
+        const primaryLogoSVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="agentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g id="icon">
+    <circle cx="30" cy="40" r="6" fill="url(#agentGradient)" opacity="1"/>
+    <circle cx="15" cy="25" r="4" fill="#6366F1" opacity="0.8"/>
+    <circle cx="45" cy="25" r="4" fill="#8B5CF6" opacity="0.8"/>
+    <circle cx="50" cy="45" r="4" fill="#EC4899" opacity="0.8"/>
+    <circle cx="30" cy="58" r="4" fill="#06B6D4" opacity="0.8"/>
+    <circle cx="10" cy="45" r="4" fill="#6366F1" opacity="0.8"/>
+    <line x1="30" y1="40" x2="15" y2="25" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="30" y1="40" x2="45" y2="25" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="30" y1="40" x2="50" y2="45" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="30" y1="40" x2="30" y2="58" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="30" y1="40" x2="10" y2="45" stroke="url(#agentGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="15" y1="25" x2="45" y2="25" stroke="#6366F1" stroke-width="1" opacity="0.3"/>
+    <line x1="10" y1="45" x2="50" y2="45" stroke="#8B5CF6" stroke-width="1" opacity="0.3"/>
+    <circle cx="30" cy="40" r="12" fill="none" stroke="url(#agentGradient)" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="30" cy="40" r="18" fill="none" stroke="url(#agentGradient)" stroke-width="0.3" opacity="0.2"/>
+  </g>
+  <text x="70" y="45" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="32" font-weight="600" fill="#1F2937">Agent<tspan fill="url(#agentGradient)">OS</tspan></text>
+  <text x="70" y="62" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="400" fill="#6B7280" letter-spacing="0.5">Adaptive AI Orchestration Platform</text>
+</svg>`;
+
+        // Icon SVG
+        const iconSVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="centerGradient">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366F1;stop-opacity:0.8" />
+    </radialGradient>
+  </defs>
+  <g id="icon-mark">
+    <circle cx="32" cy="32" r="8" fill="url(#centerGradient)"/>
+    <circle cx="32" cy="12" r="5" fill="#6366F1" opacity="0.9"/>
+    <circle cx="48" cy="20" r="5" fill="#8B5CF6" opacity="0.9"/>
+    <circle cx="48" cy="44" r="5" fill="#EC4899" opacity="0.9"/>
+    <circle cx="32" cy="52" r="5" fill="#06B6D4" opacity="0.9"/>
+    <circle cx="16" cy="44" r="5" fill="#8B5CF6" opacity="0.9"/>
+    <circle cx="16" cy="20" r="5" fill="#6366F1" opacity="0.9"/>
+    <path d="M 32 32 L 32 12" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+    <path d="M 32 32 L 48 20" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+    <path d="M 32 32 L 48 44" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+    <path d="M 32 32 L 32 52" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+    <path d="M 32 32 L 16 44" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+    <path d="M 32 32 L 16 20" stroke="url(#iconGradient)" stroke-width="2" opacity="0.7"/>
+    <circle cx="32" cy="32" r="24" fill="none" stroke="url(#iconGradient)" stroke-width="1" opacity="0.3" stroke-dasharray="2 4"/>
+  </g>
+</svg>`;
+
+        function downloadSVG(type) {
+            try {
+                let svgContent = type === 'primary' ? primaryLogoSVG : iconSVG;
+                
+                if (type === 'primary' && !includeSubtitle) {
+                    svgContent = svgContent.replace(/<text[^>]*y="62"[^>]*>.*?<\/text>/g, '');
+                }
+                
+                const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `agentos-${type}${type === 'primary' && !includeSubtitle ? '-no-tagline' : ''}.svg`;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            } catch (error) {
+                console.error('Error downloading SVG:', error);
+                alert('Error downloading SVG. Please try again.');
+            }
+        }
+
+        function downloadPNG(type, background, size, scale = 1) {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                let svgContent = type === 'primary' ? primaryLogoSVG : iconSVG;
+                
+                if (type === 'primary' && !includeSubtitle) {
+                    svgContent = svgContent.replace(/<text[^>]*y="62"[^>]*>.*?<\/text>/g, '');
+                }
+                
+                if (background === 'light') {
+                    // Already set for light background
+                } else if (background === 'dark') {
+                    svgContent = svgContent.replace(/#1F2937/g, '#F1F5F9')
+                                           .replace(/#6B7280/g, '#94A3B8');
+                }
+                
+                const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                img.onload = function() {
+                    if (type === 'primary') {
+                        const baseWidth = 320;
+                        const baseHeight = 80;
+                        canvas.width = baseWidth * size;
+                        canvas.height = baseHeight * size;
+                    } else {
+                        canvas.width = size * (scale || 1);
+                        canvas.height = size * (scale || 1);
+                    }
+                    
+                    if (background === 'light') {
+                        ctx.fillStyle = '#F8FAFC';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    } else if (background === 'dark') {
+                        ctx.fillStyle = '#0F172A';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                    
+                    if (type === 'primary') {
+                        const drawScale = size;
+                        ctx.drawImage(img, 0, 0, img.width * drawScale, img.height * drawScale);
+                    } else {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    }
+                    
+                    canvas.toBlob(function(pngBlob) {
+                        const a = document.createElement('a');
+                        const pngUrl = URL.createObjectURL(pngBlob);
+                        a.href = pngUrl;
+                        
+                        let filename;
+                        if (type === 'primary') {
+                            filename = `agentos-${type}${!includeSubtitle ? '-no-tagline' : ''}-${background}-${size}x.png`;
+                        } else {
+                            filename = `agentos-${type}-${background}-${size}x${size}.png`;
+                        }
+                        
+                        a.download = filename;
+                        a.style.display = 'none';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(pngUrl), 100);
+                    }, 'image/png');
+                    
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.onerror = function() {
+                    console.error('Error loading SVG');
+                    alert('Error creating PNG. Please try again.');
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.src = url;
+            } catch (error) {
+                console.error('Error downloading PNG:', error);
+                alert('Error downloading PNG. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

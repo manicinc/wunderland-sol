@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.research.news-search",
+  "name": "News Search Extension",
+  "version": "1.0.0",
+  "description": "Search for recent news articles via NewsAPI for agent awareness of current events",
+  "author": { "name": "Frame.dev" },
+  "license": "MIT",
+  "keywords": ["news", "articles", "current-events", "newsapi"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["research"],
+  "extensions": [
+    { "kind": "tool", "id": "news_search", "displayName": "News Search", "entry": "./dist/tools/newsSearch.js" }
+  ],
+  "configuration": {
+    "properties": { "newsapi.apiKey": { "type": "string", "secret": true } }
+  }
+}

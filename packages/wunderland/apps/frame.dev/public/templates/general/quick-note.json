@@ -1,0 +1,74 @@
+{
+  "id": "quick-note",
+  "name": "Quick Note",
+  "category": "general",
+  "icon": "PenLine",
+  "description": "Capture a quick thought, observation, or idea",
+  "shortDescription": "Fast note-taking for fleeting thoughts",
+  "difficulty": "beginner",
+  "estimatedTime": "2 min",
+  "tags": ["note", "quick", "idea", "thought"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 95,
+  "defaultData": {
+    "contentType": "note"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "Note title or subject"
+    },
+    {
+      "name": "content",
+      "label": "Note",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "What's on your mind?"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Categorize this note"
+    },
+    {
+      "name": "source",
+      "label": "Source",
+      "type": "text",
+      "required": false,
+      "placeholder": "Where did this come from? (URL, book, conversation)"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "source", "contentType"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: note\ncreated: {date}\n---\n\n# {title}\n\n{content}\n\n## Source\n\n{source}\n\n## Related Thoughts\n\n- Connection 1\n- Connection 2\n\n## Action Items\n\n- [ ] Follow-up task\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,210 @@
+// File: frontend/src/styles/components/_toasts.scss
+/**
+ * @file _toasts.scss
+ * @description Styles for toast notifications. "Ephemeral Harmony" theme.
+ * Updated for a futuristic, sleek, holographic look, consistent across themes.
+ * @version 2.0.0 - Revamped for holographic/glassmorphic design and theme consistency.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins; // General mixins
+@use './buttons' as buttonsFile; // To access button mixins or base styles
+
+// Keyframes for the holographic border animation.
+// The `holographic-border-glow` mixin should ideally be updated to use these or a similar
+// globally defined animation for its border effect.
+@keyframes ephemeral-toast-holo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.toast-notifications-container-ephemeral {
+  position: fixed;
+  bottom: var.$spacing-lg;
+  right: var.$spacing-lg;
+  width: clamp(320px, 90vw, 420px); // Slightly adjusted for modern feel
+  z-index: var.$z-index-toast;
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-md; // Increased gap for a more spacious look
+}
+
+.toast-notification-ephemeral {
+  // Apply glassmorphic effect for the main pane using themed variables
+  @include mixins.glassmorphic-pane(
+    '--color-bg-glass', // Use theme's glass background color prefix
+    '--color-border-glass', // Use theme's glass border color prefix
+    '--blur-glass', // Use theme's glass blur variable
+    '--shadow-depth-lg' // Use theme's shadow variable
+    // SCSS fallbacks are defined within the mixin itself
+  );
+
+  // Apply holographic border glow using themed variables (if defined in theme, else fallbacks)
+  // IMPORTANT: For animation, the `holographic-border-glow` mixin in `_mixins.scss`
+  // should have its `animation` property uncommented and set to use keyframes
+  // like `ephemeral-toast-holo-spin var.$duration-pulse-long linear infinite`.
+  @include mixins.holographic-border-glow(
+    '--color-holographic-glow-1', // Theme variable for primary holographic glow color
+    '--color-holographic-glow-2', // Theme variable for secondary holographic glow color
+    2px,                          // Width of the holographic border
+    var.$duration-pulse-long,     // Duration of one spin (if animation enabled in mixin)
+    var.$radius-lg                // Radius to match the toast's border-radius
+  );
+
+  border-radius: var.$radius-lg;
+  padding: var.$spacing-md;
+  display: flex;
+  align-items: flex-start;
+  gap: var.$spacing-sm;
+  position: relative;
+  overflow: hidden; // Crucial for border radius and pseudo-elements
+
+  // Status Accent Bar - moved to ::after to avoid conflict with holographic-border-glow's ::before
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px; // Thickness of the status bar
+    background-color: hsl(var(--color-info-h), var(--color-info-s), var(--color-info-l));
+    transition: background-color var.$duration-quick var.$ease-out-cubic;
+    // The parent's border-radius and overflow:hidden will clip this pseudo-element.
+    // No need for specific border-radius here if it's flush to the edge.
+    z-index: 0; // Above main background, below content.
+  }
+
+  // Status color variants for the ::after bar
+  &.toast--success::after { background-color: hsl(var(--color-success-h), var(--color-success-s), var(--color-success-l)); }
+  &.toast--error::after { background-color: hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l)); }
+  &.toast--warning::after { background-color: hsl(var(--color-warning-h), var(--color-warning-s), var(--color-warning-l)); }
+  // Default info color is set above
+
+  .toast-icon-wrapper-ephemeral {
+    flex-shrink: 0;
+    margin-top: calc(var.$spacing-xs / 2); // Align icon slightly better with multi-line text
+
+    .toast-icon-svg {
+      width: 1.75rem; // Slightly larger icon for impact
+      height: 1.75rem;
+      // Apply a subtle themed glow to the icon
+      @include mixins.text-glow(
+        '--color-accent-glow', // Use the theme's accent glow color
+        3px,                   // Glow radius
+        // Fallbacks from _variables.scss (via mixin) will apply if CSS vars are missing
+        var.$default-color-accent-glow-h,
+        var.$default-color-accent-glow-s,
+        var.$default-color-accent-glow-l,
+        var.$default-color-accent-glow-a
+      );
+    }
+  }
+  // Icon colors by status - these should use the same variable as the ::after bar for consistency
+  &.toast--success .toast-icon-svg { color: hsl(var(--color-success-h), var(--color-success-s), var(--color-success-l)); }
+  &.toast--error .toast-icon-svg { color: hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l)); }
+  &.toast--warning .toast-icon-svg { color: hsl(var(--color-warning-h), var(--color-warning-s), var(--color-warning-l)); }
+  &.toast--info .toast-icon-svg { color: hsl(var(--color-info-h), var(--color-info-s), var(--color-info-l)); }
+
+  .toast-content-ephemeral {
+    flex-grow: 1;
+    min-width: 0; // Prevents overflow issues with flex children
+  }
+
+  .toast-title-ephemeral {
+    font-family: var(--font-display, var.$font-family-display);
+    font-size: var.$font-size-lg; // Slightly larger title
+    font-weight: 700; // Bolder title
+    // Use text-accent if available, otherwise text-primary
+    color: hsl(
+      var(--color-text-accent-h, var(--color-text-primary-h)),
+      var(--color-text-accent-s, var(--color-text-primary-s)),
+      var(--color-text-accent-l, var(--color-text-primary-l))
+    );
+    margin-bottom: var.$spacing-xs;
+
+    // Optional: subtle glow on title if desired, can be too much with other effects.
+    // @include mixins.text-glow('--color-text-accent', 4px);
+  }
+
+  .toast-message-ephemeral {
+    font-size: var.$font-size-base-default; // Clearer base size for message
+    line-height: 1.6;
+    color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+    :deep(p) {
+      margin: 0;
+    }
+  }
+
+  .toast-close-button-ephemeral {
+    @include mixins.button-base; // Apply base button styles (cursor, alignment, etc.)
+
+    padding: calc(var.$spacing-xs * 0.75); // Original padding for the icon
+    border-radius: var.$radius-md; // Consistent rounded corners for buttons
+    background-color: transparent;
+    border: 1px solid transparent; // For layout consistency, border appears on hover/focus
+
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+      // Use a themed, translucent background on hover, aligning with glassmorphism
+      background-color: mixins.get-themed-hsla(
+        '--color-bg-glass-h', '--color-bg-glass-s', '--color-bg-glass-l', '--color-bg-glass-a', // Use theme glass color
+        var.$default-color-bg-glass-h, var.$default-color-bg-glass-s, var.$default-color-bg-glass-l, 0.15 // Fallback with alpha for hover
+      );
+      border-color: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3);
+    }
+
+    &:active:not(:disabled) {
+      background-color: mixins.get-themed-hsla(
+        '--color-bg-glass-h', '--color-bg-glass-s', '--color-bg-glass-l', '--color-bg-glass-a',
+        var.$default-color-bg-glass-h, var.$default-color-bg-glass-s, var.$default-color-bg-glass-l, 0.25 // Slightly darker on active
+      );
+    }
+
+    position: absolute;
+    top: var.$spacing-sm; // Adjusted for better visual balance with new padding/title size
+    right: var.$spacing-sm;
+
+    .toast-close-icon-svg {
+      width: 1.25rem; // Slightly larger close icon
+      height: 1.25rem;
+      // Apply a subtle glow to the close icon, using interactive accent color
+      @include mixins.text-glow(
+        '--color-accent-interactive',
+        3px,
+        var.$default-color-accent-interactive-h,
+        var.$default-color-accent-interactive-s,
+        var.$default-color-accent-interactive-l,
+        0.8
+      );
+    }
+
+    // Custom focus ring for better visibility against potentially complex backgrounds
+    &:focus-visible:not(:disabled) {
+      @include mixins.focus-ring(
+        '--color-bg-glass',         // Offset color based on toast's glass background
+        '--color-accent-interactive',// Ring color using interactive accent
+        1px,                        // Offset width
+        2px,                        // Ring thickness
+        0.85                        // Ring opacity
+      );
+    }
+  }
+}
+
+// Toast Transitions (ensure names match Vue <TransitionGroup> or other animation library)
+.toast-transition-enter-active,
+.toast-transition-leave-active {
+  transition: all var.$duration-smooth var.$ease-out-expo;
+}
+.toast-transition-enter-from,
+.toast-transition-leave-to {
+  opacity: 0;
+  transform: translateX(100%) scale(0.9); // Adjusted for a slightly more dynamic entry/exit
+}
+.toast-transition-move { // For re-ordering
+  transition: transform var.$duration-smooth var.$ease-out-expo;
+}

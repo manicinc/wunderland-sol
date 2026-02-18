@@ -1,0 +1,6 @@
+* text=auto eol=lf
+# Ensure legal pages are always UTF-8 with LF
+app/legal/** text eol=lf working-tree-encoding=UTF-8
+app/about/** text eol=lf working-tree-encoding=UTF-8
+
+

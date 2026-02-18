@@ -1,0 +1,577 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CODEX LANDING PAGE — ADAPTIVE GLASS INTERFACE
+   Premium holographic command center aesthetic with light/dark mode support
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.codex-landing {
+  /* Timing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* The Emerald — Primary Luminescence (same in both modes) */
+  --emerald-dark: hsl(160, 85%, 15%);
+  --emerald-core: hsl(160, 84%, 39%);
+  --emerald-bright: hsl(160, 90%, 45%);
+  --emerald-glow: hsl(160, 100%, 50%);
+
+  /* The Cyan — Secondary Luminescence (same in both modes) */
+  --cyan-dark: hsl(173, 80%, 20%);
+  --cyan-core: hsl(173, 80%, 40%);
+  --cyan-bright: hsl(180, 85%, 45%);
+  --cyan-glow: hsl(185, 100%, 55%);
+
+  /* Holographic Spectrum */
+  --holo-violet: hsl(270, 70%, 60%);
+  --holo-rose: hsl(330, 70%, 60%);
+  --holo-amber: hsl(38, 92%, 50%);
+
+  /* LIGHT MODE DEFAULTS */
+  --void-pure: hsl(60, 10%, 96%);
+  --void-deep: hsl(60, 8%, 94%);
+  --void-medium: hsl(60, 6%, 92%);
+  --void-soft: hsl(60, 4%, 88%);
+  --glass-bg: hsla(60, 10%, 98%, 0.85);
+  --glass-border: hsla(160, 60%, 35%, 0.2);
+  --glass-border-bright: hsla(160, 60%, 40%, 0.35);
+  --text-primary: hsl(220, 25%, 15%);
+  --text-secondary: hsl(220, 15%, 35%);
+  --text-muted: hsl(220, 10%, 50%);
+
+  background: var(--void-pure);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* DARK MODE */
+:is(.dark, [data-theme="dark"], [data-theme="sepia-dark"]) .codex-landing {
+  --void-pure: hsl(220, 25%, 3%);
+  --void-deep: hsl(220, 22%, 5%);
+  --void-medium: hsl(220, 20%, 8%);
+  --void-soft: hsl(220, 18%, 12%);
+  --glass-bg: hsla(220, 25%, 8%, 0.85);
+  --glass-border: hsla(160, 60%, 40%, 0.15);
+  --glass-border-bright: hsla(160, 60%, 50%, 0.25);
+  --text-primary: hsl(220, 15%, 95%);
+  --text-secondary: hsl(220, 15%, 70%);
+  --text-muted: hsl(220, 15%, 50%);
+  --emerald-bright: hsl(160, 90%, 55%);
+  --cyan-bright: hsl(180, 85%, 55%);
+}
+
+/* Neumorphic Card */
+.neo-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 0.5px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow:
+    12px 12px 40px hsla(220, 30%, 0%, 0.4),
+    -6px -6px 20px hsla(160, 50%, 30%, 0.02),
+    inset 0 0 0 1px hsla(160, 60%, 40%, 0.08);
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.neo-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--glass-border-bright);
+  box-shadow:
+    16px 16px 50px hsla(220, 30%, 0%, 0.5),
+    0 0 30px hsla(160, 100%, 50%, 0.08);
+}
+
+/* Buttons */
+.neo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, hsla(160, 80%, 35%, 0.9), hsla(170, 75%, 40%, 0.9));
+  color: var(--void-pure);
+  border: none;
+  box-shadow: 6px 6px 20px hsla(220, 30%, 0%, 0.4);
+  transition: all 0.2s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+.neo-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px hsla(160, 100%, 50%, 0.25);
+}
+
+.neo-button-secondary {
+  background: var(--glass-bg);
+  color: var(--emerald-bright);
+  border: 1px solid var(--glass-border-bright);
+}
+
+/* Glass Panel */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+}
+
+/* Text Glow */
+.text-glow {
+  text-shadow: 0 0 20px hsla(160, 100%, 50%, 0.3);
+}
+
+/* Terminal */
+.terminal-window {
+  background: var(--void-pure);
+  border: 1px solid hsla(160, 60%, 30%, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.terminal-header {
+  background: hsla(220, 25%, 10%, 0.95);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid hsla(160, 60%, 30%, 0.2);
+}
+
+.terminal-body {
+  padding: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.8;
+  color: var(--emerald-bright);
+}
+
+/* Comparison */
+.comparison-full { background: var(--emerald-core); box-shadow: 0 0 12px hsla(160, 100%, 50%, 0.4); }
+.comparison-partial { background: linear-gradient(135deg, var(--emerald-core) 50%, var(--void-soft) 50%); }
+.comparison-none { background: var(--void-soft); border: 2px solid hsla(220, 20%, 25%, 0.5); }
+
+/* Animations */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes pulse-glow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+@keyframes scroll-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* GPU-accelerated shimmer using transform (not background-position) */
+@keyframes shimmer-transform {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Simple shimmer slide for lazy-loaded skeletons */
+@keyframes shimmer-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+.scroll-indicator { animation: scroll-bounce 2s ease-in-out infinite; }
+.animate-fade-in-up { 
+  animation: fade-in-up 0.6s var(--ease-out-expo) both;
+  opacity: 0;
+}
+.animate-fade-in { 
+  animation: fade-in 0.6s var(--ease-out-expo) both;
+  opacity: 0;
+}
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-800 { animation-delay: 800ms; }
+
+/* GPU-accelerated animation classes for replacing framer-motion */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* View-triggered animations - add .in-view class via JS/Intersection Observer */
+.view-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.view-animate.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delays for view animations */
+.view-animate[data-delay="1"] { transition-delay: 0.1s; }
+.view-animate[data-delay="2"] { transition-delay: 0.2s; }
+.view-animate[data-delay="3"] { transition-delay: 0.3s; }
+.view-animate[data-delay="4"] { transition-delay: 0.4s; }
+.view-animate[data-delay="5"] { transition-delay: 0.5s; }
+
+/* GPU hints for composited animations */
+.gpu-accelerate {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Hover effects via CSS instead of framer-motion */
+.hover-lift {
+  transition: transform 0.2s var(--ease-out-expo), box-shadow 0.2s var(--ease-out-expo);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+.hover-scale {
+  transition: transform 0.2s var(--ease-out-expo);
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SEAMLESS SECTION DIVIDERS
+   Clean, minimal, invisible transitions between sections
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Base divider - just breathing space */
+.neo-divider,
+.neo-divider-flow,
+.neo-divider-orb,
+.neo-divider-diamond,
+.neo-divider-inset {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Flow divider - subtle horizontal fade */
+.neo-divider-flow {
+  height: 1px;
+  margin: 3rem 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsla(0, 0%, 50%, 0.08) 20%,
+    hsla(0, 0%, 50%, 0.12) 50%,
+    hsla(0, 0%, 50%, 0.08) 80%,
+    transparent 100%
+  );
+}
+
+:is(.dark) .neo-divider-flow {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsla(0, 0%, 100%, 0.04) 20%,
+    hsla(0, 0%, 100%, 0.06) 50%,
+    hsla(0, 0%, 100%, 0.04) 80%,
+    transparent 100%
+  );
+}
+
+/* Orb divider - tiny centered dot */
+.neo-divider-orb {
+  height: 40px;
+  margin: 2rem 0;
+}
+
+.neo-divider-orb::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: hsla(160, 60%, 45%, 0.4);
+}
+
+:is(.dark) .neo-divider-orb::before {
+  background: hsla(160, 60%, 55%, 0.3);
+}
+
+/* Diamond divider - minimal center accent */
+.neo-divider-diamond {
+  height: 32px;
+  margin: 2.5rem 0;
+}
+
+.neo-divider-diamond .diamond {
+  width: 5px;
+  height: 5px;
+  background: hsla(160, 50%, 45%, 0.3);
+  transform: rotate(45deg);
+}
+
+:is(.dark) .neo-divider-diamond .diamond {
+  background: hsla(160, 50%, 55%, 0.25);
+}
+
+/* Inset divider - soft inset line */
+.neo-divider-inset {
+  height: 1px;
+  margin: 2.5rem auto;
+  max-width: 200px;
+  background: hsla(0, 0%, 50%, 0.1);
+  border-radius: 1px;
+}
+
+:is(.dark) .neo-divider-inset {
+  background: hsla(0, 0%, 100%, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FLOWING SECTION BACKGROUNDS
+   Sections morph seamlessly with shifting gradients
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.codex-landing {
+  /* Full-page flowing gradient as base */
+  background: 
+    linear-gradient(
+      180deg,
+      hsl(60, 10%, 96%) 0%,
+      hsl(150, 15%, 95%) 8%,
+      hsl(170, 12%, 94%) 16%,
+      hsl(200, 15%, 95%) 24%,
+      hsl(260, 12%, 96%) 32%,
+      hsl(300, 10%, 95%) 40%,
+      hsl(30, 15%, 95%) 48%,
+      hsl(45, 12%, 94%) 56%,
+      hsl(180, 10%, 95%) 64%,
+      hsl(220, 15%, 96%) 72%,
+      hsl(270, 12%, 95%) 80%,
+      hsl(160, 15%, 94%) 88%,
+      hsl(60, 10%, 96%) 100%
+    );
+}
+
+:is(.dark) .codex-landing {
+  background: 
+    linear-gradient(
+      180deg,
+      hsl(220, 25%, 4%) 0%,
+      hsl(200, 30%, 5%) 8%,
+      hsl(180, 25%, 5%) 16%,
+      hsl(160, 30%, 4%) 24%,
+      hsl(220, 25%, 5%) 32%,
+      hsl(260, 20%, 5%) 40%,
+      hsl(280, 15%, 4%) 48%,
+      hsl(320, 20%, 5%) 56%,
+      hsl(30, 25%, 5%) 64%,
+      hsl(200, 30%, 4%) 72%,
+      hsl(240, 25%, 5%) 80%,
+      hsl(180, 20%, 4%) 88%,
+      hsl(220, 25%, 4%) 100%
+    );
+}
+
+/* Individual sections add subtle local color shifts */
+.codex-landing > section {
+  position: relative;
+  background: transparent !important;
+}
+
+/* Each section gets a soft gradient overlay that blends with neighbors */
+.codex-landing > section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background: radial-gradient(
+    ellipse 100% 60% at 50% 50%,
+    var(--section-tint, transparent),
+    transparent 70%
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* Section-specific tints for color morphing */
+.codex-landing > section:nth-child(1) { --section-tint: hsla(160, 60%, 50%, 0.15); }
+.codex-landing > section:nth-child(2) { --section-tint: hsla(200, 60%, 50%, 0.12); }
+.codex-landing > section:nth-child(3) { --section-tint: hsla(270, 50%, 55%, 0.1); }
+.codex-landing > section:nth-child(4) { --section-tint: hsla(320, 50%, 55%, 0.08); }
+.codex-landing > section:nth-child(5) { --section-tint: hsla(30, 60%, 50%, 0.1); }
+.codex-landing > section:nth-child(6) { --section-tint: hsla(180, 50%, 50%, 0.12); }
+.codex-landing > section:nth-child(7) { --section-tint: hsla(220, 55%, 55%, 0.1); }
+.codex-landing > section:nth-child(8) { --section-tint: hsla(160, 55%, 50%, 0.12); }
+.codex-landing > section:nth-child(9) { --section-tint: hsla(280, 45%, 55%, 0.08); }
+.codex-landing > section:nth-child(10) { --section-tint: hsla(200, 60%, 50%, 0.1); }
+.codex-landing > section:nth-child(11) { --section-tint: hsla(45, 60%, 50%, 0.12); }
+.codex-landing > section:nth-child(12) { --section-tint: hsla(160, 50%, 50%, 0.1); }
+.codex-landing > section:nth-child(13) { --section-tint: hsla(340, 50%, 55%, 0.08); }
+.codex-landing > section:nth-child(14) { --section-tint: hsla(180, 55%, 50%, 0.1); }
+.codex-landing > section:nth-child(15) { --section-tint: hsla(260, 50%, 55%, 0.12); }
+.codex-landing > section:nth-child(16) { --section-tint: hsla(30, 55%, 50%, 0.1); }
+.codex-landing > section:nth-child(17) { --section-tint: hsla(200, 50%, 50%, 0.08); }
+.codex-landing > section:nth-child(18) { --section-tint: hsla(160, 60%, 50%, 0.12); }
+.codex-landing > section:nth-child(19) { --section-tint: hsla(220, 55%, 55%, 0.1); }
+.codex-landing > section:nth-child(20) { --section-tint: hsla(280, 45%, 50%, 0.08); }
+.codex-landing > section:nth-child(n+21) { --section-tint: hsla(160, 55%, 50%, 0.1); }
+
+/* Dark mode tint adjustments */
+:is(.dark) .codex-landing > section::before {
+  opacity: 0.5;
+  mix-blend-mode: screen;
+}
+
+:is(.dark) .codex-landing > section:nth-child(1) { --section-tint: hsla(160, 70%, 40%, 0.08); }
+:is(.dark) .codex-landing > section:nth-child(2) { --section-tint: hsla(200, 70%, 45%, 0.06); }
+:is(.dark) .codex-landing > section:nth-child(3) { --section-tint: hsla(270, 60%, 50%, 0.05); }
+:is(.dark) .codex-landing > section:nth-child(4) { --section-tint: hsla(320, 60%, 50%, 0.04); }
+:is(.dark) .codex-landing > section:nth-child(5) { --section-tint: hsla(30, 70%, 45%, 0.05); }
+:is(.dark) .codex-landing > section:nth-child(6) { --section-tint: hsla(180, 60%, 45%, 0.06); }
+:is(.dark) .codex-landing > section:nth-child(7) { --section-tint: hsla(220, 65%, 50%, 0.05); }
+:is(.dark) .codex-landing > section:nth-child(8) { --section-tint: hsla(160, 65%, 45%, 0.06); }
+:is(.dark) .codex-landing > section:nth-child(9) { --section-tint: hsla(280, 55%, 50%, 0.04); }
+:is(.dark) .codex-landing > section:nth-child(10) { --section-tint: hsla(200, 70%, 45%, 0.05); }
+:is(.dark) .codex-landing > section:nth-child(n+11) { --section-tint: hsla(160, 60%, 45%, 0.05); }
+
+/* Remove clashing backdrop blur overlays */
+.codex-landing > section > [class*="backdrop-blur"] {
+  display: none !important;
+}
+
+/* Consistent section padding */
+.codex-landing section {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .codex-landing section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .codex-landing section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ACCESSIBILITY & PERFORMANCE
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Force GPU compositing for all framer-motion elements to eliminate non-composited animations */
+.codex-landing [style*="opacity"],
+.codex-landing [style*="transform"] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize motion elements for GPU compositing */
+.codex-landing motion,
+.codex-landing [data-framer-component-type] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Contain layout paint for animation containers */
+.codex-landing section {
+  contain: layout style;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .codex-landing * { 
+    animation: none !important; 
+    transition-duration: 0.01ms !important; 
+  }
+  .neo-divider-orb { animation: none; }
+  .neo-divider-flow::before,
+  .neo-divider-flow::after { animation: none; }
+  
+  /* Disable parallax and floating elements */
+  .floating-elements,
+  .parallax-layer { display: none !important; }
+}
+
+/* Touch device optimizations - reduce complex effects for better performance */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable mouse-following effects */
+  .floating-elements { display: none; }
+  
+  /* Simplify hover states */
+  .codex-landing [class*="whileHover"],
+  .codex-landing [class*="hover:scale"],
+  .codex-landing [class*="hover:-translate"] {
+    transform: none !important;
+  }
+  
+  /* Reduce backdrop blur for performance */
+  .codex-landing [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* Reduce box-shadow complexity */
+  .codex-landing .shadow-neuro-light,
+  .codex-landing .shadow-neuro-dark,
+  .codex-landing .shadow-neuro-sm-light,
+  .codex-landing .shadow-neuro-sm-dark {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 767px) {
+  /* Reduce section padding on mobile */
+  .codex-landing section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  /* Disable section tint overlays on mobile for cleaner look */
+  .codex-landing > section::before {
+    opacity: 0.2;
+  }
+  
+  /* Ensure touch targets are large enough */
+  .codex-landing button,
+  .codex-landing a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .codex-landing {
+    --section-tint: transparent !important;
+  }
+  
+  .codex-landing > section::before {
+    display: none;
+  }
+}

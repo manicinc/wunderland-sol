@@ -1,0 +1,176 @@
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins'    as mixins;
+@use './buttons'              as btn;   // <<< access button mixins
+
+/* ───────── Modal Overlay ───────── */
+.modal-overlay-ephemeral {
+  position: fixed; inset: 0;
+  z-index: var.$z-index-modal-backdrop;
+
+  display: flex; align-items: center; justify-content: center;
+  padding: var.$spacing-md;
+
+  background-color: hsla(var(--color-bg-primary-h),
+                         var(--color-bg-primary-s),
+                         calc(var(--color-bg-primary-l) - 10%), 0.6);
+  backdrop-filter: blur(calc(var(--blur-glass) * 0.75)) saturate(110%);
+  -webkit-backdrop-filter: blur(calc(var(--blur-glass) * 0.75)) saturate(110%);
+
+  animation: fadeIn var.$duration-smooth var.$ease-out-quad;
+}
+
+/* ───────── Modal Content ───────── */
+.modal-content-ephemeral {
+  @include mixins.glassmorphic-pane(
+    var(--color-bg-glass),
+    hsla(var(--color-accent-primary-h),
+         var(--color-accent-primary-s),
+         var(--color-accent-primary-l), 0.5),
+    var(--blur-glass),
+    var(--shadow-depth-lg)
+  );
+  border-radius: var.$radius-2xl;
+
+  width: 100%; max-width: 550px;
+  max-height: calc(100vh - var.$spacing-xl * 2);
+  display: flex; flex-direction: column; overflow: hidden;
+
+  animation: modalContentAppear var.$duration-movement var.$ease-out-quint;
+}
+
+@keyframes modalContentAppear {
+  from { opacity: 0; transform: translateY(25px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ───────── Header ───────── */
+.modal-header-ephemeral {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var.$spacing-md var.$spacing-lg;
+  border-bottom: 1px solid hsla(var(--color-border-primary-h),
+                                var(--color-border-primary-s),
+                                var(--color-border-primary-l), 0.25);
+  flex-shrink: 0;
+}
+
+.modal-title-ephemeral {
+  font-family: var(--font-display, #{var.$font-family-display});
+  font-size: var.$font-size-xl;
+  font-weight: 600;
+  color: hsl(var(--color-text-primary-h),
+             var(--color-text-primary-s),
+             var(--color-text-primary-l));
+  @include mixins.text-glow('--color-accent-primary', 6px);
+}
+
+/* close-button now uses mixin-based btn-classes, variables corrected elsewhere */
+.modal-close-button-ephemeral {
+  @include btn.base-button-styles;      // .btn core
+  @include btn.btn-icon-modifier;       // icon size/padding
+  @include btn.btn-ghost-look;          // ghost appearance
+
+  padding: var.$spacing-xs !important;
+  color: hsl(var(--color-text-muted-h),
+             var(--color-text-muted-s),
+             var(--color-text-muted-l));
+
+  &:hover,
+  &:focus-visible {
+    color: hsl(var(--color-accent-secondary-h),
+               var(--color-accent-secondary-s),
+               var(--color-accent-secondary-l));
+    background-color: hsla(var(--color-accent-secondary-h),
+                           var(--color-accent-secondary-s),
+                           var(--color-accent-secondary-l), 0.15);
+  }
+
+  .icon-base {
+    width: var.$font-size-lg;
+    height: var.$font-size-lg;
+  }
+}
+
+/* Body & Footer unchanged except variable fixes */
+.modal-body-ephemeral { padding: var.$spacing-lg; flex-grow: 1; overflow-y: auto;
+  color: hsl(var(--color-text-secondary-h),
+             var(--color-text-secondary-s),
+             var(--color-text-secondary-l));
+}
+
+.modal-footer-ephemeral {
+  display: flex; justify-content: flex-end; gap: var.$spacing-md;
+  padding: var.$spacing-md var.$spacing-lg;
+  border-top: 1px solid hsla(var(--color-border-primary-h),
+                             var(--color-border-primary-s),
+                             var(--color-border-primary-l), 0.25);
+  background-color: hsla(var(--color-bg-primary-h),
+                         var(--color-bg-primary-s),
+                         var(--color-bg-primary-l), 0.1);
+  flex-shrink: 0;
+  .btn { @include btn.btn-sm-modifier; }   // small buttons in footer
+}
+
+// Specific styling for transcription history list within a modal (from VoiceInput.vue)
+.history-list-ephemeral {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-sm; // Use gap for spacing between items
+}
+
+.history-item-ephemeral {
+  padding: var.$spacing-sm;
+  border-radius: var.$radius-lg;
+  border: 1px solid hsla(var(--color-border-translucent-h), var(--color-border-translucent-s), var(--color-border-translucent-l), var(--color-border-translucent-a, 0.2));
+  background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.6); // Semi-transparent items
+  transition: background-color var.$duration-quick var.$ease-out-quad,
+              border-color var.$duration-quick var.$ease-out-quad,
+              transform var.$duration-quick var.$ease-out-quad;
+
+  &:hover {
+    background-color: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.8);
+    border-color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.4);
+    transform: scale(1.01); // Slight lift on hover
+  }
+}
+
+.history-item-text-ephemeral {
+  font-size: var.$font-size-sm;
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  margin-bottom: var.$spacing-xs;
+  line-height: 1.6; // Good readability for potentially longer text
+}
+
+.history-item-meta-ephemeral {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var.$spacing-xs;
+}
+
+.timestamp-ephemeral {
+  font-size: 0.7rem; // Consistent xxs size
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  font-family: var(--font-mono, var.$font-family-mono);
+}
+
+.resend-btn-ephemeral {
+  font-size: var.$font-size-xs;
+  font-weight: 500;
+  color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none; // No underline by default
+  transition: color var.$duration-quick, text-decoration-color var.$duration-quick;
+
+  &:hover, &:focus-visible {
+    color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) - 10%));
+    text-decoration: underline;
+    text-decoration-color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) - 10%), 0.5);
+    outline: none;
+  }
+}

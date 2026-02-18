@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" fill="none">
+  <!-- Background -->
+  <rect width="1400" height="900" fill="#1a1a2e"/>
+
+  <!-- Header Bar -->
+  <rect x="0" y="0" width="1400" height="60" fill="#0d0d1a"/>
+  <text x="30" y="38" fill="#85ea2d" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600">Quarry API</text>
+  <text x="150" y="38" fill="#666" font-family="system-ui, sans-serif" font-size="14">v1.0.0</text>
+  <text x="220" y="38" fill="#888" font-family="system-ui, sans-serif" font-size="14">OpenAPI 3.1.0</text>
+
+  <!-- Swagger UI Badge -->
+  <rect x="1250" y="18" width="120" height="26" rx="4" fill="#85ea2d"/>
+  <text x="1275" y="36" fill="#1a1a2e" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Swagger UI</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="60" width="280" height="840" fill="#16162a"/>
+
+  <!-- Sidebar Title -->
+  <text x="20" y="100" fill="#fff" font-family="system-ui, sans-serif" font-size="14" font-weight="600">Endpoints</text>
+
+  <!-- Sidebar Groups -->
+  <rect x="10" y="120" width="260" height="36" rx="4" fill="#262640"/>
+  <text x="20" y="143" fill="#61affe" font-family="system-ui, sans-serif" font-size="13" font-weight="500">Knowledge</text>
+  <text x="230" y="143" fill="#61affe" font-family="system-ui, sans-serif" font-size="11">6</text>
+
+  <rect x="10" y="166" width="260" height="36" rx="4" fill="#262640"/>
+  <text x="20" y="189" fill="#49cc90" font-family="system-ui, sans-serif" font-size="13" font-weight="500">Generation</text>
+  <text x="230" y="189" fill="#49cc90" font-family="system-ui, sans-serif" font-size="11">3</text>
+
+  <rect x="10" y="212" width="260" height="36" rx="4" fill="#262640"/>
+  <text x="20" y="235" fill="#fca130" font-family="system-ui, sans-serif" font-size="13" font-weight="500">Tokens</text>
+  <text x="230" y="235" fill="#fca130" font-family="system-ui, sans-serif" font-size="11">4</text>
+
+  <rect x="10" y="258" width="260" height="36" rx="4" fill="#262640"/>
+  <text x="20" y="281" fill="#f93e3e" font-family="system-ui, sans-serif" font-size="13" font-weight="500">Audit</text>
+  <text x="230" y="281" fill="#f93e3e" font-family="system-ui, sans-serif" font-size="11">3</text>
+
+  <rect x="10" y="304" width="260" height="36" rx="4" fill="#262640"/>
+  <text x="20" y="327" fill="#9012fe" font-family="system-ui, sans-serif" font-size="13" font-weight="500">System</text>
+  <text x="230" y="327" fill="#9012fe" font-family="system-ui, sans-serif" font-size="11">2</text>
+
+  <!-- Main Content Area -->
+  <rect x="280" y="60" width="1120" height="840" fill="#1a1a2e"/>
+
+  <!-- API Description -->
+  <text x="310" y="110" fill="#fff" font-family="system-ui, sans-serif" font-size="24" font-weight="600">Quarry Codex REST API</text>
+  <text x="310" y="140" fill="#888" font-family="system-ui, sans-serif" font-size="14">Access your knowledge base programmatically with full OpenAPI documentation.</text>
+
+  <!-- Base URL -->
+  <rect x="310" y="160" width="400" height="32" rx="4" fill="#262640"/>
+  <text x="324" y="181" fill="#61affe" font-family="monospace" font-size="13">http://localhost:3847/api/v1</text>
+
+  <!-- Knowledge Section -->
+  <rect x="310" y="220" width="1060" height="40" rx="6" fill="#61affe20" stroke="#61affe" stroke-width="1"/>
+  <text x="330" y="246" fill="#61affe" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Knowledge</text>
+  <text x="430" y="246" fill="#888" font-family="system-ui, sans-serif" font-size="13">Search and retrieve content from your knowledge base</text>
+
+  <!-- GET /strands Endpoint -->
+  <rect x="310" y="270" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="283" width="50" height="24" rx="4" fill="#61affe"/>
+  <text x="332" y="300" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">GET</text>
+  <text x="385" y="300" fill="#fff" font-family="monospace" font-size="13">/strands</text>
+  <text x="520" y="300" fill="#888" font-family="system-ui, sans-serif" font-size="12">List all strands with optional filtering</text>
+
+  <!-- GET /search Endpoint -->
+  <rect x="310" y="330" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="343" width="50" height="24" rx="4" fill="#61affe"/>
+  <text x="332" y="360" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">GET</text>
+  <text x="385" y="360" fill="#fff" font-family="monospace" font-size="13">/search</text>
+  <text x="520" y="360" fill="#888" font-family="system-ui, sans-serif" font-size="12">Full-text search across your knowledge base</text>
+
+  <!-- GET /weaves Endpoint -->
+  <rect x="310" y="390" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="403" width="50" height="24" rx="4" fill="#61affe"/>
+  <text x="332" y="420" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">GET</text>
+  <text x="385" y="420" fill="#fff" font-family="monospace" font-size="13">/weaves</text>
+  <text x="520" y="420" fill="#888" font-family="system-ui, sans-serif" font-size="12">List all weaves (notebooks)</text>
+
+  <!-- Generation Section -->
+  <rect x="310" y="470" width="1060" height="40" rx="6" fill="#49cc9020" stroke="#49cc90" stroke-width="1"/>
+  <text x="330" y="496" fill="#49cc90" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Generation</text>
+  <text x="440" y="496" fill="#888" font-family="system-ui, sans-serif" font-size="13">AI-powered content generation endpoints</text>
+
+  <!-- POST /generate/flashcards -->
+  <rect x="310" y="520" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="533" width="50" height="24" rx="4" fill="#49cc90"/>
+  <text x="328" y="550" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">POST</text>
+  <text x="385" y="550" fill="#fff" font-family="monospace" font-size="13">/generate/flashcards</text>
+  <text x="580" y="550" fill="#888" font-family="system-ui, sans-serif" font-size="12">Generate flashcards from content</text>
+
+  <!-- POST /generate/quiz -->
+  <rect x="310" y="580" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="593" width="50" height="24" rx="4" fill="#49cc90"/>
+  <text x="328" y="610" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">POST</text>
+  <text x="385" y="610" fill="#fff" font-family="monospace" font-size="13">/generate/quiz</text>
+  <text x="545" y="610" fill="#888" font-family="system-ui, sans-serif" font-size="12">Generate quiz questions from content</text>
+
+  <!-- Tokens Section -->
+  <rect x="310" y="660" width="1060" height="40" rx="6" fill="#fca13020" stroke="#fca130" stroke-width="1"/>
+  <text x="330" y="686" fill="#fca130" font-family="system-ui, sans-serif" font-size="16" font-weight="600">Tokens</text>
+  <text x="410" y="686" fill="#888" font-family="system-ui, sans-serif" font-size="13">API token management with audit logging</text>
+
+  <!-- POST /tokens -->
+  <rect x="310" y="710" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="723" width="50" height="24" rx="4" fill="#49cc90"/>
+  <text x="328" y="740" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">POST</text>
+  <text x="385" y="740" fill="#fff" font-family="monospace" font-size="13">/tokens</text>
+  <text x="485" y="740" fill="#888" font-family="system-ui, sans-serif" font-size="12">Create a new API token</text>
+
+  <!-- DELETE /tokens/:id -->
+  <rect x="310" y="770" width="1060" height="50" rx="4" fill="#262640"/>
+  <rect x="320" y="783" width="65" height="24" rx="4" fill="#f93e3e"/>
+  <text x="324" y="800" fill="#fff" font-family="system-ui, sans-serif" font-size="11" font-weight="600">DELETE</text>
+  <text x="400" y="800" fill="#fff" font-family="monospace" font-size="13">/tokens/{'{id}'}</text>
+  <text x="545" y="800" fill="#888" font-family="system-ui, sans-serif" font-size="12">Revoke an API token</text>
+
+  <!-- Auth Lock Icon -->
+  <rect x="1320" y="283" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="300" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+  <rect x="1320" y="343" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="360" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+  <rect x="1320" y="403" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="420" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+  <rect x="1320" y="533" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="550" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+  <rect x="1320" y="593" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="610" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+  <rect x="1320" y="723" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="740" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+  <rect x="1320" y="783" width="40" height="24" rx="4" fill="#49cc90"/>
+  <text x="1330" y="800" fill="#fff" font-family="system-ui, sans-serif" font-size="10">AUTH</text>
+</svg>

@@ -1,0 +1,735 @@
+openapi: 3.1.0
+info:
+  title: Quarry Codex API
+  description: |
+    REST API for Quarry Codex knowledge management system.
+
+    ## Features
+    - **Blocks API**: Create, read, update, delete content blocks
+    - **Generate API**: LLM-powered text and image generation
+    - **Analysis API**: NLP analysis and summarization
+    - **GitHub API**: Repository integration and sync
+
+    ## Authentication
+    Most endpoints require authentication via API key or session cookie.
+    Set `Authorization: Bearer <token>` header for authenticated requests.
+
+    ## Client-Side AI
+    Many features run entirely client-side using:
+    - **BERT embeddings** via Transformers.js
+    - **TextRank summarization** in Web Workers
+    - **TF-IDF keyword extraction**
+
+    No data leaves your device for these operations.
+  version: 1.0.0
+  contact:
+    name: Quarry Support
+    url: https://frame.dev/support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: /api
+    description: Local API server
+
+tags:
+  - name: Health
+    description: Server health and status
+  - name: Blocks
+    description: Content blocks (strands) management
+  - name: Generate
+    description: LLM-powered content generation
+  - name: Analysis
+    description: NLP analysis and summarization
+  - name: Images
+    description: AI image generation
+  - name: GitHub
+    description: GitHub repository operations
+  - name: Jobs
+    description: Background job management
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns server health status
+      operationId: getHealth
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 1.0.0
+
+  /capabilities:
+    get:
+      tags: [Health]
+      summary: Get server capabilities
+      description: Returns available features and providers
+      operationId: getCapabilities
+      responses:
+        '200':
+          description: Server capabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capabilities'
+
+  /blocks:
+    get:
+      tags: [Blocks]
+      summary: List blocks
+      description: Retrieve content blocks with optional filtering
+      operationId: listBlocks
+      parameters:
+        - name: weave
+          in: query
+          description: Filter by weave path
+          schema:
+            type: string
+        - name: loom
+          in: query
+          description: Filter by loom path
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of blocks to return
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+        - name: offset
+          in: query
+          description: Offset for pagination
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of blocks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blocks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Block'
+                  total:
+                    type: integer
+                  hasMore:
+                    type: boolean
+
+  /blocks/search:
+    post:
+      tags: [Blocks]
+      summary: Search blocks
+      description: |
+        Search blocks using semantic or keyword search.
+        Semantic search uses BERT embeddings for meaning-based matching.
+      operationId: searchBlocks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query:
+                  type: string
+                  description: Search query
+                  example: "authentication patterns"
+                mode:
+                  type: string
+                  enum: [semantic, keyword, hybrid]
+                  default: hybrid
+                  description: Search mode
+                limit:
+                  type: integer
+                  default: 10
+                  maximum: 100
+                weave:
+                  type: string
+                  description: Filter by weave
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  description: Filter by tags
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchResult'
+                  total:
+                    type: integer
+                  query:
+                    type: string
+
+  /blocks/tags:
+    get:
+      tags: [Blocks]
+      summary: List all tags
+      description: Get all unique tags across blocks
+      operationId: listTags
+      responses:
+        '200':
+          description: List of tags with counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag:
+                          type: string
+                        count:
+                          type: integer
+
+  /generate:
+    post:
+      tags: [Generate]
+      summary: Generate text
+      description: |
+        Generate text using LLM providers.
+        Supports Claude, OpenAI, and local Ollama models.
+      operationId: generateText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt:
+                  type: string
+                  description: Generation prompt
+                provider:
+                  type: string
+                  enum: [claude, openai, ollama, openrouter]
+                  default: claude
+                model:
+                  type: string
+                  description: Model ID
+                  example: claude-3-5-sonnet-20241022
+                maxTokens:
+                  type: integer
+                  default: 1000
+                temperature:
+                  type: number
+                  minimum: 0
+                  maximum: 2
+                  default: 0.7
+                systemPrompt:
+                  type: string
+                  description: System prompt for context
+      responses:
+        '200':
+          description: Generated text
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerationResult'
+
+  /generate/stream:
+    post:
+      tags: [Generate]
+      summary: Stream text generation
+      description: |
+        Stream text generation token by token.
+        Returns Server-Sent Events (SSE) stream.
+      operationId: streamGeneration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateRequest'
+      responses:
+        '200':
+          description: SSE stream of tokens
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /analysis/analyze:
+    post:
+      tags: [Analysis]
+      summary: Analyze text
+      description: |
+        Perform NLP analysis on text.
+        Includes entity extraction, keyword detection, and summarization.
+
+        **Client-Side Alternative**: For fully offline analysis, use the
+        Web Worker API at `/lib/summarization/summarizationWorkerClient.ts`.
+      operationId: analyzeText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                  description: Text to analyze
+                operations:
+                  type: array
+                  items:
+                    type: string
+                    enum: [entities, keywords, summary, tags, sentiment]
+                  default: [entities, keywords, summary]
+                summarization:
+                  type: object
+                  properties:
+                    algorithm:
+                      type: string
+                      enum: [textrank, tfidf, lead, bert]
+                      default: textrank
+                    maxSentences:
+                      type: integer
+                      default: 3
+      responses:
+        '200':
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+
+  /images/generate:
+    post:
+      tags: [Images]
+      summary: Generate image
+      description: Generate images using DALL-E or other providers
+      operationId: generateImage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt:
+                  type: string
+                  description: Image generation prompt
+                size:
+                  type: string
+                  enum: ['1024x1024', '1792x1024', '1024x1792']
+                  default: '1024x1024'
+                quality:
+                  type: string
+                  enum: [standard, hd]
+                  default: standard
+                style:
+                  type: string
+                  enum: [natural, vivid]
+                  default: natural
+                provider:
+                  type: string
+                  enum: [openai, stability]
+                  default: openai
+      responses:
+        '200':
+          description: Generated image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageResult'
+
+  /github/tree:
+    get:
+      tags: [GitHub]
+      summary: Get repository tree
+      description: Fetch file tree from GitHub repository
+      operationId: getGitHubTree
+      parameters:
+        - name: repo
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Repository in owner/repo format
+        - name: branch
+          in: query
+          schema:
+            type: string
+            default: main
+        - name: path
+          in: query
+          schema:
+            type: string
+            default: ''
+      responses:
+        '200':
+          description: Repository tree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GitHubTree'
+
+  /github/content:
+    get:
+      tags: [GitHub]
+      summary: Get file content
+      description: Fetch file content from GitHub
+      operationId: getGitHubContent
+      parameters:
+        - name: repo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: branch
+          in: query
+          schema:
+            type: string
+            default: main
+      responses:
+        '200':
+          description: File content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  sha:
+                    type: string
+                  encoding:
+                    type: string
+
+  /jobs:
+    get:
+      tags: [Jobs]
+      summary: List jobs
+      description: Get list of background jobs
+      operationId: listJobs
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, running, completed, failed]
+      responses:
+        '200':
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+
+  /jobs/{jobId}:
+    get:
+      tags: [Jobs]
+      summary: Get job status
+      description: Get status of a specific job
+      operationId: getJob
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+
+components:
+  schemas:
+    Block:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        type:
+          type: string
+          enum: [paragraph, heading, list, code, blockquote, table]
+        weave:
+          type: string
+          description: Parent weave path
+        loom:
+          type: string
+          description: Parent loom path
+        strand:
+          type: string
+          description: Parent strand path
+        tags:
+          type: array
+          items:
+            type: string
+        summary:
+          type: string
+          description: Extractive summary (TextRank)
+        embeddings:
+          type: array
+          items:
+            type: number
+          description: BERT embeddings (384 dimensions)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SearchResult:
+      type: object
+      properties:
+        block:
+          $ref: '#/components/schemas/Block'
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Relevance score
+        highlights:
+          type: array
+          items:
+            type: string
+          description: Matching text snippets
+
+    GenerateRequest:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+        provider:
+          type: string
+          enum: [claude, openai, ollama, openrouter]
+        model:
+          type: string
+        maxTokens:
+          type: integer
+        temperature:
+          type: number
+        systemPrompt:
+          type: string
+
+    GenerationResult:
+      type: object
+      properties:
+        text:
+          type: string
+        usage:
+          type: object
+          properties:
+            promptTokens:
+              type: integer
+            completionTokens:
+              type: integer
+            totalTokens:
+              type: integer
+        cost:
+          type: number
+          description: Estimated cost in USD
+        provider:
+          type: string
+        model:
+          type: string
+        duration:
+          type: integer
+          description: Generation time in milliseconds
+
+    AnalysisResult:
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+              type:
+                type: string
+                enum: [person, organization, location, technology, concept]
+              confidence:
+                type: number
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+              score:
+                type: number
+        summary:
+          type: object
+          properties:
+            text:
+              type: string
+            algorithm:
+              type: string
+              enum: [textrank, tfidf, lead, bert]
+            sentences:
+              type: array
+              items:
+                type: string
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag:
+                type: string
+              confidence:
+                type: number
+              source:
+                type: string
+                enum: [nlp, llm, existing]
+
+    ImageResult:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        base64:
+          type: string
+        revisedPrompt:
+          type: string
+        cost:
+          type: number
+        provider:
+          type: string
+        model:
+          type: string
+
+    GitHubTree:
+      type: object
+      properties:
+        tree:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+              type:
+                type: string
+                enum: [blob, tree]
+              sha:
+                type: string
+              size:
+                type: integer
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+        result:
+          type: object
+        error:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+
+    Capabilities:
+      type: object
+      properties:
+        providers:
+          type: object
+          properties:
+            llm:
+              type: array
+              items:
+                type: string
+            image:
+              type: array
+              items:
+                type: string
+            embedding:
+              type: array
+              items:
+                type: string
+        features:
+          type: object
+          properties:
+            clientSideAI:
+              type: boolean
+              description: BERT/Transformers.js available
+            webWorkers:
+              type: boolean
+              description: Background processing available
+            offlineMode:
+              type: boolean
+              description: Offline storage available
+        version:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - bearerAuth: []
+  - apiKey: []

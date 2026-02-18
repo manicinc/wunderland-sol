@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "알 수 없는 오류가 발생했습니다",
+    "tryAgain": "잠시 후 다시 시도해 주세요",
+    "contactSupport": "문제가 계속되면 고객 지원팀에 문의해 주세요"
+  },
+  "network": {
+    "offline": "오프라인 상태인 것 같습니다",
+    "timeout": "요청 시간이 초과되었습니다",
+    "serverError": "서버 오류가 발생했습니다",
+    "connectionFailed": "연결에 실패했습니다"
+  },
+  "validation": {
+    "required": "이 필드는 필수 항목입니다",
+    "invalidEmail": "이메일 형식이 올바르지 않습니다",
+    "passwordTooShort": "비밀번호는 최소 {{min}}자 이상이어야 합니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "invalidFormat": "형식이 올바르지 않습니다",
+    "numberOnly": "숫자만 입력할 수 있습니다",
+    "minLength": "{{min}}자 이상 입력해 주세요",
+    "maxLength": "{{max}}자 이하로 입력해 주세요"
+  },
+  "auth": {
+    "unauthorized": "허가되지 않은 접근입니다",
+    "sessionExpired": "세션이 만료되었습니다",
+    "invalidCredentials": "이메일 또는 비밀번호가 잘못되었습니다",
+    "accountLocked": "계정이 잠겼습니다",
+    "emailNotVerified": "이메일 인증을 완료해 주세요",
+    "tokenInvalid": "토큰이 유효하지 않거나 만료되었습니다"
+  },
+  "api": {
+    "rateLimited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요",
+    "notFound": "요청한 리소스를 찾을 수 없습니다",
+    "methodNotAllowed": "허용되지 않은 메서드입니다",
+    "serverError": "서버 내부 오류가 발생했습니다",
+    "badRequest": "잘못된 요청입니다",
+    "forbidden": "접근이 거부되었습니다"
+  },
+  "file": {
+    "tooLarge": "파일 크기가 제한을 초과했습니다",
+    "invalidType": "지원되지 않는 파일 형식입니다",
+    "uploadFailed": "파일 업로드에 실패했습니다",
+    "notFound": "파일을 찾을 수 없습니다"
+  }
+}

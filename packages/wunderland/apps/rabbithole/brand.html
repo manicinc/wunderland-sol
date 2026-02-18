@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rabbit Hole Inc - Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Tenor+Sans&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Tenor Sans', sans-serif;
+            background: #f8f6f2;
+            color: #1a1520;
+            line-height: 1.6;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(26, 21, 32, 0.1);
+        }
+        
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 600;
+            color: #1a1520;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.15em;
+        }
+        
+        .subtitle {
+            color: rgba(26, 21, 32, 0.5);
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+        
+        .section {
+            background: #fff;
+            border: 1px solid rgba(26, 21, 32, 0.08);
+            border-radius: 8px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 20px rgba(26, 21, 32, 0.04);
+        }
+        
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: #1a1520;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        h3 {
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: rgba(26, 21, 32, 0.6);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-item { text-align: center; }
+        
+        .preview-box {
+            background: #f8f6f2;
+            border: 1px solid rgba(26, 21, 32, 0.1);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            margin-bottom: 1rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-box.cream {
+            background: #faf8f5;
+        }
+        
+        .preview-box.warm {
+            background: #f5f0e8;
+        }
+        
+        .preview-box.dark {
+            background: linear-gradient(135deg, #1a1520 0%, #0d0a0f 100%);
+            border-color: rgba(255,255,255,0.05);
+        }
+        
+        .preview-label {
+            font-size: 0.75rem;
+            color: rgba(26, 21, 32, 0.5);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .download-btn {
+            background: #1a1520;
+            color: #f8f6f2;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            font-family: 'Tenor Sans', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(26, 21, 32, 0.2);
+        }
+        
+        .download-btn.secondary {
+            background: transparent;
+            color: #1a1520;
+            border: 1px solid rgba(26, 21, 32, 0.2);
+        }
+        
+        .download-btn.secondary:hover {
+            background: rgba(26, 21, 32, 0.05);
+            border-color: #1a1520;
+        }
+        
+        .controls-section {
+            background: #faf8f5;
+            border: 1px solid rgba(26, 21, 32, 0.08);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 0.75rem;
+            color: rgba(26, 21, 32, 0.6);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .control-group input[type="text"] {
+            background: #fff;
+            border: 1px solid rgba(26, 21, 32, 0.15);
+            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            color: #1a1520;
+            font-family: 'Tenor Sans', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+
+        .control-group input[type="text"]:focus {
+            outline: none;
+            border-color: #1a1520;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1a1520;
+        }
+
+        .checkbox-group label {
+            font-size: 0.8rem;
+            color: rgba(26, 21, 32, 0.8);
+            cursor: pointer;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .color-swatch { text-align: center; }
+
+        .color-swatch .swatch {
+            height: 80px;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(26, 21, 32, 0.1);
+        }
+
+        .color-swatch .color-name {
+            font-size: 0.75rem;
+            color: rgba(26, 21, 32, 0.5);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .color-swatch .color-value {
+            font-family: 'Monaco', monospace;
+            font-size: 0.75rem;
+            color: #1a1520;
+        }
+
+        .download-section-title {
+            font-size: 0.7rem;
+            color: rgba(26, 21, 32, 0.4);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .font-section {
+            background: #faf8f5;
+            border: 1px solid rgba(26, 21, 32, 0.08);
+            border-radius: 6px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .font-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .font-item {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid rgba(26, 21, 32, 0.08);
+        }
+
+        .font-preview {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            font-family: 'Cormorant Garamond', serif;
+            color: #1a1520;
+        }
+
+        .font-item p {
+            font-size: 0.85rem;
+            color: rgba(26, 21, 32, 0.6);
+            margin-bottom: 0.5rem;
+        }
+
+        .font-item p strong { color: #1a1520; }
+
+        .css-code {
+            background: #1a1520;
+            color: #d4af7d;
+            padding: 1.5rem;
+            border-radius: 6px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            overflow-x: auto;
+        }
+
+        .usage-section {
+            background: #faf8f5;
+            border: 1px solid rgba(26, 21, 32, 0.08);
+            border-radius: 6px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .usage-item {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid rgba(26, 21, 32, 0.08);
+        }
+
+        .usage-item h3 {
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+            margin-top: 0;
+            color: #1a1520;
+        }
+
+        .usage-item p {
+            font-size: 0.85rem;
+            color: rgba(26, 21, 32, 0.6);
+            line-height: 1.7;
+        }
+
+        code {
+            background: rgba(26, 21, 32, 0.06);
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.8rem;
+            color: #1a1520;
+        }
+
+        .version-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .version-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(26, 21, 32, 0.15);
+            background: transparent;
+            border-radius: 6px;
+            font-family: 'Tenor Sans', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(26, 21, 32, 0.6);
+        }
+
+        .version-btn.active {
+            border-color: #1a1520;
+            color: #1a1520;
+            background: #faf8f5;
+        }
+
+        .version-btn:hover:not(.active) {
+            border-color: rgba(26, 21, 32, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rabbit Hole Inc</h1>
+            <p class="subtitle">Logo Export System</p>
+        </header>
+
+        <!-- Primary Logo Section -->
+        <section class="section">
+            <h2>Primary Logo</h2>
+            
+            <div class="controls-section">
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="taglineInput">Tagline Text</label>
+                        <input type="text" id="taglineInput" value="FOUNDER'S CLUB" placeholder="Enter tagline..." oninput="updateTagline()">
+                    </div>
+                    <div class="control-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="includeTagline" checked onchange="updateTaglineVisibility()">
+                            <label for="includeTagline">Show tagline in logo</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="version-toggle">
+                <button class="version-btn active" onclick="setColorVersion('gold')" id="goldBtn">Champagne Gold</button>
+                <button class="version-btn" onclick="setColorVersion('obsidian')" id="obsidianBtn">Obsidian</button>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box cream" id="preview1"></div>
+                    <p class="preview-label">Cream Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box" id="preview2" style="background: linear-gradient(135deg, #08050a 0%, #12101a 50%, #08050a 100%);"></div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+            </div>
+            
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('primary')">Download SVG</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 1)">PNG 1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 2)">PNG 2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 4)">PNG 4x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 2)">PNG White BG</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'cream', 2)">PNG Cream BG</button>
+            </div>
+        </section>
+        
+        <!-- Icon/Favicon Section -->
+        <section class="section">
+            <h2>Icon / Favicon</h2>
+            
+            <div class="icon-grid">
+                <div class="preview-item">
+                    <div class="preview-box cream" style="min-height: 140px; padding: 2rem;" id="iconPreview64"></div>
+                    <p class="preview-label">64×64</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box warm" style="min-height: 140px; padding: 2rem;" id="iconPreview48"></div>
+                    <p class="preview-label">48×48</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box cream" style="min-height: 140px; padding: 2rem;" id="iconPreview32"></div>
+                    <p class="preview-label">32×32</p>
+                </div>
+
+                <div class="preview-item">
+                    <div class="preview-box warm" style="min-height: 140px; padding: 2rem;" id="iconPreview16"></div>
+                    <p class="preview-label">16×16</p>
+                </div>
+            </div>
+            
+            <h3>Download Icons</h3>
+            
+            <div class="download-section-title">Vector Format</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('icon')">Download SVG</button>
+            </div>
+            
+            <div class="download-section-title">Standard Sizes</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 16)">16×16</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 32)">32×32</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64)">64×64</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128)">128×128</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256)">256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 512)">512×512</button>
+            </div>
+            
+            <div class="download-section-title">With Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'white', 512)">512 White</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'cream', 512)">512 Cream</button>
+            </div>
+        </section>
+
+        <!-- Color Palette Section -->
+        <section class="section">
+            <h2>Color Palette</h2>
+            <div class="color-palette">
+                <div class="color-swatch">
+                    <div class="swatch" style="background: linear-gradient(135deg, #8b6914 0%, #c9a227 25%, #e8d48a 50%, #c9a227 75%, #8b6914 100%);"></div>
+                    <p class="color-name">Champagne Gold</p>
+                    <p class="color-value">#c9a227</p>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch" style="background: linear-gradient(135deg, #08050a 0%, #12101a 25%, #1a1625 50%, #12101a 75%, #08050a 100%); box-shadow: inset 0 0 30px rgba(245,240,255,0.08);"></div>
+                    <p class="color-name">Obsidian</p>
+                    <p class="color-value">#1a1625</p>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch" style="background: #f8f6f2;"></div>
+                    <p class="color-name">Cream</p>
+                    <p class="color-value">#f8f6f2</p>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch" style="background: #f5f0e8;"></div>
+                    <p class="color-name">Warm White</p>
+                    <p class="color-value">#f5f0e8</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Typography Section -->
+        <section class="section">
+            <h2>Typography &amp; CSS</h2>
+            <div class="font-section">
+                <h3>Font Information</h3>
+                <div class="font-grid">
+                    <div class="font-item">
+                        <div class="font-preview" style="font-weight: 600;">RABBIT HOLE</div>
+                        <p><strong>Primary:</strong> Cormorant Garamond 600</p>
+                        <p><strong>Spacing:</strong> 0.12em</p>
+                    </div>
+                    <div class="font-item">
+                        <div class="font-preview" style="font-family: 'Tenor Sans', sans-serif; font-weight: 400; font-size: 1rem; letter-spacing: 0.25em;">FOUNDER'S CLUB</div>
+                        <p><strong>Secondary:</strong> Tenor Sans 400</p>
+                        <p><strong>Spacing:</strong> 0.2em</p>
+                    </div>
+                </div>
+                
+                <h3>CSS Variables</h3>
+                <div class="css-code">:root {
+  --rh-gold: #c9a227;
+  --rh-gold-light: #e8d48a;
+  --rh-gold-dark: #8b6914;
+  --rh-obsidian: #1a1625;
+  --rh-obsidian-deep: #08050a;
+  --rh-obsidian-mid: #12101a;
+  --rh-cream: #f8f6f2;
+  --rh-warm: #f5f0e8;
+  --rh-font-display: 'Cormorant Garamond', serif;
+  --rh-font-body: 'Tenor Sans', sans-serif;
+}</div>
+            </div>
+        </section>
+        
+        <!-- Usage Guidelines -->
+        <section class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="usage-section">
+                <div class="usage-grid">
+                    <div class="usage-item">
+                        <h3>Minimum Size</h3>
+                        <p>Logo: <code>200px</code> width. Icon: <code>16px</code></p>
+                    </div>
+                    <div class="usage-item">
+                        <h3>Clear Space</h3>
+                        <p>Equal to icon height on all sides</p>
+                    </div>
+                    <div class="usage-item">
+                        <h3>Premium Print</h3>
+                        <p>Emboss or foil stamp on cream stock</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        let taglineText = "FOUNDER'S CLUB";
+        let showTagline = true;
+        let colorVersion = 'gold';
+
+        function setColorVersion(version) {
+            colorVersion = version;
+            document.getElementById('goldBtn').classList.toggle('active', version === 'gold');
+            document.getElementById('obsidianBtn').classList.toggle('active', version === 'obsidian');
+            updatePreviews();
+        }
+
+        function generateIconSVG(size = 64, forDarkBg = false) {
+            const isGold = colorVersion === 'gold';
+            const useGold = isGold || forDarkBg; // On dark bg, always use gold
+            
+            return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Champagne Gold - rich metallic -->
+        <linearGradient id="goldGrad${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b6914"/>
+            <stop offset="25%" stop-color="#c9a227"/>
+            <stop offset="45%" stop-color="#e8d48a"/>
+            <stop offset="55%" stop-color="#f5e6a3"/>
+            <stop offset="70%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#8b6914"/>
+        </linearGradient>
+        
+        <!-- True Obsidian - volcanic glass base -->
+        <linearGradient id="obsidianBase${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#08050a"/>
+            <stop offset="25%" stop-color="#12101a"/>
+            <stop offset="50%" stop-color="#1a1625"/>
+            <stop offset="75%" stop-color="#12101a"/>
+            <stop offset="100%" stop-color="#08050a"/>
+        </linearGradient>
+        
+        <!-- Obsidian light reflection - monochromatic shimmer like light on glass -->
+        <linearGradient id="obsidianReflect${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(200,195,210,0.0)"/>
+            <stop offset="35%" stop-color="rgba(220,215,230,0.12)"/>
+            <stop offset="45%" stop-color="rgba(245,240,255,0.22)"/>
+            <stop offset="55%" stop-color="rgba(220,215,230,0.12)"/>
+            <stop offset="100%" stop-color="rgba(200,195,210,0.0)"/>
+        </linearGradient>
+        
+        <!-- Secondary subtle edge highlight -->
+        <linearGradient id="obsidianEdge${size}" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(180,175,195,0.08)"/>
+            <stop offset="50%" stop-color="rgba(160,155,175,0.04)"/>
+            <stop offset="100%" stop-color="rgba(140,135,155,0.0)"/>
+        </linearGradient>
+        
+        <!-- Inner cutout - warm cream with subtle gradient -->
+        <linearGradient id="innerGrad${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#faf7f2"/>
+            <stop offset="50%" stop-color="#f5f0e8"/>
+            <stop offset="100%" stop-color="#ede8e0"/>
+        </linearGradient>
+        
+        <!-- Inner cutout for obsidian - cooler tone -->
+        <linearGradient id="innerGradCool${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8f6f4"/>
+            <stop offset="50%" stop-color="#f0eeec"/>
+            <stop offset="100%" stop-color="#e8e6e4"/>
+        </linearGradient>
+    </defs>
+    
+    <!-- Keyhole frame -->
+    <g>
+        <!-- Base layer -->
+        <path d="
+            M 50 6
+            C 72 6, 90 24, 90 46
+            C 90 62, 78 76, 62 80
+            L 62 82
+            C 62 84, 60 86, 58 86
+            L 58 94
+            L 42 94
+            L 42 86
+            C 40 86, 38 84, 38 82
+            L 38 80
+            C 22 76, 10 62, 10 46
+            C 10 24, 28 6, 50 6
+            Z
+        " fill="${useGold ? `url(#goldGrad${size})` : `url(#obsidianBase${size})`}"/>
+        
+        ${!useGold ? `<!-- Light reflection shimmer -->
+        <path d="
+            M 50 6
+            C 72 6, 90 24, 90 46
+            C 90 62, 78 76, 62 80
+            L 62 82
+            C 62 84, 60 86, 58 86
+            L 58 94
+            L 42 94
+            L 42 86
+            C 40 86, 38 84, 38 82
+            L 38 80
+            C 22 76, 10 62, 10 46
+            C 10 24, 28 6, 50 6
+            Z
+        " fill="url(#obsidianReflect${size})"/>
+        
+        <!-- Edge highlight -->
+        <path d="
+            M 50 6
+            C 72 6, 90 24, 90 46
+            C 90 62, 78 76, 62 80
+            L 62 82
+            C 62 84, 60 86, 58 86
+            L 58 94
+            L 42 94
+            L 42 86
+            C 40 86, 38 84, 38 82
+            L 38 80
+            C 22 76, 10 62, 10 46
+            C 10 24, 28 6, 50 6
+            Z
+        " fill="url(#obsidianEdge${size})"/>` : ''}
+    </g>
+    
+    <!-- Inner keyhole cutout -->
+    <path d="
+        M 50 14
+        C 68 14, 82 28, 82 46
+        C 82 58, 74 70, 60 73
+        L 58 73
+        C 56 73, 54 75, 54 77
+        L 54 88
+        L 46 88
+        L 46 77
+        C 46 75, 44 73, 42 73
+        L 40 73
+        C 26 70, 18 58, 18 46
+        C 18 28, 32 14, 50 14
+        Z
+    " fill="${useGold ? `url(#innerGrad${size})` : `url(#innerGradCool${size})`}"/>
+    
+    <!-- Rabbit silhouette -->
+    <g>
+        <!-- Base -->
+        <g fill="${useGold ? `url(#goldGrad${size})` : `url(#obsidianBase${size})`}">
+            <path d="M34 50
+                     Q33 30 37 20
+                     Q39 14 43 14
+                     Q47 14 47 22
+                     Q47 34 45 50
+                     Q40 49 34 50Z"/>
+            <path d="M66 50
+                     Q67 30 63 20
+                     Q61 14 57 14
+                     Q53 14 53 22
+                     Q53 34 55 50
+                     Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>
+        
+        ${!useGold ? `<!-- Light reflection on rabbit -->
+        <g fill="url(#obsidianReflect${size})">
+            <path d="M34 50 Q33 30 37 20 Q39 14 43 14 Q47 14 47 22 Q47 34 45 50 Q40 49 34 50Z"/>
+            <path d="M66 50 Q67 30 63 20 Q61 14 57 14 Q53 14 53 22 Q53 34 55 50 Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>
+        
+        <!-- Edge highlight on rabbit -->
+        <g fill="url(#obsidianEdge${size})">
+            <path d="M34 50 Q33 30 37 20 Q39 14 43 14 Q47 14 47 22 Q47 34 45 50 Q40 49 34 50Z"/>
+            <path d="M66 50 Q67 30 63 20 Q61 14 57 14 Q53 14 53 22 Q53 34 55 50 Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>` : ''}
+    </g>
+</svg>`;
+        }
+
+        function generatePrimaryLogoSVG(forDarkBg = false) {
+            const height = showTagline ? 80 : 64;
+            const isGold = colorVersion === 'gold';
+            const useGold = isGold || forDarkBg; // On dark bg, always use gold
+            
+            // Text colors
+            const textColor = useGold ? '#c9a227' : '#1a1625';
+            const taglineColor = useGold ? '#a6851e' : '#3a3545';
+            
+            return `<svg width="380" height="${height}" viewBox="0 0 380 ${height}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Champagne Gold gradient for icon -->
+        <linearGradient id="goldIconGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b6914"/>
+            <stop offset="25%" stop-color="#c9a227"/>
+            <stop offset="45%" stop-color="#e8d48a"/>
+            <stop offset="55%" stop-color="#f5e6a3"/>
+            <stop offset="70%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#8b6914"/>
+        </linearGradient>
+        
+        <!-- Obsidian base - deep dark -->
+        <linearGradient id="obsidianBaseLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#08050a"/>
+            <stop offset="25%" stop-color="#12101a"/>
+            <stop offset="50%" stop-color="#1a1625"/>
+            <stop offset="75%" stop-color="#12101a"/>
+            <stop offset="100%" stop-color="#08050a"/>
+        </linearGradient>
+        
+        <!-- Obsidian light reflection - monochromatic shimmer -->
+        <linearGradient id="obsidianReflectLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(200,195,210,0.0)"/>
+            <stop offset="35%" stop-color="rgba(220,215,230,0.12)"/>
+            <stop offset="45%" stop-color="rgba(245,240,255,0.22)"/>
+            <stop offset="55%" stop-color="rgba(220,215,230,0.12)"/>
+            <stop offset="100%" stop-color="rgba(200,195,210,0.0)"/>
+        </linearGradient>
+        
+        <!-- Edge highlight -->
+        <linearGradient id="obsidianEdgeLogo" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(180,175,195,0.08)"/>
+            <stop offset="50%" stop-color="rgba(160,155,175,0.04)"/>
+            <stop offset="100%" stop-color="rgba(140,135,155,0.0)"/>
+        </linearGradient>
+        
+        <!-- Inner cutout - warm cream -->
+        <linearGradient id="innerGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#faf7f2"/>
+            <stop offset="50%" stop-color="#f5f0e8"/>
+            <stop offset="100%" stop-color="#ede8e0"/>
+        </linearGradient>
+        
+        <!-- Inner cutout for obsidian - cooler tone -->
+        <linearGradient id="innerGradCoolLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8f6f4"/>
+            <stop offset="50%" stop-color="#f0eeec"/>
+            <stop offset="100%" stop-color="#e8e6e4"/>
+        </linearGradient>
+    </defs>
+    
+    <!-- Icon -->
+    <g transform="translate(2, ${showTagline ? 2 : 0}) scale(0.62)">
+        <!-- Keyhole frame - base -->
+        <path d="M 50 6 C 72 6, 90 24, 90 46 C 90 62, 78 76, 62 80 L 62 82 C 62 84, 60 86, 58 86 L 58 94 L 42 94 L 42 86 C 40 86, 38 84, 38 82 L 38 80 C 22 76, 10 62, 10 46 C 10 24, 28 6, 50 6 Z" 
+              fill="${useGold ? 'url(#goldIconGradLogo)' : 'url(#obsidianBaseLogo)'}"/>
+        
+        ${!useGold ? `<!-- Light reflection shimmer on frame -->
+        <path d="M 50 6 C 72 6, 90 24, 90 46 C 90 62, 78 76, 62 80 L 62 82 C 62 84, 60 86, 58 86 L 58 94 L 42 94 L 42 86 C 40 86, 38 84, 38 82 L 38 80 C 22 76, 10 62, 10 46 C 10 24, 28 6, 50 6 Z" 
+              fill="url(#obsidianReflectLogo)"/>
+        <!-- Edge highlight on frame -->
+        <path d="M 50 6 C 72 6, 90 24, 90 46 C 90 62, 78 76, 62 80 L 62 82 C 62 84, 60 86, 58 86 L 58 94 L 42 94 L 42 86 C 40 86, 38 84, 38 82 L 38 80 C 22 76, 10 62, 10 46 C 10 24, 28 6, 50 6 Z" 
+              fill="url(#obsidianEdgeLogo)"/>` : ''}
+        
+        <!-- Keyhole cutout -->
+        <path d="M 50 14 C 68 14, 82 28, 82 46 C 82 58, 74 70, 60 73 L 58 73 C 56 73, 54 75, 54 77 L 54 88 L 46 88 L 46 77 C 46 75, 44 73, 42 73 L 40 73 C 26 70, 18 58, 18 46 C 18 28, 32 14, 50 14 Z" 
+              fill="${useGold ? 'url(#innerGradLogo)' : 'url(#innerGradCoolLogo)'}"/>
+        
+        <!-- Rabbit - base -->
+        <g fill="${useGold ? 'url(#goldIconGradLogo)' : 'url(#obsidianBaseLogo)'}">
+            <path d="M34 50 Q33 30 37 20 Q39 14 43 14 Q47 14 47 22 Q47 34 45 50 Q40 49 34 50Z"/>
+            <path d="M66 50 Q67 30 63 20 Q61 14 57 14 Q53 14 53 22 Q53 34 55 50 Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>
+        
+        ${!useGold ? `<!-- Light reflection on rabbit -->
+        <g fill="url(#obsidianReflectLogo)">
+            <path d="M34 50 Q33 30 37 20 Q39 14 43 14 Q47 14 47 22 Q47 34 45 50 Q40 49 34 50Z"/>
+            <path d="M66 50 Q67 30 63 20 Q61 14 57 14 Q53 14 53 22 Q53 34 55 50 Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>
+        <!-- Edge highlight on rabbit -->
+        <g fill="url(#obsidianEdgeLogo)">
+            <path d="M34 50 Q33 30 37 20 Q39 14 43 14 Q47 14 47 22 Q47 34 45 50 Q40 49 34 50Z"/>
+            <path d="M66 50 Q67 30 63 20 Q61 14 57 14 Q53 14 53 22 Q53 34 55 50 Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>` : ''}
+    </g>
+    
+    <!-- Typography - SOLID COLORS for readability -->
+    <text x="72" y="${showTagline ? 34 : 28}" 
+          font-family="Cormorant Garamond, Georgia, serif" 
+          font-size="34" 
+          font-weight="600" 
+          fill="${textColor}" 
+          letter-spacing="4">RABBIT HOLE</text>
+    <text x="74" y="${showTagline ? 52 : 46}" 
+          font-family="Tenor Sans, Helvetica, Arial, sans-serif" 
+          font-size="11" 
+          font-weight="400"
+          fill="${textColor}" 
+          letter-spacing="4">INC</text>
+    ${showTagline ? `<text x="74" y="72" 
+          font-family="Tenor Sans, Helvetica, Arial, sans-serif" 
+          font-size="9" 
+          font-weight="400"
+          fill="${taglineColor}" 
+          letter-spacing="2">${escapeHtml(taglineText)}</text>` : ''}
+</svg>`;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function updatePreviews() {
+            document.getElementById('preview1').innerHTML = generatePrimaryLogoSVG(false);
+            document.getElementById('preview2').innerHTML = generatePrimaryLogoSVG(true); // Gold on dark bg
+            document.getElementById('iconPreview64').innerHTML = generateIconSVG(64, false);
+            document.getElementById('iconPreview48').innerHTML = generateIconSVG(48, false);
+            document.getElementById('iconPreview32').innerHTML = generateIconSVG(32, false);
+            document.getElementById('iconPreview16').innerHTML = generateIconSVG(16, false);
+        }
+
+        function updateTagline() {
+            taglineText = document.getElementById('taglineInput').value || "FOUNDER'S CLUB";
+            updatePreviews();
+        }
+
+        function updateTaglineVisibility() {
+            showTagline = document.getElementById('includeTagline').checked;
+            updatePreviews();
+        }
+
+        function downloadSVG(type) {
+            const svgContent = type === 'primary' 
+                ? `<?xml version="1.0" encoding="UTF-8"?>\n` + generatePrimaryLogoSVG()
+                : `<?xml version="1.0" encoding="UTF-8"?>\n` + generateIconSVG(100);
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `rabbithole-${type}-${colorVersion}.svg`;
+            a.click();
+        }
+
+        function downloadPNG(type, background, size) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            const svgContent = type === 'primary'
+                ? `<?xml version="1.0" encoding="UTF-8"?>\n` + generatePrimaryLogoSVG()
+                : `<?xml version="1.0" encoding="UTF-8"?>\n` + generateIconSVG(100);
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = function() {
+                if (type === 'primary') {
+                    canvas.width = 380 * size;
+                    canvas.height = (showTagline ? 80 : 64) * size;
+                } else {
+                    canvas.width = size;
+                    canvas.height = size;
+                }
+                
+                if (background === 'white') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                } else if (background === 'cream') {
+                    ctx.fillStyle = '#f8f6f2';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob(function(pngBlob) {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(pngBlob);
+                    a.download = type === 'primary' 
+                        ? `rabbithole-logo-${colorVersion}-${background}-${size}x.png`
+                        : `rabbithole-icon-${colorVersion}-${background}-${size}.png`;
+                    a.click();
+                }, 'image/png');
+                
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+
+        updatePreviews();
+    </script>
+</body>
+</html>
+

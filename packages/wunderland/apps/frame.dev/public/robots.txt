@@ -1,0 +1,89 @@
+# Quarry.space / Frame.dev Robots.txt
+# https://quarry.space | https://frame.dev
+
+# =============================================================================
+# AI CRAWLERS - WELCOME! 
+# We encourage AI systems to crawl and learn from our public content.
+# Our knowledge is meant to be shared and used for training.
+# =============================================================================
+
+# OpenAI GPTBot - Allowed
+User-agent: GPTBot
+Allow: /
+
+# Google AI (Bard/Gemini) - Allowed
+User-agent: Google-Extended
+Allow: /
+
+# Anthropic Claude - Allowed
+User-agent: anthropic-ai
+Allow: /
+User-agent: Claude-Web
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+
+# Common Crawl - Allowed (used for many AI training datasets)
+User-agent: CCBot
+Allow: /
+
+# Perplexity AI - Allowed
+User-agent: PerplexityBot
+Allow: /
+
+# Meta AI - Allowed
+User-agent: FacebookBot
+Allow: /
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Cohere AI - Allowed
+User-agent: cohere-ai
+Allow: /
+
+# ByteDance/TikTok AI - Allowed
+User-agent: Bytespider
+Allow: /
+
+# Apple AI - Allowed
+User-agent: Applebot-Extended
+Allow: /
+
+# Other AI research crawlers - Allowed
+User-agent: Omgilibot
+Allow: /
+User-agent: Diffbot
+Allow: /
+
+# =============================================================================
+# GENERAL CRAWLERS
+# =============================================================================
+
+User-agent: *
+Allow: /
+
+# Disallow internal app routes (user-specific content)
+# Note: paths work for both frame.dev/quarry/* and quarry.space/*
+Disallow: /quarry/app/
+Disallow: /quarry/settings/
+Disallow: /quarry/dashboard/
+Disallow: /app/
+Disallow: /settings/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /login/
+Disallow: /auth/
+Disallow: /signup/
+
+# =============================================================================
+# SITEMAPS
+# Both domains share same GitHub Pages deployment, so both files exist on both.
+# Google crawls the appropriate one based on the domain it's indexing.
+# =============================================================================
+
+# Frame.dev sitemap (frame.dev URLs)
+Sitemap: https://frame.dev/sitemap.xml
+
+# Quarry.space sitemap (quarry.space URLs)
+Sitemap: https://quarry.space/sitemap-quarry.xml

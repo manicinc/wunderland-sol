@@ -1,0 +1,56 @@
+diff --git a/packages/agentos/src/api/AgentOS.ts b/packages/agentos/src/api/AgentOS.ts
+--- a/packages/agentos/src/api/AgentOS.ts
++++ b/packages/agentos/src/api/AgentOS.ts
+@@
+-    const effectivePersonaId = input.selectedPersonaId || this.config.defaultPersonaId;
+-    const orchestratorInput: AgentOSInput = {
+-      ...input,
+-      selectedPersonaId: effectivePersonaId,
+-    };
++    const guardrailContext: GuardrailContext = {
++      userId: input.userId,
++      sessionId: input.sessionId,
++      personaId: input.selectedPersonaId,
++      conversationId: input.conversationId,
++    };
++
++    const guardrailInputOutcome = await evaluateInputGuardrails(this.guardrailService, input, guardrailContext);
++
++    if (guardrailInputOutcome.evaluation?.action === GuardrailAction.BLOCK) {
++      yield* createGuardrailBlockedStream(guardrailContext, guardrailInputOutcome.evaluation, {
++        streamId: input.sessionId || `agentos-guardrail-${Date.now()}`,
++        personaId: input.selectedPersonaId,
++      });
++      return;
++    }
++
++    const sanitizedInput = guardrailInputOutcome.sanitizedInput;
++
++    const effectivePersonaId = sanitizedInput.selectedPersonaId || this.config.defaultPersonaId;
++    guardrailContext.personaId = effectivePersonaId;
++    const orchestratorInput: AgentOSInput = {
++      ...sanitizedInput,
++      selectedPersonaId: effectivePersonaId,
++    };
+@@
+-      await this.streamingManager.registerClient(streamIdToListen, bridge);
+-      this.logger.debug?.('Bridge registered', { bridgeId: bridge.id, streamId: streamIdToListen });
+-
+-      // Yield chunks from the bridge
+-      for await (const chunk of bridge.consume()) {
++      await this.streamingManager.registerClient(streamIdToListen, bridge);
++      this.logger.debug?.('Bridge registered', { bridgeId: bridge.id, streamId: streamIdToListen });
++
++      const guardedStream = wrapOutputGuardrails(
++        this.guardrailService,
++        guardrailContext,
++        bridge.consume(),
++        {
++          streamId: streamIdToListen,
++          personaId: effectivePersonaId,
++          inputEvaluation: guardrailInputOutcome.evaluation ?? null,
++        },
++      );
++
++      // Yield chunks from the bridge (guardrails may inject metadata or block output)
++      for await (const chunk of guardedStream) {

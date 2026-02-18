@@ -1,0 +1,556 @@
+/**
+ * @file social-feed.service.ts
+ * @description Injectable service for the Wunderland Social Feed.
+ *
+ * Encapsulates business logic for feed retrieval, post storage,
+ * engagement tracking, and reply thread management. Will be wired
+ * to the AgentOS provenance layer for InputManifest validation
+ * and to a persistence layer for post storage.
+ */
+
+import { Injectable, Optional, Inject } from '@nestjs/common';
+import { DatabaseService } from '../../../database/database.service.js';
+import { PostNotFoundException } from '../wunderland.exceptions.js';
+import { WunderlandSolService } from '../wunderland-sol/wunderland-sol.service.js';
+import type { FeedQueryDto, EngagePostDto } from '../dto/index.js';
+
+@Injectable()
+export class SocialFeedService {
+  constructor(
+    private readonly db: DatabaseService,
+    @Optional() @Inject(WunderlandSolService) private readonly sol?: WunderlandSolService,
+  ) {}
+
+  private async resolveCanonicalPostId(postIdOrSolPostPda: string): Promise<string | null> {
+    const raw = typeof postIdOrSolPostPda === 'string' ? postIdOrSolPostPda.trim() : '';
+    if (!raw) return null;
+
+    const row = await this.db.get<{ post_id: string }>(
+      `SELECT post_id FROM wunderland_posts WHERE post_id = ? OR sol_post_pda = ? LIMIT 1`,
+      [raw, raw],
+    );
+    return row?.post_id ? String(row.post_id) : null;
+  }
+
+  async getFeed(query: FeedQueryDto = {}) {
+    return this.getFeedInternal({ ...query });
+  }
+
+  async getAgentFeed(seedId: string, query: FeedQueryDto = {}) {
+    return this.getFeedInternal({ ...query, seedId });
+  }
+
+  async getPost(postId: string) {
+    const row = await this.db.get<any>(
+      `
+        SELECT
+          p.*,
+          a.display_name as agent_display_name,
+          a.avatar_url as agent_avatar_url,
+          a.provenance_enabled as agent_provenance_enabled,
+          c.level as agent_level,
+          c.xp as agent_xp
+        FROM wunderland_posts p
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
+        WHERE p.post_id = ? LIMIT 1
+      `,
+      [postId]
+    );
+
+    if (!row) throw new PostNotFoundException(postId);
+
+    return {
+      post: this.mapPost(row),
+    };
+  }
+
+  async getThread(postId: string) {
+    const root = await this.db.get<{ post_id: string }>(
+      'SELECT post_id FROM wunderland_posts WHERE post_id = ? LIMIT 1',
+      [postId]
+    );
+    if (!root) throw new PostNotFoundException(postId);
+
+    const replies = await this.db.all<any>(
+      `
+        SELECT
+          p.*,
+          a.display_name as agent_display_name,
+          a.avatar_url as agent_avatar_url,
+          a.provenance_enabled as agent_provenance_enabled,
+          c.level as agent_level
+        FROM wunderland_posts p
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
+        WHERE p.reply_to_post_id = ?
+        ORDER BY p.created_at ASC
+      `,
+      [postId]
+    );
+
+    return {
+      postId,
+      replies: replies.map((row) => this.mapPost(row)),
+      total: replies.length,
+    };
+  }
+
+  async engagePost(postId: string, userId: string, dto: EngagePostDto) {
+    const now = Date.now();
+    const post = await this.db.get<{
+      post_id: string;
+      likes: number;
+      downvotes: number;
+      boosts: number;
+      replies: number;
+    }>('SELECT post_id, likes, downvotes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1', [
+      postId,
+    ]);
+    if (!post) throw new PostNotFoundException(postId);
+
+    // Ensure actor seed exists and belongs to the current user (prevents arbitrary spoofing).
+    const actor = await this.db.get<{ seed_id: string }>(
+      'SELECT seed_id FROM wunderbots WHERE seed_id = ? AND owner_user_id = ? AND status != ? LIMIT 1',
+      [dto.seedId, userId, 'archived']
+    );
+    if (!actor) {
+      return {
+        postId,
+        applied: false,
+        reason: `Agent "${dto.seedId}" not found or not owned by current user.`,
+      };
+    }
+
+    const actionId = this.db.generateId();
+    await this.db.run(
+      `
+        INSERT INTO wunderland_engagement_actions (
+          action_id, post_id, actor_seed_id, type, payload, timestamp
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      [
+        actionId,
+        postId,
+        dto.seedId,
+        dto.action,
+        dto.content ? JSON.stringify({ content: dto.content }) : null,
+        now,
+      ]
+    );
+
+    if (dto.action === 'like') {
+      await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [
+        postId,
+      ]);
+    } else if (dto.action === 'downvote') {
+      await this.db.run('UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?', [
+        postId,
+      ]);
+    } else if (dto.action === 'boost') {
+      await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [
+        postId,
+      ]);
+    } else if (dto.action === 'reply') {
+      await this.db.run('UPDATE wunderland_posts SET replies = replies + 1 WHERE post_id = ?', [
+        postId,
+      ]);
+    } else if (dto.action === 'report') {
+      // no counter today; stored as an engagement action only
+    }
+
+    const updated = await this.db.get<{ likes: number; downvotes: number; boosts: number; replies: number }>(
+      'SELECT likes, downvotes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1',
+      [postId]
+    );
+
+    return {
+      postId,
+      applied: true,
+      actionId,
+      counts: updated ?? { likes: post.likes, downvotes: post.downvotes, boosts: post.boosts, replies: post.replies },
+      timestamp: new Date(now).toISOString(),
+    };
+  }
+
+  private async getFeedInternal(query: FeedQueryDto & { seedId?: string }) {
+    const page = Math.max(1, Number(query.page ?? 1));
+    const limit = Math.min(50, Math.max(1, Number(query.limit ?? 10)));
+    const offset = (page - 1) * limit;
+
+    const where: string[] = ["p.status = 'published'"];
+    const params: Array<string | number> = [];
+
+    if (query.seedId) {
+      where.push('p.seed_id = ?');
+      params.push(query.seedId);
+    }
+
+    if (query.since) {
+      const ms = Date.parse(query.since);
+      if (!Number.isNaN(ms)) {
+        where.push('p.published_at >= ?');
+        params.push(ms);
+      }
+    }
+
+    if (query.until) {
+      const ms = Date.parse(query.until);
+      if (!Number.isNaN(ms)) {
+        where.push('p.published_at <= ?');
+        params.push(ms);
+      }
+    }
+
+    if (query.topic && query.topic !== 'all') {
+      where.push('p.subreddit_id = ?');
+      params.push(query.topic);
+    }
+
+    const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
+
+    const totalRow = await this.db.get<{ count: number }>(
+      `SELECT COUNT(1) as count FROM wunderland_posts p ${whereSql}`,
+      params
+    );
+    const total = totalRow?.count ?? 0;
+
+    const sort = query.sort ?? 'recent';
+    const orderSql =
+      sort === 'top'
+        ? 'ORDER BY (COALESCE(p.likes, 0) - COALESCE(p.downvotes, 0)) DESC, p.boosts DESC, p.published_at DESC'
+        : sort === 'trending'
+          ? 'ORDER BY ((COALESCE(p.likes, 0) - COALESCE(p.downvotes, 0)) + (p.boosts * 2) + (p.replies * 3)) DESC, p.published_at DESC'
+          : 'ORDER BY p.published_at DESC';
+
+    const rows = await this.db.all<any>(
+      `
+        SELECT
+          p.*,
+          a.display_name as agent_display_name,
+          a.avatar_url as agent_avatar_url,
+          a.provenance_enabled as agent_provenance_enabled,
+          c.level as agent_level
+        FROM wunderland_posts p
+        LEFT JOIN wunderbots a ON a.seed_id = p.seed_id
+        LEFT JOIN wunderland_citizens c ON c.seed_id = p.seed_id
+        ${whereSql}
+        ${orderSql}
+        LIMIT ? OFFSET ?
+      `,
+      [...params, limit, offset]
+    );
+
+    return {
+      items: rows.map((row) => this.mapPost(row)),
+      page,
+      limit,
+      total,
+    };
+  }
+
+  private mapPost(row: any) {
+    const publishedAtMs = typeof row.published_at === 'number' ? row.published_at : null;
+    const createdAtMs = typeof row.created_at === 'number' ? row.created_at : publishedAtMs;
+    const manifest = this.parseJson(row.manifest, {} as any);
+
+    // Extract stimulus source info for UI (which world feed item / tip triggered this post)
+    const stimulus = manifest?.stimulus;
+    const triggeredBy = stimulus?.type ? {
+      type: String(stimulus.type),
+      eventId: stimulus.eventId ? String(stimulus.eventId) : null,
+      sourceProviderId: stimulus.sourceProviderId ? String(stimulus.sourceProviderId) : null,
+      timestamp: stimulus.timestamp ? String(stimulus.timestamp) : null,
+    } : null;
+
+    return {
+      postId: String(row.post_id),
+      seedId: String(row.seed_id),
+      title: row.title ?? null,
+      content: String(row.content ?? ''),
+      manifest,
+      triggeredBy,
+      status: String(row.status ?? 'unknown'),
+      replyToPostId: row.reply_to_post_id ?? null,
+      topic: row.subreddit_id ?? null,
+      proof: {
+        anchorStatus: row.anchor_status ?? null,
+        anchorError: row.anchor_error ?? null,
+        anchoredAt:
+          typeof row.anchored_at === 'number' ? new Date(row.anchored_at).toISOString() : null,
+        contentHashHex: row.content_hash_hex ?? null,
+        manifestHashHex: row.manifest_hash_hex ?? null,
+        contentCid: row.content_cid ?? null,
+        manifestCid: row.manifest_cid ?? null,
+        solana: {
+          cluster: row.sol_cluster ?? null,
+          programId: row.sol_program_id ?? null,
+          enclavePda: row.sol_enclave_pda ?? null,
+          postPda: row.sol_post_pda ?? null,
+          txSignature: row.sol_tx_signature ?? null,
+          entryIndex:
+            typeof row.sol_entry_index === 'number'
+              ? Number(row.sol_entry_index)
+              : row.sol_entry_index
+                ? Number(row.sol_entry_index)
+                : null,
+        },
+      },
+      counts: {
+        likes: Number(row.likes ?? 0),
+        downvotes: Number(row.downvotes ?? 0),
+        boosts: Number(row.boosts ?? 0),
+        replies: Number(row.replies ?? 0),
+        views: Number(row.views ?? 0),
+      },
+      createdAt: createdAtMs ? new Date(createdAtMs).toISOString() : new Date().toISOString(),
+      publishedAt: publishedAtMs ? new Date(publishedAtMs).toISOString() : null,
+      agent: {
+        seedId: String(row.seed_id),
+        displayName: row.agent_display_name ?? null,
+        avatarUrl: row.agent_avatar_url ?? null,
+        level: row.agent_level ? Number(row.agent_level) : null,
+        provenanceEnabled: Boolean(row.agent_provenance_enabled),
+      },
+    };
+  }
+
+  // ── Comment CRUD ───────────────────────────────────────────────────────────
+
+  async getComments(postId: string, opts?: { sort?: string; limit?: number; offset?: number }) {
+    const canonicalPostId = (await this.resolveCanonicalPostId(postId)) ?? postId;
+    const limit = Math.min(opts?.limit ?? 50, 200);
+    const offset = opts?.offset ?? 0;
+    const sort = opts?.sort ?? 'best';
+
+    const orderSql =
+      sort === 'new' ? 'ORDER BY c.created_at DESC'
+        : sort === 'old' ? 'ORDER BY c.created_at ASC'
+          : 'ORDER BY c.wilson_score DESC, c.created_at DESC';
+
+    const comments = await this.db.all<any>(
+      `SELECT c.*, a.display_name as agent_display_name, a.avatar_url as agent_avatar_url
+         FROM wunderland_comments c
+         LEFT JOIN wunderbots a ON a.seed_id = c.seed_id
+        WHERE c.post_id = ? AND c.status = 'active'
+        ${orderSql}
+        LIMIT ? OFFSET ?`,
+      [canonicalPostId, limit, offset],
+    );
+
+    const total = await this.db.get<{ cnt: number }>(
+      `SELECT COUNT(*) as cnt FROM wunderland_comments WHERE post_id = ? AND status = 'active'`,
+      [canonicalPostId],
+    );
+
+    return {
+      comments: comments.map((c: any) => this.mapComment(c)),
+      total: total?.cnt ?? 0,
+    };
+  }
+
+  async createComment(dto: {
+    postId: string;
+    seedId: string;
+    content: string;
+    parentCommentId?: string;
+    manifest?: string;
+  }) {
+    const commentId = this.db.generateId();
+
+    let depth = 0;
+    let path = commentId;
+    if (dto.parentCommentId) {
+      const parent = await this.db.get<{ depth: number; path: string }>(
+        'SELECT depth, path FROM wunderland_comments WHERE comment_id = ? LIMIT 1',
+        [dto.parentCommentId],
+      );
+      if (parent) {
+        depth = (parent.depth ?? 0) + 1;
+        path = `${parent.path}/${commentId}`;
+      }
+    }
+
+    await this.db.run(
+      `INSERT INTO wunderland_comments (
+        comment_id, post_id, parent_comment_id, seed_id, content, manifest,
+        depth, path, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')`,
+      [
+        commentId,
+        dto.postId,
+        dto.parentCommentId || null,
+        dto.seedId,
+        dto.content,
+        dto.manifest || '{}',
+        depth,
+        path,
+      ],
+    );
+
+    // Increment child_count on parent comment
+    if (dto.parentCommentId) {
+      await this.db.run(
+        'UPDATE wunderland_comments SET child_count = child_count + 1 WHERE comment_id = ?',
+        [dto.parentCommentId],
+      );
+    }
+
+    // Schedule on-chain anchoring
+    this.sol?.scheduleAnchorForComment(commentId);
+
+    return { commentId, depth, path };
+  }
+
+  private mapComment(row: any) {
+    return {
+      commentId: row.comment_id,
+      postId: row.post_id,
+      parentCommentId: row.parent_comment_id ?? null,
+      seedId: row.seed_id,
+      content: row.content,
+      depth: row.depth ?? 0,
+      path: row.path ?? '',
+      upvotes: row.upvotes ?? 0,
+      downvotes: row.downvotes ?? 0,
+      score: row.score ?? 0,
+      wilsonScore: Number(row.wilson_score ?? 0),
+      childCount: row.child_count ?? 0,
+      status: row.status ?? 'active',
+      createdAt: row.created_at,
+      agent: {
+        seedId: row.seed_id,
+        displayName: row.agent_display_name ?? null,
+        avatarUrl: row.agent_avatar_url ?? null,
+      },
+      proof: {
+        anchorStatus: row.anchor_status ?? null,
+        anchorError: row.anchor_error ?? null,
+        anchoredAt:
+          typeof row.anchored_at === 'number' ? new Date(row.anchored_at).toISOString() : null,
+        contentHashHex: row.content_hash_hex ?? null,
+        manifestHashHex: row.manifest_hash_hex ?? null,
+        contentCid: row.content_cid ?? null,
+        manifestCid: row.manifest_cid ?? null,
+        // Legacy fields kept for backward compatibility.
+        solTxSignature: row.sol_tx_signature ?? null,
+        solPostPda: row.sol_post_pda ?? null,
+        solana: {
+          cluster: row.sol_cluster ?? null,
+          programId: row.sol_program_id ?? null,
+          commentPda: row.sol_post_pda ?? null,
+          txSignature: row.sol_tx_signature ?? null,
+        },
+      },
+    };
+  }
+
+  async getCommentTree(postId: string, opts?: { sort?: string; limit?: number }) {
+    const canonicalPostId = (await this.resolveCanonicalPostId(postId)) ?? postId;
+    const sort = opts?.sort ?? 'best';
+    const limit = Math.min(Math.max(1, opts?.limit ?? 500), 2000);
+
+    const rows = await this.db.all<any>(
+      `SELECT c.*, a.display_name as agent_display_name, a.avatar_url as agent_avatar_url
+         FROM wunderland_comments c
+         LEFT JOIN wunderbots a ON a.seed_id = c.seed_id
+        WHERE c.post_id = ? AND c.status = 'active'
+        ORDER BY c.created_at ASC
+        LIMIT ?`,
+      [canonicalPostId, limit],
+    );
+
+    const total = await this.db.get<{ cnt: number }>(
+      `SELECT COUNT(*) as cnt FROM wunderland_comments WHERE post_id = ? AND status = 'active'`,
+      [canonicalPostId],
+    );
+    const totalCount = total?.cnt ?? 0;
+
+    type CommentNode = ReturnType<SocialFeedService['mapComment']> & { children: CommentNode[] };
+
+    const nodes: CommentNode[] = rows.map((row: any) => ({
+      ...this.mapComment(row),
+      children: [],
+    })) as CommentNode[];
+
+    const nodesById = new Map<string, CommentNode>();
+    for (const node of nodes) {
+      nodesById.set(String(node.commentId), node);
+    }
+
+    const tree: CommentNode[] = [];
+    const orphaned: CommentNode[] = [];
+
+    for (const node of nodes) {
+      const parentId = node.parentCommentId ? String(node.parentCommentId) : '';
+      if (parentId && nodesById.has(parentId)) {
+        nodesById.get(parentId)!.children.push(node);
+      } else if (parentId) {
+        orphaned.push(node);
+      } else {
+        tree.push(node);
+      }
+    }
+
+    const compare = (a: CommentNode, b: CommentNode) => {
+      if (sort === 'new') {
+        return String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? ''));
+      }
+      if (sort === 'old') {
+        return String(a.createdAt ?? '').localeCompare(String(b.createdAt ?? ''));
+      }
+      // best (default)
+      if (a.wilsonScore !== b.wilsonScore) return b.wilsonScore - a.wilsonScore;
+      return String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? ''));
+    };
+
+    const sortTree = (nodesToSort: CommentNode[]) => {
+      nodesToSort.sort(compare);
+      for (const n of nodesToSort) {
+        if (n.children.length > 0) sortTree(n.children);
+      }
+    };
+
+    sortTree(tree);
+    if (orphaned.length > 0) sortTree(orphaned);
+
+    return {
+      postId,
+      sort,
+      total: totalCount,
+      returned: nodes.length,
+      truncated: nodes.length < totalCount,
+      tree,
+      orphanedCount: orphaned.length,
+      orphaned: orphaned.length > 0 ? orphaned : undefined,
+    };
+  }
+
+  async getReactions(postId: string) {
+    const canonicalPostId = (await this.resolveCanonicalPostId(postId)) ?? postId;
+    const rows = await this.db.all<{ emoji: string; count: number }>(
+      `SELECT emoji, COUNT(*) as count
+       FROM wunderland_emoji_reactions
+       WHERE entity_type = 'post' AND entity_id = ?
+       GROUP BY emoji
+       ORDER BY count DESC`,
+      [canonicalPostId],
+    );
+
+    const reactions: Record<string, number> = {};
+    for (const row of rows) {
+      reactions[row.emoji] = row.count;
+    }
+    return { postId, reactions };
+  }
+
+  private parseJson(raw: unknown, fallback: any) {
+    if (typeof raw !== 'string') return fallback;
+    if (!raw.trim()) return fallback;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return fallback;
+    }
+  }
+}

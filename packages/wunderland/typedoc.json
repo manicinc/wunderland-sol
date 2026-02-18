@@ -1,0 +1,16 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "packages/gitpaywidget-sdk/src/index.ts",
+    "packages/gitpaywidget-widget/src/index.ts",
+    "packages/payments-core/src/index.ts"
+  ],
+  "out": "apps/gitpaywidget/public/docs",
+  "plugin": [],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "readme": "apps/gitpaywidget/README.md",
+  "name": "GitPayWidget API Documentation",
+  "includeVersion": true,
+  "categorizeByGroup": true
+}

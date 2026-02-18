@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quarry Basic - Stripe Product Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      gap: 24px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #22A55D, #2DB86A);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34, 165, 93, 0.3); }
+    .btn.secondary { background: #333; }
+    .btn.secondary:hover { background: #444; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+
+    .card {
+      width: 640px;
+      height: 400px;
+      background: linear-gradient(135deg, #FAFAFA 0%, #F0F0F0 40%, #E8E8E8 70%, #E0E0E0 100%);
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 50px 100px -20px rgba(0, 0, 0, 0.25),
+        0 30px 60px -30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    /* Fabric weave pattern - bottom background */
+    .fabric-bg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      padding: 32px 40px;
+    }
+
+    /* Left side - Logo + Quarry branding */
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 180px;
+      padding-right: 32px;
+      border-right: 1px solid rgba(0,0,0,0.08);
+      position: relative;
+    }
+
+    .left-bg-decor {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      overflow: hidden;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-wrapper {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 8px 24px -8px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255,255,255,1);
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      font-size: 12px;
+      color: #6B7280;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .badges {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(75, 85, 99, 0.06));
+      border: 1px solid rgba(107, 114, 128, 0.15);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge svg { width: 12px; height: 12px; }
+
+    .badge-green {
+      background: linear-gradient(135deg, rgba(34, 165, 93, 0.1), rgba(45, 184, 106, 0.06));
+      border: 1px solid rgba(34, 165, 93, 0.2);
+      color: #22A55D;
+    }
+
+    /* Right side - Plan info */
+    .right-section {
+      flex: 1;
+      padding-left: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .plan-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .plan-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: -1px;
+    }
+
+    .plan-badge {
+      background: rgba(107, 114, 128, 0.12);
+      border: 1px solid rgba(107, 114, 128, 0.2);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .price {
+      font-size: 48px;
+      font-weight: 800;
+      color: #1a1a1a;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .price-note {
+      font-size: 13px;
+      color: #9CA3AF;
+      font-weight: 500;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    .feature-icon {
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(135deg, rgba(34, 165, 93, 0.15), rgba(45, 184, 106, 0.1));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .feature-icon svg { width: 10px; height: 10px; color: #22A55D; }
+
+    .sync-limit {
+      font-size: 12px;
+      color: #9CA3AF;
+      background: rgba(156, 163, 175, 0.08);
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 16px;
+      right: 24px;
+      font-size: 11px;
+      color: #9CA3AF;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer a {
+      color: #22A55D;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .footer-item svg {
+      width: 12px;
+      height: 12px;
+      color: #6B7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <!-- Fabric weave SVG background -->
+    <svg class="fabric-bg" viewBox="0 0 640 200" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <pattern id="weave" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M0 20 Q10 10 20 20 T40 20" stroke="#22A55D" stroke-width="2" fill="none" opacity="0.6"/>
+          <path d="M0 30 Q10 20 20 30 T40 30" stroke="#22A55D" stroke-width="1.5" fill="none" opacity="0.4"/>
+          <path d="M20 0 Q10 10 20 20 T20 40" stroke="#1A7F4B" stroke-width="2" fill="none" opacity="0.5"/>
+          <path d="M30 0 Q20 10 30 20 T30 40" stroke="#1A7F4B" stroke-width="1.5" fill="none" opacity="0.3"/>
+        </pattern>
+        <linearGradient id="fadeUp" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="white" stop-opacity="1"/>
+          <stop offset="100%" stop-color="white" stop-opacity="0"/>
+        </linearGradient>
+        <mask id="fadeMask">
+          <rect width="100%" height="100%" fill="url(#fadeUp)"/>
+        </mask>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#weave)" mask="url(#fadeMask)"/>
+      <!-- Extra decorative curves -->
+      <path d="M0 180 Q160 120 320 160 T640 140" stroke="#22A55D" stroke-width="3" fill="none" opacity="0.15"/>
+      <path d="M0 160 Q160 200 320 140 T640 180" stroke="#2DB86A" stroke-width="2" fill="none" opacity="0.12"/>
+      <path d="M0 140 Q160 180 320 120 T640 160" stroke="#4FCA85" stroke-width="1.5" fill="none" opacity="0.1"/>
+    </svg>
+
+    <div class="content">
+      <div class="left-section">
+        <!-- Background decorative pattern -->
+        <svg class="left-bg-decor" viewBox="0 0 180 340" preserveAspectRatio="xMidYMid slice">
+          <!-- Scattered stone shapes -->
+          <polygon points="20,80 45,75 50,95 30,100 15,90" fill="#8B7355" opacity="0.6"/>
+          <polygon points="60,120 85,110 95,130 75,145 55,135" fill="#9E8B73" opacity="0.5"/>
+          <polygon points="10,180 35,170 45,195 25,210 5,195" fill="#A08B70" opacity="0.4"/>
+          <polygon points="70,200 100,190 110,220 85,235 65,220" fill="#7D6E5D" opacity="0.5"/>
+          <polygon points="25,260 55,250 65,280 40,295 20,280" fill="#8B6F5C" opacity="0.4"/>
+          <polygon points="90,270 120,260 130,290 105,305 85,290" fill="#B5A08A" opacity="0.3"/>
+
+          <!-- Connection lines -->
+          <path d="M35 90 Q60 100 75 125" stroke="#22A55D" stroke-width="1.5" fill="none" opacity="0.4"/>
+          <path d="M75 135 Q50 160 25 185" stroke="#22A55D" stroke-width="1" fill="none" opacity="0.3"/>
+          <path d="M35 195 Q70 210 80 215" stroke="#2DB86A" stroke-width="1.5" fill="none" opacity="0.35"/>
+          <path d="M85 225 Q55 245 40 270" stroke="#22A55D" stroke-width="1" fill="none" opacity="0.3"/>
+
+          <!-- Dots/nodes -->
+          <circle cx="35" cy="90" r="3" fill="#22A55D" opacity="0.5"/>
+          <circle cx="75" cy="130" r="3" fill="#22A55D" opacity="0.5"/>
+          <circle cx="25" cy="190" r="3" fill="#22A55D" opacity="0.4"/>
+          <circle cx="85" cy="220" r="3" fill="#22A55D" opacity="0.4"/>
+          <circle cx="40" cy="275" r="3" fill="#22A55D" opacity="0.35"/>
+
+          <!-- Abstract curves -->
+          <path d="M0 50 Q90 80 180 40" stroke="#4FCA85" stroke-width="2" fill="none" opacity="0.2"/>
+          <path d="M0 150 Q90 180 180 140" stroke="#4FCA85" stroke-width="1.5" fill="none" opacity="0.15"/>
+          <path d="M0 250 Q90 280 180 240" stroke="#4FCA85" stroke-width="1.5" fill="none" opacity="0.15"/>
+        </svg>
+
+        <div class="logo-row">
+          <div class="logo-wrapper">
+            <svg width="36" height="36" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="s1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#8B6F5C"/>
+                  <stop offset="100%" stop-color="#5C4A3D"/>
+                </linearGradient>
+                <linearGradient id="s2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#A08977"/>
+                  <stop offset="100%" stop-color="#7A6855"/>
+                </linearGradient>
+                <linearGradient id="s3" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#B5A08A"/>
+                  <stop offset="100%" stop-color="#8A7A68"/>
+                </linearGradient>
+                <linearGradient id="s4" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#C4B09A"/>
+                  <stop offset="100%" stop-color="#9A8872"/>
+                </linearGradient>
+                <linearGradient id="s5" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#BDA78F"/>
+                  <stop offset="100%" stop-color="#95846E"/>
+                </linearGradient>
+                <filter id="shadow">
+                  <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#5C4A3D" flood-opacity="0.3"/>
+                </filter>
+              </defs>
+              <g transform="translate(22, 10)" filter="url(#shadow)">
+                <polygon points="0,0 34,0 30,30 0,26" fill="url(#s1)"/>
+                <polygon points="34,0 76,0 76,22 42,30 30,30" fill="url(#s2)"/>
+                <polygon points="0,26 30,30 26,60 0,60" fill="url(#s3)"/>
+                <polygon points="30,30 42,30 46,60 26,60" fill="url(#s4)"/>
+                <polygon points="42,30 76,22 76,60 46,60" fill="url(#s5)"/>
+              </g>
+            </svg>
+          </div>
+          <span class="brand-name">Quarry</span>
+        </div>
+
+        <p class="tagline">Your automatic second brain</p>
+
+        <div class="badges">
+          <div class="badge badge-green">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            Open Source
+          </div>
+          <div class="badge">Open Source</div>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <div class="plan-header">
+          <h1 class="plan-title">Basic Plan</h1>
+        </div>
+
+        <div class="price-row">
+          <span class="price">$0</span>
+          <span class="price-note">No credit card required</span>
+        </div>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span>Local-first SQLite</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span>Auto-tagging</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span>Semantic search</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span>Knowledge graph</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span>Desktop & web</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span>All 6 themes</span>
+          </div>
+        </div>
+
+        <div class="sync-limit">Cloud sync: 100MB storage limit</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-item">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        <a href="https://github.com/framersai/quarry" target="_blank">framersai/quarry</a>
+      </div>
+      <div class="footer-item">
+        <span>Created by</span>
+        <a href="https://frame.dev" target="_blank">frame.dev</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="downloadPNG(1)">PNG 1x (640×400)</button>
+    <button class="btn" onclick="downloadPNG(2)">PNG 2x (1280×800)</button>
+    <button class="btn secondary" onclick="downloadPNG(3)">PNG 3x (1920×1200)</button>
+    <button class="btn secondary" onclick="downloadPNG(4)">PNG 4x (2560×1600)</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    async function downloadPNG(scale) {
+      // Clear any text selection
+      window.getSelection().removeAllRanges();
+
+      const card = document.getElementById('card');
+
+      // Store original style and remove box-shadow for clean export
+      const originalCardStyle = card.style.cssText;
+      card.style.boxShadow = 'none';
+
+      // Wait for styles to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const canvas = await html2canvas(card, {
+        scale: scale,
+        backgroundColor: null,
+        useCORS: true,
+        logging: false,
+        removeContainer: true
+      });
+
+      // Restore original style
+      card.style.cssText = originalCardStyle;
+
+      const link = document.createElement('a');
+      link.download = `quarry-basic-${scale}x.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>

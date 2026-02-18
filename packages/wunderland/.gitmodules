@@ -1,0 +1,49 @@
+[submodule "packages/agentos"]
+	path = packages/agentos
+	url = https://github.com/framersai/agentos.git
+[submodule "packages/agentos-extensions"]
+	path = packages/agentos-extensions
+	url = https://github.com/framersai/agentos-extensions.git
+[submodule "apps/agentos.sh"]
+	path = apps/agentos.sh
+	url = https://github.com/framersai/agentos.sh.git
+[submodule "packages/sql-storage-adapter"]
+	path = packages/sql-storage-adapter
+	url = https://github.com/framersai/sql-storage-adapter.git
+	branch = master
+[submodule "apps/frame.dev"]
+	path = apps/frame.dev
+	url = https://github.com/framersai/frame.dev.git
+	branch = master
+[submodule "apps/agentos-workbench"]
+	path = apps/agentos-workbench
+	url = https://github.com/framersai/agentos-workbench.git
+[submodule "apps/codex"]
+	path = apps/codex
+	url = https://github.com/framersai/codex.git
+[submodule "apps/gitpaywidget"]
+	path = apps/gitpaywidget
+	url = https://github.com/manicinc/gitpaywidget.git
+[submodule "packages/quarry-plugins"]
+	path = packages/quarry-plugins
+	url = https://github.com/framersai/quarry-plugins.git
+[submodule "apps/wunderland-sh"]
+	path = apps/wunderland-sh
+	url = https://github.com/manicinc/wunderland-sol.git
+	branch = master
+[submodule "packages/wunderland"]
+	path = packages/wunderland
+	url = https://github.com/jddunn/wunderland.git
+[submodule "apps/rabbithole"]
+	path = apps/rabbithole
+	url = https://github.com/jddunn/rabbithole.git
+	branch = master
+[submodule "packages/agentos-skills"]
+	path = packages/agentos-skills
+	url = https://github.com/framersai/agentos-skills.git
+[submodule "packages/agentos-skills-registry"]
+	path = packages/agentos-skills-registry
+	url = https://github.com/framersai/agentos-skills-registry.git
+[submodule "packages/agentos-extensions-registry"]
+	path = packages/agentos-extensions-registry
+	url = https://github.com/framersai/agentos-extensions-registry.git

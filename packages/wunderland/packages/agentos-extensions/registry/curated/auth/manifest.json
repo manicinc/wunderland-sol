@@ -1,0 +1,28 @@
+{
+  "id": "com.framers.auth",
+  "name": "Authentication & Subscription",
+  "version": "1.0.0",
+  "description": "JWT authentication and subscription tier management for AgentOS",
+  "author": {
+    "name": "Framers AI",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "category": "core",
+  "keywords": ["auth", "jwt", "subscription", "permissions", "tiers"],
+  "provides": {
+    "services": ["authService", "subscriptionService"],
+    "providers": ["toolPermissions", "personaTiers"]
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.1"
+  },
+  "verified": true,
+  "verifiedAt": "2025-11-14T00:00:00Z",
+  "verifiedBy": {
+    "name": "AgentOS Core Team",
+    "email": "security@agentos.sh"
+  }
+}
+

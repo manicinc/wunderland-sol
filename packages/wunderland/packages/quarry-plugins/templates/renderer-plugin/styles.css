@@ -1,0 +1,40 @@
+/**
+ * Renderer Plugin Styles Template
+ *
+ * Add styling for your custom rendered elements.
+ */
+
+/* Wiki link styles */
+.wiki-link {
+  transition: all 0.15s ease;
+}
+
+.wiki-link:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Broken link indicator */
+.wiki-link.broken {
+  color: #ef4444;
+  text-decoration: line-through;
+}
+
+.wiki-link.broken::after {
+  content: ' ⚠';
+  font-size: 0.75em;
+}
+
+/* Print styles */
+@media print {
+  .wiki-link {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .wiki-link::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #666;
+  }
+}

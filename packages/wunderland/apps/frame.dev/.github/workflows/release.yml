@@ -1,0 +1,303 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.2.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+            arch: universal
+          - os: windows-latest
+            platform: win
+            arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Electron App (macOS)
+        if: matrix.platform == 'mac'
+        run: pnpm electron:dist:mac:unsigned
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Electron App (Windows)
+        if: matrix.platform == 'win'
+        run: pnpm electron:dist:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Electron App (Linux)
+        if: matrix.platform == 'linux'
+        run: pnpm electron:dist:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List built files
+        shell: bash
+        run: |
+          echo "=== Built files in dist/ ==="
+          ls -la dist/ || echo "No dist directory"
+
+      - name: Upload macOS artifacts
+        if: matrix.platform == 'mac'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quarry-mac-universal
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          if-no-files-found: error
+
+      - name: Upload Windows artifacts
+        if: matrix.platform == 'win'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quarry-win-x64
+          path: |
+            dist/*.exe
+          if-no-files-found: error
+
+      - name: Upload Linux artifacts
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quarry-linux-x64
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+          if-no-files-found: error
+
+  # ============================================================================
+  # MOBILE BUILDS (iOS/Android via Capacitor)
+  # Uncomment when ready to enable mobile builds
+  # ============================================================================
+
+  # build-ios:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 10
+  #
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #
+  #     - name: Build for Capacitor
+  #       run: pnpm cap:prebuild
+  #
+  #     - name: Sync Capacitor
+  #       run: pnpm cap:sync
+  #
+  #     - name: Setup Xcode
+  #       uses: maxim-lobanov/setup-xcode@v1
+  #       with:
+  #         xcode-version: latest-stable
+  #
+  #     - name: Build iOS App
+  #       working-directory: ios/App
+  #       run: |
+  #         xcodebuild -workspace App.xcworkspace \
+  #           -scheme App \
+  #           -configuration Release \
+  #           -archivePath build/Quarry.xcarchive \
+  #           archive \
+  #           CODE_SIGN_IDENTITY="" \
+  #           CODE_SIGNING_REQUIRED=NO \
+  #           CODE_SIGNING_ALLOWED=NO
+  #
+  #     - name: Export IPA (unsigned)
+  #       working-directory: ios/App
+  #       run: |
+  #         xcodebuild -exportArchive \
+  #           -archivePath build/Quarry.xcarchive \
+  #           -exportPath build/export \
+  #           -exportOptionsPlist ../../build/ExportOptions.plist
+  #
+  #     - name: Upload iOS artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: quarry-ios
+  #         path: ios/App/build/export/*.ipa
+  #         if-no-files-found: warn
+
+  # build-android:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 10
+  #
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #
+  #     - name: Build for Capacitor
+  #       run: pnpm cap:prebuild
+  #
+  #     - name: Sync Capacitor
+  #       run: pnpm cap:sync
+  #
+  #     - name: Setup Java
+  #       uses: actions/setup-java@v4
+  #       with:
+  #         distribution: 'temurin'
+  #         java-version: '17'
+  #
+  #     - name: Setup Android SDK
+  #       uses: android-actions/setup-android@v3
+  #
+  #     - name: Build Android APK
+  #       working-directory: android
+  #       run: ./gradlew assembleRelease
+  #
+  #     - name: Build Android AAB (for Play Store)
+  #       working-directory: android
+  #       run: ./gradlew bundleRelease
+  #
+  #     - name: Upload Android artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: quarry-android
+  #         path: |
+  #           android/app/build/outputs/apk/release/*.apk
+  #           android/app/build/outputs/bundle/release/*.aab
+  #         if-no-files-found: warn
+
+  release:
+    needs: build
+    # When enabling mobile builds, change to:
+    # needs: [build, build-ios, build-android]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List downloaded artifacts
+        run: |
+          echo "=== Downloaded artifacts ==="
+          find artifacts -type f -name "*" | sort
+
+      - name: Flatten artifacts
+        run: |
+          mkdir -p release-files
+          find artifacts -type f \( -name "*.dmg" -o -name "*.zip" -o -name "*.exe" -o -name "*.AppImage" -o -name "*.deb" \) -exec cp {} release-files/ \;
+          echo "=== Files to release ==="
+          ls -la release-files/
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+          echo "Version: $(cat $GITHUB_OUTPUT | grep VERSION)"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Quarry v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          files: release-files/*
+          body: |
+            ## Quarry v${{ steps.version.outputs.VERSION }}
+
+            ### Downloads
+
+            | Platform | Architecture | File |
+            |----------|--------------|------|
+            | macOS | Universal (Intel + Apple Silicon) | `.dmg` or `.zip` |
+            | Windows | x64 | `.exe` (NSIS installer) |
+            | Linux | x64 | `.AppImage` or `.deb` |
+
+            ### Installation
+
+            **macOS:**
+            1. Download the `.dmg` file
+            2. Open the DMG and drag Quarry to Applications
+            3. On first launch, right-click and select "Open" to bypass Gatekeeper (unsigned build)
+
+            **Windows:**
+            1. Download the `.exe` installer
+            2. Run the installer and follow the prompts
+            3. Launch Quarry from the Start Menu or Desktop shortcut
+
+            **Linux:**
+            - **AppImage:** Make executable with `chmod +x Quarry-*.AppImage` and run
+            - **Debian/Ubuntu:** Install with `sudo dpkg -i quarry_*.deb`
+
+            ---
+            *This is an unsigned development build.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

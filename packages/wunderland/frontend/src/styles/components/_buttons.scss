@@ -1,0 +1,283 @@
+// File: frontend/src/styles/components/_buttons.scss
+/**
+ * @file _buttons.scss
+ * @description Base styling, visual "look" mixins, size modifiers,
+ * and global utility classes for button components within the
+ * "Ephemeral Harmony" design system.
+ * @version 3.0.4 - Addressed SASS [mixed-decls] warnings.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as commonMixins;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BASE BUTTON MIXIN (Structure & Interaction, no specific visual look)
+// ─────────────────────────────────────────────────────────────────────────────
+@mixin base-button-styles {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var.$spacing-xs;
+  padding: var.$spacing-sm var.$spacing-lg;
+
+  border-radius: var.$radius-holographic-default;
+
+  font-family: var(--font-sans, #{var.$font-family-sans});
+  font-size: var.$font-size-base-default;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+
+  transition: var.$duration-quick var.$ease-out-quad;
+  transition-property: background-color, border-color, color, box-shadow, transform, filter;
+  will-change: transform, box-shadow;
+
+  &:hover { // Moved before &:active and &:disabled for proper cascade if filter is used generally
+    filter: brightness(1.1);
+  }
+  &:active {
+    transform: scale(0.97);
+    filter: brightness(0.95);
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: saturate(0.5);
+  }
+
+  &:focus-visible {
+    @include commonMixins.focus-ring(
+      '--color-bg-primary',
+      '--color-accent-primary'
+    );
+  }
+
+  .icon {
+    width: 1.2em;
+    height: 1.2em;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// APPEARANCE (“look”) MIXINS (Define specific visual styles)
+// ─────────────────────────────────────────────────────────────────────────────
+
+@mixin btn-primary-look {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--color-accent-primary-h) var(--color-accent-primary-s) var(--color-accent-primary-l)),
+    hsl(var(--color-accent-primary-h) var(--color-accent-primary-s) calc(var(--color-accent-primary-l) - 10%))
+  );
+  color: hsl(var(--color-text-on-primary-h) var(--color-text-on-primary-s) var(--color-text-on-primary-l));
+  border-color: hsla(var(--color-accent-primary-h) var(--color-accent-primary-s) calc(var(--color-accent-primary-l) - 15%) / 0.5);
+  box-shadow: var(--shadow-depth-sm, var.$scss-box-shadow-sm),
+              0 0 0 0 hsla(var(--color-accent-primary-h) var(--color-accent-primary-s) var(--color-accent-primary-l) / 0);
+
+  &:hover,
+  &:focus-visible {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--color-accent-primary-h) var(--color-accent-primary-s) calc(var(--color-accent-primary-l) + 5%)),
+      hsl(var(--color-accent-primary-h) var(--color-accent-primary-s) var(--color-accent-primary-l))
+    );
+    box-shadow: var(--shadow-depth-md, var.$scss-box-shadow-md),
+      0 0 12px 2px hsla(var(--color-accent-primary-h) var(--color-accent-primary-s) var(--color-accent-primary-l) / 0.4);
+    transform: translateY(-1px) scale(1);
+    filter: brightness(1.15);
+  }
+  &:active {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--color-accent-primary-h) var(--color-accent-primary-s) calc(var(--color-accent-primary-l) - 10%)),
+      hsl(var(--color-accent-primary-h) var(--color-accent-primary-s) calc(var(--color-accent-primary-l) - 15%))
+    );
+    box-shadow: inset 0 2px 4px hsla(0 0% 0% / 0.2),
+      0 0 8px 1px hsla(var(--color-accent-primary-h) var(--color-accent-primary-s) var(--color-accent-primary-l) / 0.3);
+    filter: brightness(0.9);
+  }
+}
+
+@mixin btn-secondary-look {
+  @include commonMixins.neomorphic-extrude(
+    $bg-color-var-prefix: '--color-bg-secondary',
+    $distance: 4px,
+    $blur: 8px,
+    $shadow-opacity-var: '--shadow-opacity-soft',
+    $radius: var.$radius-holographic-default,
+    $shadow-h-var: '--shadow-color-h',
+    $shadow-s-var: '--shadow-color-s',
+    $shadow-l-var: '--shadow-color-l',
+    $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+    $fb-bg-h: var.$default-color-bg-secondary-h,
+    $fb-bg-s: var.$default-color-bg-secondary-s,
+    $fb-bg-l: var.$default-color-bg-secondary-l,
+    $fb-bg-a: 1, // Added fallback alpha for background
+    $fb-shadow-op: var.$default-shadow-opacity-soft,
+    $fb-shadow-h: var.$default-shadow-color-h,
+    $fb-shadow-s: var.$default-shadow-color-s,
+    $fb-shadow-l: var.$default-shadow-color-l,
+    $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+  );
+  color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+  border-color: transparent;
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+  &:active {
+    @include commonMixins.neomorphic-inset(
+      $fill-color-var-prefix: '--color-bg-secondary',
+      $blur: 6px,
+      $distance: 3px,
+      $shadow-opacity-var: '--shadow-opacity-soft',
+      $radius: var.$radius-holographic-default,
+      $shadow-h-var: '--shadow-color-h',
+      $shadow-s-var: '--shadow-color-s',
+      $shadow-l-var: '--shadow-color-l',
+      $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+      $fb-fill-h: var.$default-color-bg-secondary-h,
+      $fb-fill-s: var.$default-color-bg-secondary-s,
+      $fb-fill-l: calc(var.$default-color-bg-secondary-l - 2%),
+      $fb-fill-a: 1, // Added fallback alpha for fill
+      $fb-shadow-op: var.$default-shadow-opacity-soft,
+      $fb-shadow-h: var.$default-shadow-color-h,
+      $fb-shadow-s: var.$default-shadow-color-s,
+      $fb-shadow-l: var.$default-shadow-color-l,
+      $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+    );
+    transform: scale(0.98);
+    filter: none;
+  }
+}
+
+@mixin btn-ghost-look {
+  // Corrected: Moved background-color before &:hover to resolve [mixed-decls]
+  background-color: transparent;
+  color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+  border-color: transparent;
+  padding: calc(var.$spacing-sm - 1px) calc(var.$spacing-lg - 1px);
+
+  &:hover {
+    background-color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.1);
+    color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l));
+    filter: none;
+  }
+  &:active {
+    background-color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.15);
+    filter: none;
+  }
+}
+
+@mixin btn-error-look {
+  // This mixin seems fine regarding mixed-decls if background is set first.
+  background: linear-gradient(135deg,
+    hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l)),
+    hsl(var(--color-error-h), var(--color-error-s), calc(var(--color-error-l) - 10%))
+  );
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  border-color: hsla(var(--color-error-h), var(--color-error-s), calc(var(--color-error-l) - 15%), 0.5);
+  box-shadow: var(--shadow-depth-sm, var.$scss-box-shadow-sm), 0 0 0 0 hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0);
+
+  &:hover,
+  &:focus-visible {
+    background: linear-gradient(135deg,
+      hsl(var(--color-error-h), var(--color-error-s), calc(var(--color-error-l) + 5%)),
+      hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l))
+    );
+    box-shadow: var(--shadow-depth-md, var.$scss-box-shadow-md),
+      0 0 12px 2px hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.4);
+  }
+  &:active {
+    background: linear-gradient(135deg,
+      hsl(var(--color-error-h), var(--color-error-s), calc(var(--color-error-l) - 10%)),
+      hsl(var(--color-error-h), var(--color-error-s), calc(var(--color-error-l) - 15%))
+    );
+    box-shadow: inset 0 2px 4px hsla(0,0%,0%,0.2),
+      0 0 8px 1px hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.3);
+  }
+}
+
+// (Size/Shape Modifiers and Composite Mixins remain as they were, assuming no [mixed-decls] issues there)
+// ...
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SIZE / SHAPE MODIFIER MIXINS (Applied on top of a base/look)
+// ─────────────────────────────────────────────────────────────────────────────
+@mixin btn-icon-modifier { // For icon-only buttons
+  padding: var.$spacing-sm; // Square padding
+  gap: 0; // No gap as there's no text
+  .icon { width: 1.5em; height: 1.5em; } // Slightly larger icon for icon-only buttons
+}
+
+@mixin btn-xs-modifier { // Extra small
+  padding: calc(var.$spacing-xs * 0.75) var.$spacing-sm;
+  font-size: var.$font-size-xs;
+  border-radius: calc(var.$radius-holographic-default * 0.6);
+  .icon { width: 0.8em; height: 0.8em; }
+}
+@mixin btn-sm-modifier { // Small
+  padding: var.$spacing-xs var.$spacing-md; // Adjusted for typical small button needs
+  font-size: var.$font-size-sm;
+  border-radius: calc(var.$radius-holographic-default * 0.8);
+  .icon { width: 1em; height: 1em; }
+}
+@mixin btn-lg-modifier { // Large
+  padding: var.$spacing-md var.$spacing-xl;
+  font-size: var.$font-size-lg;
+  border-radius: calc(var.$radius-holographic-default * 1.2);
+  .icon { width: 1.3em; height: 1.3em; }
+}
+@mixin btn-xl-modifier { // Extra large
+  padding: var.$spacing-lg var.$spacing-2xl;
+  font-size: var.$font-size-xl;
+  border-radius: calc(var.$radius-holographic-default * 1.5);
+  .icon { width: 1.5em; height: 1.5em; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPOSITE MIXINS (Combine base styles with a specific look)
+// These are for @include in other SCSS files if utility classes are not used directly.
+// ─────────────────────────────────────────────────────────────────────────────
+@mixin btn { @include base-button-styles; }
+@mixin btn-primary { @include base-button-styles; @include btn-primary-look; }
+@mixin btn-secondary { @include base-button-styles; @include btn-secondary-look; }
+@mixin btn-ghost { @include base-button-styles; @include btn-ghost-look; }
+@mixin btn-error { @include base-button-styles; @include btn-error-look; }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLOBAL UTILITY CLASSES (Apply these directly in HTML)
+// e.g., <button class="btn btn-primary btn-sm">Click Me</button>
+// ─────────────────────────────────────────────────────────────────────────────
+.btn { @include btn; }
+
+.btn-primary { @include btn-primary; }
+.btn-secondary { @include btn-secondary; }
+.btn-ghost { @include btn-ghost; }
+.btn-error { @include btn-error; }
+
+.btn-icon { @include btn-icon-modifier; }
+.btn-xs { @include btn-xs-modifier; }
+.btn-sm { @include btn-sm-modifier; }
+.btn-lg { @include btn-lg-modifier; }
+.btn-xl { @include btn-xl-modifier; }
+
+.btn-primary-ephemeral {
+  @include btn-primary;
+}
+
+.btn-secondary-ephemeral {
+  @include btn-secondary;
+}
+
+.btn-ghost-ephemeral {
+  @include btn-ghost;
+}

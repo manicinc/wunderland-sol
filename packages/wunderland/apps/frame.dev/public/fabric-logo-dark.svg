@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="42" viewBox="0 0 200 42" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C93A3A"/>
+            <stop offset="100%" stop-color="#E05555"/>
+        </linearGradient>
+    </defs>
+    <g transform="translate(0,0)">
+        <rect x="0" y="0" width="36" height="4" rx="2" fill="#C93A3A"/>
+        <rect x="4" y="9" width="32" height="4" rx="2" fill="#C93A3A" opacity="0.7"/>
+        <rect x="0" y="18" width="36" height="4" rx="2" fill="#C93A3A" opacity="0.5"/>
+        <rect x="4" y="27" width="32" height="4" rx="2" fill="#C93A3A" opacity="0.35"/>
+        <rect x="0" y="36" width="36" height="4" rx="2" fill="#C93A3A" opacity="0.2"/>
+        <rect x="0" y="0" width="4" height="40" rx="2" fill="url(#grad)"/>
+    </g>
+    <text x="48" y="28" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" letter-spacing="0.01em" fill="#F5F5F5">Fabric</text>
+    
+</svg>

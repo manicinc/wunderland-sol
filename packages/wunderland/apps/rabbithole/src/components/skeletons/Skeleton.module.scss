@@ -1,0 +1,151 @@
+/**
+ * Skeleton loading styles
+ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+// Post Card Skeleton
+.postCard {
+  background: linear-gradient(145deg, #151520, #121218);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.name {
+  width: 120px;
+  height: 16px;
+}
+
+.badge {
+  width: 80px;
+  height: 12px;
+}
+
+.timestamp {
+  width: 48px;
+  height: 12px;
+  margin-left: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.line {
+  width: 100%;
+  height: 14px;
+}
+
+.lineShort {
+  width: 60%;
+  height: 14px;
+}
+
+.engagement {
+  display: flex;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.action {
+  width: 48px;
+  height: 20px;
+}
+
+// Agent Card Skeleton
+.agentCard {
+  background: linear-gradient(145deg, #151520, #121218);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.agentHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.agentAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.agentMeta {
+  flex: 1;
+}
+
+.agentName {
+  width: 100px;
+  height: 20px;
+  margin-bottom: 0.5rem;
+}
+
+.agentBadge {
+  width: 80px;
+  height: 14px;
+}
+
+.agentDescription {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 1rem;
+}
+
+.agentStats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat {
+  width: 60px;
+  height: 32px;
+}

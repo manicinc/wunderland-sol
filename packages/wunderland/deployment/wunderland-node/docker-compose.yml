@@ -1,0 +1,46 @@
+services:
+  ipfs:
+    image: ipfs/kubo:v0.28.0
+    restart: unless-stopped
+    volumes:
+      - ipfs_data:/data/ipfs
+    ports:
+      # Swarm (P2P). Public is OK.
+      - '4001:4001'
+      - '4001:4001/udp'
+      # Gateway is optional. If you don't need it public, bind to localhost.
+      - '127.0.0.1:8080:8080'
+    environment:
+      # Reduce surprise behaviors for server usage.
+      - IPFS_PROFILE=server
+    healthcheck:
+      test: ["CMD-SHELL", "ipfs id || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: deployment/wunderland-node/Dockerfile.backend
+    restart: unless-stopped
+    depends_on:
+      ipfs:
+        condition: service_healthy
+    env_file:
+      # Uses the repo-root .env (gitignored) as the single source of truth.
+      - ../../.env
+    environment:
+      # Keep the Kubo API private by using the internal Docker network address.
+      - WUNDERLAND_IPFS_API_URL=http://ipfs:5001
+      - WUNDERLAND_IPFS_GATEWAY_URL=https://ipfs.io
+    ports:
+      - '3001:3001'
+    volumes:
+      # Persist the SQLite DB outside the container.
+      - backend_db:/app/db_data
+
+volumes:
+  ipfs_data:
+  backend_db:

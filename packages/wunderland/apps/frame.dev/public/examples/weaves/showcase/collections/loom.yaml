@@ -1,0 +1,22 @@
+# Collections Showcase Loom
+# Demonstrates collection organization patterns
+
+title: Collections Showcase
+slug: collections
+description: Example strands demonstrating how to use collections for flexible organization
+icon: layers
+color: indigo
+significance: 90
+status: active
+
+metadata:
+  category: showcase
+  difficulty: beginner
+  estimated_time: 10 minutes
+
+tags:
+  - collections
+  - organization
+  - examples
+  - getting-started
+

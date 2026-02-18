@@ -1,0 +1,30 @@
+{
+  "welcome": {
+    "subject": "Bienvenue sur Voice Chat Assistant",
+    "greeting": "Bonjour {{name}}",
+    "body": "Merci d'avoir rejoint Voice Chat Assistant. Votre compte a été créé avec succès.",
+    "action": "Commencer",
+    "footer": "Si vous avez des questions, n'hésitez pas à nous contacter."
+  },
+  "passwordReset": {
+    "subject": "Réinitialiser votre mot de passe",
+    "greeting": "Bonjour {{name}}",
+    "body": "Nous avons reçu une demande de réinitialisation de votre mot de passe. Cliquez sur le lien ci-dessous pour en choisir un nouveau.",
+    "action": "Réinitialiser le mot de passe",
+    "expire": "Ce lien expirera dans {{hours}} heures.",
+    "ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail."
+  },
+  "verification": {
+    "subject": "Vérifiez votre adresse e-mail",
+    "greeting": "Bonjour {{name}}",
+    "body": "Veuillez vérifier votre adresse e-mail afin de finaliser votre inscription.",
+    "action": "Vérifier l'e-mail",
+    "expire": "Ce lien expirera dans {{hours}} heures."
+  },
+  "notification": {
+    "subject": "Nouvelle notification",
+    "greeting": "Bonjour {{name}}",
+    "body": "Vous avez reçu une nouvelle notification.",
+    "action": "Voir la notification"
+  }
+}

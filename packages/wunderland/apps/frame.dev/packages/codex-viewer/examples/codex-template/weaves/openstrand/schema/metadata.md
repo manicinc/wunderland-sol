@@ -1,0 +1,157 @@
+---
+title: "Strand Metadata"
+tags: ["schema", "metadata"]
+publishing:
+  status: published
+---
+
+Every strand begins with YAML frontmatter. Here's the complete schema:
+
+## Basic Fields
+
+```yaml
+---
+id: "uuid-or-slug"
+title: "Strand title"
+summary: "Strand-level extractive summary (one sentence)"
+aiSummary: "AI-generated abstractive summary"
+tags: ["schema", "reference"]
+difficulty: "beginner"
+taxonomy:
+  subjects: ["knowledge"]
+  topics: ["openstrand"]
+relationships:
+  prerequisites: ["weaves/openstrand/schema/hierarchy.md"]
+  references: ["./related-strand.md"]
+publishing:
+  status: published
+  lastUpdated: "2025-11-16"
+---
+```
+
+## Block-Level Summaries
+
+For paragraph-by-paragraph and block-by-block summaries:
+
+```yaml
+blockSummaries:
+  - blockId: "block-0"
+    blockType: paragraph   # paragraph | heading | code | list | blockquote | table
+    startLine: 10
+    endLine: 15
+    extractive: "Key sentences from this paragraph..."
+    abstractive: "AI-generated summary of this block..."
+    notes: ["Important concept"]
+    tags: ["core-concept"]
+```
+
+## Source Metadata (Provenance Tracking)
+
+Track the origin of strands, distinguishing between **creator** (original author) and **uploader** (person who added to the system):
+
+```yaml
+source:
+  # How the strand was created
+  sourceType: manual      # manual | upload | scrape | template
+  sourceUrl: "https://..."      # For scraped content
+  sourceFilename: "doc.pdf"     # For uploaded files
+  sourceTemplateId: "uuid"      # For template-based creation
+
+  # Creator tracking (original author of the content)
+  creator: "John Doe"           # Name of original author
+  creatorType: git              # git | manual | session | scraped | unknown
+  creatorVerified: true         # Whether identity was verified from metadata
+
+  # Uploader tracking (person who added to system)
+  uploader: "Jane Smith"        # Who uploaded this content
+  uploaderType: git             # git | manual | session
+  uploaderIsCreator: false      # True if uploader is also the creator
+
+  # Scraped metadata (from source URL)
+  scrapedAuthor: "Original Author"  # Author extracted from source
+  scrapedSite: "example.com"        # Site/publisher name
+
+  # Timestamps
+  createdAt: "2025-01-15T10:30:00Z"
+  uploadedAt: "2025-01-15T10:30:00Z"
+  lastModified: "2025-01-16T14:00:00Z"
+```
+
+### Creator vs Uploader
+
+- **Creator**: The original author who wrote/created the content
+- **Uploader**: The person who uploaded the content to the system
+
+For original content, `creator === uploader`. For scraped/uploaded content, creator may be "Unknown" until verified from source metadata.
+
+### Creator Types
+
+| Type | Description |
+|------|-------------|
+| `git` | Verified via GitHub authentication |
+| `manual` | User manually entered their name |
+| `session` | Tracked via browser session |
+| `scraped` | Extracted from source metadata |
+| `unknown` | Not yet verified |
+
+### Connect GitHub for Verification
+
+Users can connect their GitHub account to automatically:
+- Set their GitHub username as the uploader identity
+- Verify creator attribution for their own content
+- Enable verified badges on authored strands
+
+## Illustrations & Gallery
+
+Attach images to specific blocks or the whole strand:
+
+```yaml
+illustrations:
+  - src: "/images/diagram.svg"
+    alt: "Architecture diagram"
+    caption: "System overview"
+    style: diagram        # diagram | sketch | infographic | chart | photo | icon | custom
+    blockId: "block-3"    # Optional: associate with specific block
+    aiGenerated: false
+    width: full           # full | half | quarter | or number in pixels
+    position: inline      # inline | float-left | float-right | margin
+
+gallery:
+  title: "Visual Examples"
+  description: "Screenshots and diagrams"
+  layout: grid           # grid | carousel | masonry | filmstrip
+  columns: 3
+  images:
+    - src: "/img/example1.png"
+      caption: "First example"
+```
+
+## SEO Controls
+
+Control search engine indexing per-strand:
+
+```yaml
+seo:
+  index: true             # Include in search engines (default: true)
+  follow: true            # Follow outbound links (default: true)
+  canonicalUrl: "https://custom-url.com/article"
+  metaDescription: "Custom meta description for SEO"
+  ogImage: "/images/custom-og.png"
+  sitemapPriority: 0.8    # 0.0-1.0
+  changeFrequency: weekly # always | hourly | daily | weekly | monthly | yearly | never
+
+# Legacy (use seo.index instead)
+noindex: false
+```
+
+## Notes
+
+- `id` or `slug` helps external systems pin canonical references.
+- `tags`, `subjects`, `topics` feed the Codex viewer's filters and search facets.
+- `relationships` allows you to model prerequisites or "see also" references—these show up as backlinks.
+- `publishing.status` can be `draft`, `published`, or `archived`. Draft strands remain readable but can be filtered out in search or UI toggles.
+- `blockSummaries` can be auto-generated by the indexer or manually curated.
+- `seo.index: false` excludes the strand from search engine crawling (adds `noindex` meta tag).
+- `source` metadata tracks provenance and attribution—who created vs who uploaded the content.
+
+Keep metadata minimal but intentional; the viewer already extracts file paths, names, and timestamps from GitHub.

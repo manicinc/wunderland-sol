@@ -1,0 +1,126 @@
+{
+  "name": "@framers/codex-extensions",
+  "version": "1.0.0",
+  "description": "Plugin and theme registry for Frame Codex and Codex Viewer",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./plugins/*": {
+      "import": "./dist/plugins/*.mjs",
+      "require": "./dist/plugins/*.js"
+    },
+    "./themes/*": {
+      "import": "./dist/themes/*.mjs",
+      "require": "./dist/themes/*.js"
+    },
+    "./loader": {
+      "import": "./dist/loader.mjs",
+      "require": "./dist/loader.js",
+      "types": "./dist/loader.d.ts"
+    },
+    "./registry": {
+      "import": "./dist/registry.mjs",
+      "require": "./dist/registry.js",
+      "types": "./dist/registry.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "registry.json",
+    "themes.json"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run lint && npm run typecheck && npm run test",
+    "security:audit": "npm audit --audit-level=moderate",
+    "prepublishOnly": "npm run validate && npm run build",
+    "release": "semantic-release",
+    "generate:plugin": "tsx scripts/generate-plugin.ts",
+    "generate:theme": "tsx scripts/generate-theme.ts"
+  },
+  "keywords": [
+    "codex",
+    "frame",
+    "plugins",
+    "themes",
+    "extensions",
+    "knowledge",
+    "viewer"
+  ],
+  "author": {
+    "name": "Framers AI",
+    "email": "support@frame.dev",
+    "url": "https://frame.dev"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/framersai/codex-extensions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/framersai/codex-extensions/issues"
+  },
+  "homepage": "https://github.com/framersai/codex-extensions#readme",
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {},
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/semver": "^7.7.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-security": "^2.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "semantic-release": "^23.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "zod": "^3.0.0"
+  },
+  "dependencies": {
+    "semver": "^7.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

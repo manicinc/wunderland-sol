@@ -1,0 +1,76 @@
+{
+  "id": "daily-planner",
+  "name": "Daily Planner",
+  "category": "personal",
+  "icon": "CalendarDays",
+  "description": "Plan your day with time blocks, priorities, and to-dos. Includes morning routine, main tasks, and evening reflection.",
+  "shortDescription": "Structured daily planning template",
+  "difficulty": "beginner",
+  "estimatedTime": "5 min",
+  "tags": ["daily", "planner", "schedule", "routine", "productivity"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 94,
+  "defaultData": {
+    "contentType": "planner"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Date",
+      "type": "date",
+      "required": true,
+      "placeholder": "Select the date"
+    },
+    {
+      "name": "focus",
+      "label": "Today's Focus",
+      "type": "text",
+      "required": false,
+      "placeholder": "What's the main focus today?"
+    },
+    {
+      "name": "mood",
+      "label": "Morning Mood",
+      "type": "select",
+      "required": false,
+      "placeholder": "How are you feeling?",
+      "options": ["energized", "neutral", "tired", "stressed", "excited"],
+      "defaultValue": "neutral"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Add tags"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["focus", "mood", "tags", "gratitude", "wins", "lessons"]
+  },
+  "template": "---\ntitle: \"Daily Plan - {title}\"\nsummary: \"{focus}\"\ntags: [{tags}]\ncontentType: planner\ndate: {title}\nmood: {mood}\ncreated: {date}\n---\n\n# 📅 Daily Plan — {title}\n\n**Today's Focus:** {focus}\n**Mood:** {mood}\n\n---\n\n## 🌅 Morning Setup (5 min)\n\n### Intention\n> What do I want to accomplish today?\n\n\n### Gratitude\n1. \n2. \n3. \n\n---\n\n## 🎯 Top 3 Priorities\n\n1. [ ] **#1:** \n2. [ ] **#2:** \n3. [ ] **#3:** \n\n---\n\n## 📋 All Tasks\n\n### Must Do (Non-negotiable)\n- [ ] Task 1\n- [ ] Task 2\n\n### Should Do (Important)\n- [ ] Task 3\n- [ ] Task 4\n\n### Could Do (Nice to have)\n- [ ] Task 5\n\n---\n\n## ⏰ Time Blocks\n\n| Time | Activity |\n|------|----------|\n| 06:00 | Wake up / Morning routine |\n| 07:00 | |\n| 08:00 | |\n| 09:00 | |\n| 10:00 | |\n| 11:00 | |\n| 12:00 | Lunch |\n| 13:00 | |\n| 14:00 | |\n| 15:00 | |\n| 16:00 | |\n| 17:00 | |\n| 18:00 | |\n| 19:00 | |\n| 20:00 | |\n| 21:00 | Wind down |\n\n---\n\n## 📞 Meetings & Appointments\n\n| Time | Event | Notes |\n|------|-------|-------|\n| | | |\n\n---\n\n## 🌙 Evening Review (5 min)\n\n### Wins Today 🎉\n1. \n2. \n3. \n\n### Lessons Learned\n- \n\n### Tomorrow's Priority\n- [ ] \n\n### Rating: ⭐⭐⭐⭐⭐ / 5\n\n**Notes:**\n\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

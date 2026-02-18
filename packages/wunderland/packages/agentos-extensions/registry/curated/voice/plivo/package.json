@@ -1,0 +1,30 @@
+{
+  "name": "@framers/agentos-ext-voice-plivo",
+  "version": "0.1.0",
+  "description": "Plivo voice call provider for AgentOS — outbound/inbound calls via Plivo Voice API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["agentos", "extension", "voice", "plivo", "telephony"],
+  "author": { "name": "Framers AI", "url": "https://frame.dev" },
+  "license": "MIT",
+  "files": ["dist", "manifest.json"],
+  "peerDependencies": {
+    "@framers/agentos": "^0.1.0"
+  },
+  "dependencies": {
+    "plivo": "^4.0.0"
+  },
+  "devDependencies": {
+    "@framers/agentos": "workspace:*",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": { "node": ">=18.0.0" }
+}

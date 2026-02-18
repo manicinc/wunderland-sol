@@ -1,0 +1,30 @@
+{
+  "welcome": {
+    "subject": "Bem-vindo ao Voice Chat Assistant",
+    "greeting": "Olá {{name}}",
+    "body": "Obrigado por se juntar ao Voice Chat Assistant. Sua conta foi criada com sucesso.",
+    "action": "Começar agora",
+    "footer": "Se tiver alguma dúvida, entre em contato conosco."
+  },
+  "passwordReset": {
+    "subject": "Redefina sua senha",
+    "greeting": "Olá {{name}}",
+    "body": "Recebemos um pedido para redefinir sua senha. Clique no link abaixo para criar uma nova senha.",
+    "action": "Redefinir senha",
+    "expire": "Este link expira em {{hours}} horas.",
+    "ignore": "Se você não fez esta solicitação, ignore este e-mail."
+  },
+  "verification": {
+    "subject": "Verifique seu e-mail",
+    "greeting": "Olá {{name}}",
+    "body": "Confirme seu endereço de e-mail para concluir seu cadastro.",
+    "action": "Verificar e-mail",
+    "expire": "Este link expira em {{hours}} horas."
+  },
+  "notification": {
+    "subject": "Nova notificação",
+    "greeting": "Olá {{name}}",
+    "body": "Você tem uma nova notificação.",
+    "action": "Ver notificação"
+  }
+}

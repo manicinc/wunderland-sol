@@ -1,0 +1,488 @@
+// File: frontend/src/styles/views/settings/_settings-page.scss
+/**
+ * @file _settings-page.scss
+ * @description Styles for the Settings.vue page, implementing the "Ephemeral Harmony" theme.
+ * Includes styles for overall page layout, header, sections, and custom form elements.
+ * @version 1.0.1 - Corrected SASS calculations.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use '../components/buttons' as buttonsFile; // For button styling
+@use '../components/cards' as cardsFile;   // For potential card base styles/mixins
+
+// Overall Page Container
+.settings-page-ephemeral {
+  min-height: 100vh;
+  background-color: hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l));
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  padding-bottom: calc(#{var.$spacing-xl} * 2); // Space for content at the bottom
+}
+
+// Page Header specific to Settings view
+.settings-header-ephemeral {
+  @include mixins.glassmorphic-pane(
+    '--color-bg-primary', // CSS Var prefix for HSL(A)
+    '--color-border-glass', // CSS Var prefix for HSL(A)
+    '--blur-glass', // CSS Var for blur amount
+    '--shadow-depth-sm', // CSS Var for full shadow string
+    // SCSS Fallbacks
+    var.$default-color-bg-primary-h, var.$default-color-bg-primary-s, calc(var.$default-color-bg-primary-l + 2%), 0.75,
+    var.$default-color-border-glass-h, var.$default-color-border-glass-s, var.$default-color-border-glass-l, 0.25,
+    var.$default-blur-glass,
+    var.$scss-box-shadow-sm
+  );
+  padding: var.$spacing-sm var.$spacing-lg;
+  position: sticky;
+  top: 0;
+  z-index: calc(var.$z-index-sticky + 5); // Ensure it's above main app header if that one is also sticky
+
+  .header-content-container-ephemeral {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: calc(#{var.$site-max-width} + 100px); // Use SCSS var for site-max-width
+    margin: 0 auto;
+  }
+
+  .logo-title-group-ephemeral {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-md;
+    .logo-img-ephemeral {
+      width: 38px; height: 38px;
+      filter: drop-shadow(0 0 7px hsla(var(--color-accent-primary-h),var(--color-accent-primary-s),var(--color-accent-primary-l),0.65));
+    }
+    .page-title-ephemeral {
+      font-size: clamp(1.2rem, 0.9rem + 1vw, 1.65rem);
+      font-weight: 600;
+      color: hsl(var(--color-text-primary-h),var(--color-text-primary-s),var(--color-text-primary-l));
+      @include mixins.text-glow(
+        '--color-accent-primary', 4px,
+        var.$default-color-accent-primary-h, var.$default-color-accent-primary-s, var.$default-color-accent-primary-l, 0.55
+      );
+    }
+  }
+  .back-button-ephemeral {
+    // These classes should be applied in the Vue template: class="btn btn-secondary-ephemeral btn-sm back-button-ephemeral"
+    // This ensures the button mixins from _buttons.scss are applied.
+    // Additional specific tweaks for this button if needed:
+    .icon-sm { margin-right: calc(#{var.$spacing-xs} * 0.75); }
+  }
+}
+
+// Main Content Area
+.settings-main-content-ephemeral {
+  max-width: 860px;
+  margin: var.$spacing-xl auto 0;
+  padding: 0 var.$spacing-lg;
+
+  @media (max-width: var.$breakpoint-sm) {
+    margin-top: var.$spacing-lg;
+    padding: 0 var.$spacing-md;
+  }
+}
+
+.intro-text-ephemeral {
+  text-align: center;
+  margin-bottom: calc(#{var.$spacing-xl} * 1.8);
+  .intro-icon-ephemeral {
+    width: 3.25rem; height: 3.25rem;
+    margin: 0 auto calc(#{var.$spacing-md} * 1.25); // This was already correct, as var.$spacing-md * 1.25 is inside a calc().
+    color: hsl(var(--color-accent-secondary-h),var(--color-accent-secondary-s),var(--color-accent-secondary-l));
+    opacity: 0.75;
+    filter: drop-shadow(0 0 12px hsla(var(--color-accent-secondary-h),var(--color-accent-secondary-s),var(--color-accent-secondary-l),0.5));
+  }
+  p {
+    font-size: calc(var.$font-size-base-default * 1.05);
+    color: hsl(var(--color-text-secondary-h),var(--color-text-secondary-s),var(--color-text-secondary-l));
+    max-width: 60ch;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.65;
+  }
+}
+
+// Layout for sections
+.settings-layout-grid-ephemeral {
+  display: grid;
+  gap: calc(#{var.$spacing-xl} * 1.5);
+}
+.settings-grid-span-2 { /* For future use if layout becomes multi-column */ }
+
+// Grid for items within a section (e.g., 2-column for some settings)
+.settings-items-grid-ephemeral {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var.$spacing-lg var.$spacing-xl;
+}
+.settings-item-spaced-ephemeral {
+  margin-top: var.$spacing-lg;
+}
+.settings-item-compact-ephemeral {
+  margin-top: var.$spacing-sm;
+}
+
+.select-input-ephemeral,
+.input-field-sm-ephemeral { // Grouping similar input fields
+  // Base styles (neomorphic-inset, padding, border, etc.) remain the same
+  @include mixins.neomorphic-inset(
+    '--color-bg-primary', 4px, 2px, '--shadow-opacity-soft', var.$radius-lg,
+    '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+    var.$default-color-bg-primary-h, var.$default-color-bg-primary-s, var.$default-color-bg-primary-l,
+    var.$default-shadow-opacity-soft,
+    var.$default-shadow-color-h, var.$default-shadow-color-s, var.$default-shadow-color-l,
+    var.$default-shadow-highlight-l-factor
+  );
+  appearance: none; // For select
+  background-position: right 0.75rem center; // For select chevron
+  background-repeat: no-repeat; // For select chevron
+  background-size: 1.25em 1.25em; // For select chevron
+  padding-right: 2.5rem; // For select chevron
+  border: 1px solid hsla(var(--color-border-secondary-h),var(--color-border-secondary-s),var(--color-border-secondary-l), 0.3); // Slightly softer initial border
+  color: hsl(var(--color-text-primary-h),var(--color-text-primary-s),var(--color-text-primary-l));
+  font-size: var.$font-size-sm;
+  width: 100%;
+  transition: border-color var.$duration-smooth, box-shadow var.$duration-smooth, background-color var.$duration-smooth; // Smoother transitions
+  line-height: 1.5;
+
+  &.input-field-sm-ephemeral { // Specifics for smaller text inputs
+    padding: var.$spacing-xs var.$spacing-sm;
+    max-width: 120px;
+    background-image: none; // No chevron for text inputs
+  }
+  &:not(.input-field-sm-ephemeral){ // Apply select chevron only to selects
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='hsl(#{var(--color-text-muted-h)}, #{var(--color-text-muted-s)}, #{var(--color-text-muted-l)})'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.29a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  }
+
+
+  &:hover {
+    border-color: hsla(var(--color-accent-interactive-h),var(--color-accent-interactive-s),var(--color-accent-interactive-l), 0.4); // Softer hover border
+    // Keep the neomorphic inset shadows on hover, perhaps slightly adjust bg
+    background-color: hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 1%));
+  }
+
+  &:focus, &:focus-visible {
+    outline: none;
+    border-color: hsla(var(--color-accent-interactive-h),var(--color-accent-interactive-s),var(--color-accent-interactive-l), 0.6) !important; // Clearer border color
+    // The neomorphic-inset mixin already applies an inset box-shadow.
+    // On focus, we want to enhance this, not create a hard outer ring.
+    // We will add an animated subtle outer glow.
+    // The original inset shadows should remain.
+    animation: inputFocusGlowPulse 2s infinite ease-in-out;
+    // Explicitly re-state base inset shadows if animation overrides. But animation target is box-shadow, so it should.
+    // To combine, you might need to include the inset values within the keyframes or use multiple shadows carefully.
+    // For simplicity, inputFocusGlowPulse will define the full box-shadow on focus.
+    // Let's ensure the inputFocusGlowPulse animation also includes the inset part.
+  }
+}
+
+.input-field-sm-ephemeral {
+  @extend .select-input-ephemeral; // Inherit base select style
+  padding: var.$spacing-xs var.$spacing-sm;
+  max-width: 120px;
+  background-image: none; // Remove chevron
+}
+
+.range-slider-ephemeral {
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: var.$radius-full;
+  background-color: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.5);
+  position: relative;
+  cursor: pointer;
+  @include mixins.neomorphic-inset(
+    '--color-bg-tertiary', 3px, 1px, '--shadow-opacity-soft', var.$radius-full,
+    '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+    var.$default-color-bg-tertiary-h, var.$default-color-bg-tertiary-s, var.$default-color-bg-tertiary-l,
+    var.$default-shadow-opacity-soft, var.$default-shadow-color-h, var.$default-shadow-color-s, var.$default-shadow-color-l, var.$default-shadow-highlight-l-factor
+  );
+
+  &::before { // Track fill
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: var(--range-progress-ephemeral, 0%); // JS updates this CSS var
+    background: linear-gradient(90deg, hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l)), hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l)));
+    border-radius: inherit;
+    transition: width 0.1s linear; // Smooth progress update
+  }
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 22px; height: 22px;
+    border-radius: var.$radius-full;
+    background-color: hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 5%));
+    border: 2px solid hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.5);
+    box-shadow: var(--shadow-depth-md);
+    cursor: grab;
+    transition: transform var.$duration-quick, box-shadow var.$duration-quick;
+    position: relative;
+    z-index: 1;
+    &:active { cursor: grabbing; transform: scale(1.15); }
+  }
+  &::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background-color: hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 5%));
+    border: 2px solid hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.5);
+    box-shadow: var(--shadow-depth-md); cursor: grab;
+  }
+  &:focus-visible::-webkit-slider-thumb {
+      box-shadow: var(--shadow-depth-md), 0 0 0 3px hsla(var(--color-accent-interactive-h),var(--color-accent-interactive-s),var(--color-accent-interactive-l), 0.4);
+  }
+}
+
+.toggle-switch-ephemeral {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  input { // Visually hide the actual checkbox
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+  .track {
+    width: 52px;
+    height: 28px;
+    border-radius: var.$radius-full;
+    background-color: hsla(var(--color-bg-tertiary-h),var(--color-bg-tertiary-s),var(--color-bg-tertiary-l), 0.6);
+    transition: background-color var.$duration-quick;
+    position: relative;
+    @include mixins.neomorphic-inset(
+      '--color-bg-tertiary', 3px, 2px, '--shadow-opacity-soft', var.$radius-full,
+      '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+      var.$default-color-bg-tertiary-h,var.$default-color-bg-tertiary-s,var.$default-color-bg-tertiary-l,
+      var.$default-shadow-opacity-soft,var.$default-shadow-color-h,var.$default-shadow-color-s,var.$default-shadow-color-l,var.$default-shadow-highlight-l-factor
+    );
+    display: flex; // To align knob
+    align-items: center;
+  }
+  .knob {
+    width: 22px;
+    height: 22px;
+    border-radius: var.$radius-full;
+    background-color: hsl(var(--color-bg-primary-h),var(--color-bg-primary-s),var(--color-bg-primary-l));
+    @include mixins.neomorphic-extrude(
+      '--color-bg-primary', 2px, 4px, '--shadow-opacity-soft', var.$radius-full,
+      '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+      var.$default-color-bg-primary-h,var.$default-color-bg-primary-s,var.$default-color-bg-primary-l,
+      var.$default-shadow-opacity-soft,var.$default-shadow-color-h,var.$default-shadow-color-s,var.$default-shadow-color-l,var.$default-shadow-highlight-l-factor
+    );
+    // position: absolute; top: 3px; left: 3px; // Replaced by flex alignment
+    margin-left: 3px; // Initial position
+    transition: transform var.$duration-smooth var.$ease-elastic, background-color var.$duration-quick;
+  }
+  input:checked + .track {
+    background-color: hsl(var(--color-accent-interactive-h),var(--color-accent-interactive-s),var(--color-accent-interactive-l));
+    @include mixins.neomorphic-inset(
+      '--color-accent-interactive', 3px, 2px, '--shadow-opacity-soft', var.$radius-full,
+      '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+      var.$default-color-accent-interactive-h, var.$default-color-accent-interactive-s, var.$default-color-accent-interactive-l,
+      var.$default-shadow-opacity-soft, var.$default-shadow-color-h, var.$default-shadow-color-s, var.$default-shadow-color-l, var.$default-shadow-highlight-l-factor
+    );
+    .knob {
+      transform: translateX(24px); // 52px track width - 22px knob - 3px left margin - 3px right margin = 24px travel
+      background-color: hsl(var(--color-bg-primary-h),var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 5%));
+    }
+  }
+    input:focus-visible + .track { // Focus on the track
+        // Replace hard ring with a softer, pulsing glow around the track
+        outline: none;
+        animation: inputFocusGlowPulse 2s infinite ease-in-out;
+        // The animation adds a box-shadow, so ensure it doesn't conflict badly with neomorphic-inset on track
+        // The keyframes for inputFocusGlowPulse will need to be designed to complement this.
+        // Alternatively, a simpler focus:
+        // box-shadow:
+        //   inset 0 1px 3px hsla(var(--shadow-color-h),var(--shadow-color-s),var(--shadow-color-l), 0.15), // from neomorphic-inset
+        //   0 0 0 2px hsl(var(--color-bg-primary-h),var(--color-bg-primary-s),var(--color-bg-primary-l)), // offset space
+        //   0 0 0 4px hsla(var(--color-accent-interactive-h),var(--color-accent-interactive-s),var(--color-accent-interactive-l),0.5); // softer ring
+    }
+}
+
+// Subsections within SettingsSection
+.setting-subsection-ephemeral {
+  margin-top: var.$spacing-lg;
+  padding-top: var.$spacing-lg;
+  border-top: 1px solid hsla(var(--color-border-secondary-h), var(--color-border-secondary-s), var(--color-border-secondary-l), 0.2);
+}
+.subsection-title-ephemeral {
+  font-size: var.$font-size-sm;
+  font-weight: 600;
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  margin-bottom: var.$spacing-md;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.subsection-description-ephemeral {
+    font-size: var.$font-size-sm;
+    color: hsl(var(--color-text-muted-h),var(--color-text-muted-s),var(--color-text-muted-l));
+    margin-bottom: var.$spacing-md;
+    line-height: 1.5;
+}
+
+// Info Cards (for session cost)
+.info-card-ephemeral {
+  @include cardsFile.card-base-styles;
+  @include cardsFile.card-glass-look; // Uses glass look mixin
+  padding: var.$spacing-md;
+  text-align: center;
+}
+.info-card-title-ephemeral {
+  font-size: var.$font-size-xs;
+  font-weight: 500;
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  margin-bottom: var.$spacing-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.info-card-value-ephemeral {
+  font-size: calc(#{var.$font-size-xl} * 1.3); // This should be fine as $font-size-xl is '1.25rem' not a calc string.
+  font-weight: 600;
+  font-family: var(--font-mono, var.$font-family-mono);
+  color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  @include mixins.text-glow(
+    '--color-accent-primary', 5px,
+    var.$default-color-accent-primary-h, var.$default-color-accent-primary-s, var.$default-color-accent-primary-l, 0.4
+  );
+}
+
+// Danger Zone
+.danger-zone-ephemeral {
+  @include cardsFile.card-base-styles;
+  padding: var.$spacing-lg;
+  background-color: hsla(var(--color-error-h),var(--color-error-s),var(--color-error-l), 0.08);
+  border: 1px solid hsla(var(--color-error-h),var(--color-error-s),var(--color-error-l), 0.4);
+  border-radius: var.$radius-lg;
+  margin-top: var.$spacing-xl;
+
+  .subsection-title-ephemeral { // Targets the h4 if it uses this class
+    color: hsl(var(--color-error-h),var(--color-error-s),calc(var(--color-error-l) - 10%)) !important; // !important to override generic if needed
+    @include mixins.text-glow(
+        '--color-error', 3px,
+        var.$default-color-error-h, var.$default-color-error-s, var.$default-color-error-l, 0.3
+    );
+  }
+  .setting-description { // Targets p tags if they have this class
+    color: hsl(var(--color-error-h),var(--color-error-s),calc(var(--color-error-l) + 5%)) !important;
+    opacity: 0.9;
+  }
+  // Buttons will use .btn-danger-ephemeral or .btn-danger-outline-ephemeral from template
+}
+
+// Group for multiple action buttons
+.settings-actions-group-ephemeral {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var.$spacing-md;
+    margin-top: var.$spacing-sm;
+    > .btn {
+        flex-grow: 1;
+        min-width: 180px;
+    }
+}
+.file-input-hidden-ephemeral {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+// Theme selector buttons
+.theme-buttons-group-ephemeral {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var.$spacing-md;
+
+  .theme-btn-ephemeral {
+    @include buttonsFile.btn-secondary; // Uses the composite mixin for secondary buttons
+    padding: var.$spacing-sm var.$spacing-md !important;
+    font-size: var.$font-size-sm !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var.$spacing-xs;
+
+    .icon-xs { width: 1.1em; height: 1.1em; }
+
+    &.active {
+      @include mixins.neomorphic-inset(
+        '--color-accent-interactive',
+        4px, 2px, '--shadow-opacity-soft', var.$radius-md,
+        '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+        var.$default-color-accent-interactive-h, var.$default-color-accent-interactive-s, var.$default-color-accent-interactive-l,
+        var.$default-shadow-opacity-soft,
+        var.$default-shadow-color-h, var.$default-shadow-color-s, var.$default-shadow-color-l,
+        var.$default-shadow-highlight-l-factor
+      );
+      color: hsl(var(--color-text-on-primary-h),var(--color-text-on-primary-s),var(--color-text-on-primary-l));
+      border-color: hsl(var(--color-accent-interactive-h),var(--color-accent-interactive-s),calc(var(--color-accent-interactive-l) - 10%));
+      filter: none; // Remove base hover/active filters
+      box-shadow: inset 0 1px 2px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3),
+                  0 0 8px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3);
+      .icon-xs {
+        color: hsl(var(--color-text-on-primary-h),var(--color-text-on-primary-s),var(--color-text-on-primary-l));
+      }
+    }
+  }
+}
+
+.form-actions-footer-ephemeral {
+  margin-top: calc(#{var.$spacing-xl} * 2);
+  padding-top: var.$spacing-lg;
+  border-top: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.2);
+  display: flex;
+  justify-content: flex-end;
+
+  @media (max-width: var.$breakpoint-sm) {
+    justify-content: center;
+    .btn { width: 100%; }
+  }
+  // .btn.btn-primary-ephemeral.btn-lg should be styled by _buttons.scss
+}
+
+// Ensure specific button variants are styled by _buttons.scss
+// .btn-secondary-ephemeral, .btn-danger-ephemeral, .btn-danger-outline-ephemeral etc.
+// will rely on the utility classes generated by _buttons.scss which @include the respective mixins.
+
+.billing-overview {
+  display: flex;
+  flex-direction: column;
+  gap: calc(#{var.$spacing-xs} * 0.75);
+}
+
+.billing-plan {
+  font-weight: 600;
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+}
+
+.billing-status-text {
+  font-size: calc(var.$font-size-sm * 0.95);
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+}
+
+.billing-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-sm;
+}
+
+.billing-button {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var.$spacing-xs;
+}
+
+.billing-helper {
+  font-size: calc(var.$font-size-sm * 0.9);
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+}
+
+.billing-helper--error {
+  color: hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l));
+}

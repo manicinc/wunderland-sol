@@ -1,0 +1,57 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.productivity.google-calendar",
+  "name": "Google Calendar Extension",
+  "version": "0.1.0",
+  "description": "Google Calendar integration with OAuth2 auth and event management — supports event CRUD, free/busy queries, and multi-calendar listing.",
+  "categories": ["productivity", "calendar"],
+  "platforms": ["google-calendar"],
+  "sdk": "googleapis",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "calendarListEvents",
+      "displayName": "List Calendar Events"
+    },
+    {
+      "kind": "tool",
+      "id": "calendarCreateEvent",
+      "displayName": "Create Calendar Event"
+    },
+    {
+      "kind": "tool",
+      "id": "calendarUpdateEvent",
+      "displayName": "Update Calendar Event"
+    },
+    {
+      "kind": "tool",
+      "id": "calendarDeleteEvent",
+      "displayName": "Delete Calendar Event"
+    },
+    {
+      "kind": "tool",
+      "id": "calendarFindFreeTime",
+      "displayName": "Find Free Time Slots"
+    },
+    {
+      "kind": "tool",
+      "id": "calendarListCalendars",
+      "displayName": "List Calendars"
+    },
+    {
+      "kind": "productivity",
+      "id": "googleCalendarService",
+      "displayName": "Google Calendar Service"
+    }
+  ],
+  "requiredSecrets": ["google.clientId", "google.clientSecret", "google.refreshToken"],
+  "features": [
+    "List events within a date range",
+    "Create, update, and delete calendar events",
+    "Multi-calendar support with calendar listing",
+    "Free/busy availability queries across calendars",
+    "Attendee management",
+    "OAuth2 token refresh",
+    "Time zone support"
+  ]
+}

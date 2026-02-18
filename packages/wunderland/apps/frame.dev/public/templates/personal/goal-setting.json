@@ -1,0 +1,40 @@
+{
+  "id": "goal-setting",
+  "name": "Goal Setting",
+  "category": "personal",
+  "icon": "Target",
+  "description": "Define, plan, and track meaningful goals using proven frameworks",
+  "shortDescription": "Strategic goal planning with SMART framework",
+  "difficulty": "beginner",
+  "estimatedTime": "15 min",
+  "tags": ["goals", "planning", "achievement", "personal"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 88,
+  "defaultData": {
+    "contentType": "goal"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, goal, planning]\ncontentType: goal\ntimeframe: {timeframe}\nstatus: not-started\nprogress: 0\n---\n\n# 🎯 {title}\n\n> {summary}\n\n## Goal Overview\n\n| Attribute | Value |\n|-----------|-------|\n| **Timeframe** | {timeframe} |\n| **Status** | 🔴 Not Started |\n| **Progress** | ░░░░░░░░░░ 0% |\n| **Priority** | High/Medium/Low |\n\n## Why This Goal Matters\n\n### The Vision\n\nWhat does achieving this goal look like? Paint a vivid picture...\n\n### Core Motivation\n\n**Why do I want this?** (Go deep—surface reasons, then dig)\n\n1. Surface: \n2. Deeper: \n3. Core: \n\n### Impact\n\n**If I achieve this:**\n- Life impact:\n- Career impact:\n- Relationship impact:\n- Self-image impact:\n\n**If I don't achieve this:**\n- What I'll miss:\n- Regret factor:\n\n## SMART Breakdown\n\n### Specific\n\n*What exactly will I accomplish?*\n\n- **The goal:** \n- **Success looks like:** \n- **How I'll know I'm done:** \n\n### Measurable\n\n*How will I track progress?*\n\n| Metric | Current | Target | How to Measure |\n|--------|---------|--------|----------------|\n| Metric 1 | 0 | X | Method |\n| Metric 2 | 0 | Y | Method |\n\n### Achievable\n\n*Is this realistic?*\n\n- **Skills I have:** \n- **Skills I need:** \n- **Resources available:** \n- **Resources needed:** \n- **Confidence level:** /10\n\n### Relevant\n\n*Does this align with my values and bigger picture?*\n\n- **Core values this supports:** \n- **Larger life goals this feeds:** \n- **What I'm sacrificing for this:** \n- **Is this sacrifice worth it?** \n\n### Time-Bound\n\n*What's my deadline?*\n\n- **Start date:** \n- **Target end date:** \n- **Review checkpoints:** Weekly/Monthly\n\n## Action Plan\n\n### Milestones\n\n| Milestone | Target Date | Status | Notes |\n|-----------|-------------|--------|-------|\n| 25% - [Description] | [Date] | ⬜ | |\n| 50% - [Description] | [Date] | ⬜ | |\n| 75% - [Description] | [Date] | ⬜ | |\n| 100% - Goal Complete | [Date] | ⬜ | |\n\n### Weekly Actions\n\n**Week 1:**\n- [ ] Action 1\n- [ ] Action 2\n\n**Week 2:**\n- [ ] Action 1\n- [ ] Action 2\n\n**Week 3+:**\n- [ ] Recurring action\n\n### Daily Habits\n\nWhat small daily actions support this goal?\n\n- [ ] Morning: \n- [ ] During day: \n- [ ] Evening: \n\n## Obstacle Planning\n\n### Potential Roadblocks\n\n| Obstacle | Likelihood | Prevention | Solution If It Happens |\n|----------|------------|------------|------------------------|\n| Obstacle 1 | High/Med/Low | How to avoid | Backup plan |\n| Obstacle 2 | High/Med/Low | How to avoid | Backup plan |\n\n### If I Fall Off Track\n\n**My recovery plan:**\n1. Don't beat myself up\n2. Identify what happened\n3. Adjust and continue\n4. Specific next step: \n\n## Support System\n\n### Accountability\n\n- **Accountability partner:** \n- **Check-in schedule:** \n- **What I'll share:** \n\n### Resources & Help\n\n- **People who can help:** \n- **Tools/apps:** \n- **Learning resources:** \n\n## Progress Log\n\n### Updates\n\n| Date | Progress | Notes | Next Action |\n|------|----------|-------|-------------|\n| {date} | 0% | Goal set | First action |\n\n### Wins to Celebrate 🎉\n\n- \n\n### Lessons Learned 📚\n\n- \n\n## Reflection Questions\n\n*Review monthly:*\n\n- Is this still the right goal?\n- What's working?\n- What needs to change?\n- Am I being honest with myself?\n\n## Reward\n\n**When I achieve this goal, I will celebrate by:**\n\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

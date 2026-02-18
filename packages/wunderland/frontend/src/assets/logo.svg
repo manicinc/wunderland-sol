@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- =========================================================
+   VCA · ICON ONLY · lifelike slow pulse + richer 30-s gradient
+   May 2025
+============================================================ -->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="-132 -132 264 264"
+     role="img"
+     aria-labelledby="title desc">
+  <title id="title">VCA icon — slow breathing &amp; expanded pink-violet gradient</title>
+  <desc id="desc">
+    Circular ring and stylised V waveform. The whole icon gently breathes;
+    glow strength follows the breath; colours wander through a five-stop
+    pink–violet spectrum every 30 seconds.
+  </desc>
+
+  <!-- ── DEFINITIONS ─────────────────────────────────────── -->
+  <defs>
+    <!-- 5-stop gradient: stays in warm pink/UV family yet offers variety -->
+    <linearGradient id="gradRange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF0066">
+        <animate attributeName="stop-color"
+                 dur="30s" repeatCount="indefinite"
+                 values="#FF0066; #FF1785; #C900FF; #7200FF; #FF0066"/>
+      </stop>
+      <stop offset="25%" stop-color="#FF3490">
+        <animate attributeName="stop-color"
+                 dur="30s" repeatCount="indefinite"
+                 values="#FF3490; #FF4BA5; #D34BFF; #8B34FF; #FF3490"/>
+      </stop>
+      <stop offset="50%" stop-color="#FF63B0">
+        <animate attributeName="stop-color"
+                 dur="30s" repeatCount="indefinite"
+                 values="#FF63B0; #FF79C1; #DD79FF; #A163FF; #FF63B0"/>
+      </stop>
+      <stop offset="75%" stop-color="#FF8CCA">
+        <animate attributeName="stop-color"
+                 dur="30s" repeatCount="indefinite"
+                 values="#FF8CCA; #FFA0D9; #E6A0FF; #B28CFF; #FF8CCA"/>
+      </stop>
+      <stop offset="100%" stop-color="#FFB1E2">
+        <animate attributeName="stop-color"
+                 dur="30s" repeatCount="indefinite"
+                 values="#FFB1E2; #FFC2EC; #F0C2FF; #C6B1FF; #FFB1E2"/>
+      </stop>
+
+      <!-- ultra-slow rotation for depth -->
+      <animateTransform attributeName="gradientTransform"
+                        type="rotate"
+                        from="0 0 0" to="360 0 0"
+                        dur="120s" repeatCount="indefinite"/>
+    </linearGradient>
+
+    <!-- Glow that breathes with the icon -->
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur">
+        <!-- blur radius swells with the breath -->
+        <animate attributeName="stdDeviation"
+                 dur="24s" repeatCount="indefinite"
+                 values="6;8;6"/>
+      </feGaussianBlur>
+      <feComponentTransfer in="blur" result="fade">
+        <feFuncA type="linear" slope="1">
+          <!-- opacity of blur layer rises/falls -->
+          <animate attributeName="slope"
+                   dur="24s" repeatCount="indefinite"
+                   values="0.6;1;0.6"/>
+        </feFuncA>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="fade"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── ICON (breathes via scale) ────────────────────────── -->
+  <g filter="url(#softGlow)">
+    <!-- breathing transform -->
+    <animateTransform attributeName="transform"
+                      type="scale"
+                      values="1;1.1;1"
+                      dur="24s" repeatCount="indefinite"/>
+
+    <!-- Conversational ring -->
+    <circle cx="0" cy="0" r="120"
+            fill="none"
+            stroke="url(#gradRange)"
+            stroke-width="24"
+            stroke-linecap="round"/>
+
+    <!-- Stylised V waveform -->
+    <path d="M -60 -40 L 0 60 L 60 -40"
+          fill="none"
+          stroke="url(#gradRange)"
+          stroke-width="24"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+  </g>
+</svg>

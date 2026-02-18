@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  codex:
+    build: .
+    container_name: codex-template
+    environment:
+      - NEXT_PUBLIC_CODEX_REPO_OWNER=${NEXT_PUBLIC_CODEX_REPO_OWNER:-framersai}
+      - NEXT_PUBLIC_CODEX_REPO_NAME=${NEXT_PUBLIC_CODEX_REPO_NAME:-codex-template}
+      - NEXT_PUBLIC_CODEX_REPO_BRANCH=${NEXT_PUBLIC_CODEX_REPO_BRANCH:-main}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      - REVALIDATE_SECRET=${REVALIDATE_SECRET:-changeme}
+    ports:
+      - "3000:3000"
+

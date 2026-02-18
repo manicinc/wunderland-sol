@@ -1,0 +1,573 @@
+// File: frontend/src/styles/animations/_keyframes.scss
+/**
+ * @file _keyframes.scss
+ * @version 3.0.0
+ * @description Enhanced keyframes for "Ephemeral Harmony" with state-based animations,
+ * text reveal effects, cellular automata patterns, and terminal-specific animations.
+ * Includes organic "Her"-inspired effects and brutalist terminal aesthetics.
+ * 
+ * @role Provides comprehensive CSS keyframe animations for all UI states and effects.
+ */
+
+@use '../abstracts/variables' as var;
+@use 'sass:math';
+
+
+// -----------------------------------------------------------------------------
+// Core UI Animations (Enhanced with organic feel)
+// -----------------------------------------------------------------------------
+@keyframes fadeIn {
+  from { 
+    opacity: var(--animation-fade-in-opacity-from, 0);
+    filter: blur(var(--animation-fade-in-blur, 2px));
+  }
+  to { 
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeOut {
+  from { 
+    opacity: var(--animation-fade-out-opacity-from, 1);
+    filter: blur(0);
+  }
+  to { 
+    opacity: 0;
+    filter: blur(var(--animation-fade-out-blur, 2px));
+  }
+}
+
+@keyframes slideInUp {
+  from { 
+    opacity: 0;
+    transform: translateY(var(--animation-slide-in-translate-y, 20px)) scale(0.98);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+// spin animation for holographic-border-glow and other rotations
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+// Text Reveal Animations (Character/Word/Line)
+// -----------------------------------------------------------------------------
+
+// Organic character bloom effect (Her-inspired)
+@keyframes charBloom {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(180deg);
+    filter: blur(10px) hue-rotate(var(--char-hue-rotate-start, 180deg));
+  }
+  40% {
+    opacity: 0.5;
+    transform: scale(1.4) rotate(90deg);
+    filter: blur(4px) hue-rotate(var(--char-hue-rotate-mid, 90deg));
+  }
+  70% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(20deg);
+    filter: blur(1px) hue-rotate(var(--char-hue-rotate-end, 20deg));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: blur(0) hue-rotate(0deg);
+  }
+}
+
+// Word materialization with glow trail
+@keyframes wordMaterialize {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) translateZ(50px);
+    text-shadow: 0 0 20px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(0) translateZ(10px);
+    text-shadow: 0 0 15px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+    text-shadow: 0 0 3px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.3);
+  }
+}
+
+// Line cascade for code/structured content
+@keyframes lineCascade {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scaleX(0.9);
+    border-left: 3px solid hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateX(-5px) scaleX(0.98);
+    border-left: 3px solid hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scaleX(1);
+    border-left: 3px solid transparent;
+  }
+}
+
+// Quantum probability collapse effect
+@keyframes quantumCollapse {
+  0% {
+    opacity: 0.05;
+    transform: scale(3) translateY(calc(var(--quantum-offset-y, 0px) + (math.random() - 0.5) * 40px));
+    filter: blur(20px) brightness(2);
+  }
+  30% {
+    opacity: 0.3;
+    transform: scale(2) translateY(calc(var(--quantum-offset-y, 0px) * 0.7));
+    filter: blur(10px) brightness(1.5);
+  }
+  60% {
+    opacity: 0.7;
+    transform: scale(1.3) translateY(calc(var(--quantum-offset-y, 0px) * 0.3));
+    filter: blur(3px) brightness(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0) brightness(1);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Living Text Micro-animations (Post-reveal)
+// -----------------------------------------------------------------------------
+@keyframes textBreathe {
+  0%, 100% { 
+    transform: translateY(0) scale(1);
+    opacity: var(--text-breathe-opacity-rest, 1);
+  }
+  50% { 
+    transform: translateY(var(--text-breathe-offset, -1px)) scale(var(--text-breathe-scale, 1.01));
+    opacity: var(--text-breathe-opacity-peak, 0.95);
+  }
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes textPulseGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 2px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.3),
+      0 0 4px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.2);
+  }
+  50% {
+    text-shadow: 
+      0 0 4px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.6),
+      0 0 8px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.4),
+      0 0 12px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.2);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// State-Based UI Animations
+// -----------------------------------------------------------------------------
+
+// Idle state - gentle breathing
+@keyframes stateIdleBreathe {
+  0%, 100% {
+    opacity: var(--state-idle-opacity, 0.8);
+    transform: scale(1);
+  }
+  50% {
+    opacity: var(--state-idle-opacity-peak, 0.9);
+    transform: scale(var(--state-idle-scale, 1.02));
+  }
+}
+
+// Listening state - expanding ripples
+@keyframes stateListeningRipple {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+    box-shadow: 0 0 0 0 hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.7);
+  }
+  70% {
+    transform: scale(1);
+    opacity: 0;
+    box-shadow: 0 0 0 30px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0);
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+// Thinking state - neural swirl
+@keyframes stateThinkingSwirl {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: hue-rotate(0deg);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.1);
+    filter: hue-rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+    filter: hue-rotate(180deg);
+  }
+  75% {
+    transform: rotate(270deg) scale(0.9);
+    filter: hue-rotate(270deg);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    filter: hue-rotate(360deg);
+  }
+}
+
+// Responding state - flowing energy
+@keyframes stateRespondingFlow {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.2);
+  }
+  100% {
+    background-position: 200% 50%;
+    filter: brightness(1);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Particle Effects (Sakura petals, data streams, ASCII)
+// -----------------------------------------------------------------------------
+
+// Sakura petal float
+@keyframes petalFloat {
+  0% {
+    transform: translateY(-10px) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+  90% {
+    opacity: var(--petal-opacity, 0.8);
+  }
+  100% {
+    transform: translateY(100vh) translateX(calc(sin(var(--petal-sway-amount, 2)) * 50px)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+// Digital data stream
+@keyframes dataStream {
+  0% {
+    transform: translateY(-100%) translateZ(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--stream-opacity, 0.7);
+  }
+  90% {
+    opacity: var(--stream-opacity, 0.7);
+  }
+  100% {
+    transform: translateY(100vh) translateZ(0);
+    opacity: 0;
+  }
+}
+
+// ASCII particle drift (for Terminus theme)
+@keyframes asciiDrift {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(var(--drift-x, 10px), var(--drift-y, -20px)) scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(calc(var(--drift-x, 10px) * 4), calc(var(--drift-y, -20px) * 4)) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--drift-x, 10px) * 5), calc(var(--drift-y, -20px) * 5)) scale(0);
+    opacity: 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Terminal-Specific Effects (Retro Terminus)
+// -----------------------------------------------------------------------------
+
+// CRT scanline
+@keyframes crtScanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+// Phosphor glow pulse
+@keyframes phosphorGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 2px hsla(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l), 0.8),
+      0 0 4px hsla(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l), 0.4);
+  }
+  50% {
+    text-shadow: 
+      0 0 4px hsla(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l), 1),
+      0 0 8px hsla(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l), 0.6),
+      0 0 12px hsla(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l), 0.3);
+  }
+}
+
+// Terminal cursor blink
+@keyframes terminalCursorBlink {
+  0%, 49% {
+    opacity: 1;
+    background-color: hsl(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l));
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+// Glitch effect
+@keyframes glitchEffect {
+  0%, 100% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: translate(-1px, 1px);
+    filter: hue-rotate(90deg);
+  }
+  40% {
+    transform: translate(1px, -1px);
+    filter: hue-rotate(180deg);
+  }
+  60% {
+    transform: translate(-1px, 0);
+    filter: hue-rotate(270deg);
+  }
+  80% {
+    transform: translate(1px, 0);
+    filter: hue-rotate(360deg);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Voice Visualization Animations
+// -----------------------------------------------------------------------------
+
+// Circular waveform (Her-inspired)
+@keyframes voiceWaveformCircular {
+  0% {
+    stroke-dashoffset: 0;
+    stroke-width: var(--waveform-stroke-min, 2);
+    opacity: 0.6;
+  }
+  50% {
+    stroke-dashoffset: var(--waveform-offset, -20);
+    stroke-width: var(--waveform-stroke-max, 6);
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: var(--waveform-offset-end, -40);
+    stroke-width: var(--waveform-stroke-min, 2);
+    opacity: 0.6;
+  }
+}
+
+// Organic blob morph
+@keyframes voiceBlobMorph {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: scale(var(--blob-scale-1, 1.1)) rotate(90deg);
+  }
+  50% {
+    border-radius: 40% 60% 60% 40% / 70% 30% 40% 60%;
+    transform: scale(var(--blob-scale-2, 1.05)) rotate(180deg);
+  }
+  75% {
+    border-radius: 70% 30% 40% 60% / 40% 70% 60% 30%;
+    transform: scale(var(--blob-scale-3, 0.95)) rotate(270deg);
+  }
+}
+
+// Continue with remaining animations...
+
+
+// Keyframes for loading overlay from _loading-overlay.scss (ensure these are here or loaded)
+@keyframes organicPetalUnfurl { /* Define as per Ephemeral Harmony design if not already */
+  0% { opacity: 0; transform: scale(0.5) rotate(-90deg); }
+  50% { opacity: 1; transform: scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: scale(0.8) rotate(90deg) translateY(10px); }
+}
+@keyframes centerOrbPulse { /* Define as per Ephemeral Harmony design */
+  0%, 100% { transform: translate(-50%, -50%) scale(0.8); box-shadow: 0 0 10px 1px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.5); }
+  50% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 16px 4px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.8); }
+}
+@keyframes subtlePulse { /* General purpose pulse */
+  0%, 100% { opacity: var(--opacity-start, 0.75); transform: scale(1); }
+  50% { opacity: var(--opacity-pulse, 1); transform: scale(var(--scale-pulse, 1.015)); }
+}
+
+// -----------------------------------------------------------------------------
+// MicInputButton Specific Animations (NEW ADDITIONS)
+// -----------------------------------------------------------------------------
+
+// Holographic shimmer/flicker for background elements or accents
+@keyframes micHolographicShimmer {
+  0%, 100% { 
+    opacity: var(--mic-holo-opacity-base, 0.3); 
+    filter: brightness(var(--mic-holo-brightness-base, 0.8)) saturate(var(--mic-holo-saturate-base, 0.7));
+  }
+  25% { 
+    opacity: var(--mic-holo-opacity-flicker, 0.5); 
+    filter: brightness(var(--mic-holo-brightness-flicker, 1)) saturate(var(--mic-holo-saturate-flicker, 1));
+  }
+  50% { 
+    opacity: var(--mic-holo-opacity-base, 0.3); 
+    filter: brightness(var(--mic-holo-brightness-base, 0.8)) saturate(var(--mic-holo-saturate-base, 0.7));
+  }
+  75% { 
+    opacity: var(--mic-holo-opacity-flicker-alt, 0.6); 
+    filter: brightness(var(--mic-holo-brightness-flicker-alt, 1.1)) saturate(var(--mic-holo-saturate-flicker-alt, 1.2));
+  }
+}
+
+// Gentle idle pulse for the core mic icon's energy
+@keyframes micIdleCorePulse {
+  0%, 100% { 
+    transform: scale(var(--mic-idle-core-scale-min, 0.8)); 
+    opacity: var(--mic-idle-core-opacity-min, 0.6); 
+  }
+  50% { 
+    transform: scale(var(--mic-idle-core-scale-max, 1)); 
+    opacity: var(--mic-idle-core-opacity-max, 0.9); 
+  }
+}
+
+// Radiant waves for listening state
+@keyframes micListeningWave {
+  0% {
+    stroke-width: var(--mic-wave-stroke-start, 1px);
+    opacity: var(--mic-wave-opacity-start, 0.7);
+    transform: scale(var(--mic-wave-scale-start, 0.3));
+  }
+  80% {
+    stroke-width: var(--mic-wave-stroke-end, 1.5px);
+    opacity: var(--mic-wave-opacity-end, 0);
+    transform: scale(var(--mic-wave-scale-end, 1.5)); // Waves expand further
+  }
+  100% { // Ensure it fully disappears
+    opacity: 0;
+    transform: scale(var(--mic-wave-scale-end, 1.5));
+  }
+}
+
+// Active listening core energy animation (more dynamic pulse)
+@keyframes micActiveCoreThrob {
+  0%, 100% { 
+    transform: scale(var(--mic-active-core-scale-min, 0.9)); 
+    opacity: var(--mic-active-core-opacity-min, 0.7); 
+    filter: brightness(var(--mic-active-core-brightness-min, 0.9));
+  }
+  25% {
+    transform: scale(var(--mic-active-core-scale-mid, 1.1)); 
+    opacity: var(--mic-active-core-opacity-mid, 1); 
+    filter: brightness(var(--mic-active-core-brightness-mid, 1.2));
+  }
+  50% { 
+    transform: scale(var(--mic-active-core-scale-max, 1.05)); 
+    opacity: var(--mic-active-core-opacity-max, 0.9); 
+    filter: brightness(var(--mic-active-core-brightness-max, 1.1));
+  }
+  75% {
+    transform: scale(var(--mic-active-core-scale-mid2, 1.15)); 
+    opacity: var(--mic-active-core-opacity-mid2, 0.95); 
+    filter: brightness(var(--mic-active-core-brightness-mid2, 1.15));
+  }
+}
+
+// Processing LLM: swirling, contained energy
+@keyframes micProcessingSwirl {
+  0% { 
+    transform: rotate(0deg) scale(1); 
+    opacity: var(--mic-processing-opacity-start, 0.6);
+  }
+  50% { 
+    transform: rotate(180deg) scale(var(--mic-processing-scale-mid, 1.1)); 
+    opacity: var(--mic-processing-opacity-mid, 0.9);
+  }
+  100% { 
+    transform: rotate(360deg) scale(1); 
+    opacity: var(--mic-processing-opacity-end, 0.6);
+  }
+}
+
+// Error state: glitchy twitch/flicker
+@keyframes micErrorGlitch {
+  0%, 100% { transform: translate(0, 0); opacity: 1; }
+  10% { transform: translate(var(--mic-glitch-x, -2px), var(--mic-glitch-y, 2px)); opacity: 0.8; }
+  20% { transform: translate(var(--mic-glitch-x, 2px), var(--mic-glitch-y, -2px)); opacity: 1; }
+  30% { transform: translate(var(--mic-glitch-x, -1px), var(--mic-glitch-y, -1px)); opacity: 0.7; }
+  40% { transform: translate(var(--mic-glitch-x, 1px), var(--mic-glitch-y, 1px)); opacity: 1; }
+  50% { transform: translate(0,0); opacity: 0.6; } // Quick fade
+  // Repeat pattern or similar
+  60% { transform: translate(var(--mic-glitch-x-alt, 2px), var(--mic-glitch-y-alt, 1px)); opacity: 1; }
+  70% { transform: translate(var(--mic-glitch-x-alt, -1px), var(--mic-glitch-y-alt, -2px)); opacity: 0.8; }
+  80% { transform: translate(0,0); opacity: 1;}
+}
+
+// Subtle floating animation for "holographic particles"
+@keyframes micHoloParticleFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: var(--mic-particle-opacity-base, 0.5);
+  }
+  25% {
+    transform: translateY(var(--mic-particle-float-y, -2px)) translateX(var(--mic-particle-float-x, 1px)) scale(var(--mic-particle-scale-drift, 1.1));
+    opacity: var(--mic-particle-opacity-drift, 0.7);
+  }
+  50% {
+    transform: translateY(0px) translateX(var(--mic-particle-float-x-alt, -1px)) scale(1);
+    opacity: var(--mic-particle-opacity-base, 0.5);
+  }
+  75% {
+    transform: translateY(var(--mic-particle-float-y-alt, 1px)) translateX(0px) scale(var(--mic-particle-scale-drift, 1.1));
+    opacity: var(--mic-particle-opacity-drift, 0.7);
+  }
+}

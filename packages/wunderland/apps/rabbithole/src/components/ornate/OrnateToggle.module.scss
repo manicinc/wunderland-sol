@@ -1,0 +1,286 @@
+// ============================================================================
+// ORNATE TOGGLE — Decorative analog switch with brass/gold bezel
+// ============================================================================
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.track {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: 14px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: visible;
+
+  // Outer bezel ring
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 17px;
+    background: linear-gradient(
+      135deg,
+      #c9a227 0%,
+      #e8d48a 25%,
+      #b08d57 50%,
+      #8b6914 75%,
+      #c9a227 100%
+    );
+    z-index: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  // Inner track surface
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    z-index: 1;
+    transition: all 0.4s ease;
+  }
+}
+
+.trackOff {
+  &::after {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.trackOn {
+  &::after {
+    background: linear-gradient(180deg, #1a3a2e 0%, #0d2a1a 100%);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 12px rgba(16, 255, 176, 0.2);
+  }
+}
+
+.thumb {
+  position: absolute;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  z-index: 2;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  // Metallic surface
+  background: linear-gradient(
+    145deg,
+    #e8d48a 0%,
+    #c9a227 30%,
+    #b08d57 60%,
+    #8b6914 100%
+  );
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+
+  // Center dot
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transition: all 0.4s ease;
+  }
+}
+
+.thumbOff {
+  left: 3px;
+
+  &::after {
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.thumbOn {
+  left: 31px;
+
+  &::after {
+    background: #10ffb0;
+    box-shadow:
+      0 0 6px rgba(16, 255, 176, 0.6),
+      0 0 12px rgba(16, 255, 176, 0.3);
+  }
+}
+
+.label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: color 0.3s ease;
+}
+
+.labelOff {
+  color: var(--color-text-dim, #6b6b7b);
+}
+
+.labelOn {
+  color: var(--color-text, #e0e0f0);
+}
+
+// --- Size variants ---
+
+.sm {
+  .track {
+    width: 44px;
+    height: 22px;
+    border-radius: 11px;
+
+    &::before {
+      inset: -2px;
+      border-radius: 13px;
+    }
+
+    &::after {
+      border-radius: 11px;
+    }
+  }
+
+  .thumb {
+    top: 2px;
+    width: 18px;
+    height: 18px;
+
+    &::after {
+      width: 6px;
+      height: 6px;
+    }
+  }
+
+  .thumbOff {
+    left: 2px;
+  }
+
+  .thumbOn {
+    left: 24px;
+  }
+
+  .label {
+    font-size: 0.6875rem;
+  }
+}
+
+.lg {
+  .track {
+    width: 68px;
+    height: 34px;
+    border-radius: 17px;
+
+    &::before {
+      inset: -4px;
+      border-radius: 21px;
+    }
+
+    &::after {
+      border-radius: 17px;
+    }
+  }
+
+  .thumb {
+    top: 4px;
+    width: 26px;
+    height: 26px;
+
+    &::after {
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  .thumbOff {
+    left: 4px;
+  }
+
+  .thumbOn {
+    left: 38px;
+  }
+}
+
+// --- Light mode ---
+
+:global(html.light) {
+  .track {
+    &::before {
+      background: linear-gradient(
+        135deg,
+        #b08d57 0%,
+        #d4b06a 25%,
+        #c9a227 50%,
+        #a07a20 75%,
+        #b08d57 100%
+      );
+    }
+  }
+
+  .trackOff::after {
+    background: linear-gradient(180deg, #e8e4dc 0%, #d5d0c8 100%);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .trackOn::after {
+    background: linear-gradient(180deg, #d4eee0 0%, #c0e0d0 100%);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.08),
+      0 0 8px rgba(16, 180, 120, 0.15);
+  }
+
+  .thumb {
+    background: linear-gradient(
+      145deg,
+      #d4b06a 0%,
+      #c9a227 30%,
+      #a07a20 60%,
+      #8b6914 100%
+    );
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      inset 0 1px 1px rgba(255, 255, 255, 0.4),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .thumbOn::after {
+    background: #0fa874;
+    box-shadow: 0 0 4px rgba(15, 168, 116, 0.4);
+  }
+
+  .thumbOff::after {
+    background: rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .labelOff {
+    color: #6b6b7b;
+  }
+
+  .labelOn {
+    color: #2a2a3e;
+  }
+}

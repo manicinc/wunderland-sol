@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.voice.twilio",
+  "name": "Twilio Voice Call Extension",
+  "version": "0.1.0",
+  "description": "Twilio telephony provider for voice calls — supports outbound/inbound calls, TwiML, media streams, and bidirectional audio.",
+  "categories": ["voice", "telephony"],
+  "platforms": ["twilio"],
+  "sdk": "twilio",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "twilioVoiceCall",
+      "displayName": "Twilio Voice Call"
+    },
+    {
+      "kind": "voice-provider",
+      "id": "twilioVoiceProvider",
+      "displayName": "Twilio Voice Provider"
+    }
+  ],
+  "requiredSecrets": ["twilio.accountSid", "twilio.authToken"],
+  "features": [
+    "Outbound phone calls with TwiML",
+    "Inbound call webhook handling",
+    "Notify mode (TTS + hangup)",
+    "Conversation mode (bidirectional media streams)",
+    "HMAC-SHA1 webhook signature verification",
+    "Call status callback processing",
+    "E.164 phone number validation"
+  ]
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(7, 12)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.5"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.5"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.5"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.5"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.5"/>
+    </g>
+</svg>

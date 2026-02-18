@@ -1,0 +1,477 @@
+// File: frontend/src/styles/utilities/_mobile-responsive.scss
+/**
+ * @file _mobile-responsive.scss
+ * @description Mobile-first responsive utilities and mixins for touch devices,
+ * landscape/portrait orientations, and adaptive layouts.
+ *
+ * @version 1.0.0
+ */
+
+@use '../abstracts/variables' as var;
+
+// ============================================================================
+// Breakpoint Definitions
+// ============================================================================
+
+$breakpoints: (
+  'xs': 320px,   // Small phones
+  'sm': 480px,   // Large phones
+  'md': 768px,   // Tablets
+  'lg': 1024px,  // Small laptops/tablets landscape
+  'xl': 1280px,  // Desktops
+  'xxl': 1536px, // Large screens
+);
+
+// ============================================================================
+// Responsive Mixins
+// ============================================================================
+
+/**
+ * @mixin respond-to
+ * @description Apply styles at a specific breakpoint and above (mobile-first).
+ * @param {String} $breakpoint - The breakpoint name from $breakpoints map.
+ */
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: #{map-get($breakpoints, $breakpoint)}) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint `#{$breakpoint}` not found in `$breakpoints`.";
+  }
+}
+
+/**
+ * @mixin respond-below
+ * @description Apply styles below a specific breakpoint (desktop-first).
+ * @param {String} $breakpoint - The breakpoint name.
+ */
+@mixin respond-below($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: #{map-get($breakpoints, $breakpoint) - 1px}) {
+      @content;
+    }
+  }
+}
+
+/**
+ * @mixin respond-between
+ * @description Apply styles between two breakpoints.
+ */
+@mixin respond-between($lower, $upper) {
+  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
+    @media (min-width: #{map-get($breakpoints, $lower)}) and (max-width: #{map-get($breakpoints, $upper) - 1px}) {
+      @content;
+    }
+  }
+}
+
+// ============================================================================
+// Orientation Mixins
+// ============================================================================
+
+/**
+ * @mixin landscape
+ * @description Apply styles only in landscape orientation.
+ */
+@mixin landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+/**
+ * @mixin portrait
+ * @description Apply styles only in portrait orientation.
+ */
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+/**
+ * @mixin mobile-landscape
+ * @description Apply styles for mobile devices in landscape mode.
+ */
+@mixin mobile-landscape {
+  @media (max-height: 500px) and (orientation: landscape) {
+    @content;
+  }
+}
+
+/**
+ * @mixin tablet-portrait
+ * @description Apply styles for tablets in portrait mode.
+ */
+@mixin tablet-portrait {
+  @media (min-width: map-get($breakpoints, 'md')) and (max-width: map-get($breakpoints, 'lg') - 1px) and (orientation: portrait) {
+    @content;
+  }
+}
+
+// ============================================================================
+// Touch Device Detection
+// ============================================================================
+
+/**
+ * @mixin touch-device
+ * @description Apply styles for touch-capable devices.
+ */
+@mixin touch-device {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+/**
+ * @mixin non-touch-device
+ * @description Apply styles for non-touch devices (mouse/trackpad).
+ */
+@mixin non-touch-device {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+/**
+ * @mixin touch-hover
+ * @description Apply hover styles only on devices that support hover.
+ * Prevents sticky hover on touch devices.
+ */
+@mixin touch-hover {
+  @media (hover: hover) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+// ============================================================================
+// Touch-Friendly Sizing
+// ============================================================================
+
+/// Minimum touch target size (WCAG 2.1 Level AAA recommends 44x44px)
+$touch-target-min: 44px;
+$touch-target-comfortable: 48px;
+
+/**
+ * @mixin touch-target
+ * @description Ensures element meets minimum touch target size.
+ * @param {Length} $size - Minimum size (default: 44px).
+ */
+@mixin touch-target($size: $touch-target-min) {
+  min-width: $size;
+  min-height: $size;
+  
+  // Increase hit area for small elements
+  @include touch-device {
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: $size;
+      min-height: $size;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+/**
+ * @mixin touch-safe-spacing
+ * @description Adds extra padding on touch devices for easier interaction.
+ */
+@mixin touch-safe-spacing($mobile-padding: 1rem, $desktop-padding: 0.5rem) {
+  padding: $desktop-padding;
+  
+  @include touch-device {
+    padding: $mobile-padding;
+  }
+}
+
+// ============================================================================
+// Safe Area Support (Notch/Rounded Corners)
+// ============================================================================
+
+/**
+ * @mixin safe-area-padding
+ * @description Adds safe area insets for devices with notches/rounded corners.
+ */
+@mixin safe-area-padding {
+  padding-left: max(env(safe-area-inset-left), 1rem);
+  padding-right: max(env(safe-area-inset-right), 1rem);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/**
+ * @mixin safe-area-bottom
+ * @description Adds bottom safe area for home indicator/gesture bar.
+ */
+@mixin safe-area-bottom($min-padding: 1rem) {
+  padding-bottom: max(env(safe-area-inset-bottom), $min-padding);
+}
+
+// ============================================================================
+// Responsive Grid Utilities
+// ============================================================================
+
+/**
+ * @mixin responsive-grid
+ * @description Creates an adaptive grid that adjusts columns based on viewport.
+ * @param {Length} $min-item-width - Minimum width for each grid item.
+ * @param {Length} $gap - Gap between items.
+ */
+@mixin responsive-grid($min-item-width: 280px, $gap: 1rem) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min($min-item-width, 100%), 1fr));
+  gap: $gap;
+}
+
+/**
+ * @mixin stack-on-mobile
+ * @description Converts a row layout to stacked on mobile.
+ */
+@mixin stack-on-mobile($breakpoint: 'md') {
+  display: flex;
+  flex-direction: column;
+  
+  @include respond-to($breakpoint) {
+    flex-direction: row;
+  }
+}
+
+// ============================================================================
+// Typography Scaling
+// ============================================================================
+
+/**
+ * @mixin fluid-type
+ * @description Creates fluid typography that scales with viewport.
+ * @param {Length} $min-size - Minimum font size.
+ * @param {Length} $max-size - Maximum font size.
+ * @param {Length} $min-viewport - Minimum viewport width.
+ * @param {Length} $max-viewport - Maximum viewport width.
+ */
+@mixin fluid-type($min-size, $max-size, $min-viewport: 320px, $max-viewport: 1200px) {
+  font-size: $min-size;
+  
+  @media (min-width: $min-viewport) {
+    font-size: clamp(
+      #{$min-size},
+      calc(#{$min-size} + (#{$max-size} - #{$min-size}) * ((100vw - #{$min-viewport}) / (#{$max-viewport} - #{$min-viewport}))),
+      #{$max-size}
+    );
+  }
+  
+  @media (min-width: $max-viewport) {
+    font-size: $max-size;
+  }
+}
+
+// ============================================================================
+// Mobile Utility Classes
+// ============================================================================
+
+// Hide on specific breakpoints
+.hide-mobile {
+  @include respond-below('md') {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  @include respond-between('md', 'lg') {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @include respond-to('lg') {
+    display: none !important;
+  }
+}
+
+// Show only on specific breakpoints
+.show-mobile-only {
+  display: none !important;
+  
+  @include respond-below('md') {
+    display: block !important;
+  }
+}
+
+.show-tablet-only {
+  display: none !important;
+  
+  @include respond-between('md', 'lg') {
+    display: block !important;
+  }
+}
+
+.show-desktop-only {
+  display: none !important;
+  
+  @include respond-to('lg') {
+    display: block !important;
+  }
+}
+
+// Orientation-specific visibility
+.hide-landscape {
+  @include landscape {
+    display: none !important;
+  }
+}
+
+.hide-portrait {
+  @include portrait {
+    display: none !important;
+  }
+}
+
+// Touch-friendly spacing
+.touch-padding {
+  @include touch-safe-spacing;
+}
+
+// Safe area utilities
+.safe-area-inset {
+  @include safe-area-padding;
+}
+
+.safe-area-bottom {
+  @include safe-area-bottom;
+}
+
+// ============================================================================
+// Swipe Gesture Support
+// ============================================================================
+
+/**
+ * @mixin swipeable
+ * @description Enables horizontal swiping/scrolling with snap points.
+ */
+@mixin swipeable($snap-align: start) {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  > * {
+    flex-shrink: 0;
+    scroll-snap-align: $snap-align;
+  }
+}
+
+// ============================================================================
+// Pull-to-Refresh Support
+// ============================================================================
+
+.pull-to-refresh-container {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+// ============================================================================
+// Bottom Sheet / Drawer Support
+// ============================================================================
+
+/**
+ * @mixin bottom-sheet
+ * @description Styles for mobile bottom sheet pattern.
+ */
+@mixin bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 90vh;
+  border-radius: 1rem 1rem 0 0;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  
+  &.is-open {
+    transform: translateY(0);
+  }
+  
+  @include safe-area-bottom;
+}
+
+// ============================================================================
+// Prevent Zoom on Input Focus (iOS)
+// ============================================================================
+
+@mixin prevent-ios-zoom {
+  @include touch-device {
+    input, textarea, select {
+      font-size: 16px; // Prevents iOS zoom on focus
+    }
+  }
+}
+
+// ============================================================================
+// Adaptive Card Grid
+// ============================================================================
+
+.adaptive-card-grid {
+  @include responsive-grid(280px, 1rem);
+  
+  @include respond-below('sm') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================================
+// Mobile Navigation Pattern
+// ============================================================================
+
+.mobile-nav-bottom {
+  @include respond-below('md') {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-around;
+    background: var(--color-surface-elevated);
+    border-top: 1px solid var(--color-divider);
+    @include safe-area-bottom(0.5rem);
+    
+    > * {
+      @include touch-target;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      
+      &.active {
+        color: var(--color-accent);
+      }
+    }
+  }
+  
+  @include respond-to('md') {
+    display: none;
+  }
+}
+
+
+

@@ -1,0 +1,117 @@
+/**
+ * RabbitHoleLogo styles
+ * Uses brand typography: Cormorant Garamond + Tenor Sans
+ */
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .icon {
+    filter: brightness(1.1);
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  transition: filter 0.2s ease;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.wordmark {
+  line-height: 1.1;
+}
+
+.name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--rh-gold, #c9a227);
+  line-height: 1;
+}
+
+.inc {
+  font-family: 'Tenor Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--rh-gold, #c9a227);
+  line-height: 1;
+}
+
+.tagline {
+  font-family: 'Tenor Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  color: var(--rh-gold-dark, #8b6914);
+  line-height: 1;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+// Light mode — darker gold for readability on cream backgrounds
+:global(html.light) {
+    .name {
+        color: #6b4f10;
+    }
+
+    .inc {
+        color: #6b4f10;
+    }
+
+    .tagline {
+        color: #5a4310;
+    }
+}
+
+// Size variants
+.logo--sm {
+  .name {
+    font-size: 1rem;
+  }
+
+  .inc {
+    font-size: 0.4rem;
+  }
+
+  .tagline {
+    font-size: 0.5rem;
+  }
+}
+
+.logo--md {
+  .name {
+    font-size: 1.5rem;
+  }
+
+  .inc {
+    font-size: 0.6rem;
+  }
+
+  .tagline {
+    font-size: 0.6rem;
+  }
+}
+
+.logo--lg {
+  .name {
+    font-size: 2rem;
+  }
+
+  .inc {
+    font-size: 0.8rem;
+  }
+
+  .tagline {
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.16.1
+    container_name: agentos-qdrant
+    restart: unless-stopped
+    ports:
+      - '6333:6333' # HTTP
+      - '6334:6334' # gRPC (optional)
+    volumes:
+      - ../../db_data/qdrant:/qdrant/storage
+    # Local dev: leave QDRANT_API_KEY empty to disable auth.
+    # If set, AgentOS can use `QDRANT_API_KEY` / `AGENTOS_RAG_QDRANT_API_KEY`.
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:-}

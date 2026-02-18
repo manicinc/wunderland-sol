@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:1
+
+# Monorepo build for the NestJS backend (includes workspace deps like @framers/agentos).
+
+FROM node:20-bookworm-slim AS builder
+
+# Native deps for better-sqlite3 and other native modules.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /repo
+
+# Use the repo-pinned pnpm version.
+RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+
+# Copy the full workspace (filtered by .dockerignore).
+COPY . .
+
+# Install deps and build backend + its workspace deps.
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter voice-chat-assistant-backend... build
+
+# Create a minimal, deployable folder for runtime.
+# pnpm v10 requires injected workspaces by default; `--legacy` keeps the old behavior.
+RUN pnpm --filter voice-chat-assistant-backend deploy --legacy --prod /out
+
+# -----------------------------------------------------------------------------
+
+FROM node:20-bookworm-slim
+
+ENV NODE_ENV=production
+
+WORKDIR /app
+
+COPY --from=builder /out/ ./
+
+# Backend defaults to PORT=3001 when unset, but we keep it explicit in docker-compose.
+EXPOSE 3001
+
+CMD ["node", "dist/src/main.js"]
+

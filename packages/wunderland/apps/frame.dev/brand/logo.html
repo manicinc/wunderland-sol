@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FABRIC - Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg: #F7F7F5;
+            --surface: #FFFFFF;
+            --border: #E5E5E5;
+            --text: #0F0F0F;
+            --text-soft: #3D3D3D;
+            --text-muted: #6B6B6B;
+            --accent: #1A7F4B;
+            --accent-soft: #22A55D;
+            --preview-bg: #FFFFFF;
+            --preview-text: #0F0F0F;
+            --preview-text-muted: #6B6B6B;
+        }
+        
+        .dark-mode {
+            --bg: #0F0F0F;
+            --surface: #1A1A1A;
+            --border: #2A2A2A;
+            --text: #F5F5F5;
+            --text-soft: #BEBEBE;
+            --text-muted: #858585;
+            --accent: #C93A3A;
+            --accent-soft: #E05555;
+            --preview-bg: #0F0F0F;
+            --preview-text: #F5F5F5;
+            --preview-text-muted: #999999;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            font-size: 14px;
+            transition: background 0.2s, color 0.2s;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header-title {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+        
+        .header-subtitle {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        /* Tab switcher */
+        .mode-tabs {
+            display: flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
+        }
+        
+        .mode-tab {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mode-tab .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .mode-tab.light .dot { background: #1A7F4B; }
+        .mode-tab.dark .dot { background: #C93A3A; }
+        
+        .mode-tab.active {
+            background: var(--border);
+            color: var(--text);
+        }
+        
+        section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .preview-area {
+            padding: 4rem 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--preview-bg);
+            min-height: 200px;
+            transition: background 0.2s;
+        }
+        
+        .card-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .control-label {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        
+        .toggle {
+            width: 36px;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .toggle.active {
+            background: var(--accent);
+        }
+        
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .toggle.active::after {
+            transform: translateX(16px);
+        }
+        
+        .tagline-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+            font-family: inherit;
+            color: var(--text);
+            width: 200px;
+            transition: border-color 0.15s ease;
+        }
+        
+        .tagline-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-soft);
+            border-color: var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--text-muted);
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            min-width: 120px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.15s ease;
+            z-index: 50;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            background: transparent;
+            text-align: left;
+            font-size: 0.8125rem;
+            color: var(--text-soft);
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        /* Icon grid */
+        .icon-row {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 2.5rem;
+            padding: 3rem;
+            background: var(--preview-bg);
+        }
+        
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .icon-size {
+            font-size: 0.6875rem;
+            color: var(--preview-text-muted);
+        }
+        
+        /* Specs */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+        
+        .spec-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .spec-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .color-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 0.625rem;
+        }
+        
+        .color-row:last-child { margin-bottom: 0; }
+        
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.15s;
+            flex-shrink: 0;
+        }
+        
+        .color-swatch:hover { transform: scale(1.1); }
+        
+        .color-name {
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+        
+        .color-hex {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+        }
+        
+        .type-sample {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.75rem;
+            font-weight: 400;
+            margin-bottom: 0.75rem;
+        }
+        
+        .type-details {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        
+        .usage-list {
+            list-style: none;
+        }
+        
+        .usage-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8125rem;
+            color: var(--text-soft);
+        }
+        
+        .usage-list li:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .current-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        
+        .current-mode-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem 1rem; }
+            .preview-area { padding: 3rem 1.5rem; }
+            .card-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .controls { flex-direction: column; align-items: stretch; }
+            .tagline-input { width: 100%; }
+            .icon-row { gap: 1.5rem; flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1 class="header-title">Fabric</h1>
+                <p class="header-subtitle">Brand Assets & Export</p>
+            </div>
+            <div class="mode-tabs">
+                <button class="mode-tab light active" onclick="setMode('light')">
+                    <span class="dot"></span> Light
+                </button>
+                <button class="mode-tab dark" onclick="setMode('dark')">
+                    <span class="dot"></span> Dark
+                </button>
+            </div>
+        </header>
+        
+        <!-- Primary Logo -->
+        <section>
+            <div class="section-header">
+                <span class="section-label">Primary Logo</span>
+                <span class="current-mode-badge"><span class="dot"></span> <span id="modeBadge">Green · Light</span></span>
+            </div>
+            <div class="card">
+                <div class="preview-area" id="logoPreview"></div>
+                <div class="card-footer">
+                    <div class="controls">
+                        <div class="control-group">
+                            <span class="control-label">Tagline</span>
+                            <div class="toggle active" id="taglineToggle" onclick="toggleTagline()"></div>
+                        </div>
+                        <input 
+                            type="text" 
+                            class="tagline-input" 
+                            id="taglineInput" 
+                            value="The fabric of knowledge"
+                            oninput="updateTagline()"
+                        >
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="downloadSVG('logo')">SVG</button>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary">PNG ↓</button>
+                            <div class="dropdown-content">
+                                <button class="dropdown-item" onclick="downloadPNG('logo', 1)">1x</button>
+                                <button class="dropdown-item" onclick="downloadPNG('logo', 2)">2x</button>
+                                <button class="dropdown-item" onclick="downloadPNG('logo', 4)">4x</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Wordmark -->
+        <section>
+            <div class="section-header">
+                <span class="section-label">Wordmark</span>
+            </div>
+            <div class="card">
+                <div class="preview-area" id="wordmarkPreview"></div>
+                <div class="card-footer">
+                    <div></div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="downloadSVG('wordmark')">SVG</button>
+                        <button class="btn btn-secondary" onclick="downloadPNG('wordmark', 2)">PNG 2x</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Icon -->
+        <section>
+            <div class="section-header">
+                <span class="section-label">Icon / Favicon</span>
+            </div>
+            <div class="card">
+                <div class="icon-row" id="iconPreview"></div>
+                <div class="card-footer">
+                    <div></div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="downloadSVG('icon')">SVG</button>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary">PNG ↓</button>
+                            <div class="dropdown-content">
+                                <button class="dropdown-item" onclick="downloadPNG('icon', 16)">16px</button>
+                                <button class="dropdown-item" onclick="downloadPNG('icon', 32)">32px</button>
+                                <button class="dropdown-item" onclick="downloadPNG('icon', 64)">64px</button>
+                                <button class="dropdown-item" onclick="downloadPNG('icon', 128)">128px</button>
+                                <button class="dropdown-item" onclick="downloadPNG('icon', 256)">256px</button>
+                                <button class="dropdown-item" onclick="downloadPNG('icon', 512)">512px</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Specs -->
+        <section>
+            <div class="section-header">
+                <span class="section-label">Brand Specifications</span>
+            </div>
+            <div class="specs-grid">
+                <div class="spec-card" id="colorSpec"></div>
+                
+                <div class="spec-card">
+                    <p class="spec-title">Typography</p>
+                    <p class="type-sample">Fabric</p>
+                    <p class="type-details">
+                        <strong>Wordmark:</strong> Fraunces, 400<br>
+                        <strong>Tagline:</strong> Inter, 400
+                    </p>
+                </div>
+                
+                <div class="spec-card">
+                    <p class="spec-title">Usage</p>
+                    <ul class="usage-list">
+                        <li>Green variant for light backgrounds</li>
+                        <li>Red variant for dark backgrounds</li>
+                        <li>Minimum logo width: 120px</li>
+                        <li>Minimum icon size: 16px</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // State
+        let currentMode = 'light';
+        let showTagline = true;
+        let taglineText = 'The fabric of knowledge';
+        
+        // Colors per mode
+        const palette = {
+            light: {
+                primary: '#1A7F4B',
+                secondary: '#22A55D',
+                text: '#0F0F0F',
+                textMuted: '#6B6B6B',
+                bg: '#FFFFFF',
+                name: 'Green'
+            },
+            dark: {
+                primary: '#C93A3A',
+                secondary: '#E05555',
+                text: '#F5F5F5',
+                textMuted: '#999999',
+                bg: '#0F0F0F',
+                name: 'Red'
+            }
+        };
+        
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        
+        // SVG generators
+        function logoSVG(mode, withTagline, tagline) {
+            const c = palette[mode];
+            const h = withTagline ? 56 : 42;
+            const ty = withTagline ? 30 : 28;
+            return `<svg width="200" height="${h}" viewBox="0 0 200 ${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${c.primary}"/>
+            <stop offset="100%" stop-color="${c.secondary}"/>
+        </linearGradient>
+    </defs>
+    <g transform="translate(0,${withTagline ? 0 : 0})">
+        <rect x="0" y="0" width="36" height="4" rx="2" fill="${c.primary}"/>
+        <rect x="4" y="9" width="32" height="4" rx="2" fill="${c.primary}" opacity="0.7"/>
+        <rect x="0" y="18" width="36" height="4" rx="2" fill="${c.primary}" opacity="0.5"/>
+        <rect x="4" y="27" width="32" height="4" rx="2" fill="${c.primary}" opacity="0.35"/>
+        <rect x="0" y="36" width="36" height="4" rx="2" fill="${c.primary}" opacity="0.2"/>
+        <rect x="0" y="0" width="4" height="40" rx="2" fill="url(#grad)"/>
+    </g>
+    <text x="48" y="${ty}" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" letter-spacing="0.01em" fill="${c.text}">Fabric</text>
+    ${withTagline ? `<text x="49" y="${ty + 16}" font-family="Inter, sans-serif" font-size="9" letter-spacing="0.04em" fill="${c.textMuted}">${escapeHtml(tagline)}</text>` : ''}
+</svg>`;
+        }
+        
+        function wordmarkSVG(mode) {
+            const c = palette[mode];
+            return `<svg width="110" height="32" viewBox="0 0 110 32" xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="26" font-family="Fraunces, Georgia, serif" font-size="26" font-weight="400" letter-spacing="0.01em" fill="${c.text}">Fabric</text>
+</svg>`;
+        }
+        
+        function iconSVG(mode) {
+            const c = palette[mode];
+            return `<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${c.primary}"/>
+            <stop offset="100%" stop-color="${c.secondary}"/>
+        </linearGradient>
+    </defs>
+    <rect x="10" y="8" width="44" height="6" rx="3" fill="${c.primary}"/>
+    <rect x="16" y="19" width="38" height="6" rx="3" fill="${c.primary}" opacity="0.7"/>
+    <rect x="10" y="30" width="44" height="6" rx="3" fill="${c.primary}" opacity="0.5"/>
+    <rect x="16" y="41" width="38" height="6" rx="3" fill="${c.primary}" opacity="0.35"/>
+    <rect x="10" y="52" width="44" height="6" rx="3" fill="${c.primary}" opacity="0.2"/>
+    <rect x="10" y="8" width="6" height="50" rx="3" fill="url(#iconGrad)"/>
+</svg>`;
+        }
+        
+        // Render
+        function render() {
+            const c = palette[currentMode];
+            
+            // Update body class
+            document.body.classList.toggle('dark-mode', currentMode === 'dark');
+            
+            // Update tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.classList.contains(currentMode));
+            });
+            
+            // Mode badge
+            document.getElementById('modeBadge').textContent = `${c.name} · ${currentMode === 'light' ? 'Light' : 'Dark'}`;
+            
+            // Logo preview
+            document.getElementById('logoPreview').innerHTML = logoSVG(currentMode, showTagline, taglineText);
+            
+            // Wordmark preview
+            document.getElementById('wordmarkPreview').innerHTML = wordmarkSVG(currentMode);
+            
+            // Icon preview
+            const sizes = [64, 48, 32, 16];
+            document.getElementById('iconPreview').innerHTML = sizes.map(s => `
+                <div class="icon-item">
+                    <svg width="${s}" height="${s}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="ig${s}" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="${c.primary}"/>
+                                <stop offset="100%" stop-color="${c.secondary}"/>
+                            </linearGradient>
+                        </defs>
+                        <rect x="10" y="8" width="44" height="6" rx="3" fill="${c.primary}"/>
+                        <rect x="16" y="19" width="38" height="6" rx="3" fill="${c.primary}" opacity="0.7"/>
+                        <rect x="10" y="30" width="44" height="6" rx="3" fill="${c.primary}" opacity="0.5"/>
+                        <rect x="16" y="41" width="38" height="6" rx="3" fill="${c.primary}" opacity="0.35"/>
+                        <rect x="10" y="52" width="44" height="6" rx="3" fill="${c.primary}" opacity="0.2"/>
+                        <rect x="10" y="8" width="6" height="50" rx="3" fill="url(#ig${s})"/>
+                    </svg>
+                    <span class="icon-size">${s}px</span>
+                </div>
+            `).join('');
+            
+            // Color spec
+            document.getElementById('colorSpec').innerHTML = `
+                <p class="spec-title">Colors (${c.name})</p>
+                <div class="color-row">
+                    <div class="color-swatch" style="background:${c.primary}" onclick="copyColor('${c.primary}')"></div>
+                    <div>
+                        <p class="color-name">Primary</p>
+                        <p class="color-hex">${c.primary}</p>
+                    </div>
+                </div>
+                <div class="color-row">
+                    <div class="color-swatch" style="background:${c.secondary}" onclick="copyColor('${c.secondary}')"></div>
+                    <div>
+                        <p class="color-name">Secondary</p>
+                        <p class="color-hex">${c.secondary}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Mode switch
+        function setMode(mode) {
+            currentMode = mode;
+            render();
+        }
+        
+        // Tagline toggle
+        function toggleTagline() {
+            showTagline = !showTagline;
+            document.getElementById('taglineToggle').classList.toggle('active', showTagline);
+            document.getElementById('taglineInput').style.opacity = showTagline ? 1 : 0.4;
+            render();
+        }
+        
+        // Tagline update
+        function updateTagline() {
+            taglineText = document.getElementById('taglineInput').value || 'The fabric of knowledge';
+            render();
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+        
+        // Copy
+        function copyColor(hex) {
+            navigator.clipboard.writeText(hex);
+            showToast(`Copied ${hex}`);
+        }
+        
+        // Download SVG
+        function downloadSVG(type) {
+            let svg;
+            if (type === 'logo') svg = `<?xml version="1.0" encoding="UTF-8"?>\n${logoSVG(currentMode, showTagline, taglineText)}`;
+            else if (type === 'wordmark') svg = `<?xml version="1.0" encoding="UTF-8"?>\n${wordmarkSVG(currentMode)}`;
+            else svg = `<?xml version="1.0" encoding="UTF-8"?>\n${iconSVG(currentMode)}`;
+            
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `fabric-${type}-${currentMode}.svg`;
+            a.click();
+            showToast('Downloaded SVG');
+        }
+        
+        // Download PNG
+        function downloadPNG(type, size) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            let svg;
+            if (type === 'logo') svg = logoSVG(currentMode, showTagline, taglineText);
+            else if (type === 'wordmark') svg = wordmarkSVG(currentMode);
+            else svg = iconSVG(currentMode);
+            
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = () => {
+                if (type === 'icon') {
+                    canvas.width = size;
+                    canvas.height = size;
+                } else if (type === 'logo') {
+                    const h = showTagline ? 56 : 42;
+                    canvas.width = 200 * size;
+                    canvas.height = h * size;
+                } else {
+                    canvas.width = 110 * size;
+                    canvas.height = 32 * size;
+                }
+                
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                canvas.toBlob(b => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(b);
+                    a.download = `fabric-${type}-${currentMode}-${type === 'icon' ? size + 'px' : size + 'x'}.png`;
+                    a.click();
+                    showToast('Downloaded PNG');
+                }, 'image/png');
+                
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+        
+        // Init
+        render();
+    </script>
+</body>
+</html>

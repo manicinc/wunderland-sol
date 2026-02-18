@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# DYNAMIC DOCUMENTS LOOM - Embark-Style Features
+# ═══════════════════════════════════════════════════════════════════════════════
+# This loom demonstrates the Embark-inspired dynamic documents features:
+# @mentions, formulas, embedded views, and AI enrichment.
+# Based on Ink & Switch's "Embark: Dynamic Documents as Personal Software" paper.
+
+name: Dynamic Documents
+description: Interactive examples of @mentions, formulas, maps, and embedded views inspired by Ink & Switch's Embark research
+
+style:
+  icon: Sparkles
+  accentColor: "#f97316"
+  backgroundColor: "#fff7ed"
+  backgroundGradient: "linear-gradient(135deg, #fed7aa 0%, #fdba74 50%, #fb923c 100%)"
+  darkText: true
+
+metadata:
+  author: Frame Team
+  created: "2024-12-31"
+  updated: "2024-12-31"
+  tags:
+    - embark
+    - dynamic-documents
+    - mentions
+    - formulas
+    - views
+    - maps
+    - calendars
+    - interactive
+  license: MIT
+  references:
+    - title: "Embark: Dynamic Documents as Personal Software"
+      url: "https://inkandswitch.com/embark"
+      authors: ["Paul Sonnentag", "Alexander Obenauer", "Geoffrey Litt"]
+      conference: "LIVE 2023"
+
+order: 1
+featured: true
+hidden: false
+
+
+
+

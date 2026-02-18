@@ -1,0 +1,22 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "registry/curated/auth/src/index.ts",
+    "registry/curated/communications/telegram-bot/src/index.ts",
+    "registry/curated/integrations/telegram/src/index.ts",
+    "registry/curated/provenance/anchor-providers/src/index.ts",
+    "registry/curated/research/web-browser/src/index.ts",
+    "registry/curated/research/web-search/src/index.ts",
+    "registry/curated/system/cli-executor/src/index.ts"
+  ],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "name": "AgentOS Extensions API",
+  "includeVersion": true,
+  "hideGenerator": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "treatWarningsAsErrors": false,
+  "skipErrorChecking": true
+}

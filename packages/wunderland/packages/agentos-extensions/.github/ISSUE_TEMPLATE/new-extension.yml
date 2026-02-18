@@ -1,0 +1,78 @@
+name: 🚀 New Extension Proposal
+description: Propose a new extension for AgentOS
+title: "[Extension]: "
+labels: ["extension-proposal", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a new extension! We provide **FREE CI/CD** for all community extensions.
+  
+  - type: input
+    id: name
+    attributes:
+      label: Extension Name
+      description: What will your extension be called?
+      placeholder: e.g., Weather, Database, Email
+    validations:
+      required: true
+  
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What will this extension do?
+      placeholder: Describe the functionality, use cases, and benefits
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - productivity
+        - research
+        - development
+        - integration
+        - communication
+        - utility
+    validations:
+      required: true
+  
+  - type: textarea
+    id: tools
+    attributes:
+      label: Planned Tools
+      description: What tools will this extension provide?
+      placeholder: |
+        - Tool 1: Description
+        - Tool 2: Description
+    validations:
+      required: true
+  
+  - type: textarea
+    id: api-requirements
+    attributes:
+      label: API Requirements
+      description: Does this require external APIs? Are there free tiers available?
+      placeholder: |
+        - API Name: Free tier details, signup link
+        - No API required
+  
+  - type: checkboxes
+    id: commitment
+    attributes:
+      label: Development Commitment
+      options:
+        - label: I am willing to develop this extension
+        - label: I will maintain this extension
+        - label: I will provide documentation and examples
+        - label: I will write tests (>80% coverage)
+  
+  - type: textarea
+    id: timeline
+    attributes:
+      label: Estimated Timeline
+      description: When could you have this ready?
+      placeholder: e.g., 1-2 weeks

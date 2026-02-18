@@ -1,0 +1,966 @@
+// File: frontend/src/styles/views/_about-page.scss
+/**
+ * @file _about-page.scss
+ * @description Styles specific to the About.vue page, implementing the "Ephemeral Harmony" design.
+ * @version 1.0.2 - Corrected SASS calculations, mixin parameters, and ensured theme consistency.
+ */
+
+@use 'sass:math'; // For math.div() if needed, and for modern SASS practices
+@use 'sass:string'; // For string.unquote()
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use '../components/buttons' as buttonsFile; 
+@use '../components/cards' as cardsFile; 
+
+.guest-pill-ephemeral {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) + 5%), 0.25), hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), calc(var(--color-accent-secondary-l) + 10%), 0.35));
+  border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.35);
+  color: var(--color-text-primary);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+.guest-pill-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-accent-primary);
+}
+
+.guest-pill-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.hero-guest-pill {
+  margin: 0 auto 1.5rem;
+}
+
+.about-page-ephemeral {
+  // CSS variable for section spacing. var.$spacing-xl is itself a calc string.
+  // We need to ensure the multiplication happens within a CSS calc().
+  --section-spacing-y: calc(#{var.$spacing-xl} * 2.5); 
+  --content-max-width: #{var.$site-max-width}; // This correctly interpolates the SASS variable
+  --card-accent-color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+
+  background-color: hsl(var(--color-bg-primary-h, #{var.$default-color-bg-primary-h}), var(--color-bg-primary-s, #{var.$default-color-bg-primary-s}), var(--color-bg-primary-l, #{var.$default-color-bg-primary-l}));
+  color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+  min-height: 100vh; 
+}
+
+.about-header-ephemeral {
+  padding: var.$spacing-md var.$spacing-lg;
+  @include mixins.glassmorphic-pane(
+    $bg-color-css-var-prefix: '--color-bg-primary', 
+    $border-color-css-var-prefix: '--color-border-glass', 
+    $blur-amount-css-var: '--blur-glass', 
+    $shadow-css-var: '--shadow-depth-sm',
+    // Fallbacks
+    $fb-bg-h: var.$default-color-bg-primary-h, 
+    $fb-bg-s: var.$default-color-bg-primary-s, 
+    $fb-bg-l: calc(#{var.$default-color-bg-primary-l} + 2%), // SASS calc is fine here
+    $fb-bg-a: 0.6, 
+    $fb-border-h: var.$default-color-border-glass-h, 
+    $fb-border-s: var.$default-color-border-glass-s, 
+    $fb-border-l: var.$default-color-border-glass-l, 
+    $fb-border-a: 0.25,
+    $fb-blur: var.$default-blur-glass, 
+    $fb-shadow: var.$scss-box-shadow-sm
+  );
+  position: sticky;
+  top: 0;
+  z-index: var.$z-index-sticky;
+  border-bottom: 1px solid hsla(var(--color-border-glass-h, #{var.$default-color-border-glass-h}),var(--color-border-glass-s, #{var.$default-color-border-glass-s}),var(--color-border-glass-l, #{var.$default-color-border-glass-l}), 0.2);
+
+  .header-content-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: var(--content-max-width); 
+    margin: 0 auto;
+  }
+
+  .logo-title-group {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-sm;
+  }
+  .header-logo-img {
+    width: 36px;
+    height: 36px;
+    filter: drop-shadow(0 0 5px hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}),0.5));
+  }
+  .main-page-title {
+    font-size: clamp(1.25rem, calc(1rem + 1vw), 1.75rem); // CSS calc
+    font-weight: 600;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+    @include mixins.text-glow(
+        $glow-color-var-prefix: '--color-accent-primary', 
+        $glow-radius: 5px, 
+        $fb-glow-h: var.$default-color-accent-primary-h,
+        $fb-glow-s: var.$default-color-accent-primary-s,
+        $fb-glow-l: var.$default-color-accent-primary-l,
+        $fb-glow-a: 0.6
+    );
+  }
+  .back-button-ephemeral { // Assuming this class is applied to a button component
+    // Styles for this button would typically come from _buttons.scss or be specific here
+    // Example: @extend .btn, .btn-ghost-ephemeral;
+    .icon-sm { width: 1.125rem; height: 1.125rem; margin-right: calc(#{var.$spacing-xs} * 0.8); } // SASS calc
+  }
+}
+
+.about-main-content-area {
+  padding: var.$spacing-lg;
+  max-width: calc(var(--content-max-width) + (#{var.$spacing-lg} * 2)); // CSS calc
+  margin: 0 auto;
+
+  @media (max-width: var.$breakpoint-sm) {
+    padding: var.$spacing-md;
+  }
+}
+
+.content-section-ephemeral {
+  margin-bottom: var(--section-spacing-y);
+  padding: var.$spacing-lg 0; 
+  &:last-of-type { margin-bottom: 0; }
+}
+
+.section-title-main {
+  font-size: clamp(1.8rem, calc(1.5rem + 2vw), 2.75rem); // CSS calc
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: calc(#{var.$spacing-lg} * 1.5); // SASS calc
+  color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+  @include mixins.text-glow(
+      $glow-color-var-prefix: '--color-accent-secondary', 
+      $glow-radius: 8px, 
+      $fb-glow-h: var.$default-color-accent-secondary-h,
+      $fb-glow-s: var.$default-color-accent-secondary-s,
+      $fb-glow-l: var.$default-color-accent-secondary-l,
+      $fb-glow-a: 0.4
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var.$spacing-sm;
+
+  .section-title-icon {
+    width: clamp(2rem, calc(1.5rem + 1.5vw), 2.5rem); // CSS calc
+    height: clamp(2rem, calc(1.5rem + 1.5vw), 2.5rem); // CSS calc
+    opacity: 0.8;
+    color: hsl(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}), var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}), var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}));
+  }
+
+  &.--expandable { 
+    cursor: pointer;
+    border-radius: var.$radius-lg;
+    padding: var.$spacing-sm var.$spacing-md;
+    transition: background-color var.$duration-quick;
+    &:hover {
+      background-color: hsla(var(--color-bg-secondary-h, #{var.$default-color-bg-secondary-h}),var(--color-bg-secondary-s, #{var.$default-color-bg-secondary-s}),var(--color-bg-secondary-l, #{var.$default-color-bg-secondary-l}), 0.4);
+    }
+    .chevron-indicator-about.--section-title { margin-left: auto; }
+  }
+}
+
+// Hero Section
+.hero-section-about {
+  text-align: center;
+  padding: calc(#{var.$spacing-xl} * 1.5) var.$spacing-lg; // SASS calc
+  margin-bottom: var(--section-spacing-y);
+  border-radius: var.$radius-3xl; 
+  position: relative; 
+  overflow: hidden; 
+
+  &.card-glass-interactive--hero { 
+    @include mixins.glassmorphic-pane(
+      $bg-color-css-var-prefix: '--color-bg-primary', 
+      $border-color-css-var-prefix: '--color-border-glass', 
+      $blur-amount-css-var: '--blur-glass', 
+      $shadow-css-var: '--shadow-depth-lg',
+      $fb-bg-h: var.$default-color-bg-primary-h, 
+      $fb-bg-s: var.$default-color-bg-primary-s, 
+      $fb-bg-l: calc(#{var.$default-color-bg-primary-l} + 1%), // SASS calc
+      $fb-bg-a: 0.7, 
+      $fb-border-h: var.$default-color-border-glass-h, 
+      $fb-border-s: var.$default-color-border-glass-s, 
+      $fb-border-l: var.$default-color-border-glass-l, 
+      $fb-border-a: 0.3,
+      $fb-blur: var.$default-blur-glass, 
+      $fb-shadow: var.$scss-box-shadow-lg
+    );
+    @include mixins.holographic-border-glow('--color-accent-primary', '--color-accent-secondary', 2px, 6s, var.$radius-3xl);
+  }
+
+  .hero-logo-wrapper { margin-bottom: var.$spacing-lg; }
+  .hero-logo-main {
+    width: clamp(80px, 15vw, 120px);
+    height: clamp(80px, 15vw, 120px);
+    margin: 0 auto;
+    filter: drop-shadow(0 0 20px hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}), 0.7));
+  }
+  .spinning-glow-logo { 
+    animation: spin 20s linear infinite, subtlePulse 3s ease-in-out infinite alternate; 
+    --scale-pulse: 1.05; // CSS variable for animation
+  }
+
+  .hero-main-title {
+    font-size: clamp(2rem, calc(1.5rem + 3.5vw), 3.75rem); // CSS calc
+    font-weight: 700; 
+    line-height: 1.2;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+    margin-bottom: var.$spacing-md;
+    text-wrap: balance;
+    @include mixins.text-glow(
+        $glow-color-var-prefix: '--color-accent-primary', 
+        $glow-radius: 10px, 
+        $fb-glow-h: var.$default-color-accent-primary-h,
+        $fb-glow-s: var.$default-color-accent-primary-s,
+        $fb-glow-l: var.$default-color-accent-primary-l,
+        $fb-glow-a: 0.5
+    );
+  }
+  .hero-sub-title {
+    font-size: clamp(1rem, calc(0.85rem + 0.75vw), 1.25rem); // CSS calc
+    color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+    max-width: 70ch;
+    margin: 0 auto var.$spacing-lg;
+    line-height: 1.7;
+    opacity: 0.9;
+    .highlight-text {
+      color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+      font-weight: 600;
+    }
+  }
+  .hero-cta-button { // Assuming this class is applied to a button component
+    // Example: @extend .btn, .btn-primary, .btn-lg;
+    padding: var.$spacing-md var.$spacing-xl !important; 
+    font-size: var.$font-size-lg !important;
+  }
+}
+
+// Mission Section
+.mission-grid-about {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var.$spacing-lg;
+}
+.mission-item-card-about {
+  padding: var.$spacing-lg;
+  text-align: center;
+  position: relative; 
+  border-left: 4px solid var(--card-accent-color); 
+
+  .mission-card-icon-wrapper {
+    width: 64px; height: 64px;
+    border-radius: var.$radius-full;
+    margin: 0 auto var.$spacing-md;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(145deg, hsla(var(--color-bg-secondary-h, #{var.$default-color-bg-secondary-h}),var(--color-bg-secondary-s, #{var.$default-color-bg-secondary-s}),var(--color-bg-secondary-l, #{var.$default-color-bg-secondary-l}),0.8), hsla(var(--color-bg-tertiary-h, #{var.$default-color-bg-tertiary-h}),var(--color-bg-tertiary-s, #{var.$default-color-bg-tertiary-s}),var(--color-bg-tertiary-l, #{var.$default-color-bg-tertiary-l}),0.9));
+    box-shadow: var(--shadow-depth-sm, #{var.$scss-box-shadow-sm});
+  }
+  .mission-card-icon {
+    width: 32px; height: 32px;
+    color: var(--card-accent-color);
+  }
+  .mission-card-title {
+    font-size: var.$font-size-xl;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var.$spacing-sm;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+  }
+  .mission-card-description {
+    font-size: var.$font-size-base-default;
+    color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+    line-height: 1.6;
+  }
+}
+
+// Expandable Sections
+.expandable-sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-lg;
+}
+.expandable-section-card-about {
+  padding: 0; 
+  overflow: hidden; 
+}
+.expandable-header-button-about {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: var.$spacing-md var.$spacing-lg;
+  text-align: left;
+  font-size: var.$font-size-lg;
+  font-weight: 600;
+  color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+  background-color: transparent; 
+  border: none;
+  cursor: pointer;
+  transition: background-color var.$duration-quick;
+
+  &:hover, &:focus-visible {
+    background-color: hsla(var(--color-bg-tertiary-h, #{var.$default-color-bg-tertiary-h}),var(--color-bg-tertiary-s, #{var.$default-color-bg-tertiary-s}),var(--color-bg-tertiary-l, #{var.$default-color-bg-tertiary-l}), 0.5);
+  }
+  &:focus-visible { @include mixins.focus-ring('--color-bg-secondary', '--color-accent-interactive'); }
+
+  .expandable-title-text {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-sm;
+  }
+  .expandable-title-icon {
+    width: 1.3em; height: 1.3em;
+    color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+  }
+}
+.chevron-indicator-about {
+  width: 1.25rem; height: 1.25rem;
+  color: hsl(var(--color-text-muted-h, #{var.$default-color-text-muted-h}), var(--color-text-muted-s, #{var.$default-color-text-muted-s}), var(--color-text-muted-l, #{var.$default-color-text-muted-l}));
+  transition: transform var.$duration-smooth var.$ease-out-expo;
+  &.rotated { transform: rotate(180deg); }
+}
+.expandable-content-wrapper-about {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var.$duration-movement var.$ease-in-out-quad, padding var.$duration-movement var.$ease-in-out-quad;
+  padding: 0 var.$spacing-lg;
+
+  &.open {
+    max-height: 2000px; 
+    padding: var.$spacing-md var.$spacing-lg var.$spacing-lg;
+  }
+}
+.prose-enhanced-about { 
+  font-size: var.$font-size-base-default;
+  line-height: 1.7;
+  color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+  h4 { font-size: var.$font-size-lg; margin-top: var.$spacing-lg; margin-bottom: var.$spacing-sm; color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));}
+  h5 { font-size: calc(#{var.$font-size-base-default} * 1.1); margin-top: var.$spacing-md; margin-bottom: var.$spacing-xs; font-weight: 600; color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l})); }
+  ul { list-style: disc; padding-left: var.$spacing-lg; margin-bottom: var.$spacing-md; }
+  li { margin-bottom: var.$spacing-xs; }
+  strong { font-weight: 600; color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));}
+  p + h5, ul + h5 { margin-top: var.$spacing-lg; }
+}
+
+// Components Grid
+.components-grid-about {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var.$spacing-md;
+}
+.component-item-card-about {
+    padding: var.$spacing-md;
+    &.card-neo-subtle { 
+        @include mixins.neomorphic-extrude(
+            $bg-color-var-prefix: '--color-bg-secondary', 
+            $distance: 3px, 
+            $blur: 6px, 
+            $shadow-opacity-var: '--shadow-opacity-soft', 
+            $radius: var.$radius-lg,
+            $shadow-h-var: '--shadow-color-h', 
+            $shadow-s-var: '--shadow-color-s', // Corrected from --color-shadow-s
+            $shadow-l-var: '--shadow-color-l', // Corrected from --color-shadow-l
+            $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+            $fb-bg-h: var.$default-color-bg-secondary-h, 
+            $fb-bg-s: var.$default-color-bg-secondary-s, 
+            $fb-bg-l: var.$default-color-bg-secondary-l,
+            $fb-bg-a: var.$fb-bg-a, // Added alpha fallback
+            $fb-shadow-op: var.$default-shadow-opacity-soft, 
+            $fb-shadow-h: var.$default-shadow-color-h, 
+            $fb-shadow-s: var.$default-shadow-color-s, 
+            $fb-shadow-l: var.$default-shadow-color-l, 
+            $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+        );
+    }
+    .component-item-icon {
+        width: 2rem; height: 2rem;
+        color: hsl(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}),var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}),var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}));
+        margin-bottom: var.$spacing-sm;
+    }
+    .component-item-name {
+        font-size: calc(#{var.$font-size-base-default} * 1.1); // SASS calc
+        font-weight: 600; margin-top:0; margin-bottom: var.$spacing-xs;
+        color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}),var(--color-text-primary-s, #{var.$default-color-text-primary-s}),var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+    }
+    .component-item-description {
+        font-size: var.$font-size-sm;
+        color: hsl(var(--color-text-muted-h, #{var.$default-color-text-muted-h}),var(--color-text-muted-s, #{var.$default-color-text-muted-s}),var(--color-text-muted-l, #{var.$default-color-text-muted-l}));
+        line-height: 1.5;
+    }
+}
+
+// Architecture Diagrams Section
+.diagrams-grid-about {
+  display: grid;
+  grid-template-columns: 1fr; 
+  gap: var.$spacing-xl;
+  margin-top: var.$spacing-lg;
+}
+.diagram-card-about {
+  padding: var.$spacing-lg;
+  .diagram-card-title {
+    font-size: var.$font-size-xl; font-weight: 600; margin-top:0;
+    margin-bottom: var.$spacing-sm;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+    @include mixins.text-glow(
+        $glow-color-var-prefix: '--color-accent-primary', 
+        $glow-radius: 4px, 
+        $fb-glow-h: var.$default-color-accent-primary-h,
+        $fb-glow-s: var.$default-color-accent-primary-s,
+        $fb-glow-l: var.$default-color-accent-primary-l,
+        $fb-glow-a: 0.5
+    );
+  }
+  .diagram-card-description {
+    font-size: var.$font-size-base-default;
+    color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+    margin-bottom: var.$spacing-md;
+    line-height: 1.6;
+  }
+  .diagram-viewer-about { 
+    border: 1px solid hsla(var(--color-border-primary-h, #{var.$default-color-border-primary-h}),var(--color-border-primary-s, #{var.$default-color-border-primary-s}),var(--color-border-primary-l, #{var.$default-color-border-primary-l}), 0.2);
+    border-radius: var.$radius-lg;
+    padding: var.$spacing-sm; 
+    background-color: hsla(var(--color-bg-tertiary-h, #{var.$default-color-bg-tertiary-h}),var(--color-bg-tertiary-s, #{var.$default-color-bg-tertiary-s}),var(--color-bg-tertiary-l, #{var.$default-color-bg-tertiary-l}), 0.1);
+    min-height: 300px; 
+    svg { max-width: 100%; height: auto; } 
+  }
+}
+
+// Pricing Section
+.pricing-grid-about {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var.$spacing-lg;
+  align-items: stretch; 
+}
+.pricing-plan-card-about {
+  padding: var.$spacing-xl var.$spacing-lg;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  position: relative; 
+
+  &.featured-plan-glow {
+    @include mixins.holographic-border-glow('--color-accent-primary', '--color-accent-secondary', 2px, 4s, var.$radius-2xl);
+  }
+
+  .featured-chip-about {
+    position: absolute;
+    top: calc(#{var.$spacing-md} * -0.75); // SASS calc
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l})), hsl(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}),var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}),var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l})));
+    color: hsl(var(--color-text-on-primary-h, #{var.$default-color-text-on-primary-h}),var(--color-text-on-primary-s, #{var.$default-color-text-on-primary-s}),var(--color-text-on-primary-l, #{var.$default-color-text-on-primary-l}));
+    padding: var.$spacing-xs var.$spacing-sm;
+    border-radius: var.$radius-full;
+    font-size: var.$font-size-xs;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-depth-md, #{var.$scss-box-shadow-md});
+  }
+
+  .plan-title-about {
+    font-size: calc(#{var.$font-size-xl} * 1.2); // SASS calc
+    font-weight: 600; margin-top:0; margin-bottom: var.$spacing-xs;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+  }
+  .plan-price-container-about {
+    margin-bottom: var.$spacing-lg;
+    .plan-price-value {
+      font-size: calc(#{var.$font-size-display-default} * 0.9); // SASS calc
+      font-weight: 700;
+      color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+      @include mixins.text-glow(
+          $glow-color-var-prefix: '--color-accent-primary', 
+          $glow-radius: 5px, 
+          $fb-glow-h: var.$default-color-accent-primary-h,
+          $fb-glow-s: var.$default-color-accent-primary-s,
+          $fb-glow-l: var.$default-color-accent-primary-l,
+          $fb-glow-a: 0.4
+      );
+    }
+    .plan-price-period {
+      font-size: var.$font-size-sm;
+      color: hsl(var(--color-text-muted-h, #{var.$default-color-text-muted-h}), var(--color-text-muted-s, #{var.$default-color-text-muted-s}), var(--color-text-muted-l, #{var.$default-color-text-muted-l}));
+      margin-left: calc(#{var.$spacing-xs} * 0.5); // SASS calc
+    }
+  }
+  .plan-features-list-about {
+    list-style: none; padding: 0; margin-bottom: var.$spacing-lg;
+    text-align: left;
+    flex-grow: 1; 
+    .plan-feature-item {
+      display: flex; align-items: flex-start; gap: var.$spacing-sm;
+      margin-bottom: var.$spacing-sm;
+      font-size: var.$font-size-base-default;
+      color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+      .feature-icon { width: 1.125rem; height: 1.125rem; flex-shrink: 0; margin-top: 0.125rem; }
+      .icon-success { color: hsl(var(--color-success-h, #{var.$default-color-success-h}),var(--color-success-s, #{var.$default-color-success-s}),var(--color-success-l, #{var.$default-color-success-l})); }
+      .icon-error { color: hsla(var(--color-error-h, #{var.$default-color-error-h}),var(--color-error-s, #{var.$default-color-error-s}),var(--color-error-l, #{var.$default-color-error-l}), 0.7); }
+    }
+  }
+  .plan-button-about { // Assuming this class is applied to a button component
+    margin-top: auto; 
+    width: 100%;
+    // Example: @extend .btn, .btn-primary, .btn-lg;
+  }
+}
+
+// Permissions section
+.permissions-section-about {
+  .permissions-card {
+    padding: var.$spacing-xl;
+    border-radius: var.$radius-2xl;
+    display: flex;
+    flex-direction: column;
+    gap: var.$spacing-md;
+    background: hsla(var(--color-bg-secondary-h, #{var.$default-color-bg-secondary-h}), var(--color-bg-secondary-s, #{var.$default-color-bg-secondary-s}), var(--color-bg-secondary-l, #{var.$default-color-bg-secondary-l}), 0.55);
+    border: 1px solid hsla(var(--color-border-primary-h, #{var.$default-color-border-primary-h}), var(--color-border-primary-s, #{var.$default-color-border-primary-s}), var(--color-border-primary-l, #{var.$default-color-border-primary-l}), 0.25);
+    box-shadow: var(--shadow-depth-md, #{var.$scss-box-shadow-md});
+
+    @media (max-width: var.$breakpoint-md) {
+      padding: var.$spacing-lg;
+    }
+    @media (max-width: var.$breakpoint-sm) {
+      padding: var.$spacing-md;
+    }
+  }
+
+  .permissions-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var.$spacing-sm;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: var.$spacing-sm;
+      font-size: var.$font-size-base-default;
+      color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+
+      .permissions-item-icon {
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+        color: hsl(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}), var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}), var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}));
+      }
+
+      span {
+        flex: 1;
+      }
+
+      @media (max-width: var.$breakpoint-sm) {
+        font-size: var.$font-size-sm;
+      }
+    }
+  }
+}
+
+// Roadmap Section
+// Mobile-Responsive Roadmap Section
+.roadmap-timeline-container-about {
+  position: relative;
+  padding: var.$spacing-lg 0;
+  max-width: 800px; 
+  margin: 0 auto;
+
+  // Desktop timeline line
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0; 
+    bottom: 0;
+    width: 4px; 
+    background: linear-gradient(to bottom,
+      hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}),0.3),
+      hsla(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}),var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}),var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}),0.3)
+    );
+    border-radius: var.$radius-sm;
+    z-index: 0;
+  }
+
+  // Mobile timeline line - positioned on the left
+  @media (max-width: var.$breakpoint-md) {
+    padding: var.$spacing-md 0;
+    
+    &::before {
+      left: var.$spacing-lg;
+      transform: none;
+    }
+  }
+
+  @media (max-width: var.$breakpoint-sm) {
+    padding: var.$spacing-sm 0;
+    
+    &::before {
+      left: var.$spacing-md;
+    }
+  }
+}
+
+.roadmap-item-container-about {
+  position: relative;
+  margin-bottom: calc(#{var.$spacing-xl} * 1.5);
+  width: 50%; 
+  padding: 0 var.$spacing-lg; 
+
+  // Desktop layout - alternating sides
+  &:nth-child(odd) {
+    left: 0;
+    .roadmap-item-content-card { 
+      margin-left: var.$spacing-lg; 
+    } 
+  }
+  
+  &:nth-child(even) {
+    left: 50%;
+    .roadmap-item-content-card { 
+      margin-right: var.$spacing-lg; 
+      text-align: right; 
+    }
+    .roadmap-features-list { 
+      align-items: flex-end; 
+      li { justify-content: flex-end; } 
+    }
+    .status-badge-roadmap { 
+      order: -1; 
+      margin-right: 0; 
+      margin-left: var.$spacing-sm; 
+    }
+  }
+
+  &:last-child { 
+    margin-bottom: 0; 
+  }
+
+  // Desktop dots positioning
+  .roadmap-item-dot {
+    content: '';
+    position: absolute;
+    top: calc(#{var.$spacing-md} / 2);
+    width: 18px; 
+    height: 18px;
+    border-radius: var.$radius-full;
+    background-color: hsl(var(--color-bg-primary-h, #{var.$default-color-bg-primary-h}),var(--color-bg-primary-s, #{var.$default-color-bg-primary-s}),var(--color-bg-primary-l, #{var.$default-color-bg-primary-l}));
+    border: 4px solid hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+    z-index: 2;
+    box-shadow: 0 0 10px hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}),0.5);
+  }
+  
+  &:nth-child(odd) .roadmap-item-dot { 
+    right: calc(#{var.$spacing-lg} * -1 - 9px); 
+  } 
+  
+  &:nth-child(even) .roadmap-item-dot { 
+    left: calc(#{var.$spacing-lg} * -1 - 9px); 
+  }
+
+  // Mobile layout - single column
+  @media (max-width: var.$breakpoint-md) {
+    width: 100%;
+    left: 0 !important;
+    padding: 0 var.$spacing-md 0 calc(#{var.$spacing-lg} + #{var.$spacing-md});
+    margin-bottom: var.$spacing-xl;
+
+    .roadmap-item-content-card {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      text-align: left !important;
+    }
+
+    .roadmap-features-list {
+      align-items: flex-start !important;
+      li { 
+        justify-content: flex-start !important; 
+      }
+    }
+
+    .status-badge-roadmap {
+      order: 0 !important;
+      margin-left: var.$spacing-sm !important;
+      margin-right: 0 !important;
+    }
+
+    .roadmap-item-dot {
+      left: calc(#{var.$spacing-lg} - 9px) !important;
+      right: auto !important;
+    }
+  }
+
+  @media (max-width: var.$breakpoint-sm) {
+    padding: 0 var.$spacing-sm 0 calc(#{var.$spacing-md} + #{var.$spacing-sm});
+    margin-bottom: var.$spacing-lg;
+
+    .roadmap-item-dot {
+      left: calc(#{var.$spacing-md} - 9px) !important;
+      width: 14px;
+      height: 14px;
+      border-width: 3px;
+    }
+  }
+}
+
+.roadmap-item-content-card {
+  padding: var.$spacing-lg;
+  
+  &.card-neo-subtle {
+    @include mixins.neomorphic-extrude(
+      $bg-color-var-prefix: '--color-bg-secondary', 
+      $distance: 2px, 
+      $blur: 5px, 
+      $shadow-opacity-var: '--shadow-opacity-soft', 
+      $radius: var.$radius-lg,
+      $shadow-h-var: '--shadow-color-h', 
+      $shadow-s-var: '--shadow-color-s',
+      $shadow-l-var: '--shadow-color-l',
+      $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+      $fb-bg-h: var.$default-color-bg-secondary-h, 
+      $fb-bg-s: var.$default-color-bg-secondary-s, 
+      $fb-bg-l: var.$default-color-bg-secondary-l,
+      $fb-bg-a: var.$fb-bg-a,
+      $fb-shadow-op: var.$default-shadow-opacity-soft, 
+      $fb-shadow-h: var.$default-shadow-color-h, 
+      $fb-shadow-s: var.$default-shadow-color-s, 
+      $fb-shadow-l: var.$default-shadow-color-l, 
+      $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+    );
+  }
+
+  // Mobile responsive padding
+  @media (max-width: var.$breakpoint-md) {
+    padding: var.$spacing-md;
+  }
+
+  @media (max-width: var.$breakpoint-sm) {
+    padding: var.$spacing-sm var.$spacing-md;
+  }
+
+  .roadmap-quarter-title {
+    font-size: var.$font-size-sm; 
+    font-weight: 600; 
+    margin: 0; 
+    text-transform: uppercase;
+    color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+
+    @media (max-width: var.$breakpoint-sm) {
+      font-size: var.$font-size-xs;
+    }
+  }
+
+  .roadmap-quarter-theme {
+    font-size: var.$font-size-lg; 
+    font-weight: 600; 
+    margin-top: var.$spacing-xs; 
+    margin-bottom: var.$spacing-md;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}),var(--color-text-primary-s, #{var.$default-color-text-primary-s}),var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+
+    @media (max-width: var.$breakpoint-md) {
+      font-size: var.$font-size-base-default;
+      margin-bottom: var.$spacing-sm;
+    }
+
+    @media (max-width: var.$breakpoint-sm) {
+      font-size: var.$font-size-sm;
+    }
+  }
+
+  .roadmap-features-list {
+    list-style: none; 
+    padding: 0;
+    display: flex; 
+    flex-direction: column; 
+    gap: var.$spacing-md;
+
+    @media (max-width: var.$breakpoint-md) {
+      gap: var.$spacing-sm;
+    }
+  }
+
+  .roadmap-feature-item {
+    font-size: var.$font-size-base-default;
+    color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}),var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}),var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+    display: flex; 
+    flex-wrap: wrap; 
+    align-items: center;
+
+    @media (max-width: var.$breakpoint-sm) {
+      font-size: var.$font-size-sm;
+    }
+
+    .feature-name-roadmap { 
+      font-weight: 500; 
+      color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}),var(--color-text-primary-s, #{var.$default-color-text-primary-s}),var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+
+      @media (max-width: var.$breakpoint-sm) {
+        font-size: var.$font-size-sm;
+      }
+    }
+
+    .feature-description-roadmap { 
+      font-size: var.$font-size-xs; 
+      opacity: 0.8; 
+      width: 100%; 
+      margin-top: calc(#{var.$spacing-xs} * 0.5); 
+      margin-left: 1.2rem;
+
+      @media (max-width: var.$breakpoint-md) {
+        margin-left: 0;
+        margin-top: var.$spacing-xs;
+      }
+
+      @media (max-width: var.$breakpoint-sm) {
+        font-size: calc(#{var.$font-size-xs} * 0.9);
+      }
+    }
+  }
+}
+
+.status-badge-roadmap {
+  font-size: calc(#{var.$font-size-xs} * 0.9); 
+  padding: 0.15rem 0.5rem; 
+  border-radius: var.$radius-full;
+  font-weight: 500; 
+  margin-left: var.$spacing-sm; 
+  text-transform: capitalize;
+  color: hsl(var(--color-text-on-primary-h, #{var.$default-color-text-on-primary-h}),var(--color-text-on-primary-s, #{var.$default-color-text-on-primary-s}),var(--color-text-on-primary-l, #{var.$default-color-text-on-primary-l}));
+  white-space: nowrap;
+  
+  @media (max-width: var.$breakpoint-sm) {
+    font-size: calc(#{var.$font-size-xs} * 0.8);
+    padding: 0.1rem 0.4rem;
+    margin-left: var.$spacing-xs;
+  }
+
+  &.status-idea { 
+    background-color: hsl(var(--color-info-h, #{var.$default-color-info-h}),var(--color-info-s, #{var.$default-color-info-s}),calc(var(--color-info-l, #{var.$default-color-info-l}) + 10%)); 
+  }
+  &.status-planned { 
+    background-color: hsl(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}),var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}),var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l})); 
+  }
+  &.status-in-progress { 
+    background-color: hsl(var(--color-warning-h, #{var.$default-color-warning-h}),var(--color-warning-s, #{var.$default-color-warning-s}),var(--color-warning-l, #{var.$default-color-warning-l})); 
+  }
+  &.status-beta { 
+    background-color: hsl(var(--color-success-h, #{var.$default-color-success-h}),var(--color-success-s, #{var.$default-color-success-s}),calc(var(--color-success-l, #{var.$default-color-success-l}) - 5%)); 
+  }
+  &.status-completed { 
+    background-color: hsl(var(--color-text-muted-h, #{var.$default-color-text-muted-h}),var(--color-text-muted-s, #{var.$default-color-text-muted-s}),var(--color-text-muted-l, #{var.$default-color-text-muted-l})); 
+  }
+}
+
+// Footer
+.about-page-footer-ephemeral {
+  margin-top: var(--section-spacing-y);
+  padding: var.$spacing-xl var.$spacing-lg;
+  border-top: 1px solid hsla(var(--color-border-primary-h, #{var.$default-color-border-primary-h}),var(--color-border-primary-s, #{var.$default-color-border-primary-s}),var(--color-border-primary-l, #{var.$default-color-border-primary-l}), 0.1);
+  .footer-content-inner-about {
+    &.card-glass { 
+       @include mixins.glassmorphic-pane(
+        $bg-color-css-var-prefix: '--color-bg-secondary', 
+        $border-color-css-var-prefix: '--color-border-glass', 
+        $blur-amount-css-var: '--blur-glass', 
+        $shadow-css-var: '--shadow-depth-md',
+        $fb-bg-h: var.$default-color-bg-secondary-h, 
+        $fb-bg-s: var.$default-color-bg-secondary-s, 
+        $fb-bg-l: var.$default-color-bg-secondary-l, 
+        $fb-bg-a: 0.3, 
+        $fb-border-h: var.$default-color-border-glass-h, 
+        $fb-border-s: var.$default-color-border-glass-s, 
+        $fb-border-l: var.$default-color-border-glass-l, 
+        $fb-border-a: 0.15,
+        $fb-blur: var.$default-blur-glass, 
+        $fb-shadow: var.$scss-box-shadow-md
+      );
+      border-radius: var.$radius-2xl;
+    }
+    padding: var.$spacing-lg;
+    text-align: center;
+    color: hsl(var(--color-text-secondary-h, #{var.$default-color-text-secondary-h}), var(--color-text-secondary-s, #{var.$default-color-text-secondary-s}), var(--color-text-secondary-l, #{var.$default-color-text-secondary-l}));
+    font-size: var.$font-size-sm;
+  }
+  .footer-credits-text { margin-bottom: var.$spacing-md; line-height: 1.6; }
+  .highlight-text { color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l})); font-weight: 500; }
+  .footer-link {
+    color: hsl(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}), var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}), var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}));
+    font-weight: 500;
+    text-decoration: none;
+    &:hover { text-decoration: underline; filter: brightness(1.1); }
+  }
+  .footer-social-links-group { margin-bottom: var.$spacing-sm; }
+  .copyright-text-about { opacity: 0.8; }
+}
+
+// General Card Styles (ensure these are defined in _cards.scss or here if specific to About page)
+.card-glass-interactive { // This class seems to be a general utility
+  @include cardsFile.card-base-styles; 
+  @include mixins.glassmorphic-pane(
+    $bg-color-css-var-prefix: '--color-bg-secondary', 
+    $border-color-css-var-prefix: '--color-border-glass', 
+    $blur-amount-css-var: '--blur-glass', 
+    $shadow-css-var: '--shadow-depth-md',
+    $fb-bg-h: var.$default-color-bg-secondary-h, 
+    $fb-bg-s: var.$default-color-bg-secondary-s, 
+    $fb-bg-l: var.$default-color-bg-secondary-l, 
+    $fb-bg-a: 0.4,
+    $fb-border-h: var.$default-color-border-glass-h, 
+    $fb-border-s: var.$default-color-border-glass-s, 
+    $fb-border-l: var.$default-color-border-glass-l, 
+    $fb-border-a: 0.2,
+    $fb-blur: var.$default-blur-glass, 
+    $fb-shadow: var.$scss-box-shadow-md
+  );
+  transition: transform var.$duration-smooth var.$ease-out-expo, box-shadow var.$duration-smooth var.$ease-out-expo;
+  &:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: var(--shadow-depth-lg, #{var.$scss-box-shadow-lg}), 0 0 25px hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}),var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}),var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}),0.2);
+  }
+}
+
+.card-neo-interactive { // This class seems to be a general utility
+  @include cardsFile.card-base-styles; 
+  @include mixins.neomorphic-extrude(
+
+  );
+  transition: transform var.$duration-smooth var.$ease-out-expo, box-shadow var.$duration-smooth var.$ease-out-expo;
+  &:hover {
+    transform: translateY(-5px);
+    @include mixins.neomorphic-extrude(
+      $bg-color-var-prefix: '--color-bg-secondary', 
+      $distance: 8px, 
+      $blur: 16px, 
+      $shadow-opacity-var: '--shadow-opacity-deep', 
+      $radius: var.$radius-xl,
+      $shadow-h-var: '--shadow-color-h', 
+      $shadow-s-var: '--shadow-color-s', // Corrected
+      $shadow-l-var: '--shadow-color-l', // Corrected
+      $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+      $fb-bg-h: var.$default-color-bg-secondary-h, 
+      $fb-bg-s: var.$default-color-bg-secondary-s, 
+      $fb-bg-l: var.$default-color-bg-secondary-l,
+      $fb-bg-a: var.$fb-bg-a, // Added alpha fallback
+      $fb-shadow-op: var.$default-shadow-opacity-deep, 
+      $fb-shadow-h: var.$default-shadow-color-h, 
+      $fb-shadow-s: var.$default-shadow-color-s, 
+      $fb-shadow-l: var.$default-shadow-color-l, 
+      $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+    );
+  }
+}
+

@@ -1,0 +1,121 @@
+// File: frontend/src/styles/components/_loading-overlay.scss
+/**
+ * @file _loading-overlay.scss
+ * @description Styles for the global loading overlay, revamped for the "Ephemeral Harmony" theme.
+ * Features an organic, "blossoming" spinner animation, theme-aware colors and glows,
+ * and an enhanced backdrop for a more immersive loading experience.
+ *
+ * @role Defines the visual appearance and animation of the application-wide loading state.
+ * @dependencies `../abstracts/variables` (for z-index, durations, easing, theme color fallbacks),
+ * `../abstracts/mixins` (for text glow).
+ * @assumptions Keyframe animations (e.g., `organicPetalUnfurl`, `centerOrbPulse`, `subtlePulse`, `fadeIn`)
+ * are or will be defined in `_keyframes.scss`. CSS custom properties for theming are available.
+ * @version 2.0.5 - Corrected SASS unquote() to string.unquote(). Added sass:string import.
+ */
+
+@use 'sass:math';
+@use 'sass:string'; // ADDED: For string.unquote()
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+.loading-overlay-ephemeral {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var.$z-index-dev-tools + 100);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var.$duration-smooth var.$ease-out-quad;
+
+  // --- Enhanced Backdrop ---
+  --loading-backdrop-bg-h: var(--color-bg-primary-h, #{var.$default-color-bg-primary-h});
+  --loading-backdrop-bg-s: var(--color-bg-primary-s, #{var.$default-color-bg-primary-s});
+  --loading-backdrop-bg-l: var(--color-bg-primary-l, #{var.$default-color-bg-primary-l});
+  --loading-backdrop-bg-a: var(--overlay-bg-alpha, 0.85);
+  --loading-backdrop-blur: calc(var(--blur-glass, #{var.$default-blur-glass}) * 0.75);
+
+
+  background-color: hsla(var(--loading-backdrop-bg-h), var(--loading-backdrop-bg-s), var(--loading-backdrop-bg-l), var(--loading-backdrop-bg-a));
+  backdrop-filter: blur(var(--loading-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--loading-backdrop-blur));
+
+  .loading-animation-content {
+    text-align: center;
+    padding: var.$spacing-xl;
+    position: relative;
+    z-index: 1;
+  }
+
+  .loading-spinner-ephemeral {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var.$spacing-lg;
+    &::before { // Central orb
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      background-color: hsl(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}));
+      border-radius: var.$radius-full;
+      transform: translate(-50%, -50%) scale(0.8);
+      box-shadow: 0 0 12px 2px hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}), 0.7);
+      animation: centerOrbPulse 1.8s var.$ease-in-out-sine infinite alternate; // Ensure centerOrbPulse is defined in _keyframes.scss
+    }
+  }
+
+  .spinner-petal-ephemeral {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 10px;
+    height: 30px;
+    margin-left: -5px;
+    margin-top: -3px;
+    border-radius: 5px 5px 2px 2px / 20px 20px 2px 2px;
+    transform-origin: center 3px;
+    background: linear-gradient(
+      170deg,
+      hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}), 0.95),
+      hsla(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}), var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}), var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}), 0.7) 70%,
+      hsla(var(--color-accent-secondary-h, #{var.$default-color-accent-secondary-h}), var(--color-accent-secondary-s, #{var.$default-color-accent-secondary-s}), var(--color-accent-secondary-l, #{var.$default-color-accent-secondary-l}), 0.3) 100%
+    );
+    box-shadow: 0 0 8px hsla(var(--color-accent-primary-h, #{var.$default-color-accent-primary-h}), var(--color-accent-primary-s, #{var.$default-color-accent-primary-s}), var(--color-accent-primary-l, #{var.$default-color-accent-primary-l}), 0.5);
+    opacity: 0;
+    // CORRECTED: Used string.unquote()
+    animation: organicPetalUnfurl string.unquote("calc(#{var.$duration-pulse-long} * 1.2)") var.$ease-in-out-cubic infinite; // Ensure organicPetalUnfurl is defined
+  }
+
+  $petal-count: 6;
+  @for $i from 1 through $petal-count {
+    .spinner-petal-ephemeral:nth-child(#{$i}) {
+      transform: rotate(#{($i - 1) * math.div(360, $petal-count)}deg) translateY(-12px);
+      // CORRECTED: Used string.unquote()
+      animation-delay: string.unquote("calc(#{var.$duration-smooth} / #{$petal-count} * (#{$i - 1}))");
+    }
+  }
+
+  .loading-text-ephemeral {
+    font-family: var(--font-family-display, #{var.$font-family-display});
+    font-size: calc(#{var.$font-size-lg} + 0.1rem);
+    font-weight: 500;
+    color: hsl(var(--color-text-primary-h, #{var.$default-color-text-primary-h}), var(--color-text-primary-s, #{var.$default-color-text-primary-s}), var(--color-text-primary-l, #{var.$default-color-text-primary-l}));
+    @include mixins.text-glow(
+      $glow-color-var-prefix: '--color-accent-primary',
+      $glow-radius: 6px,
+      $fb-glow-h: var.$default-color-accent-primary-h,
+      $fb-glow-s: var.$default-color-accent-primary-s,
+      $fb-glow-l: var.$default-color-accent-primary-l,
+      $fb-glow-a: 0.6
+    );
+    letter-spacing: 0.06em;
+    // CORRECTED: Used string.unquote()
+    animation: subtlePulse string.unquote("calc(#{var.$duration-pulse-slow} * 1.1)") var.$ease-elastic infinite alternate; // Ensure subtlePulse is defined
+    --opacity-start: 0.75;
+    --opacity-pulse: 1;
+    --scale-pulse: 1.015;
+  }
+}

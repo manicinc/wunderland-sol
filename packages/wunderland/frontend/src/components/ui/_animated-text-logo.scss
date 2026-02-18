@@ -1,0 +1,60 @@
+// File: frontend/src/styles/components/_animated-text-logo.scss
+/**
+ * @file _animated-text-logo.scss
+ * @version 1.0.0
+ *
+ * @description
+ *  Styles for <AnimatedTextLogo/>.  Responsive sizing, gradient text,
+ *  voice-state glows, and one-time intro animation are all handled here.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins'    as mix;
+
+/* ------------- Base structure ------------- */
+.animated-text-logo {
+  --brand-font: var(--font-family-brand, 'Outfit', 'Plus Jakarta Sans', sans-serif);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  user-select: none;
+  pointer-events: none;
+
+  .atl-main {
+    font-family: var(--brand-font);
+    font-weight: 600;
+    font-size: clamp(0.9rem, 2.4vw, 1.05rem);
+    color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  }
+  .atl-subtitle {
+    font-family: var(--brand-font);
+    font-weight: 700;
+    font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+    letter-spacing: 0.015em;
+    @include mix.gradient-text(90deg, transparent 0%); // gradient set inline
+    background-clip: text; -webkit-text-fill-color: transparent;
+  }
+}
+
+/* ------------- Responsive ↓ ------------- */
+.atl--mobile {
+  .atl-main     { font-size: 0.9rem; }
+  .atl-subtitle { font-size: 0.72rem; }
+}
+
+/* ------------- Voice-state pulses ------------- */
+.atl--listening .atl-subtitle {
+  animation: atlPulseUser 3s var.$ease-in-out-sine infinite;
+}
+.atl--ai .atl-subtitle {
+  animation: atlPulseAI 1.6s var.$ease-in-out-sine infinite;
+}
+
+/* ------------- One-time intro ------------- */
+.atl--intro {
+  animation: atlIntro 1.15s var.$ease-out-cubic both;
+}
+/* -- keyframes -- */
+@keyframes atlPulseUser { 0%,100%{text-shadow:0 0 3px hsla(var(--color-voice-user-h),var(--color-voice-user-s),var(--color-voice-user-l),0.6);}50%{text-shadow:0 0 8px hsla(var(--color-voice-user-h),var(--color-voice-user-s),var(--color-voice-user-l),0.9);} }
+@keyframes atlPulseAI   { 0%,100%{text-shadow:0 0 3px hsla(var(--color-voice-ai-speaking-h),var(--color-voice-ai-speaking-s),var(--color-voice-ai-speaking-l),0.6);}50%{text-shadow:0 0 8px hsla(var(--color-voice-ai-speaking-h),var(--color-voice-ai-speaking-s),var(--color-voice-ai-speaking-l),0.9);} }
+@keyframes atlIntro     { from{opacity:0;transform:translateY(-8px) scale(.9);} to{opacity:1;transform:translateY(0) scale(1);} }

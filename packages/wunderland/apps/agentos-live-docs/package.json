@@ -1,0 +1,54 @@
+{
+  "name": "@framersai/agentos-live-docs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "pull-docs": "node scripts/pull-docs.mjs",
+    "prebuild": "npm run pull-docs",
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.7.0",
+    "@docusaurus/preset-classic": "^3.7.0",
+    "@docusaurus/plugin-client-redirects": "^3.7.0",
+    "@docusaurus/theme-mermaid": "^3.7.0",
+    "docusaurus-plugin-typedoc": "^1.4.0",
+    "typedoc": "~0.28.0",
+    "typedoc-plugin-markdown": "^4.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "clsx": "^2.1.0",
+    "@mdx-js/react": "^3.0.0"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^3.7.0",
+    "@docusaurus/types": "^3.7.0",
+    "typescript": "~5.6.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-live-docs"
+  },
+  "license": "MIT"
+}

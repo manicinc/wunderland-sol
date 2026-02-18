@@ -1,0 +1,70 @@
+# syntax=docker/dockerfile:1
+
+# RabbitHole Next.js 16 frontend — monorepo workspace build.
+
+FROM node:22-bookworm-slim AS builder
+
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+
+# Copy the full workspace (filtered by .dockerignore).
+COPY . .
+
+RUN pnpm install --no-frozen-lockfile
+
+# NEXT_PUBLIC_* vars must be present at build time for Next.js to inline them.
+ARG NEXT_PUBLIC_OAUTH_GOOGLE=true
+ARG NEXT_PUBLIC_OAUTH_GITHUB=true
+ARG NEXT_PUBLIC_API_URL=/api
+ENV NEXT_PUBLIC_OAUTH_GOOGLE=$NEXT_PUBLIC_OAUTH_GOOGLE
+ENV NEXT_PUBLIC_OAUTH_GITHUB=$NEXT_PUBLIC_OAUTH_GITHUB
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Build workspace dependencies in dependency order
+RUN pnpm --filter @framers/shared build \
+ && pnpm --filter @framers/sql-storage-adapter build \
+ && pnpm --filter @framers/agentos build \
+ && pnpm --filter @framers/agentos-extensions-registry build \
+ && pnpm --filter @framers/agentos-skills-registry build \
+ && pnpm --filter rabbithole build
+
+# Resolve all symlinks in standalone output to real files so Docker COPY works.
+RUN cd /repo/apps/rabbithole/.next/standalone && \
+    find . -type l | while IFS= read -r lnk; do \
+      target=$(readlink -f "$lnk"); \
+      rm "$lnk"; \
+      if [ -d "$target" ]; then cp -r "$target" "$lnk"; \
+      elif [ -f "$target" ]; then mkdir -p "$(dirname "$lnk")"; cp "$target" "$lnk"; \
+      fi; \
+    done
+
+# Patch: standalone tracer misses some Next.js deps in pnpm monorepo.
+RUN STANDALONE=/repo/apps/rabbithole/.next/standalone/apps/rabbithole/node_modules && \
+    for pkg in @swc/helpers @next/env caniuse-lite postcss; do \
+      if [ ! -d "$STANDALONE/$pkg" ]; then \
+        SRC="/repo/node_modules/$pkg"; \
+        if [ -d "$SRC" ] || [ -L "$SRC" ]; then \
+          mkdir -p "$STANDALONE/$(dirname $pkg)"; \
+          cp -rL "$SRC" "$STANDALONE/$pkg"; \
+          echo "Patched missing dep: $pkg"; \
+        fi; \
+      fi; \
+    done
+
+# -----------------------------------------------------------------------------
+
+FROM node:22-bookworm-slim
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --from=builder /repo/apps/rabbithole/.next/standalone ./
+COPY --from=builder /repo/apps/rabbithole/.next/static ./apps/rabbithole/.next/static
+COPY --from=builder /repo/apps/rabbithole/public ./apps/rabbithole/public
+
+EXPOSE 3010
+
+CMD ["node", "apps/rabbithole/server.js"]

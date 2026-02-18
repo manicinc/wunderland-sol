@@ -1,0 +1,388 @@
+// File: frontend/src/styles/layout/_header.scss
+/**
+ * @file _header.scss
+ * @version 9.0.0 - Full Revamp
+ * @description Comprehensive and fully revamped styles for the Header.vue and its child MobileNavPanel.vue.
+ * Addresses all user feedback regarding mobile visibility, icon sizing, logo interaction,
+ * SiteMenuDropdown trigger size/effects, and mobile navigation panel display, height, and animation.
+ * Implements "Ephemeral Harmony" design principles throughout.
+ *
+ * @role Defines all visual aspects and layout for the global application header and mobile navigation panel.
+ * @dependencies `../abstracts/variables`, `../abstracts/mixins`, `../components/buttons`, `../components/dropdowns`.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use '../components/buttons' as buttonsFile;
+@use '../components/dropdowns' as dropdownMixins; // For .dropdown-panel-ephemeral structure if needed as a base
+
+// --- CSS Custom Properties for Header Dimensions ---
+:root { // Can also be on .app-shell-ephemeral if preferred
+  --header-height-mobile: 58px; // Slightly adjusted for a sleeker look
+  --header-height-desktop: 68px;
+  --header-actual-height: var(--header-height-mobile); // Default, overridden by media query
+  --header-padding-x-mobile: #{var.$spacing-sm};
+  --header-padding-x-desktop: #{var.$spacing-lg};
+  --header-padding-x: var(--header-padding-x-mobile);
+  --header-bg-alpha: 0.88; // Slightly more opaque for better readability and effect
+  --header-blur: 10px;
+}
+
+// --- Main Application Header Bar ---
+.app-header-ephemeral {
+  height: var(--header-actual-height);
+  padding: 0 var(--header-padding-x);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0; left: 0; right: 0;
+  z-index: calc(var.$z-index-sticky + 20); // High z-index
+
+  @include mixins.glassmorphic-pane(
+    $bg-color-css-var-prefix: '--color-bg-primary',
+    $border-color-css-var-prefix: '--color-border-secondary',
+    $blur-amount-css-var: '--header-blur',
+    $shadow-css-var: '--shadow-depth-lg',
+    $fb-bg-h: var.$default-color-bg-primary-h, $fb-bg-s: var.$default-color-bg-primary-s, $fb-bg-l: var.$default-color-bg-primary-l, $fb-bg-a: var(--header-bg-alpha),
+    $fb-border-h: var.$default-color-border-secondary-h, $fb-border-s: var.$default-color-border-secondary-s, $fb-border-l: var.$default-color-border-secondary-l, $fb-border-a: 0.35, // Slightly more defined border
+    $fb-blur: 10px,
+    $fb-shadow: var.$scss-box-shadow-lg
+  );
+  border-width: 0;
+  border-bottom-width: 1px;
+
+  transition: background-color var.$duration-smooth var.$ease-out-quad,
+              border-bottom-color var.$duration-smooth var.$ease-out-quad,
+              box-shadow var.$duration-smooth var.$ease-out-quad;
+
+  &::before { // Under-glow effect
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -3px;
+    height: 65px; // Slightly taller glow
+    border-radius: 50%;
+    background: transparent;
+    opacity: 0;
+    transition: opacity 0.5s var.$ease-out-quad, background 0.5s var.$ease-out-quad, transform 0.5s var.$ease-out-quad;
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(35px); // Softer, wider glow
+    transform: scaleX(2.1) translateY(65%);
+  }
+
+  &.user-listening-active {
+    border-bottom-color: hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.8);
+    box-shadow: var(--shadow-depth-xl, var.$scss-box-shadow-xl), 0 4px 25px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.3);
+    &::before {
+      opacity: 0.8;
+      background: radial-gradient(ellipse at center bottom, hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.55) 0%, transparent 65%);
+      animation: header-state-pulse-user 2.5s var.$ease-in-out-sine infinite alternate;
+    }
+  }
+
+  &.ai-speaking-active {
+    border-bottom-color: hsla(var(--color-voice-ai-speaking-h), var(--color-voice-ai-speaking-s), var(--color-voice-ai-speaking-l), 0.9);
+    box-shadow: var(--shadow-depth-xl, var.$scss-box-shadow-xl), 0 6px 30px hsla(var(--color-voice-ai-speaking-h), var(--color-voice-ai-speaking-s), var(--color-voice-ai-speaking-l), 0.35);
+    &::before {
+      opacity: 0.9;
+      background: radial-gradient(ellipse at center bottom, hsla(var(--color-voice-ai-speaking-h), var(--color-voice-ai-speaking-s), var(--color-voice-ai-speaking-l), 0.7) 0%, transparent 65%);
+      animation: header-state-pulse-ai 1.8s var.$ease-in-out-quad infinite alternate;
+    }
+  }
+
+  @media (min-width: var.$breakpoint-md) {
+    --header-actual-height: var(--header-height-desktop);
+    --header-padding-x: var(--header-padding-x-desktop);
+  }
+}
+
+.header-content-wrapper-ephemeral {
+  width: 100%;
+  max-width: var.$site-max-width;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  gap: var.$spacing-sm; // Base gap for items in the header content
+}
+
+// Left Section: Logo & Optional Agent Display
+.header-left-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: var.$spacing-sm; // Gap between logo and agent display
+  @media (min-width: var.$breakpoint-md) { gap: var.$spacing-md; }
+
+  .animated-logo-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var.$spacing-xs;
+    margin: calc(var.$spacing-xs * -1); // Visual alignment
+    border-radius: var.$radius-md;
+    transition: background-color var.$duration-quick;
+    cursor: pointer; // Indicate it's clickable
+    &:hover, &:focus-visible {
+      background-color: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.4);
+    }
+    &:focus-visible { @include mixins.focus-ring('--color-bg-primary', '--color-accent-interactive', 0px, 2.5px, 0.95); }
+  }
+}
+.current-agent-display-header {
+  display: none;
+  @media (min-width: var.$breakpoint-lg) {
+    // Same styles as previously, they seem fine
+    display: flex; align-items: center; gap: var.$spacing-sm; padding: calc(var.$spacing-xs + 3px) calc(var.$spacing-sm + 2px);
+    border-radius: var.$radius-lg; background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.6);
+    border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.45);
+    max-width: 240px; transition: background-color var.$duration-quick, box-shadow var.$duration-smooth var.$ease-out-quad; cursor: default;
+    &:hover { background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.8); box-shadow: var(--shadow-depth-md, var.$scss-box-shadow-md); }
+    .agent-icon-header { width: 24px; height: 24px; color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l)); }
+    .agent-name-header { font-size: var.$font-size-sm; font-weight: 500; color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), calc(var(--color-text-secondary-l) + 5%)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  }
+  @media (min-width: var.$breakpoint-xl) { max-width: 300px; }
+}
+
+// Center Section: Hearing Indicator (ALWAYS VISIBLE, size adjusts)
+.header-center-section {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 30px; // Minimum space for the icon on mobile
+  height: 100%;    // Ensure it takes full header height for vertical centering
+
+  .hearing-icon-wrapper-ephemeral {
+    display: flex; align-items: center; justify-content: center;
+    // Removed absolute positioning, relies on flex parent for centering
+    padding: calc(var.$spacing-xs / 2);
+    border-radius: var.$radius-full;
+    transition: transform 0.5s var.$ease-elastic, filter 0.4s var.$ease-out-quad;
+
+    .hearing-icon-svg {
+      width: 22px; height: 22px; // Smaller for mobile
+      opacity: 0.75;
+      transition: opacity 0.4s, filter 0.4s var.$ease-out-quad, transform 0.4s var.$ease-elastic;
+      filter: drop-shadow(0 0 3px hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.3));
+
+      @media (min-width: var.$breakpoint-sm) { width: 26px; height: 26px; }
+      @media (min-width: var.$breakpoint-md) { width: 30px; height: 30px; }
+      @media (min-width: var.$breakpoint-lg) { width: 34px; height: 34px; }
+    }
+  }
+  // State-based transforms (from previous, seem fine)
+  .app-header-ephemeral.user-listening-active & .hearing-icon-wrapper-ephemeral { /* ... */ }
+  .app-header-ephemeral.ai-speaking-active & .hearing-icon-wrapper-ephemeral { /* ... */ }
+}
+
+
+// Right Section: Desktop Controls & Mobile Trigger
+.header-right-section.desktop-controls-ephemeral {
+  display: none;
+  @media (min-width: var.$breakpoint-lg) {
+    display: flex; align-items: center; flex-shrink: 0;
+    gap: calc(var.$spacing-xs + 2px);
+  }
+  > .header-control-item { position: relative; display: flex; align-items: center; }
+}
+
+.mobile-menu-trigger-wrapper-ephemeral {
+  display: flex;
+  align-items: center;
+  gap: var.$spacing-xs;
+  @media (min-width: var.$breakpoint-lg) { display: none; }
+}
+
+// Unified Styling for Header Action Buttons/Triggers (Desktop and Mobile Hamburger)
+.direct-header-button,
+:deep(.agent-hub-trigger-button.direct-header-button), // Target AgentHubTrigger specifically
+.user-settings-dropdown-header > button,
+.voice-controls-dropdown-header > button,
+.theme-dropdown-header > button,
+.mobile-menu-trigger-button,
+.login-button-desktop { // Included Login button
+  @include buttonsFile.btn;
+  @include buttonsFile.btn-ghost-look;
+  @include buttonsFile.btn-icon-modifier;
+
+  padding: calc(var.$spacing-xs + 2px) !important; // Base padding for mobile icons
+  border-radius: var.$radius-lg !important;
+  color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), calc(var(--color-text-secondary-l) + 15%)); // Brighter default icon color
+  display: inline-flex; align-items: center; justify-content: center;
+  // Ensure minimum touch target size, especially for mobile
+  min-width: calc(var(--header-height-mobile) * 0.6);
+  min-height: calc(var(--header-height-mobile) * 0.6);
+
+
+  .icon-base, .icon-sm, .icon-xs { // Default icon size within these buttons
+    width: 1.2rem; height: 1.2rem; // Sleeker mobile icon size
+    opacity: 0.9;
+    transition: opacity 0.2s, transform 0.3s var.$ease-elastic;
+  }
+
+  // Desktop specific icon sizes
+  @media (min-width: var.$breakpoint-md) {
+    padding: calc(var.$spacing-sm * 0.7) !important; // Desktop padding
+    .icon-base, .icon-sm, .icon-xs {
+      width: 1.35rem; height: 1.35rem;
+    }
+  }
+  @media (min-width: var.$breakpoint-xl) {
+    .icon-base, .icon-sm, .icon-xs {
+      width: 1.5rem; height: 1.5rem;
+    }
+  }
+
+  // Hover, focus, active states (from previous are generally good, slight tweaks)
+  &:hover, &:focus-visible, &[aria-expanded="true"] {
+    background-color: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3) !important;
+    color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l)) !important;
+    > .icon-base, > .icon-sm, > .icon-xs, > .nexus-orb-svg {
+      opacity: 1;
+      transform: scale(1.2) rotate(-8deg);
+    }
+  }
+  &:active { transform: scale(0.9) !important; /* ... */ }
+  &:focus-visible { @include mixins.focus-ring('--color-bg-primary', '--color-accent-interactive', 0px, 2.5px, 0.95); }
+}
+
+// SiteMenuDropdown Trigger - make it WAY bigger and more interesting
+.site-menu-dropdown-header > .nexus-orb-trigger {
+  padding: calc(var.$spacing-xs * 0.5) !important; // Allow SVG to dictate size more
+  width: calc(var(--header-actual-height) * 0.65); // Larger button area
+  height: calc(var(--header-actual-height) * 0.65);
+  
+  @media (min-width: var.$breakpoint-md) {
+    width: calc(var(--header-actual-height) * 0.6);
+    height: calc(var(--header-actual-height) * 0.6);
+  }
+
+  .nexus-orb-svg { // SVG itself is sized in its component, this ensures button accommodates
+    // Size override for the SVG if needed here, but better in component's SCSS
+    // width: 100%; height: 100%;
+    transition: transform 0.4s var.$ease-elastic, filter 0.4s var.$ease-out-quad;
+  }
+
+  &:hover, &:focus-visible, &[aria-expanded="true"] {
+    .nexus-orb-svg {
+      transform: scale(1.25) rotate(25deg); // More dynamic hover
+      filter: drop-shadow(0 0 8px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.5));
+    }
+  }
+  &.active .nexus-orb-svg { // When dropdown is open
+    transform: scale(1.1) rotate(-45deg); // Different transform for active state
+    filter: drop-shadow(0 0 12px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.7));
+  }
+}
+
+// Login button on desktop
+.login-button-desktop {
+  gap: var.$spacing-xs;
+  padding-left: var.$spacing-sm !important;
+  padding-right: calc(var.$spacing-sm + 2px) !important;
+  .icon-base { width: 1.2rem; height: 1.2rem; } // Slightly smaller icon next to text
+  .login-button-text {
+    font-size: var.$font-size-sm;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    // Text visibility can be controlled with media queries if needed for very specific breakpoints
+    @media (max-width: calc(#{var.$breakpoint-lg} + 70px)) { // Example: hide if header space gets too tight
+        // display: none; 
+    }
+  }
+}
+
+.session-cost-display-ephemeral { /* Styles from 8.3.1 are generally fine */ }
+
+// --- Mobile Navigation Panel ---
+.mobile-nav-panel-ephemeral {
+  position: fixed;
+  inset: 0;
+  height: 100vh; // Fallback
+  height: 100dvh; // Full dynamic viewport height
+  z-index: var.$z-index-modal; // Ensure it's above other content but below system modals like toasts
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Panel itself does not scroll
+
+  @include mixins.glassmorphic-pane(
+    $bg-color-css-var-prefix: '--color-bg-primary',
+    $border-color-css-var-prefix: '--color-border-primary',
+    $blur-amount-css-var: #{calc(18px + 10px)}, // Increased blur for full panel
+    $shadow-css-var: '--shadow-depth-2xl', // More pronounced shadow to lift it off the page
+    $fb-bg-h: var.$default-color-bg-primary-h, $fb-bg-s: var.$default-color-bg-primary-s, $fb-bg-l: var.$default-color-bg-primary-l, $fb-bg-a: 0.975, // Almost fully opaque
+    $fb-border-h: var.$default-color-border-primary-h, $fb-border-s: var.$default-color-border-primary-s, $fb-border-l: var.$default-color-border-primary-l, $fb-border-a: 0.35,
+    $fb-blur: 28px,
+    $fb-shadow: var.$scss-box-shadow-2xl
+  );
+  // Solid fallback background for browsers not supporting backdrop-filter well
+  background-color: hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l));
+
+  .mobile-nav-header-ephemeral {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--header-padding-x-mobile);
+    height: var(--header-actual-height);
+    border-bottom: 1px solid hsla(var(--color-border-primary-h),var(--color-border-primary-s),var(--color-border-primary-l), 0.4); // Slightly stronger divider
+    flex-shrink: 0;
+
+    .mobile-nav-close-button .icon-base {
+        width: 1.7rem; height: 1.7rem; // Ensure close icon is same as hamburger
+    }
+  }
+
+  .mobile-nav-content-ephemeral {
+    padding: var.$spacing-lg var.$spacing-md; // Generous padding
+    flex-grow: 1; // CRITICAL: Fills remaining vertical space
+    overflow-y: auto; // CRITICAL: Enables scrolling for content within this area
+    -webkit-overflow-scrolling: touch; // Momentum scrolling on iOS
+
+    @include mixins.custom-scrollbar(
+      '--color-accent-interactive', 0.7, 0.95,
+      '--color-bg-secondary', 0.35, 8px, var.$radius-md
+    );
+  }
+
+  .mobile-nav-item-ephemeral {
+    padding: var.$spacing-md calc(var.$spacing-md + 2px);
+    font-size: var.$font-size-lg; // Good readable size
+    font-weight: 500;
+    margin-bottom: calc(var.$spacing-sm + 2px); // Slightly more space between items
+    // ... other styles like color, transitions, border-radius, etc., from 8.3.1 are fine ...
+
+    .nav-item-icon {
+      width: 1.4rem; height: 1.4rem; // Refined icon size for mobile nav items
+      margin-right: var.$spacing-md;
+      opacity: 0.85;
+    }
+     // ... hover, active, focus-visible states from 8.3.1 are generally good ...
+     // ... prominent-action, logout-item, theme-button-mobile fine from 8.3.1 ...
+  }
+  // ... other styles (.mobile-nav-divider-ephemeral, .mobile-nav-section-title-ephemeral etc.) from 8.3.1 are fine
+}
+
+// --- Mobile Nav Panel Transition ---
+.mobile-nav-slide-from-right-ephemeral-enter-active,
+.mobile-nav-slide-from-right-ephemeral-leave-active {
+  transition: transform 0.42s cubic-bezier(0.25, 0.85, 0.45, 1), // Custom refined easing
+              opacity 0.4s ease-out;
+}
+.mobile-nav-slide-from-right-ephemeral-enter-from,
+.mobile-nav-slide-from-right-ephemeral-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+// Keyframes for header state pulse
+@keyframes header-state-pulse-user {
+  0%, 100% { opacity: 0.6; transform: scaleX(1.85) translateY(68%); }
+  50% { opacity: 0.9; transform: scaleX(2.05) translateY(63%); }
+}
+@keyframes header-state-pulse-ai {
+  0%, 100% { opacity: 0.7; transform: scaleX(1.95) translateY(65%); }
+  50% { opacity: 1.0; transform: scaleX(2.25) translateY(58%); }
+}

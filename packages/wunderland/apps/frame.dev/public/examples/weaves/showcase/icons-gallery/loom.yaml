@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# ICONS GALLERY LOOM
+# ═══════════════════════════════════════════════════════════════════════════════
+# Demonstrates various Lucide icon options
+
+name: Icons Gallery
+description: Examples of different Lucide icons for looms
+
+style:
+  # Any Lucide icon name works here
+  # Popular choices: BookOpen, Code, Terminal, Brain, Lightbulb, Rocket, etc.
+  icon: Palette
+  
+  # Purple theme
+  accentColor: "#a855f7"
+  backgroundColor: "#faf5ff"
+  darkText: true
+
+metadata:
+  difficulty: beginner
+  estimatedTime: 5
+  tags:
+    - icons
+    - lucide
+    - customization
+
+order: 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

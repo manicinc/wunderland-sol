@@ -1,0 +1,40 @@
+{
+  "id": "project-plan",
+  "name": "Project Plan",
+  "category": "business",
+  "icon": "Briefcase",
+  "description": "Comprehensive project planning and tracking document",
+  "shortDescription": "Full project planning template",
+  "difficulty": "intermediate",
+  "estimatedTime": "45 min",
+  "tags": ["project", "planning", "management", "business"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 88,
+  "defaultData": {
+    "contentType": "project"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, project, planning]\ncontentType: project\nstatus: planning\nstartDate: {startDate}\nendDate: {endDate}\n---\n\n# {title}\n\n> {summary}\n\n## Project Overview\n\n### Quick Reference\n\n| Attribute | Value |\n|-----------|-------|\n| **Status** | 🟡 Planning |\n| **Start Date** | {startDate} |\n| **Target End** | {endDate} |\n| **Project Lead** | [Name] |\n| **Sponsor** | [Name] |\n| **Budget** | $X |\n\n### Project Health\n\n| Metric | Status | Trend |\n|--------|--------|-------|\n| Schedule | 🟢 On Track | → |\n| Budget | 🟢 On Track | → |\n| Scope | 🟢 On Track | → |\n| Quality | 🟢 On Track | → |\n| Risk | 🟡 Medium | → |\n\n## Objectives\n\n### Primary Objective\n\nWhat is the single most important outcome?\n\n### Success Criteria\n\n| Criterion | Measurement | Target |\n|-----------|-------------|--------|\n| Criterion 1 | How measured | Goal |\n| Criterion 2 | How measured | Goal |\n| Criterion 3 | How measured | Goal |\n\n### Key Results\n\n- [ ] KR1: Specific, measurable result\n- [ ] KR2: Specific, measurable result\n- [ ] KR3: Specific, measurable result\n\n## Scope\n\n### In Scope ✅\n\n- Deliverable 1: Description\n- Deliverable 2: Description\n- Deliverable 3: Description\n\n### Out of Scope ❌\n\n- Explicitly excluded item 1\n- Explicitly excluded item 2\n\n### Assumptions\n\n- Assumption 1\n- Assumption 2\n\n### Constraints\n\n- Constraint 1\n- Constraint 2\n\n## Team\n\n### Core Team\n\n| Name | Role | Responsibility | Allocation |\n|------|------|----------------|------------|\n| [Name] | Project Lead | Overall delivery | 100% |\n| [Name] | Designer | UI/UX | 50% |\n| [Name] | Developer | Implementation | 100% |\n\n### RACI Matrix\n\n| Task | Project Lead | Designer | Developer | Sponsor |\n|------|--------------|----------|-----------|----------|\n| Requirements | A | C | C | I |\n| Design | A | R | C | I |\n| Development | A | C | R | I |\n| Testing | A | C | R | I |\n| Launch | R | C | C | A |\n\n*R=Responsible, A=Accountable, C=Consulted, I=Informed*\n\n## Timeline\n\n### Phases\n\n```\nPhase 1: Discovery    [████░░░░░░░░░░░░░░░░] 20%\nPhase 2: Design       [░░░░░░░░░░░░░░░░░░░░] 0%\nPhase 3: Build        [░░░░░░░░░░░░░░░░░░░░] 0%\nPhase 4: Test         [░░░░░░░░░░░░░░░░░░░░] 0%\nPhase 5: Launch       [░░░░░░░░░░░░░░░░░░░░] 0%\n```\n\n### Milestone Schedule\n\n| Milestone | Target Date | Status | Notes |\n|-----------|-------------|--------|-------|\n| Project Kickoff | [Date] | ✅ Complete | |\n| Requirements Finalized | [Date] | 🔄 In Progress | |\n| Design Approved | [Date] | ⬜ Not Started | |\n| Development Complete | [Date] | ⬜ Not Started | |\n| Testing Complete | [Date] | ⬜ Not Started | |\n| Launch | [Date] | ⬜ Not Started | |\n\n### Detailed Schedule\n\n#### Phase 1: Discovery (Week 1-2)\n\n| Task | Owner | Start | End | Status | Dependencies |\n|------|-------|-------|-----|--------|-------------|\n| Stakeholder interviews | [Name] | [Date] | [Date] | ⬜ | - |\n| Requirements gathering | [Name] | [Date] | [Date] | ⬜ | Above |\n| Competitive analysis | [Name] | [Date] | [Date] | ⬜ | - |\n\n#### Phase 2: Design (Week 3-4)\n\n| Task | Owner | Start | End | Status | Dependencies |\n|------|-------|-------|-----|--------|-------------|\n| Wireframes | [Name] | [Date] | [Date] | ⬜ | Phase 1 |\n| Visual design | [Name] | [Date] | [Date] | ⬜ | Wireframes |\n| Design review | [Name] | [Date] | [Date] | ⬜ | Visual design |\n\n## Budget\n\n### Budget Summary\n\n| Category | Budgeted | Actual | Variance |\n|----------|----------|--------|----------|\n| Personnel | $X | $0 | $X |\n| Tools/Software | $X | $0 | $X |\n| Infrastructure | $X | $0 | $X |\n| Contingency | $X | $0 | $X |\n| **Total** | **$X** | **$0** | **$X** |\n\n### Spending Tracker\n\n| Date | Item | Category | Amount | Running Total |\n|------|------|----------|--------|---------------|\n| | | | | |\n\n## Risks\n\n### Risk Register\n\n| ID | Risk | Likelihood | Impact | Score | Mitigation | Owner | Status |\n|----|------|------------|--------|-------|------------|-------|--------|\n| R1 | [Risk description] | High | High | 🔴 | [Strategy] | [Name] | Open |\n| R2 | [Risk description] | Med | High | 🟡 | [Strategy] | [Name] | Open |\n| R3 | [Risk description] | Low | Med | 🟢 | [Strategy] | [Name] | Monitoring |\n\n### Risk Response Strategies\n\n- **Avoid:** Eliminate the threat\n- **Mitigate:** Reduce likelihood/impact\n- **Transfer:** Insurance, outsourcing\n- **Accept:** Acknowledge and monitor\n\n## Communication\n\n### Communication Plan\n\n| Audience | Content | Frequency | Channel | Owner |\n|----------|---------|-----------|---------|-------|\n| Team | Status update | Weekly | Standup | PM |\n| Stakeholders | Progress report | Bi-weekly | Email | PM |\n| Sponsor | Executive summary | Monthly | Meeting | PM |\n\n### Meeting Schedule\n\n- **Daily Standup:** [Time], [Location]\n- **Weekly Planning:** [Day], [Time]\n- **Bi-weekly Review:** [Day], [Time]\n\n## Quality\n\n### Quality Criteria\n\n- Criterion 1: How measured\n- Criterion 2: How measured\n\n### Review Checkpoints\n\n- [ ] Design review\n- [ ] Code review\n- [ ] Testing sign-off\n- [ ] Stakeholder approval\n\n## Change Management\n\n### Change Request Process\n\n1. Submit change request\n2. Impact assessment\n3. Approval/rejection\n4. Implementation\n\n### Change Log\n\n| ID | Change | Requestor | Date | Status | Impact |\n|----|--------|-----------|------|--------|--------|\n| | | | | | |\n\n## Status Updates\n\n### Latest Update: {date}\n\n**Summary:** Brief overview of current state\n\n**Accomplishments:**\n- Completed item 1\n- Completed item 2\n\n**Next Steps:**\n- Planned item 1\n- Planned item 2\n\n**Blockers:**\n- Blocker needing resolution\n\n---\n\n### Previous Updates\n\n<details>\n<summary>Update - [Date]</summary>\n\nPrevious update content...\n\n</details>\n\n## Lessons Learned\n\n*Capture throughout and review at project end*\n\n| Category | What Happened | Lesson | Action |\n|----------|---------------|--------|--------|\n| Planning | | | |\n| Execution | | | |\n| Communication | | | |\n\n## Appendix\n\n- [Requirements Document](#)\n- [Design Specs](#)\n- [Technical Architecture](#)\n- [Test Plan](#)\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

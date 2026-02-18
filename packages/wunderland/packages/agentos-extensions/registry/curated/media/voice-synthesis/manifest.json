@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.media.voice-synthesis",
+  "name": "Voice Synthesis Extension",
+  "version": "1.0.0",
+  "description": "Text-to-speech synthesis via ElevenLabs for generating agent voice audio",
+  "author": { "name": "Frame.dev" },
+  "license": "MIT",
+  "keywords": ["tts", "voice", "speech", "elevenlabs", "audio"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["media", "communication"],
+  "extensions": [
+    { "kind": "tool", "id": "text_to_speech", "displayName": "Text to Speech", "entry": "./dist/tools/textToSpeech.js" }
+  ],
+  "configuration": {
+    "properties": {
+      "elevenlabs.apiKey": { "type": "string", "secret": true }
+    }
+  }
+}

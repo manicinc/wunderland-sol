@@ -1,0 +1,42 @@
+name: CI — Test & Coverage
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: Unit Tests + Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install SDK dependencies
+        run: cd sdk && npm install
+
+      - name: Run SDK tests
+        run: cd sdk && npx vitest run
+        env:
+          CI: true
+
+  typecheck:
+    name: Type Check (SDK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install SDK dependencies
+        run: cd sdk && npm install
+
+      - name: Type check SDK
+        run: cd sdk && npx tsc --noEmit

@@ -1,0 +1,235 @@
+appId: dev.frame.quarry
+productName: Quarry
+copyright: Copyright © 2024 Framers AI
+
+directories:
+  output: dist
+  buildResources: build
+
+# Enable asar for proper integrity checks
+asar: true
+asarUnpack:
+  - ".next/standalone/**/*"
+  - "node_modules/**/*.node"
+
+files:
+  # Electron main process
+  - "electron-dist/**/*"
+  - "package.json"
+  # Next.js standalone server (includes minimal node_modules)
+  - ".next/standalone/**/*"
+  - ".next/static/**/*"
+  - "public/**/*"
+  # CRITICAL: Exclude root node_modules - standalone has its own minimal node_modules
+  - "!node_modules"
+  # Exclude other large/unnecessary folders
+  - "!.next/cache"
+  - "!.next/cache/**/*"
+  - "!src"
+  - "!src/**/*"
+  - "!__tests__"
+  - "!__tests__/**/*"
+  - "!scripts"
+  - "!scripts/**/*"
+  - "!*.md"
+  - "!*.log"
+  - "!.git"
+  - "!.git/**/*"
+
+# Copy static files after build for Next.js standalone
+# CRITICAL: Files must be INSIDE .next/standalone for the server to find them
+extraResources:
+  # Copy server.js (Next.js standalone entry point)
+  - from: ".next/standalone/server.js"
+    to: "app/.next/standalone/server.js"
+  # Copy the .next folder from standalone (contains routes, manifests, etc.)
+  - from: ".next/standalone/.next"
+    to: "app/.next/standalone/.next"
+    filter: "**/*"
+  - from: ".next/static"
+    to: "app/.next/standalone/.next/static"
+    filter: "**/*"
+  - from: "public"
+    to: "app/.next/standalone/public"
+    filter: "**/*"
+  # CRITICAL: Copy standalone's node_modules (excluded by !node_modules above)
+  - from: ".next/standalone/node_modules"
+    to: "app/.next/standalone/node_modules"
+    filter: "**/*"
+  # Copy electron-store and all its dependencies
+  - from: "node_modules/electron-store"
+    to: "app/node_modules/electron-store"
+    filter: "**/*"
+  - from: "node_modules/conf"
+    to: "app/node_modules/conf"
+    filter: "**/*"
+  - from: "node_modules/ajv"
+    to: "app/node_modules/ajv"
+    filter: "**/*"
+  - from: "node_modules/ajv-formats"
+    to: "app/node_modules/ajv-formats"
+    filter: "**/*"
+  - from: "node_modules/atomically"
+    to: "app/node_modules/atomically"
+    filter: "**/*"
+  - from: "node_modules/debounce-fn"
+    to: "app/node_modules/debounce-fn"
+    filter: "**/*"
+  - from: "node_modules/dot-prop"
+    to: "app/node_modules/dot-prop"
+    filter: "**/*"
+  - from: "node_modules/env-paths"
+    to: "app/node_modules/env-paths"
+    filter: "**/*"
+  - from: "node_modules/json-schema-typed"
+    to: "app/node_modules/json-schema-typed"
+    filter: "**/*"
+  - from: "node_modules/onetime"
+    to: "app/node_modules/onetime"
+    filter: "**/*"
+  - from: "node_modules/pkg-up"
+    to: "app/node_modules/pkg-up"
+    filter: "**/*"
+  - from: "node_modules/semver"
+    to: "app/node_modules/semver"
+    filter: "**/*"
+  - from: "node_modules/mimic-fn"
+    to: "app/node_modules/mimic-fn"
+    filter: "**/*"
+  - from: "node_modules/find-up"
+    to: "app/node_modules/find-up"
+    filter: "**/*"
+  - from: "node_modules/locate-path"
+    to: "app/node_modules/locate-path"
+    filter: "**/*"
+  - from: "node_modules/p-locate"
+    to: "app/node_modules/p-locate"
+    filter: "**/*"
+  - from: "node_modules/p-limit"
+    to: "app/node_modules/p-limit"
+    filter: "**/*"
+  # Also copy p-try into p-locate's nested node_modules for its nested p-limit
+  - from: "node_modules/p-try"
+    to: "app/node_modules/p-locate/node_modules/p-try"
+    filter: "**/*"
+  - from: "node_modules/path-exists"
+    to: "app/node_modules/path-exists"
+    filter: "**/*"
+  - from: "node_modules/fast-deep-equal"
+    to: "app/node_modules/fast-deep-equal"
+    filter: "**/*"
+  - from: "node_modules/json-schema-traverse"
+    to: "app/node_modules/json-schema-traverse"
+    filter: "**/*"
+  - from: "node_modules/require-from-string"
+    to: "app/node_modules/require-from-string"
+    filter: "**/*"
+  - from: "node_modules/uri-js"
+    to: "app/node_modules/uri-js"
+    filter: "**/*"
+  - from: "node_modules/fast-uri"
+    to: "app/node_modules/fast-uri"
+    filter: "**/*"
+  - from: "node_modules/yocto-queue"
+    to: "app/node_modules/yocto-queue"
+    filter: "**/*"
+  - from: "node_modules/is-obj"
+    to: "app/node_modules/is-obj"
+    filter: "**/*"
+  - from: "node_modules/p-try"
+    to: "app/node_modules/p-try"
+    filter: "**/*"
+  - from: "node_modules/type-fest"
+    to: "app/node_modules/type-fest"
+    filter: "**/*"
+
+# Exclude development files
+extraMetadata:
+  main: electron-dist/main.js
+
+# Skip native module rebuilding for incompatible modules
+npmRebuild: false
+
+# macOS configuration
+mac:
+  category: public.app-category.productivity
+  icon: build/icon.icns
+  target:
+    - target: dmg
+      arch:
+        - arm64
+    - target: zip
+      arch:
+        - arm64
+  darkModeSupport: true
+  hardenedRuntime: false
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # For local builds without signing, set this to false or remove
+  # For distribution, you'll need an Apple Developer certificate
+  # identity: null # Uncomment for unsigned builds
+
+# DMG configuration
+dmg:
+  # background: build/dmg-background.png  # Uncomment when available
+  icon: build/icon.icns
+  iconSize: 128
+  window:
+    width: 540
+    height: 380
+  contents:
+    - x: 140
+      y: 200
+      type: file
+    - x: 400
+      y: 200
+      type: link
+      path: /Applications
+
+# Windows configuration
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  icon: build/icon.png
+  publisherName: Framers AI
+
+# NSIS installer configuration
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Quarry
+  uninstallDisplayName: Quarry
+  deleteAppDataOnUninstall: false
+
+# Linux configuration
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  category: Office
+  icon: build/icons
+  maintainer: Framers AI <support@frame.dev>
+  vendor: Framers AI
+  synopsis: Knowledge management and note-taking app
+  description: Quarry is an AI-powered knowledge management app for organizing your digital life.
+
+# Publishing configuration - GitHub releases with auto-update support
+publish:
+  provider: github
+  owner: framersai
+  repo: frame.dev
+  releaseType: release

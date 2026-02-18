@@ -1,0 +1,5052 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FRAME CODEX DESIGN SYSTEM
+   A refined, cohesive design language for knowledge exploration
+═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  :root {
+    /* Core semantic colors */
+    --background: 0 0% 100%;
+    --foreground: 220 15% 15%;
+
+    --card: 0 0% 99%;
+    --card-foreground: 220 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 15% 25%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 40%;
+    /* Improved contrast: 5.3:1 ratio */
+
+    --accent: 173 80% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 160 84% 39%;
+
+    --radius: 0.625rem;
+
+    /* FABRIC Codex Brand Colors */
+    --codex-emerald: 160 84% 39%;
+    --codex-cyan: 173 80% 40%;
+    --codex-amber: 38 92% 50%;
+    --codex-purple: 262 83% 58%;
+
+    /* Sidebar specific */
+    --sidebar-bg: 220 14% 98%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-text: 220 15% 35%;
+    --sidebar-text-muted: 220 10% 55%;
+    --sidebar-accent: 160 84% 39%;
+
+    /* Typography scale */
+    --font-size-2xs: 0.625rem;
+    --font-size-xs: 0.6875rem;
+    --font-size-sm: 0.75rem;
+    --font-size-base: 0.8125rem;
+    --font-size-lg: 0.875rem;
+    --font-size-xl: 1rem;
+    --font-size-2xl: 1.125rem;
+
+    /* Spacing scale for compact UI */
+    --space-1: 0.125rem;
+    --space-2: 0.25rem;
+    --space-3: 0.375rem;
+    --space-4: 0.5rem;
+    --space-5: 0.625rem;
+    --space-6: 0.75rem;
+    --space-8: 1rem;
+
+    /* Animation */
+    --transition-fast: 150ms;
+    --transition-normal: 250ms;
+    --transition-slow: 400ms;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  }
+
+  .dark {
+    --background: 220 20% 6%;
+    --foreground: 220 15% 95%;
+
+    --card: 220 20% 8%;
+    --card-foreground: 220 15% 95%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 15% 95%;
+
+    --primary: 160 84% 45%;
+    --primary-foreground: 220 20% 6%;
+
+    --secondary: 220 20% 15%;
+    --secondary-foreground: 220 15% 90%;
+
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 15% 70%;
+    /* Improved contrast: 6.5:1 ratio */
+
+    --accent: 173 80% 45%;
+    --accent-foreground: 220 20% 6%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 220 15% 95%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 160 84% 45%;
+
+    /* Sidebar dark mode */
+    --sidebar-bg: 220 20% 7%;
+    --sidebar-border: 220 20% 15%;
+    --sidebar-text: 220 15% 85%;
+    --sidebar-text-muted: 220 15% 55%;
+    --sidebar-accent: 160 84% 50%;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════════
+     SEPIA THEMES - Antiquarian Book Aesthetics
+     Inspired by aged manuscripts, candlelit libraries, and vintage typography
+  ═══════════════════════════════════════════════════════════════════════════════ */
+
+  /* Sepia Light Theme - "Sunlit Parchment" - Warm vintage book aesthetic */
+  .sepia-light,
+  [data-theme="sepia-light"] {
+    /* Warm cream parchment background - like aged paper in sunlight */
+    --background: 45 50% 97%;
+    --foreground: 25 55% 15%;
+
+    /* Cards like aged vellum pages */
+    --card: 42 42% 94%;
+    --card-foreground: 25 55% 15%;
+
+    --popover: 45 50% 97%;
+    --popover-foreground: 25 55% 15%;
+
+    /* Rich sienna brown primary - like aged ink */
+    --primary: 18 70% 38%;
+    --primary-foreground: 45 50% 97%;
+
+    /* Soft vellum secondary - parchment tones */
+    --secondary: 40 38% 88%;
+    --secondary-foreground: 25 45% 20%;
+
+    /* Aged paper muted tones - fox marks */
+    --muted: 38 32% 85%;
+    --muted-foreground: 25 30% 38%;
+
+    /* Burnt orange ink accent - illuminated manuscript */
+    --accent: 22 90% 48%;
+    --accent-foreground: 45 50% 97%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 45 50% 97%;
+
+    /* Warm tan borders - like book edges */
+    --border: 36 38% 76%;
+    --input: 40 32% 91%;
+    --ring: 22 90% 48%;
+
+    /* Sepia brand colors - antiquarian palette */
+    --codex-emerald: 25 65% 42%;
+    --codex-cyan: 30 60% 50%;
+    --codex-amber: 28 90% 50%;
+    --codex-purple: 15 55% 45%;
+
+    /* Sidebar sepia light - library shelf */
+    --sidebar-bg: 42 40% 95%;
+    --sidebar-border: 36 32% 78%;
+    --sidebar-text: 25 45% 18%;
+    --sidebar-text-muted: 25 25% 42%;
+    --sidebar-accent: 22 90% 48%;
+  }
+
+  /* Sepia Dark Theme - "Candlelit Study" - Deep mahogany with golden firelight */
+  .sepia-dark,
+  [data-theme="sepia-dark"] {
+    /* TRUE DEEP mahogany - much darker than sepia-light for distinction */
+    --background: 12 65% 5%;
+    --foreground: 40 35% 88%;
+
+    /* Cards like leather-bound volumes in firelight */
+    --card: 15 55% 8%;
+    --card-foreground: 40 35% 88%;
+
+    --popover: 14 52% 10%;
+    --popover-foreground: 40 35% 88%;
+
+    /* Antique gold primary - like polished brass fixtures */
+    --primary: 40 75% 58%;
+    --primary-foreground: 12 65% 5%;
+
+    /* Rich burgundy wood secondary - oxblood leather */
+    --secondary: 10 50% 12%;
+    --secondary-foreground: 38 28% 82%;
+
+    /* Warm shadow muted tones - candlelight flicker */
+    --muted: 12 45% 10%;
+    --muted-foreground: 35 28% 58%;
+
+    /* Warm brass accent - candlelight glow */
+    --accent: 35 80% 52%;
+    --accent-foreground: 12 65% 5%;
+
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 40 35% 88%;
+
+    /* Dark walnut borders - visible but subtle */
+    --border: 15 45% 16%;
+    --input: 12 48% 10%;
+    --ring: 40 75% 58%;
+
+    /* Sepia dark brand colors - warm antique gold palette */
+    --codex-emerald: 38 68% 52%;
+    --codex-cyan: 40 75% 58%;
+    --codex-amber: 35 88% 58%;
+    --codex-purple: 22 55% 52%;
+
+    /* Sidebar sepia dark - rich wood paneling */
+    --sidebar-bg: 13 58% 6%;
+    --sidebar-border: 15 42% 14%;
+    --sidebar-text: 38 32% 85%;
+    --sidebar-text-muted: 32 25% 55%;
+    --sidebar-accent: 40 75% 58%;
+  }
+
+  /* Terminal Light Theme - Retro amber CRT */
+  .terminal-light,
+  [data-theme="terminal-light"] {
+    --background: 0 0% 0%;
+    --foreground: 40 100% 50%;
+
+    --card: 0 0% 3%;
+    --card-foreground: 40 100% 50%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 40 100% 50%;
+
+    --primary: 40 100% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 40 90% 55%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 40 80% 45%;
+
+    --accent: 40 100% 50%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 0%;
+
+    --border: 40 50% 20%;
+    --input: 0 0% 8%;
+    --ring: 40 100% 50%;
+  }
+
+  /* Terminal Dark Theme - Hacker green */
+  .terminal-dark,
+  [data-theme="terminal-dark"] {
+    --background: 0 0% 0%;
+    --foreground: 120 100% 50%;
+
+    --card: 0 0% 3%;
+    --card-foreground: 120 100% 50%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 120 100% 50%;
+
+    --primary: 120 100% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 120 90% 55%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 120 80% 35%;
+
+    --accent: 120 100% 50%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 0%;
+
+    --border: 120 50% 15%;
+    --input: 0 0% 8%;
+    --ring: 120 100% 50%;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════════
+     OCEANIC THEMES - Calm coastal and deep sea aesthetics
+     Inspired by ocean depths, coral reefs, and coastal horizons
+  ═══════════════════════════════════════════════════════════════════════════════ */
+
+  /* Oceanic Light Theme - "Coastal Sunrise" - Crisp aquatic freshness */
+  .oceanic-light,
+  [data-theme="oceanic-light"] {
+    /* Soft seafoam mist background - morning coastal fog */
+    --background: 188 42% 97%;
+    --foreground: 205 60% 12%;
+
+    /* Clean white-foam cards - sea spray */
+    --card: 192 30% 99%;
+    --card-foreground: 205 60% 12%;
+
+    --popover: 192 30% 99%;
+    --popover-foreground: 205 60% 12%;
+
+    /* Deep ocean teal primary - vibrant tide pools */
+    --primary: 190 88% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Pale seafoam secondary - foam on waves */
+    --secondary: 182 32% 92%;
+    --secondary-foreground: 205 55% 16%;
+
+    /* Mist grey muted tones - morning haze */
+    --muted: 188 22% 90%;
+    --muted-foreground: 205 30% 36%;
+
+    /* Coral reef accent - warm tropical fish contrast */
+    --accent: 18 90% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Soft wave borders - subtle aqua tint */
+    --border: 192 28% 80%;
+    --input: 188 22% 95%;
+    --ring: 190 88% 30%;
+
+    /* Oceanic brand colors - coral reef palette */
+    --codex-emerald: 172 75% 38%;
+    --codex-cyan: 190 85% 35%;
+    --codex-amber: 18 92% 52%;
+    --codex-purple: 235 75% 58%;
+
+    /* Sidebar oceanic light - coastal cliff */
+    --sidebar-bg: 188 35% 97%;
+    --sidebar-border: 190 28% 82%;
+    --sidebar-text: 205 55% 15%;
+    --sidebar-text-muted: 205 25% 40%;
+    --sidebar-accent: 190 88% 30%;
+  }
+
+  /* Oceanic Dark Theme - "Midnight Abyss" - Bioluminescent deep sea */
+  /* CRITICAL: Maximum contrast for readability - 8:1+ ratio */
+  .oceanic-dark,
+  [data-theme="oceanic-dark"] {
+    /* True midnight ocean - pure deep navy black */
+    --background: 222 80% 3%;
+    /* CRITICAL: MAXIMUM CONTRAST - bright cyan-white text */
+    --foreground: 188 90% 92%;
+
+    /* Deep reef cards - subtle elevation */
+    --card: 220 70% 6%;
+    --card-foreground: 188 90% 92%;
+
+    --popover: 218 65% 8%;
+    --popover-foreground: 188 90% 92%;
+
+    /* Bioluminescent cyan primary - MAXIMUM GLOW */
+    --primary: 187 95% 60%;
+    --primary-foreground: 222 80% 3%;
+
+    /* Deep ocean secondary - abyssal blue */
+    --secondary: 218 60% 10%;
+    --secondary-foreground: 192 75% 85%;
+
+    /* Abyssal muted tones - HIGH CONTRAST (still readable) */
+    --muted: 218 55% 12%;
+    --muted-foreground: 195 55% 65%;
+
+    /* Glowing aqua accent - intense bioluminescence */
+    --accent: 178 85% 50%;
+    --accent-foreground: 222 80% 3%;
+
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 188 90% 92%;
+
+    /* Deep reef borders - glowing edges */
+    --border: 208 55% 16%;
+    --input: 218 60% 10%;
+    --ring: 187 95% 60%;
+
+    /* Oceanic brand colors - bioluminescent glow palette */
+    --codex-emerald: 172 80% 55%;
+    --codex-cyan: 187 90% 62%;
+    --codex-amber: 38 92% 60%;
+    --codex-purple: 260 75% 70%;
+
+    /* Sidebar oceanic dark - abyssal glow */
+    --sidebar-bg: 220 75% 4%;
+    --sidebar-border: 212 52% 14%;
+    --sidebar-text: 190 80% 88%;
+    --sidebar-text-muted: 198 48% 60%;
+    --sidebar-accent: 187 95% 62%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SEPIA THEMES - Visual Styling  
+   Antiquarian book aesthetics with aged paper and candlelit ambiance
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Sepia Light Theme - "Sunlit Parchment" */
+.sepia-light,
+[data-theme="sepia-light"] {
+  background-color: #FCF9F2;
+  background-image:
+    /* Aged paper grain texture effect */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
+    /* Warm parchment vignette */
+    radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(160, 82, 45, 0.04) 100%);
+  color: #2C1A0C;
+}
+
+/* Sepia Dark Theme - "Candlelit Study" - DEEPER mahogany for distinction */
+.sepia-dark,
+[data-theme="sepia-dark"] {
+  background-color: #0E0704;
+  background-image:
+    /* Multiple candlelight sources for warmth */
+    radial-gradient(ellipse at 25% 15%, rgba(212, 167, 106, 0.08) 0%, transparent 45%),
+    radial-gradient(ellipse at 75% 85%, rgba(205, 133, 63, 0.05) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(180, 120, 60, 0.03) 0%, transparent 60%);
+  color: #EDE2D2;
+  color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   OCEANIC THEMES - Visual Styling
+   Bioluminescent deep sea aesthetics with vibrant aquatic colors
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Oceanic Light Theme - "Coastal Sunrise" - Enhanced aquatic character */
+.oceanic-light,
+[data-theme="oceanic-light"] {
+  background-color: #F2FBFC;
+  background-image:
+    /* Soft aqua wash at top - morning light on water */
+    radial-gradient(ellipse at 80% 0%, rgba(34, 211, 238, 0.08) 0%, transparent 50%),
+    /* Coral reef hint at bottom for warmth */
+    radial-gradient(ellipse at 20% 100%, rgba(249, 115, 22, 0.04) 0%, transparent 40%),
+    /* Subtle wave pattern - horizontal ripples */
+    linear-gradient(0deg, rgba(14, 165, 233, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 8px;
+  color: #0A3D5C;
+}
+
+/* Oceanic Dark Theme - "Midnight Abyss" - MAXIMUM CONTRAST bioluminescent */
+.oceanic-dark,
+[data-theme="oceanic-dark"] {
+  background-color: #010408;
+  background-image:
+    /* Bioluminescent cyan glow from above - stronger */
+    radial-gradient(ellipse at 25% 0%, rgba(34, 211, 238, 0.12) 0%, transparent 55%),
+    /* Deep teal glow from below - ocean floor bioluminescence */
+    radial-gradient(ellipse at 75% 100%, rgba(20, 184, 166, 0.08) 0%, transparent 55%),
+    /* Subtle purple accent for depth - abyssal creatures */
+    radial-gradient(ellipse at 90% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
+  /* MAXIMUM CONTRAST - bright cyan-white text */
+  color: #D4F5FA;
+  color-scheme: dark;
+}
+
+/* CRITICAL: Force oceanic-dark backgrounds - TRUE MIDNIGHT */
+html.oceanic-dark body,
+html[data-theme="oceanic-dark"] body {
+  background-color: #010408 !important;
+}
+
+html.oceanic-dark .bg-paper-50,
+html.oceanic-dark .bg-paper-texture,
+html.oceanic-dark .bg-quarry-offwhite,
+html[data-theme="oceanic-dark"] .bg-paper-50,
+html[data-theme="oceanic-dark"] .bg-paper-texture,
+html[data-theme="oceanic-dark"] .bg-quarry-offwhite {
+  background-color: #010408 !important;
+  background-image: none !important;
+}
+
+html.oceanic-dark .min-h-screen,
+html[data-theme="oceanic-dark"] .min-h-screen {
+  background-color: #010408 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   OCEANIC DARK - AGGRESSIVE GLOBAL OVERRIDES
+   Force dark backgrounds everywhere that uses dark: modifiers
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Navigation bar - force dark background */
+html.oceanic-dark nav,
+html[data-theme="oceanic-dark"] nav {
+  background-color: transparent !important;
+}
+
+html.oceanic-dark nav.bg-white\/90,
+html.oceanic-dark nav[class*="bg-white"],
+html[data-theme="oceanic-dark"] nav.bg-white\/90,
+html[data-theme="oceanic-dark"] nav[class*="bg-white"] {
+  background-color: rgba(1, 4, 8, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+}
+
+/* All bg-white variants - force dark in oceanic-dark */
+html.oceanic-dark .bg-white,
+html.oceanic-dark .bg-white\/80,
+html.oceanic-dark .bg-white\/90,
+html.oceanic-dark .bg-white\/95,
+html[data-theme="oceanic-dark"] .bg-white,
+html[data-theme="oceanic-dark"] .bg-white\/80,
+html[data-theme="oceanic-dark"] .bg-white\/90,
+html[data-theme="oceanic-dark"] .bg-white\/95 {
+  background-color: #010408 !important;
+}
+
+/* All gray-50/100/200 - force dark in oceanic-dark */
+html.oceanic-dark .bg-gray-50,
+html.oceanic-dark .bg-gray-100,
+html.oceanic-dark .bg-gray-200,
+html[data-theme="oceanic-dark"] .bg-gray-50,
+html[data-theme="oceanic-dark"] .bg-gray-100,
+html[data-theme="oceanic-dark"] .bg-gray-200 {
+  background-color: #020810 !important;
+}
+
+/* All gradient-to variants that start with light colors */
+html.oceanic-dark [class*="from-quarry-offwhite"],
+html.oceanic-dark [class*="from-gray-50"],
+html.oceanic-dark [class*="from-white"],
+html[data-theme="oceanic-dark"] [class*="from-quarry-offwhite"],
+html[data-theme="oceanic-dark"] [class*="from-gray-50"],
+html[data-theme="oceanic-dark"] [class*="from-white"] {
+  --tw-gradient-from: #010408 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+html.oceanic-dark [class*="to-gray-50"],
+html.oceanic-dark [class*="to-quarry-offwhite"],
+html[data-theme="oceanic-dark"] [class*="to-gray-50"],
+html[data-theme="oceanic-dark"] [class*="to-quarry-offwhite"] {
+  --tw-gradient-to: #020A10 !important;
+}
+
+/* All via variants that use light colors */
+html.oceanic-dark [class*="via-gray-50"],
+html.oceanic-dark [class*="via-white"],
+html[data-theme="oceanic-dark"] [class*="via-gray-50"],
+html[data-theme="oceanic-dark"] [class*="via-white"] {
+  --tw-gradient-via: #010408 !important;
+}
+
+/* Shadow overrides - neuro shadows */
+html.oceanic-dark [class*="shadow-neuro-light"],
+html.oceanic-dark [class*="shadow-neuro-sm-light"],
+html.oceanic-dark [class*="shadow-neuro-inset-light"],
+html[data-theme="oceanic-dark"] [class*="shadow-neuro-light"],
+html[data-theme="oceanic-dark"] [class*="shadow-neuro-sm-light"],
+html[data-theme="oceanic-dark"] [class*="shadow-neuro-inset-light"] {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(34, 211, 238, 0.05) !important;
+}
+
+/* Section backgrounds */
+html.oceanic-dark section,
+html[data-theme="oceanic-dark"] section {
+  background-color: #010408;
+}
+
+html.oceanic-dark section[class*="bg-gradient"],
+html[data-theme="oceanic-dark"] section[class*="bg-gradient"] {
+  background: linear-gradient(to bottom, #010408, #020A10) !important;
+}
+
+/* Cards and panels with white/light backgrounds */
+html.oceanic-dark [class*="rounded-xl"][class*="bg-white"],
+html.oceanic-dark [class*="rounded-2xl"][class*="bg-white"],
+html.oceanic-dark [class*="rounded-3xl"][class*="bg-white"],
+html.oceanic-dark div[class*="bg-quarry-offwhite"],
+html[data-theme="oceanic-dark"] [class*="rounded-xl"][class*="bg-white"],
+html[data-theme="oceanic-dark"] [class*="rounded-2xl"][class*="bg-white"],
+html[data-theme="oceanic-dark"] [class*="rounded-3xl"][class*="bg-white"],
+html[data-theme="oceanic-dark"] div[class*="bg-quarry-offwhite"] {
+  background-color: #020810 !important;
+  border-color: #0D3540 !important;
+}
+
+/* Border colors */
+html.oceanic-dark .border-gray-200,
+html.oceanic-dark .border-gray-200\/50,
+html.oceanic-dark .border-gray-200\/30,
+html[data-theme="oceanic-dark"] .border-gray-200,
+html[data-theme="oceanic-dark"] .border-gray-200\/50,
+html[data-theme="oceanic-dark"] .border-gray-200\/30 {
+  border-color: rgba(13, 53, 64, 0.5) !important;
+}
+
+/* Text colors - ensure readability */
+html.oceanic-dark .text-gray-600,
+html.oceanic-dark .text-gray-700,
+html.oceanic-dark .text-gray-800,
+html.oceanic-dark .text-gray-900,
+html[data-theme="oceanic-dark"] .text-gray-600,
+html[data-theme="oceanic-dark"] .text-gray-700,
+html[data-theme="oceanic-dark"] .text-gray-800,
+html[data-theme="oceanic-dark"] .text-gray-900 {
+  color: #A5D8E8 !important;
+}
+
+/* Muted text */
+html.oceanic-dark .text-gray-400,
+html.oceanic-dark .text-gray-500,
+html[data-theme="oceanic-dark"] .text-gray-400,
+html[data-theme="oceanic-dark"] .text-gray-500 {
+  color: #7DD3FC !important;
+}
+
+/* Hover backgrounds */
+html.oceanic-dark .hover\:bg-gray-100:hover,
+html.oceanic-dark .hover\:bg-gray-200:hover,
+html[data-theme="oceanic-dark"] .hover\:bg-gray-100:hover,
+html[data-theme="oceanic-dark"] .hover\:bg-gray-200:hover {
+  background-color: #0D2030 !important;
+}
+
+/* Mobile menu */
+html.oceanic-dark [id="mobile-menu"],
+html.oceanic-dark div[class*="bg-white\/95"],
+html[data-theme="oceanic-dark"] [id="mobile-menu"],
+html[data-theme="oceanic-dark"] div[class*="bg-white\/95"] {
+  background-color: rgba(1, 4, 8, 0.98) !important;
+}
+
+/* Oceanic Light prose styling */
+.oceanic-light .prose,
+[data-theme="oceanic-light"] .prose {
+  --tw-prose-body: #155E75;
+  --tw-prose-headings: #0C4A6E;
+  --tw-prose-links: #0891B2;
+  --tw-prose-bold: #0C4A6E;
+  --tw-prose-counters: #0E7490;
+  --tw-prose-bullets: #0E7490;
+  --tw-prose-hr: #A5F3FC;
+  --tw-prose-quotes: #164E63;
+  --tw-prose-quote-borders: #F97316;
+  --tw-prose-captions: #0891B2;
+  --tw-prose-code: #0C4A6E;
+  --tw-prose-pre-code: #E0F2FE;
+  --tw-prose-pre-bg: #0C1929;
+  --tw-prose-th-borders: #A5F3FC;
+  --tw-prose-td-borders: #CFFAFE;
+}
+
+/* Oceanic Dark prose styling - MAXIMUM CONTRAST */
+.oceanic-dark .prose,
+[data-theme="oceanic-dark"] .prose {
+  --tw-prose-body: #D4F5FA;
+  --tw-prose-headings: #F0FCFF;
+  --tw-prose-links: #5EEAD4;
+  --tw-prose-bold: #F0FCFF;
+  --tw-prose-counters: #7DD3FC;
+  --tw-prose-bullets: #7DD3FC;
+  --tw-prose-hr: #164E63;
+  --tw-prose-quotes: #BAE6FD;
+  --tw-prose-quote-borders: #22D3EE;
+  --tw-prose-captions: #7DD3FC;
+  --tw-prose-code: #BAE6FD;
+  --tw-prose-pre-code: #E0F7FA;
+  --tw-prose-pre-bg: #020810;
+  --tw-prose-th-borders: #164E63;
+  --tw-prose-td-borders: #0D3540;
+}
+
+/* Oceanic scrollbars */
+.oceanic-light ::-webkit-scrollbar-track,
+[data-theme="oceanic-light"] ::-webkit-scrollbar-track {
+  background: #E0F2FE;
+}
+
+.oceanic-light ::-webkit-scrollbar-thumb,
+[data-theme="oceanic-light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #67E8F9 0%, #22D3EE 100%);
+  border-radius: 4px;
+}
+
+.oceanic-light ::-webkit-scrollbar-thumb:hover,
+[data-theme="oceanic-light"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #22D3EE 0%, #0891B2 100%);
+}
+
+.oceanic-dark ::-webkit-scrollbar-track,
+[data-theme="oceanic-dark"] ::-webkit-scrollbar-track {
+  background: #020810;
+}
+
+.oceanic-dark ::-webkit-scrollbar-thumb,
+[data-theme="oceanic-dark"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #155E75 0%, #164E63 100%);
+  border-radius: 4px;
+}
+
+.oceanic-dark ::-webkit-scrollbar-thumb:hover,
+[data-theme="oceanic-dark"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0891B2 0%, #155E75 100%);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+}
+
+/* Oceanic selection */
+.oceanic-light ::selection,
+[data-theme="oceanic-light"] ::selection {
+  background: #22D3EE;
+  color: #0C1929;
+}
+
+.oceanic-dark ::selection,
+[data-theme="oceanic-dark"] ::selection {
+  background: #0891B2;
+  color: #F0F9FF;
+}
+
+/* Oceanic headings */
+.oceanic-light h1,
+.oceanic-light h2,
+.oceanic-light h3,
+[data-theme="oceanic-light"] h1,
+[data-theme="oceanic-light"] h2,
+[data-theme="oceanic-light"] h3 {
+  color: #0C4A6E;
+}
+
+.oceanic-dark h1,
+.oceanic-dark h2,
+.oceanic-dark h3,
+[data-theme="oceanic-dark"] h1,
+[data-theme="oceanic-dark"] h2,
+[data-theme="oceanic-dark"] h3 {
+  color: #F0FCFF;
+  text-shadow: 0 0 30px rgba(34, 211, 238, 0.18);
+}
+
+/* Oceanic links */
+.oceanic-light a,
+[data-theme="oceanic-light"] a {
+  color: #0891B2;
+  text-decoration-color: #67E8F9;
+  transition: all 0.15s ease;
+}
+
+.oceanic-light a:hover,
+[data-theme="oceanic-light"] a:hover {
+  color: #0E7490;
+  text-decoration-color: #0891B2;
+}
+
+.oceanic-dark a,
+[data-theme="oceanic-dark"] a {
+  color: #22D3EE;
+  text-decoration-color: #0891B2;
+  transition: all 0.15s ease;
+}
+
+.oceanic-dark a:hover,
+[data-theme="oceanic-dark"] a:hover {
+  color: #67E8F9;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+}
+
+/* Oceanic cards & panels */
+.oceanic-light .card,
+.oceanic-light [class*="panel"],
+[data-theme="oceanic-light"] .card,
+[data-theme="oceanic-light"] [class*="panel"] {
+  background: rgba(240, 249, 255, 0.8);
+  border: 1px solid #BAE6FD;
+  box-shadow: 0 4px 20px rgba(8, 145, 178, 0.08);
+}
+
+.oceanic-dark .card,
+.oceanic-dark [class*="panel"],
+[data-theme="oceanic-dark"] .card,
+[data-theme="oceanic-dark"] [class*="panel"] {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #164E63;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(6, 182, 212, 0.05);
+}
+
+/* Oceanic inputs */
+.oceanic-light input,
+.oceanic-light textarea,
+.oceanic-light select,
+[data-theme="oceanic-light"] input,
+[data-theme="oceanic-light"] textarea,
+[data-theme="oceanic-light"] select {
+  background: #F8FDFF !important;
+  border: 1px solid #BAE6FD !important;
+  color: #1E3A4F !important;
+}
+
+.oceanic-light input:focus,
+.oceanic-light textarea:focus,
+.oceanic-light select:focus,
+[data-theme="oceanic-light"] input:focus,
+[data-theme="oceanic-light"] textarea:focus,
+[data-theme="oceanic-light"] select:focus {
+  border-color: #0891B2 !important;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
+}
+
+.oceanic-dark input,
+.oceanic-dark textarea,
+.oceanic-dark select,
+[data-theme="oceanic-dark"] input,
+[data-theme="oceanic-dark"] textarea,
+[data-theme="oceanic-dark"] select {
+  background: #030810 !important;
+  border: 1px solid #0c2030 !important;
+  color: #E0F2FE !important;
+}
+
+.oceanic-dark input:focus,
+.oceanic-dark textarea:focus,
+.oceanic-dark select:focus,
+[data-theme="oceanic-dark"] input:focus,
+[data-theme="oceanic-dark"] textarea:focus,
+[data-theme="oceanic-dark"] select:focus {
+  border-color: #0891B2 !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+}
+
+/* Oceanic buttons */
+.oceanic-light button,
+.oceanic-light [role="button"],
+[data-theme="oceanic-light"] button,
+[data-theme="oceanic-light"] [role="button"] {
+  transition: all 0.15s ease;
+}
+
+.oceanic-light button:hover,
+.oceanic-light [role="button"]:hover,
+[data-theme="oceanic-light"] button:hover,
+[data-theme="oceanic-light"] [role="button"]:hover {
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.2);
+}
+
+.oceanic-dark button,
+.oceanic-dark [role="button"],
+[data-theme="oceanic-dark"] button,
+[data-theme="oceanic-dark"] [role="button"] {
+  transition: all 0.15s ease;
+}
+
+.oceanic-dark button:hover,
+.oceanic-dark [role="button"]:hover,
+[data-theme="oceanic-dark"] button:hover,
+[data-theme="oceanic-dark"] [role="button"]:hover {
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   OCEANIC DARK - FORCE DARK BACKGROUNDS
+   Override all Tailwind light background classes
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.oceanic-dark .bg-white,
+.oceanic-dark .bg-gray-50,
+.oceanic-dark .bg-gray-100,
+.oceanic-dark .bg-slate-50,
+.oceanic-dark .bg-slate-100,
+.oceanic-dark .bg-zinc-50,
+.oceanic-dark .bg-zinc-100,
+[data-theme="oceanic-dark"] .bg-white,
+[data-theme="oceanic-dark"] .bg-gray-50,
+[data-theme="oceanic-dark"] .bg-gray-100,
+[data-theme="oceanic-dark"] .bg-slate-50,
+[data-theme="oceanic-dark"] .bg-slate-100,
+[data-theme="oceanic-dark"] .bg-zinc-50,
+[data-theme="oceanic-dark"] .bg-zinc-100 {
+  background-color: #030912 !important;
+}
+
+.oceanic-dark .bg-gray-200,
+.oceanic-dark .bg-slate-200,
+.oceanic-dark .bg-zinc-200,
+[data-theme="oceanic-dark"] .bg-gray-200,
+[data-theme="oceanic-dark"] .bg-slate-200,
+[data-theme="oceanic-dark"] .bg-zinc-200 {
+  background-color: #061018 !important;
+}
+
+/* Force dark on main containers */
+.oceanic-dark main,
+.oceanic-dark article,
+.oceanic-dark section,
+.oceanic-dark aside,
+.oceanic-dark .container,
+[data-theme="oceanic-dark"] main,
+[data-theme="oceanic-dark"] article,
+[data-theme="oceanic-dark"] section,
+[data-theme="oceanic-dark"] aside,
+[data-theme="oceanic-dark"] .container {
+  background-color: transparent;
+}
+
+/* Force dark cards and panels */
+.oceanic-dark .card,
+.oceanic-dark [class*="panel"],
+.oceanic-dark [class*="Card"],
+.oceanic-dark [class*="modal"],
+.oceanic-dark [class*="dialog"],
+.oceanic-dark [class*="popover"],
+.oceanic-dark [class*="dropdown"],
+[data-theme="oceanic-dark"] .card,
+[data-theme="oceanic-dark"] [class*="panel"],
+[data-theme="oceanic-dark"] [class*="Card"],
+[data-theme="oceanic-dark"] [class*="modal"],
+[data-theme="oceanic-dark"] [class*="dialog"],
+[data-theme="oceanic-dark"] [class*="popover"],
+[data-theme="oceanic-dark"] [class*="dropdown"] {
+  background-color: #040c14 !important;
+  border-color: #0c2030 !important;
+}
+
+/* Force dark on common wrapper divs with light backgrounds */
+.oceanic-dark div[class*="bg-white"],
+.oceanic-dark div[class*="bg-gray-5"],
+.oceanic-dark div[class*="bg-slate-5"],
+[data-theme="oceanic-dark"] div[class*="bg-white"],
+[data-theme="oceanic-dark"] div[class*="bg-gray-5"],
+[data-theme="oceanic-dark"] div[class*="bg-slate-5"] {
+  background-color: #030912 !important;
+}
+
+/* Ensure text is visible */
+.oceanic-dark .text-gray-900,
+.oceanic-dark .text-gray-800,
+.oceanic-dark .text-gray-700,
+.oceanic-dark .text-slate-900,
+.oceanic-dark .text-slate-800,
+.oceanic-dark .text-slate-700,
+.oceanic-dark .text-zinc-900,
+.oceanic-dark .text-zinc-800,
+.oceanic-dark .text-zinc-700,
+[data-theme="oceanic-dark"] .text-gray-900,
+[data-theme="oceanic-dark"] .text-gray-800,
+[data-theme="oceanic-dark"] .text-gray-700,
+[data-theme="oceanic-dark"] .text-slate-900,
+[data-theme="oceanic-dark"] .text-slate-800,
+[data-theme="oceanic-dark"] .text-slate-700,
+[data-theme="oceanic-dark"] .text-zinc-900,
+[data-theme="oceanic-dark"] .text-zinc-800,
+[data-theme="oceanic-dark"] .text-zinc-700 {
+  color: #D4F5FA !important;
+}
+
+.oceanic-dark .text-gray-600,
+.oceanic-dark .text-gray-500,
+.oceanic-dark .text-slate-600,
+.oceanic-dark .text-slate-500,
+.oceanic-dark .text-zinc-600,
+.oceanic-dark .text-zinc-500,
+[data-theme="oceanic-dark"] .text-gray-600,
+[data-theme="oceanic-dark"] .text-gray-500,
+[data-theme="oceanic-dark"] .text-slate-600,
+[data-theme="oceanic-dark"] .text-slate-500,
+[data-theme="oceanic-dark"] .text-zinc-600,
+[data-theme="oceanic-dark"] .text-zinc-500 {
+  color: #7DD3FC !important;
+}
+
+/* Force dark borders */
+.oceanic-dark .border-gray-200,
+.oceanic-dark .border-gray-300,
+.oceanic-dark .border-slate-200,
+.oceanic-dark .border-slate-300,
+.oceanic-dark .border-zinc-200,
+.oceanic-dark .border-zinc-300,
+[data-theme="oceanic-dark"] .border-gray-200,
+[data-theme="oceanic-dark"] .border-gray-300,
+[data-theme="oceanic-dark"] .border-slate-200,
+[data-theme="oceanic-dark"] .border-slate-300,
+[data-theme="oceanic-dark"] .border-zinc-200,
+[data-theme="oceanic-dark"] .border-zinc-300 {
+  border-color: #0c2030 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   OCEANIC DARK - QUARRY LANDING PAGE OVERRIDES
+   Make Quarry-specific colors match oceanic theme
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Override quarry background colors for oceanic theme */
+.oceanic-dark .bg-quarry-offwhite,
+.oceanic-dark .dark\:bg-quarry-charcoal,
+.oceanic-dark .dark\:bg-quarry-charcoal-deep,
+[data-theme="oceanic-dark"] .bg-quarry-offwhite,
+[data-theme="oceanic-dark"] .dark\:bg-quarry-charcoal,
+[data-theme="oceanic-dark"] .dark\:bg-quarry-charcoal-deep {
+  background-color: #010408 !important;
+}
+
+/* Override quarry text colors for oceanic theme - MAXIMUM CONTRAST */
+.oceanic-dark .text-quarry-charcoal,
+.oceanic-dark .dark\:text-quarry-offwhite,
+[data-theme="oceanic-dark"] .text-quarry-charcoal,
+[data-theme="oceanic-dark"] .dark\:text-quarry-offwhite {
+  color: #D4F5FA !important;
+}
+
+/* Override quarry green accent for oceanic cyan - bioluminescent */
+.oceanic-dark .text-quarry-green-700,
+.oceanic-dark .dark\:text-quarry-green-50,
+.oceanic-dark .text-quarry-green-500,
+[data-theme="oceanic-dark"] .text-quarry-green-700,
+[data-theme="oceanic-dark"] .dark\:text-quarry-green-50,
+[data-theme="oceanic-dark"] .text-quarry-green-500 {
+  color: #5EEAD4 !important;
+}
+
+.oceanic-dark .bg-quarry-green-700,
+.oceanic-dark .dark\:bg-quarry-green-900,
+[data-theme="oceanic-dark"] .bg-quarry-green-700,
+[data-theme="oceanic-dark"] .dark\:bg-quarry-green-900 {
+  background-color: #0891B2 !important;
+}
+
+/* Override neuromorphic shadows for oceanic */
+.oceanic-dark .shadow-neuro-light,
+.oceanic-dark .shadow-neuro-sm-light,
+.oceanic-dark .dark\:shadow-neuro-dark,
+.oceanic-dark .dark\:shadow-neuro-sm-dark,
+[data-theme="oceanic-dark"] .shadow-neuro-light,
+[data-theme="oceanic-dark"] .shadow-neuro-sm-light,
+[data-theme="oceanic-dark"] .dark\:shadow-neuro-dark,
+[data-theme="oceanic-dark"] .dark\:shadow-neuro-sm-dark {
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.4),
+    -2px -2px 8px rgba(6, 182, 212, 0.08),
+    inset 0 1px 0 rgba(34, 211, 238, 0.05) !important;
+}
+
+/* Override quarry gradients for oceanic */
+.oceanic-dark .from-quarry-green-700,
+.oceanic-dark .to-quarry-green-500,
+[data-theme="oceanic-dark"] .from-quarry-green-700,
+[data-theme="oceanic-dark"] .to-quarry-green-500 {
+  --tw-gradient-from: #0891B2 !important;
+  --tw-gradient-to: #22D3EE !important;
+}
+
+/* Override emerald/teal gradients for oceanic (nav buttons) */
+.oceanic-dark .from-emerald-500,
+.oceanic-dark .to-teal-500,
+.oceanic-dark .dark\:from-rose-500,
+.oceanic-dark .dark\:to-red-500,
+[data-theme="oceanic-dark"] .from-emerald-500,
+[data-theme="oceanic-dark"] .to-teal-500,
+[data-theme="oceanic-dark"] .dark\:from-rose-500,
+[data-theme="oceanic-dark"] .dark\:to-red-500 {
+  --tw-gradient-from: #0891B2 !important;
+  --tw-gradient-to: #22D3EE !important;
+}
+
+/* Override emerald/rose accent colors for oceanic */
+.oceanic-dark .text-emerald-600,
+.oceanic-dark .text-emerald-700,
+.oceanic-dark .dark\:text-rose-300,
+.oceanic-dark .dark\:text-rose-400,
+[data-theme="oceanic-dark"] .text-emerald-600,
+[data-theme="oceanic-dark"] .text-emerald-700,
+[data-theme="oceanic-dark"] .dark\:text-rose-300,
+[data-theme="oceanic-dark"] .dark\:text-rose-400 {
+  color: #22D3EE !important;
+}
+
+/* Override emerald/rose background colors for oceanic */
+.oceanic-dark .bg-emerald-100,
+.oceanic-dark .dark\:bg-rose-900\/30,
+[data-theme="oceanic-dark"] .bg-emerald-100,
+[data-theme="oceanic-dark"] .dark\:bg-rose-900\/30 {
+  background-color: rgba(8, 145, 178, 0.2) !important;
+}
+
+/* Override shadow colors for oceanic */
+.oceanic-dark .hover\:shadow-emerald-500\/25,
+.oceanic-dark .dark\:hover\:shadow-rose-500\/25,
+[data-theme="oceanic-dark"] .hover\:shadow-emerald-500\/25,
+[data-theme="oceanic-dark"] .dark\:hover\:shadow-rose-500\/25 {
+  --tw-shadow-color: rgba(6, 182, 212, 0.25) !important;
+}
+
+/* CRITICAL: Override light gradient backgrounds for oceanic-dark */
+/* These appear on pages like About that use emerald/teal light gradients */
+.oceanic-dark .bg-gradient-to-br.from-emerald-50,
+.oceanic-dark .bg-gradient-to-br.from-teal-50,
+.oceanic-dark .from-emerald-50,
+.oceanic-dark .to-teal-50,
+.oceanic-dark .dark\:from-emerald-900\/20,
+.oceanic-dark .dark\:to-teal-900\/20,
+[data-theme="oceanic-dark"] .bg-gradient-to-br.from-emerald-50,
+[data-theme="oceanic-dark"] .bg-gradient-to-br.from-teal-50,
+[data-theme="oceanic-dark"] .from-emerald-50,
+[data-theme="oceanic-dark"] .to-teal-50,
+[data-theme="oceanic-dark"] .dark\:from-emerald-900\/20,
+[data-theme="oceanic-dark"] .dark\:to-teal-900\/20 {
+  --tw-gradient-from: #020A10 !important;
+  --tw-gradient-to: #031318 !important;
+  background: linear-gradient(to bottom right, #020A10, #031318) !important;
+}
+
+/* Override emerald-50 background for oceanic cards */
+.oceanic-dark .bg-emerald-50,
+.oceanic-dark .dark\:bg-emerald-900\/20,
+[data-theme="oceanic-dark"] .bg-emerald-50,
+[data-theme="oceanic-dark"] .dark\:bg-emerald-900\/20 {
+  background-color: #020A10 !important;
+}
+
+/* Override border colors for oceanic dark cards */
+.oceanic-dark .border-emerald-200,
+.oceanic-dark .dark\:border-emerald-800,
+[data-theme="oceanic-dark"] .border-emerald-200,
+[data-theme="oceanic-dark"] .dark\:border-emerald-800 {
+  border-color: #0E4D5C !important;
+}
+
+/* Override gray sections for oceanic */
+.oceanic-dark .bg-gray-50,
+.oceanic-dark .dark\:bg-gray-900\/50,
+[data-theme="oceanic-dark"] .bg-gray-50,
+[data-theme="oceanic-dark"] .dark\:bg-gray-900\/50 {
+  background-color: #010408 !important;
+}
+
+/* Override gray card backgrounds for oceanic */
+.oceanic-dark .bg-white,
+.oceanic-dark .dark\:bg-gray-800,
+[data-theme="oceanic-dark"] .bg-white,
+[data-theme="oceanic-dark"] .dark\:bg-gray-800 {
+  background-color: #020810 !important;
+}
+
+/* Override gray border colors for oceanic */
+.oceanic-dark .border-gray-200,
+.oceanic-dark .dark\:border-gray-700,
+[data-theme="oceanic-dark"] .border-gray-200,
+[data-theme="oceanic-dark"] .dark\:border-gray-700 {
+  border-color: #0D3540 !important;
+}
+
+/* Default dark theme prose styling - improved contrast */
+.dark .prose,
+[data-theme="dark"] .prose {
+  --tw-prose-body: #e4e4e7;
+  --tw-prose-headings: #fafafa;
+  --tw-prose-links: #34d399;
+  --tw-prose-bold: #fafafa;
+  --tw-prose-counters: #a1a1aa;
+  --tw-prose-bullets: #a1a1aa;
+  --tw-prose-hr: #3f3f46;
+  --tw-prose-quotes: #d4d4d8;
+  --tw-prose-quote-borders: #34d399;
+  --tw-prose-captions: #a1a1aa;
+  --tw-prose-code: #e4e4e7;
+  --tw-prose-pre-code: #e4e4e7;
+  --tw-prose-pre-bg: #18181b;
+  --tw-prose-th-borders: #3f3f46;
+  --tw-prose-td-borders: #27272a;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SEPIA THEMES - Typography & Visual Styling
+   Antiquarian book aesthetics with rich warm tones
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Sepia Light prose - "Sunlit Parchment" */
+.sepia-light .prose,
+[data-theme="sepia-light"] .prose {
+  --tw-prose-body: #3D2914;
+  --tw-prose-headings: #2A1B0D;
+  --tw-prose-links: #B34700;
+  --tw-prose-bold: #2A1B0D;
+  --tw-prose-counters: #8B5A2B;
+  --tw-prose-bullets: #8B5A2B;
+  --tw-prose-hr: #D4B896;
+  --tw-prose-quotes: #5C3D1E;
+  --tw-prose-quote-borders: #E07020;
+  --tw-prose-captions: #7A5C3C;
+  --tw-prose-code: #4D3319;
+  --tw-prose-pre-code: #F5EDE0;
+  --tw-prose-pre-bg: #2A1B0D;
+  --tw-prose-th-borders: #C4A882;
+  --tw-prose-td-borders: #E8DCC8;
+}
+
+/* Sepia Dark prose - "Candlelit Study" with antique gold */
+.sepia-dark .prose,
+[data-theme="sepia-dark"] .prose {
+  --tw-prose-body: #E8DCC8;
+  --tw-prose-headings: #F5EDE0;
+  --tw-prose-links: #E8A848;
+  --tw-prose-bold: #F5EDE0;
+  --tw-prose-counters: #C4A060;
+  --tw-prose-bullets: #C4A060;
+  --tw-prose-hr: #5D3A1A;
+  --tw-prose-quotes: #D4C4A8;
+  --tw-prose-quote-borders: #D4A76A;
+  --tw-prose-captions: #B89860;
+  --tw-prose-code: #E8DCC0;
+  --tw-prose-pre-code: #F5EDE0;
+  --tw-prose-pre-bg: #0D0704;
+  --tw-prose-th-borders: #5D3A1A;
+  --tw-prose-td-borders: #3D2814;
+}
+
+/* Sepia headings - distinctive typography */
+.sepia-light h1,
+.sepia-light h2,
+.sepia-light h3,
+[data-theme="sepia-light"] h1,
+[data-theme="sepia-light"] h2,
+[data-theme="sepia-light"] h3 {
+  color: #2A1B0D;
+  font-weight: 600;
+}
+
+.sepia-dark h1,
+.sepia-dark h2,
+.sepia-dark h3,
+[data-theme="sepia-dark"] h1,
+[data-theme="sepia-dark"] h2,
+[data-theme="sepia-dark"] h3 {
+  color: #F5EDE0;
+  text-shadow: 0 0 30px rgba(212, 167, 106, 0.15);
+  font-weight: 600;
+}
+
+/* Sepia links - warm tones */
+.sepia-light a,
+[data-theme="sepia-light"] a {
+  color: #B34700;
+  text-decoration-color: #E07020;
+  transition: all 0.15s ease;
+}
+
+.sepia-light a:hover,
+[data-theme="sepia-light"] a:hover {
+  color: #CC5500;
+  text-decoration-color: #CC5500;
+}
+
+.sepia-dark a,
+[data-theme="sepia-dark"] a {
+  color: #E8A848;
+  text-decoration-color: #C48830;
+  transition: all 0.15s ease;
+}
+
+.sepia-dark a:hover,
+[data-theme="sepia-dark"] a:hover {
+  color: #F0C060;
+  text-shadow: 0 0 8px rgba(232, 168, 72, 0.3);
+}
+
+/* Sepia scrollbars - premium leather look */
+.sepia-light ::-webkit-scrollbar-track,
+[data-theme="sepia-light"] ::-webkit-scrollbar-track {
+  background: #F0EBDF;
+}
+
+.sepia-light ::-webkit-scrollbar-thumb,
+[data-theme="sepia-light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #C4A882 0%, #A08060 100%);
+  border-radius: 4px;
+}
+
+.sepia-light ::-webkit-scrollbar-thumb:hover,
+[data-theme="sepia-light"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #A08060 0%, #886A48 100%);
+}
+
+.sepia-dark ::-webkit-scrollbar-track,
+[data-theme="sepia-dark"] ::-webkit-scrollbar-track {
+  background: #0E0704;
+}
+
+.sepia-dark ::-webkit-scrollbar-thumb,
+[data-theme="sepia-dark"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5D3A1A 0%, #3D2814 100%);
+  border-radius: 4px;
+}
+
+.sepia-dark ::-webkit-scrollbar-thumb:hover,
+[data-theme="sepia-dark"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #7D4A2A 0%, #5D3A1A 100%);
+  box-shadow: 0 0 8px rgba(212, 167, 106, 0.2);
+}
+
+/* Sepia selection */
+.sepia-light ::selection,
+[data-theme="sepia-light"] ::selection {
+  background: #D4A574;
+  color: #2A1B0D;
+}
+
+.sepia-dark ::selection,
+[data-theme="sepia-dark"] ::selection {
+  background: #8B5A2B;
+  color: #F5EDE0;
+}
+
+/* Sepia buttons - tactile vintage feel */
+.sepia-light button,
+.sepia-light [role="button"],
+[data-theme="sepia-light"] button,
+[data-theme="sepia-light"] [role="button"] {
+  transition: all 0.15s ease;
+}
+
+.sepia-light button:hover,
+.sepia-light [role="button"]:hover,
+[data-theme="sepia-light"] button:hover,
+[data-theme="sepia-light"] [role="button"]:hover {
+  box-shadow: 0 4px 12px rgba(160, 82, 45, 0.15);
+}
+
+.sepia-dark button,
+.sepia-dark [role="button"],
+[data-theme="sepia-dark"] button,
+[data-theme="sepia-dark"] [role="button"] {
+  transition: all 0.15s ease;
+}
+
+.sepia-dark button:hover,
+.sepia-dark [role="button"]:hover,
+[data-theme="sepia-dark"] button:hover,
+[data-theme="sepia-dark"] [role="button"]:hover {
+  box-shadow: 0 4px 12px rgba(212, 167, 106, 0.2);
+}
+
+/* Sepia cards & panels */
+.sepia-light .card,
+.sepia-light [class*="panel"],
+[data-theme="sepia-light"] .card,
+[data-theme="sepia-light"] [class*="panel"] {
+  background: rgba(251, 247, 238, 0.9);
+  border: 1px solid #D4C4A8;
+  box-shadow: 0 4px 20px rgba(139, 90, 43, 0.08);
+}
+
+.sepia-dark .card,
+.sepia-dark [class*="panel"],
+[data-theme="sepia-dark"] .card,
+[data-theme="sepia-dark"] [class*="panel"] {
+  background: rgba(26, 15, 10, 0.9);
+  border: 1px solid #5D3A1A;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 167, 106, 0.05);
+}
+
+/* Sepia inputs - parchment style */
+.sepia-light input,
+.sepia-light textarea,
+.sepia-light select,
+[data-theme="sepia-light"] input,
+[data-theme="sepia-light"] textarea,
+[data-theme="sepia-light"] select {
+  background: #FAF5EA !important;
+  border: 1px solid #C4A882 !important;
+  color: #3D2914 !important;
+}
+
+.sepia-light input:focus,
+.sepia-light textarea:focus,
+.sepia-light select:focus,
+[data-theme="sepia-light"] input:focus,
+[data-theme="sepia-light"] textarea:focus,
+[data-theme="sepia-light"] select:focus {
+  border-color: #B34700 !important;
+  box-shadow: 0 0 0 3px rgba(179, 71, 0, 0.12);
+}
+
+.sepia-dark input,
+.sepia-dark textarea,
+.sepia-dark select,
+[data-theme="sepia-dark"] input,
+[data-theme="sepia-dark"] textarea,
+[data-theme="sepia-dark"] select {
+  background: #0D0704 !important;
+  border: 1px solid #5D3A1A !important;
+  color: #E8DCC8 !important;
+}
+
+.sepia-dark input:focus,
+.sepia-dark textarea:focus,
+.sepia-dark select:focus,
+[data-theme="sepia-dark"] input:focus,
+[data-theme="sepia-dark"] textarea:focus,
+[data-theme="sepia-dark"] select:focus {
+  border-color: #D4A76A !important;
+  box-shadow: 0 0 0 3px rgba(212, 167, 106, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TERMINAL THEMES - Analog CRT Aesthetics
+   Premium retro-futuristic design with maximum readability
+   Inspired by vintage mainframe terminals, modernized for elite experience
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Terminal Light Theme (Amber) - Warm analog CRT */
+.terminal-light,
+[data-theme="terminal-light"] {
+  /* Deep obsidian black background for maximum contrast */
+  background-color: #0A0A08;
+  background-image:
+    /* Subtle scanline texture for depth */
+    repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 176, 0, 0.015) 2px,
+      rgba(255, 176, 0, 0.015) 4px),
+    /* Subtle radial vignette */
+    radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+
+  /* Premium amber phosphor glow */
+  color: #FFB800;
+
+  /* Elite monospace typography */
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+
+  /* Text rendering for crisp edges */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Terminal Dark Theme (Green) - Classic phosphor display */
+.terminal-dark,
+[data-theme="terminal-dark"] {
+  /* Pure void black */
+  background-color: #050805;
+  background-image:
+    /* Subtle scanline texture */
+    repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 65, 0.012) 2px,
+      rgba(0, 255, 65, 0.012) 4px),
+    /* Subtle radial vignette for CRT depth */
+    radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.35) 100%);
+
+  /* High-contrast phosphor green */
+  color: #00FF41;
+
+  /* Elite monospace typography */
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+
+  /* Text rendering for crisp edges */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Terminal Amber - Typography & Prose */
+.terminal-light .prose,
+[data-theme="terminal-light"] .prose {
+  /* Maximum contrast amber palette */
+  --tw-prose-body: #FFB800;
+  --tw-prose-headings: #FFDD00;
+  --tw-prose-links: #FFE566;
+  --tw-prose-bold: #FFDD00;
+  --tw-prose-counters: #CC9400;
+  --tw-prose-bullets: #CC9400;
+  --tw-prose-hr: #4A3800;
+  --tw-prose-quotes: #FFD000;
+  --tw-prose-quote-borders: #FFB800;
+  --tw-prose-captions: #B38600;
+  --tw-prose-code: #FFDD00;
+  --tw-prose-pre-code: #FFB800;
+  --tw-prose-pre-bg: #0D0D08;
+  --tw-prose-th-borders: #4A3800;
+  --tw-prose-td-borders: #2E2300;
+
+  /* Enhanced typography */
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+/* Terminal Green - Typography & Prose */
+.terminal-dark .prose,
+[data-theme="terminal-dark"] .prose {
+  /* High-contrast phosphor green palette */
+  --tw-prose-body: #00FF41;
+  --tw-prose-headings: #00FF88;
+  --tw-prose-links: #88FF88;
+  --tw-prose-bold: #00FF88;
+  --tw-prose-counters: #00CC33;
+  --tw-prose-bullets: #00CC33;
+  --tw-prose-hr: #003D10;
+  --tw-prose-quotes: #00EE44;
+  --tw-prose-quote-borders: #00FF41;
+  --tw-prose-captions: #00AA2A;
+  --tw-prose-code: #00FF88;
+  --tw-prose-pre-code: #00FF41;
+  --tw-prose-pre-bg: #050D07;
+  --tw-prose-th-borders: #003D10;
+  --tw-prose-td-borders: #002608;
+
+  /* Enhanced typography */
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+/* Terminal Headings - Bold statement typography */
+.terminal-light h1,
+.terminal-light h2,
+.terminal-light h3,
+[data-theme="terminal-light"] h1,
+[data-theme="terminal-light"] h2,
+[data-theme="terminal-light"] h3 {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(255, 184, 0, 0.4), 0 0 40px rgba(255, 184, 0, 0.2);
+}
+
+.terminal-dark h1,
+.terminal-dark h2,
+.terminal-dark h3,
+[data-theme="terminal-dark"] h1,
+[data-theme="terminal-dark"] h2,
+[data-theme="terminal-dark"] h3 {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.4), 0 0 40px rgba(0, 255, 65, 0.2);
+}
+
+/* Terminal Links - Distinctive interaction */
+.terminal-light a,
+[data-theme="terminal-light"] a {
+  color: #FFE566;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: all 0.15s ease;
+}
+
+.terminal-light a:hover,
+[data-theme="terminal-light"] a:hover {
+  color: #FFFF88;
+  text-shadow: 0 0 8px rgba(255, 229, 102, 0.6);
+}
+
+.terminal-dark a,
+[data-theme="terminal-dark"] a {
+  color: #88FF88;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: all 0.15s ease;
+}
+
+.terminal-dark a:hover,
+[data-theme="terminal-dark"] a:hover {
+  color: #AAFFAA;
+  text-shadow: 0 0 8px rgba(136, 255, 136, 0.6);
+}
+
+/* Terminal Code Blocks - Elite syntax display */
+.terminal-light pre,
+.terminal-light code,
+[data-theme="terminal-light"] pre,
+[data-theme="terminal-light"] code {
+  background: #0D0D08 !important;
+  border: 1px solid #3D3000 !important;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+}
+
+.terminal-dark pre,
+.terminal-dark code,
+[data-theme="terminal-dark"] pre,
+[data-theme="terminal-dark"] code {
+  background: #050D07 !important;
+  border: 1px solid #003D10 !important;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+}
+
+/* Terminal Buttons - Tactile analog controls */
+.terminal-light button,
+.terminal-light [role="button"],
+[data-theme="terminal-light"] button,
+[data-theme="terminal-light"] [role="button"] {
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-width: 2px;
+  transition: all 0.1s ease;
+}
+
+.terminal-light button:hover,
+.terminal-light [role="button"]:hover,
+[data-theme="terminal-light"] button:hover,
+[data-theme="terminal-light"] [role="button"]:hover {
+  box-shadow: 0 0 15px rgba(255, 184, 0, 0.4), inset 0 0 10px rgba(255, 184, 0, 0.1);
+}
+
+.terminal-dark button,
+.terminal-dark [role="button"],
+[data-theme="terminal-dark"] button,
+[data-theme="terminal-dark"] [role="button"] {
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-width: 2px;
+  transition: all 0.1s ease;
+}
+
+.terminal-dark button:hover,
+.terminal-dark [role="button"]:hover,
+[data-theme="terminal-dark"] button:hover,
+[data-theme="terminal-dark"] [role="button"]:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.4), inset 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+/* Terminal Input Fields - Clean analog controls */
+.terminal-light input,
+.terminal-light textarea,
+.terminal-light select,
+[data-theme="terminal-light"] input,
+[data-theme="terminal-light"] textarea,
+[data-theme="terminal-light"] select {
+  background: #0A0A08 !important;
+  border: 1px solid #4A3800 !important;
+  color: #FFB800 !important;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  caret-color: #FFB800;
+}
+
+.terminal-light input:focus,
+.terminal-light textarea:focus,
+.terminal-light select:focus,
+[data-theme="terminal-light"] input:focus,
+[data-theme="terminal-light"] textarea:focus,
+[data-theme="terminal-light"] select:focus {
+  border-color: #FFB800 !important;
+  box-shadow: 0 0 10px rgba(255, 184, 0, 0.3);
+  outline: none;
+}
+
+.terminal-dark input,
+.terminal-dark textarea,
+.terminal-dark select,
+[data-theme="terminal-dark"] input,
+[data-theme="terminal-dark"] textarea,
+[data-theme="terminal-dark"] select {
+  background: #050805 !important;
+  border: 1px solid #003D10 !important;
+  color: #00FF41 !important;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+  caret-color: #00FF41;
+}
+
+.terminal-dark input:focus,
+.terminal-dark textarea:focus,
+.terminal-dark select:focus,
+[data-theme="terminal-dark"] input:focus,
+[data-theme="terminal-dark"] textarea:focus,
+[data-theme="terminal-dark"] select:focus {
+  border-color: #00FF41 !important;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+  outline: none;
+}
+
+/* Terminal Cards & Panels - Depth hierarchy */
+.terminal-light .card,
+.terminal-light [class*="panel"],
+.terminal-light [class*="modal"],
+[data-theme="terminal-light"] .card,
+[data-theme="terminal-light"] [class*="panel"],
+[data-theme="terminal-light"] [class*="modal"] {
+  background: #0D0D08;
+  border: 1px solid #3D3000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 184, 0, 0.05);
+}
+
+.terminal-dark .card,
+.terminal-dark [class*="panel"],
+.terminal-dark [class*="modal"],
+[data-theme="terminal-dark"] .card,
+[data-theme="terminal-dark"] [class*="panel"],
+[data-theme="terminal-dark"] [class*="modal"] {
+  background: #050D07;
+  border: 1px solid #003D10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(0, 255, 65, 0.05);
+}
+
+/* Terminal Selection - High contrast highlight */
+.terminal-light ::selection,
+[data-theme="terminal-light"] ::selection {
+  background: #FFB800;
+  color: #0A0A08;
+}
+
+.terminal-dark ::selection,
+[data-theme="terminal-dark"] ::selection {
+  background: #00FF41;
+  color: #050805;
+}
+
+/* Terminal Scrollbars - Premium analog controls */
+.terminal-light ::-webkit-scrollbar,
+[data-theme="terminal-light"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.terminal-light ::-webkit-scrollbar-track,
+[data-theme="terminal-light"] ::-webkit-scrollbar-track {
+  background: #0D0D08;
+  border: 1px solid #3D3000;
+}
+
+.terminal-light ::-webkit-scrollbar-thumb,
+[data-theme="terminal-light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6B4800 0%, #4A3000 100%);
+  border: 1px solid #8B6000;
+  border-radius: 2px;
+}
+
+.terminal-light ::-webkit-scrollbar-thumb:hover,
+[data-theme="terminal-light"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8B6000 0%, #6B4800 100%);
+  box-shadow: 0 0 8px rgba(255, 184, 0, 0.4);
+}
+
+.terminal-dark ::-webkit-scrollbar,
+[data-theme="terminal-dark"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.terminal-dark ::-webkit-scrollbar-track,
+[data-theme="terminal-dark"] ::-webkit-scrollbar-track {
+  background: #050D07;
+  border: 1px solid #003D10;
+}
+
+.terminal-dark ::-webkit-scrollbar-thumb,
+[data-theme="terminal-dark"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #005520 0%, #003D10 100%);
+  border: 1px solid #007030;
+  border-radius: 2px;
+}
+
+.terminal-dark ::-webkit-scrollbar-thumb:hover,
+[data-theme="terminal-dark"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #007030 0%, #005520 100%);
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+}
+
+/* CRT scanline effect for terminal themes */
+.terminal-light,
+.terminal-dark,
+[data-theme="terminal-light"],
+[data-theme="terminal-dark"] {
+  position: relative;
+}
+
+.terminal-light::before,
+.terminal-dark::before,
+[data-theme="terminal-light"]::before,
+[data-theme="terminal-dark"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 2px,
+      rgba(0, 0, 0, 0.1) 4px);
+  z-index: 9999;
+}
+
+/* Text glow effect for terminal themes */
+.terminal-light,
+.terminal-light *,
+[data-theme="terminal-light"],
+[data-theme="terminal-light"] * {
+  text-shadow: 0 0 5px rgba(255, 170, 0, 0.5);
+}
+
+.terminal-dark,
+.terminal-dark *,
+[data-theme="terminal-dark"],
+[data-theme="terminal-dark"] * {
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+/* Mobile optimizations - prevent accidental zoom */
+@layer utilities {
+  /* ─────────────────────────────────────────────────────────────────────────────
+     ACCESSIBILITY: FOCUS STATES
+     Visible focus indicators for keyboard navigation (WCAG 2.4.7)
+  ───────────────────────────────────────────────────────────────────────────── */
+
+  /* Global focus-visible indicator - applies to all focusable elements */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Remove default outline when focus-visible isn't needed */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* High-contrast focus ring for better visibility */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-frame-green;
+  }
+
+  /* Skip link for keyboard users - hidden until focused */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999];
+    @apply focus:px-4 focus:py-2 focus:bg-white focus:text-gray-900 focus:rounded-md focus:shadow-lg;
+    @apply focus:ring-2 focus:ring-frame-green;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     ACCESSIBILITY: COLOR CONTRAST FIXES
+     WCAG AA requires 4.5:1 for normal text, 3:1 for large text
+  ───────────────────────────────────────────────────────────────────────────── */
+
+  /* Improved muted text contrast - use these instead of text-gray-400/500 */
+  .text-muted-accessible {
+    @apply text-gray-600 dark:text-gray-300;
+  }
+
+  .text-muted-secondary {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  /* Improved ink/paper contrast for better readability */
+  .text-ink-accessible {
+    @apply text-ink-700 dark:text-paper-200;
+  }
+
+  /* Scrollbar hiding utility - maintains scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
+  }
+
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+
+  .touch-pinch-zoom {
+    touch-action: pinch-zoom;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────────────
+     TOUCH TARGET UTILITIES
+     Ensure interactive elements meet WCAG AAA guidelines (44-48px minimum)
+  ───────────────────────────────────────────────────────────────────────────── */
+
+  /* Standard touch target (44px - iOS/Android minimum) */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Large touch target (48px - Material Design recommended) */
+  .touch-target-lg {
+    @apply min-h-[48px] min-w-[48px];
+  }
+
+  /* Extra large touch target (56px - FAB size) */
+  .touch-target-xl {
+    @apply min-h-[56px] min-w-[56px];
+  }
+
+  /* Touch-friendly padding for inline elements */
+  .touch-padding {
+    @apply px-3 py-2.5;
+  }
+
+  .touch-padding-lg {
+    @apply px-4 py-3;
+  }
+
+  /* Safe area padding utilities for notched devices */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0);
+  }
+
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0);
+  }
+
+  .p-safe {
+    padding-top: env(safe-area-inset-top, 0);
+    padding-right: env(safe-area-inset-right, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-left: env(safe-area-inset-left, 0);
+  }
+
+  /* Margin safe area utilities */
+  .mt-safe {
+    margin-top: env(safe-area-inset-top, 0);
+  }
+
+  .mb-safe {
+    margin-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Inset safe area for absolute/fixed positioning */
+  .inset-safe {
+    top: env(safe-area-inset-top, 0);
+    right: env(safe-area-inset-right, 0);
+    bottom: env(safe-area-inset-bottom, 0);
+    left: env(safe-area-inset-left, 0);
+  }
+
+  .bottom-safe {
+    bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Prevent text selection on touch elements */
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Tap highlight removal for iOS */
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Combined touch-friendly button utility */
+  .touch-button {
+    @apply min-h-[44px] min-w-[44px] px-3 py-2.5;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .touch-button-lg {
+    @apply min-h-[48px] min-w-[48px] px-4 py-3;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Landscape mode optimizations for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  /* Compact headers in landscape */
+  .codex-header {
+    @apply py-1 text-sm;
+  }
+
+  /* Reduce padding in panels */
+  .codex-panel {
+    @apply p-2;
+  }
+
+  /* Smaller font sizes */
+  .codex-content {
+    @apply text-sm leading-relaxed;
+  }
+
+  /* Hide less critical UI elements */
+  .landscape-hide {
+    @apply hidden;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 767px) {
+
+  /* Ensure interactive elements have adequate touch targets (WCAG AAA) */
+  button:not(.no-min-size),
+  a:not(.no-min-size),
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+  }
+
+  /* Compact spacing on mobile */
+  .codex-sidebar {
+    @apply px-2;
+  }
+
+  .codex-metadata-panel {
+    @apply px-3 py-2;
+  }
+
+  /* Larger tap targets for navigation */
+  .tree-node {
+    @apply py-3;
+  }
+
+  /* Hide decorative elements on small screens */
+  .mobile-hide {
+    @apply hidden;
+  }
+
+  /* Stack layouts vertically */
+  .mobile-stack {
+    @apply flex-col;
+  }
+
+  /* Improved text sizing for mobile */
+  .codex-content h1 {
+    @apply text-2xl;
+  }
+
+  .codex-content h2 {
+    @apply text-xl;
+  }
+
+  .codex-content h3 {
+    @apply text-lg;
+  }
+
+  .codex-content p,
+  .codex-content li {
+    @apply text-sm leading-relaxed;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .codex-sidebar {
+    max-width: 280px;
+  }
+
+  .codex-metadata-panel {
+    max-width: 300px;
+  }
+}
+
+
+/* Ultra-compact mode for very small screens (< 360px) */
+@media (max-width: 359px) {
+  .codex-panel {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .codex-header {
+    @apply text-sm;
+  }
+}
+
+/* Prevent text selection during pan/zoom */
+.touch-pan-y,
+.touch-pan-x,
+.touch-pinch-zoom {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in content areas */
+.codex-content,
+.codex-editor {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Override touch-pan-y user-select:none for prose content */
+.codex-content-scroll .prose,
+.codex-content-scroll article,
+.codex-content-scroll p,
+.codex-content-scroll h1,
+.codex-content-scroll h2,
+.codex-content-scroll h3,
+.codex-content-scroll h4,
+.codex-content-scroll h5,
+.codex-content-scroll h6,
+.codex-content-scroll li,
+.codex-content-scroll blockquote,
+.codex-content-scroll pre,
+.codex-content-scroll code {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+/* ===== Inline WYSIWYG Editor Code Block Styling ===== */
+
+/* Full-width code blocks in inline editor */
+.inline-wysiwyg-editor pre {
+  max-width: calc(100% + 2rem);
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  background: #1e1e1e;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.inline-wysiwyg-editor pre code {
+  background: transparent;
+  padding: 0;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+}
+
+/* Light mode code blocks */
+@media (prefers-color-scheme: light) {
+  .inline-wysiwyg-editor:not(.dark) pre {
+    background: #f8f9fa;
+  }
+}
+
+/* ===== Tiptap Table Styles ===== */
+
+/* Table wrapper - allows horizontal scroll on mobile */
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+/* Table cells base styling */
+.ProseMirror td,
+.ProseMirror th {
+  min-width: 1em;
+  border: 1px solid #e4e4e7;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.dark .ProseMirror td,
+.dark .ProseMirror th {
+  border-color: #3f3f46;
+}
+
+/* Header cells */
+.ProseMirror th {
+  font-weight: 600;
+  text-align: left;
+  background-color: #f4f4f5;
+}
+
+.dark .ProseMirror th {
+  background-color: #27272a;
+}
+
+/* Selected cell highlight */
+.ProseMirror .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(139, 92, 246, 0.15);
+  pointer-events: none;
+}
+
+/* Column resize handle */
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #8b5cf6;
+  pointer-events: none;
+}
+
+/* Table selection outline */
+.ProseMirror.resize-cursor {
+  cursor: col-resize;
+}
+
+/* Grip row and column controls */
+.ProseMirror .tableWrapper {
+  padding: 1rem 0;
+  overflow-x: auto;
+}
+
+/* Table grip (drag handle) */
+.ProseMirror table .grip-column,
+.ProseMirror table .grip-row {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+}
+
+.dark .ProseMirror table .grip-column,
+.dark .ProseMirror table .grip-row {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.ProseMirror table .grip-column:hover,
+.ProseMirror table .grip-row:hover {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
+/* Empty cell placeholder */
+.ProseMirror td>p:first-child:last-child:empty::before,
+.ProseMirror th>p:first-child:last-child:empty::before {
+  content: " ";
+  float: left;
+  height: 1em;
+}
+
+/* One Dark Pro syntax highlighting theme */
+.hljs {
+  color: #abb2bf;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #c678dd;
+}
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e06c75;
+}
+
+.hljs-literal {
+  color: #56b6c2;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #d19a66;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #61aeee;
+}
+
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #e6c07b;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}
+
+/* Clickable blocks in inline editor */
+.inline-wysiwyg-editor [data-block-id] {
+  cursor: pointer;
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Dynamic viewport height for mobile browsers */
+@supports (height: 100dvh) {
+  .h-screen {
+    height: 100dvh;
+  }
+}
+
+/* Safe area insets for notched devices */
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left, 0);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-area-inset-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Theme transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Disable transitions for elements that shouldn't animate */
+.no-transition,
+input,
+textarea,
+select,
+button:active {
+  transition: none !important;
+}
+
+/* Prevent overscroll bounce on iOS */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Custom scrollbar for better mobile experience */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-600;
+  }
+}
+
+/* Hide scrollbar on mobile for cleaner look */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-400/50 dark:bg-gray-600/50;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   NEUMORPHIC SHADOWS
+   Premium soft UI shadows for light, dark, and sepia modes
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Light mode neumorphic shadows */
+.shadow-neu {
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.08),
+    -6px -6px 12px rgba(255, 255, 255, 0.9);
+}
+
+.shadow-neu-sm {
+  box-shadow:
+    3px 3px 6px rgba(0, 0, 0, 0.06),
+    -3px -3px 6px rgba(255, 255, 255, 0.8);
+}
+
+.shadow-neu-lg {
+  box-shadow:
+    10px 10px 20px rgba(0, 0, 0, 0.1),
+    -10px -10px 20px rgba(255, 255, 255, 0.95);
+}
+
+.shadow-inner-neu {
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.06),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+}
+
+/* Dark mode neumorphic shadows */
+.dark .shadow-neu,
+.shadow-neu-dark {
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.4),
+    -6px -6px 12px rgba(255, 255, 255, 0.03);
+}
+
+.dark .shadow-neu-sm,
+.shadow-neu-dark-sm {
+  box-shadow:
+    3px 3px 6px rgba(0, 0, 0, 0.3),
+    -3px -3px 6px rgba(255, 255, 255, 0.02);
+}
+
+.dark .shadow-neu-lg,
+.shadow-neu-dark-lg {
+  box-shadow:
+    10px 10px 20px rgba(0, 0, 0, 0.5),
+    -10px -10px 20px rgba(255, 255, 255, 0.04);
+}
+
+.dark .shadow-inner-neu,
+.shadow-inner-neu-dark {
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.3),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.02);
+}
+
+/* Sepia mode neumorphic shadows */
+.sepia-light .shadow-neu,
+.sepia-dark .shadow-neu,
+.shadow-neu-sepia {
+  box-shadow:
+    6px 6px 12px rgba(120, 80, 40, 0.12),
+    -6px -6px 12px rgba(255, 250, 240, 0.8);
+}
+
+.sepia-light .shadow-neu-sm,
+.sepia-dark .shadow-neu-sm,
+.shadow-neu-sepia-sm {
+  box-shadow:
+    3px 3px 6px rgba(120, 80, 40, 0.1),
+    -3px -3px 6px rgba(255, 250, 240, 0.7);
+}
+
+.sepia-light .shadow-neu-lg,
+.sepia-dark .shadow-neu-lg,
+.shadow-neu-sepia-lg {
+  box-shadow:
+    10px 10px 20px rgba(120, 80, 40, 0.15),
+    -10px -10px 20px rgba(255, 250, 240, 0.9);
+}
+
+.sepia-light .shadow-inner-neu,
+.sepia-dark .shadow-inner-neu,
+.shadow-inner-neu-sepia {
+  box-shadow:
+    inset 4px 4px 8px rgba(120, 80, 40, 0.1),
+    inset -4px -4px 8px rgba(255, 250, 240, 0.5);
+}
+
+/* Sepia dark adjustments */
+.sepia-dark .shadow-neu,
+.sepia-dark .shadow-neu-sepia {
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.3),
+    -6px -6px 12px rgba(80, 60, 40, 0.15);
+}
+
+.sepia-dark .shadow-neu-lg,
+.sepia-dark .shadow-neu-sepia-lg {
+  box-shadow:
+    10px 10px 20px rgba(0, 0, 0, 0.4),
+    -10px -10px 20px rgba(80, 60, 40, 0.2);
+}
+
+/* Perspective for 3D transforms */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FRAME CODEX LOGO TYPOGRAPHY
+   Premium brand typography for the FABRIC Codex wordmark
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.codex-logo-frame {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  font-family: var(--font-fraunces), 'Fraunces', Georgia, serif;
+}
+
+.codex-logo-codex {
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg,
+      hsl(var(--codex-emerald)) 0%,
+      hsl(var(--codex-cyan)) 50%,
+      hsl(var(--codex-emerald)) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: codex-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes codex-shimmer {
+
+  0%,
+  100% {
+    background-position: 0% center;
+  }
+
+  50% {
+    background-position: 100% center;
+  }
+}
+
+/* Holographic shimmer for ambient UI elements */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Static version for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .codex-logo-codex {
+    animation: none;
+    background-position: 0% center;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SIDEBAR COLLAPSE ANIMATIONS
+   Smooth, refined animations for sidebar toggle
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.sidebar-collapse-icon {
+  transition: transform var(--transition-normal) var(--ease-out-expo);
+}
+
+.sidebar-collapsed .sidebar-collapse-icon {
+  transform: rotate(180deg);
+}
+
+/* Sidebar slide animation */
+.sidebar-container {
+  transition:
+    transform var(--transition-slow) var(--ease-out-expo),
+    width var(--transition-slow) var(--ease-out-expo),
+    opacity var(--transition-normal) ease-out;
+}
+
+.sidebar-collapsed .sidebar-container {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Content area expansion */
+.content-area {
+  transition: margin-left var(--transition-slow) var(--ease-out-expo);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   REFINED BUTTON STYLES
+   Consistent, accessible button styling across the app
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-1.5;
+  @apply px-2 py-1.5 rounded-lg;
+  @apply text-xs font-medium;
+  @apply transition-all duration-150;
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-800;
+  @apply active:scale-95;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  @apply focus-visible:ring-emerald-500;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-1.5;
+  @apply px-3 py-1.5 rounded-lg;
+  @apply text-xs font-semibold;
+  @apply bg-gradient-to-r from-emerald-600 to-cyan-600;
+  @apply text-white shadow-md;
+  @apply transition-all duration-150;
+  @apply hover:from-emerald-500 hover:to-cyan-500 hover:shadow-lg;
+  @apply active:scale-95;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  @apply focus-visible:ring-emerald-500;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-1.5;
+  @apply px-3 py-1.5 rounded-lg;
+  @apply text-xs font-medium;
+  @apply bg-zinc-100 dark:bg-zinc-800;
+  @apply text-zinc-700 dark:text-zinc-300;
+  @apply border border-zinc-200 dark:border-zinc-700;
+  @apply transition-all duration-150;
+  @apply hover:bg-zinc-200 dark:hover:bg-zinc-700;
+  @apply active:scale-95;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+  @apply focus-visible:ring-zinc-400;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SLEEK NAV DROPDOWN
+   Refined dropdown menus for condensed navigation
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.nav-dropdown {
+  @apply absolute top-full left-0 mt-1;
+  @apply min-w-[180px] py-1;
+  @apply bg-white dark:bg-zinc-900;
+  @apply border border-zinc-200 dark:border-zinc-700;
+  @apply rounded-xl shadow-xl;
+  @apply opacity-0 invisible scale-95;
+  @apply transition-all duration-150 ease-out;
+  @apply origin-top-left;
+  z-index: 9999;
+}
+
+.nav-dropdown-trigger:hover .nav-dropdown,
+.nav-dropdown-trigger:focus-within .nav-dropdown {
+  @apply opacity-100 visible scale-100;
+}
+
+.nav-dropdown-item {
+  @apply flex items-center gap-2;
+  @apply px-3 py-2 text-xs;
+  @apply text-zinc-700 dark:text-zinc-300;
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-800;
+  @apply transition-colors duration-100;
+}
+
+.nav-dropdown-item svg {
+  @apply w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400;
+}
+
+.nav-dropdown-divider {
+  @apply my-1 border-t border-zinc-200 dark:border-zinc-700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODAL ACCESSIBILITY
+   Click-outside and escape key support styling
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.modal-backdrop {
+  @apply fixed inset-0;
+  @apply bg-black/60 backdrop-blur-sm;
+  z-index: 9998;
+}
+
+.modal-container {
+  @apply fixed inset-0 flex items-center justify-center p-4;
+  z-index: 9999;
+}
+
+.modal-content {
+  @apply relative w-full max-h-[90vh] overflow-auto;
+  @apply bg-white dark:bg-zinc-900;
+  @apply rounded-2xl shadow-2xl;
+  animation: modal-enter 0.2s ease-out;
+}
+
+.modal-content[data-closing] {
+  animation: modal-exit 0.15s ease-in forwards;
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modal-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SPLIT EDITOR LAYOUT
+   Two-pane editor with vertical/horizontal split options
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.editor-split-horizontal {
+  @apply flex flex-row h-full;
+}
+
+.editor-split-vertical {
+  @apply flex flex-col h-full;
+}
+
+.editor-pane {
+  @apply flex-1 min-w-0 min-h-0 overflow-hidden;
+}
+
+.editor-divider {
+  @apply flex-shrink-0 bg-zinc-200 dark:bg-zinc-700;
+  @apply hover:bg-emerald-400 dark:hover:bg-emerald-600;
+  @apply transition-colors duration-150;
+  @apply cursor-col-resize;
+}
+
+.editor-split-horizontal .editor-divider {
+  @apply w-1 hover:w-1.5;
+}
+
+.editor-split-vertical .editor-divider {
+  @apply h-1 hover:h-1.5;
+  @apply cursor-row-resize;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   METADATA PANEL ANIMATIONS
+   Smooth slide-in/out for right metadata panel
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.metadata-panel {
+  @apply transition-all duration-300;
+  transition-timing-function: var(--ease-out-expo);
+}
+
+.metadata-panel-enter {
+  @apply opacity-0;
+  transform: translateX(100%);
+}
+
+.metadata-panel-enter-active {
+  @apply opacity-100;
+  transform: translateX(0);
+}
+
+.metadata-panel-exit {
+  @apply opacity-100;
+  transform: translateX(0);
+}
+
+.metadata-panel-exit-active {
+  @apply opacity-0;
+  transform: translateX(100%);
+}
+
+/* Mobile slide-up variant */
+@media (max-width: 767px) {
+  .metadata-panel-enter {
+    transform: translateY(100%);
+  }
+
+  .metadata-panel-enter-active {
+    transform: translateY(0);
+  }
+
+  .metadata-panel-exit-active {
+    transform: translateY(100%);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   COMPACT TREE NODE STYLING
+   Ultra-compact but readable tree node styles
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.tree-node {
+  @apply flex items-center gap-1;
+  @apply px-1.5 py-0.5 rounded;
+  @apply text-xs font-medium;
+  @apply transition-all duration-100;
+  @apply cursor-pointer select-none;
+  min-height: 24px;
+}
+
+.tree-node:hover {
+  @apply bg-zinc-100 dark:bg-zinc-800;
+}
+
+.tree-node.active {
+  @apply bg-emerald-100 dark:bg-emerald-900/40;
+  @apply text-emerald-800 dark:text-emerald-200;
+}
+
+.tree-node-icon {
+  @apply w-3 h-3 flex-shrink-0;
+  @apply transition-transform duration-150;
+}
+
+.tree-node-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.tree-node-label {
+  @apply flex-1 truncate;
+  @apply text-zinc-700 dark:text-zinc-300;
+}
+
+.tree-node-badge {
+  @apply text-[9px] font-bold;
+  @apply px-1 py-0.5 rounded;
+  @apply bg-zinc-200 dark:bg-zinc-700;
+  @apply text-zinc-600 dark:text-zinc-400;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   COMPREHENSIVE SCROLLBAR DESIGN SYSTEM
+   Beautiful, minimal, sleek, and vibrant scrollbars for all themes
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CSS Custom Properties for Scrollbar Theming
+───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --scrollbar-width: 8px;
+  --scrollbar-width-thin: 6px;
+  --scrollbar-track-bg: transparent;
+  --scrollbar-thumb-bg: rgba(161, 161, 170, 0.5);
+  --scrollbar-thumb-hover: rgba(113, 113, 122, 0.7);
+  --scrollbar-thumb-active: rgba(82, 82, 91, 0.9);
+  --scrollbar-radius: 9999px;
+  --scrollbar-accent: 160 84% 45%;
+  --scrollbar-glow: rgba(16, 185, 129, 0);
+}
+
+.dark {
+  --scrollbar-thumb-bg: rgba(113, 113, 122, 0.4);
+  --scrollbar-thumb-hover: rgba(161, 161, 170, 0.6);
+  --scrollbar-thumb-active: rgba(212, 212, 216, 0.7);
+  --scrollbar-glow: rgba(16, 185, 129, 0.15);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Global Default Scrollbar - Beautiful & Minimal
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-track-bg);
+}
+
+/* WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-bg);
+  border-radius: var(--scrollbar-radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+  border-radius: var(--scrollbar-radius);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--scrollbar-thumb-active);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Scrollbar Variants - Utility Classes
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Thin scrollbar for compact spaces */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-bg) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: var(--scrollbar-width-thin);
+  height: var(--scrollbar-width-thin);
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+  border-radius: var(--scrollbar-radius);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Vibrant Accent Scrollbars - For special areas
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Emerald/Green accent - For main content areas */
+.scrollbar-emerald::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.5) 0%,
+      rgba(5, 150, 105, 0.6) 100%);
+}
+
+.scrollbar-emerald::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.7) 0%,
+      rgba(5, 150, 105, 0.8) 100%);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Cyan accent - For code/editor areas */
+.scrollbar-cyan::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(6, 182, 212, 0.5) 0%,
+      rgba(8, 145, 178, 0.6) 100%);
+}
+
+.scrollbar-cyan::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(6, 182, 212, 0.7) 0%,
+      rgba(8, 145, 178, 0.8) 100%);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+}
+
+/* Purple accent - For sidebar/navigation */
+.scrollbar-purple::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(139, 92, 246, 0.5) 0%,
+      rgba(109, 40, 217, 0.6) 100%);
+}
+
+.scrollbar-purple::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(139, 92, 246, 0.7) 0%,
+      rgba(109, 40, 217, 0.8) 100%);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+}
+
+/* Amber accent - For warnings/looms */
+.scrollbar-amber::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(245, 158, 11, 0.5) 0%,
+      rgba(217, 119, 6, 0.6) 100%);
+}
+
+.scrollbar-amber::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(245, 158, 11, 0.7) 0%,
+      rgba(217, 119, 6, 0.8) 100%);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Sidebar-Specific Scrollbar - Sleek & Compact
+───────────────────────────────────────────────────────────────────────────── */
+
+.sidebar-scroll,
+.codex-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(161, 161, 170, 0.4) transparent;
+  overflow-y: auto;
+  /* Ensure scrollbar always shows when content overflows */
+
+  /* Premium scroll behavior */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* iOS momentum scrolling */
+  overscroll-behavior-y: contain;
+  /* Prevent scroll chaining */
+}
+
+/* Container hover shows scrollbar more prominently */
+.codex-sidebar-scroll:hover {
+  scrollbar-color: rgba(161, 161, 170, 0.55) transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar,
+.codex-sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track,
+.codex-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb,
+.codex-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.35);
+  border-radius: 9999px;
+  transition: background 0.2s ease, width 0.2s ease;
+}
+
+/* Container hover state - scrollbar becomes more visible */
+.codex-sidebar-scroll:hover::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.5);
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover,
+.codex-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.7) 0%,
+      rgba(6, 182, 212, 0.7) 100%);
+}
+
+.dark .sidebar-scroll::-webkit-scrollbar-thumb,
+.dark .codex-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.35);
+}
+
+/* Dark mode container hover */
+.dark .codex-sidebar-scroll:hover::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.5);
+}
+
+.dark .sidebar-scroll::-webkit-scrollbar-thumb:hover,
+.dark .codex-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.75) 0%,
+      rgba(6, 182, 212, 0.75) 100%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Tree View Scrollbar - For react-arborist trees
+───────────────────────────────────────────────────────────────────────────── */
+
+.tree-scroll,
+[data-testid="tree-container"],
+.react-arborist-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+}
+
+.tree-scroll::-webkit-scrollbar,
+[data-testid="tree-container"]::-webkit-scrollbar,
+.react-arborist-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tree-scroll::-webkit-scrollbar-track,
+[data-testid="tree-container"]::-webkit-scrollbar-track,
+.react-arborist-container::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+/* Light mode - teal/cyan gradient */
+.tree-scroll::-webkit-scrollbar-thumb,
+[data-testid="tree-container"]::-webkit-scrollbar-thumb,
+.react-arborist-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(20, 184, 166, 0.4) 0%,
+      rgba(6, 182, 212, 0.35) 100%);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.tree-scroll::-webkit-scrollbar-thumb:hover,
+[data-testid="tree-container"]::-webkit-scrollbar-thumb:hover,
+.react-arborist-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(20, 184, 166, 0.65) 0%,
+      rgba(6, 182, 212, 0.6) 100%);
+  box-shadow: 0 0 6px rgba(20, 184, 166, 0.25);
+}
+
+/* Dark mode - brighter teal/cyan */
+.dark .tree-scroll::-webkit-scrollbar-thumb,
+.dark [data-testid="tree-container"]::-webkit-scrollbar-thumb,
+.dark .react-arborist-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(45, 212, 191, 0.35) 0%,
+      rgba(34, 211, 238, 0.3) 100%);
+}
+
+.dark .tree-scroll::-webkit-scrollbar-thumb:hover,
+.dark [data-testid="tree-container"]::-webkit-scrollbar-thumb:hover,
+.dark .react-arborist-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(45, 212, 191, 0.6) 0%,
+      rgba(34, 211, 238, 0.55) 100%);
+  box-shadow: 0 0 8px rgba(45, 212, 191, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Code Block / Editor Scrollbar - Sleek cyan
+───────────────────────────────────────────────────────────────────────────── */
+
+pre::-webkit-scrollbar,
+code::-webkit-scrollbar,
+.code-scroll::-webkit-scrollbar,
+.editor-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+pre::-webkit-scrollbar-track,
+code::-webkit-scrollbar-track,
+.code-scroll::-webkit-scrollbar-track,
+.editor-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb,
+code::-webkit-scrollbar-thumb,
+.code-scroll::-webkit-scrollbar-thumb,
+.editor-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(6, 182, 212, 0.4) 0%,
+      rgba(14, 165, 233, 0.5) 100%);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+pre::-webkit-scrollbar-thumb:hover,
+code::-webkit-scrollbar-thumb:hover,
+.code-scroll::-webkit-scrollbar-thumb:hover,
+.editor-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(6, 182, 212, 0.6) 0%,
+      rgba(14, 165, 233, 0.7) 100%);
+}
+
+.dark pre::-webkit-scrollbar-track,
+.dark code::-webkit-scrollbar-track,
+.dark .code-scroll::-webkit-scrollbar-track,
+.dark .editor-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Modal / Dialog Scrollbar - Clean and subtle
+───────────────────────────────────────────────────────────────────────────── */
+
+.modal-scroll::-webkit-scrollbar,
+[role="dialog"]::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scroll::-webkit-scrollbar-track,
+[role="dialog"]::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb,
+[role="dialog"]::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.35);
+  border-radius: 9999px;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb:hover,
+[role="dialog"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.55);
+}
+
+.dark .modal-scroll::-webkit-scrollbar-thumb,
+.dark [role="dialog"]::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Auto-hide Scrollbar - Shows on hover/scroll
+───────────────────────────────────────────────────────────────────────────── */
+
+.scrollbar-auto-hide::-webkit-scrollbar-thumb {
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb,
+.scrollbar-auto-hide:focus-within::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+}
+
+.scrollbar-auto-hide:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Gutter/Margin Scrollbar - Extra slim for tight spaces
+───────────────────────────────────────────────────────────────────────────── */
+
+.scrollbar-gutter::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-gutter::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.25);
+  border-radius: 9999px;
+}
+
+.scrollbar-gutter::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.45);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Content Area Scrollbar - Main reading area with emerald accent
+───────────────────────────────────────────────────────────────────────────── */
+
+.codex-content-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.25) transparent;
+}
+
+.codex-content-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.codex-content-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 2px 0;
+}
+
+.codex-content-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.25) 0%,
+      rgba(6, 182, 212, 0.25) 100%);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.2s ease;
+}
+
+.codex-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.45) 0%,
+      rgba(6, 182, 212, 0.45) 100%);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
+}
+
+.codex-content-scroll::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.6) 0%,
+      rgba(6, 182, 212, 0.6) 100%);
+}
+
+.dark .codex-content-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.2) 0%,
+      rgba(6, 182, 212, 0.2) 100%);
+}
+
+.dark .codex-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.4) 0%,
+      rgba(6, 182, 212, 0.4) 100%);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Textarea / Input Scrollbar - For form inputs
+───────────────────────────────────────────────────────────────────────────── */
+
+textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+  margin: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.35);
+  border-radius: 9999px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.55);
+}
+
+.dark textarea::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dark textarea::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Dropdown/Select Scrollbar - For dropdown menus
+───────────────────────────────────────────────────────────────────────────── */
+
+[role="listbox"]::-webkit-scrollbar,
+[role="menu"]::-webkit-scrollbar,
+.dropdown-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+[role="listbox"]::-webkit-scrollbar-track,
+[role="menu"]::-webkit-scrollbar-track,
+.dropdown-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb,
+[role="menu"]::-webkit-scrollbar-thumb,
+.dropdown-scroll::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.4);
+  border-radius: 9999px;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb:hover,
+[role="menu"]::-webkit-scrollbar-thumb:hover,
+.dropdown-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Legacy scrollbar classes - for components using these names
+───────────────────────────────────────────────────────────────────────────── */
+
+.scrollbar-light::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-light::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.3);
+  border-radius: 9999px;
+}
+
+.scrollbar-light::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.4) 0%,
+      rgba(139, 92, 246, 0.4) 100%);
+}
+
+.scrollbar-dark::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.3);
+  border-radius: 9999px;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      rgba(16, 185, 129, 0.5) 0%,
+      rgba(139, 92, 246, 0.5) 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RADIAL MENU FOR NOTE ATTACHMENT
+   Circular menu for quick actions
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.radial-menu {
+  @apply fixed;
+  @apply bg-white/95 dark:bg-zinc-900/95;
+  @apply backdrop-blur-lg;
+  @apply rounded-full shadow-2xl;
+  @apply border border-zinc-200 dark:border-zinc-700;
+  @apply p-1;
+  z-index: 9999;
+}
+
+.radial-menu-item {
+  @apply absolute;
+  @apply w-10 h-10;
+  @apply flex items-center justify-center;
+  @apply rounded-full;
+  @apply bg-white dark:bg-zinc-800;
+  @apply border border-zinc-200 dark:border-zinc-700;
+  @apply shadow-md;
+  @apply transition-all duration-200;
+  @apply hover:scale-110 hover:shadow-lg;
+  @apply active:scale-95;
+}
+
+.radial-menu-item svg {
+  @apply w-4 h-4;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SUGGESTED QUESTIONS STYLING
+   Dynamic question cards for document navigation
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.question-card {
+  @apply p-3 rounded-xl;
+  @apply bg-gradient-to-r from-purple-50 to-cyan-50;
+  @apply dark:from-purple-900/20 dark:to-cyan-900/20;
+  @apply border border-purple-200/50 dark:border-purple-700/30;
+  @apply transition-all duration-150;
+  @apply cursor-pointer;
+}
+
+.question-card:hover {
+  @apply shadow-md;
+  @apply border-purple-300 dark:border-purple-600/50;
+  @apply scale-[1.01];
+}
+
+.question-card-icon {
+  @apply w-4 h-4 text-purple-500 dark:text-purple-400;
+}
+
+.question-card-text {
+  @apply text-xs text-purple-900 dark:text-purple-100;
+  @apply line-clamp-2;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   INLINE EDIT INDICATOR
+   Visual feedback for editable fields
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.inline-editable {
+  @apply relative;
+  @apply transition-all duration-150;
+}
+
+.inline-editable:hover::after {
+  @apply content-[''];
+  @apply absolute inset-0;
+  @apply rounded-lg;
+  @apply border-2 border-dashed border-cyan-400/50;
+  @apply pointer-events-none;
+}
+
+.inline-editable:focus-within::after {
+  @apply border-solid border-cyan-500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE IMPROVEMENTS
+   Prevent iOS zoom on input focus and improve touch interactions
+═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+
+  /* Prevent iOS Safari from zooming on input focus - ensure 16px minimum */
+  @media screen and (max-width: 767px) {
+
+    input[type="text"],
+    input[type="search"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="tel"],
+    input[type="number"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Improve touch interactions */
+  @media (hover: none) and (pointer: coarse) {
+
+    /* Ensure minimum touch targets */
+    button,
+    a,
+    [role="button"],
+    input[type="checkbox"],
+    input[type="radio"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Disable hover effects on touch devices to prevent sticky states */
+    .no-touch-hover:hover {
+      background-color: inherit;
+    }
+  }
+
+  /* Prevent text selection on interactive elements */
+  button,
+  [role="button"],
+  .touch-manipulation {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth scrolling for mobile */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Fix for iOS momentum scrolling */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Sidebar mobile improvements */
+@media screen and (max-width: 767px) {
+  .codex-sidebar {
+    /* Prevent accidental horizontal scroll */
+    overflow-x: hidden;
+    /* Smooth vertical scroll */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Larger touch targets in sidebar */
+  .codex-sidebar button,
+  .codex-sidebar a {
+    min-height: 44px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SYNTAX HIGHLIGHTING (lowlight/highlight.js)
+   Theme-aware code syntax highlighting for code blocks
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Reset prose code block backgrounds - our custom CodeBlock handles this */
+.prose pre,
+.prose code,
+[class*="prose"] pre,
+[class*="prose"] code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure our code block wrapper takes precedence */
+[data-block-type="code"] pre,
+[data-block-type="code"] code {
+  background: transparent !important;
+}
+
+/* Light mode code block container - explicit white/light backgrounds */
+:root:not(.dark) [data-block-type="code"],
+.light [data-block-type="code"],
+[data-theme="light"] [data-block-type="code"] {
+  background-color: #f6f8fa !important;
+  border-color: #e1e4e8 !important;
+}
+
+:root:not(.dark) pre:not([class*="terminal"]),
+.light pre:not([class*="terminal"]),
+[data-theme="light"] pre:not([class*="terminal"]) {
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+}
+
+/* Base code block styling */
+.hljs {
+  color: #24292e;
+  background: transparent;
+}
+
+/* Light mode syntax colors (GitHub-inspired) */
+.hljs-comment,
+.hljs-quote {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-section,
+.hljs-link {
+  color: #d73a49;
+  font-weight: 500;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-name,
+.hljs-type,
+.hljs-attribute,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: #032f62;
+}
+
+.hljs-number,
+.hljs-regexp,
+.hljs-meta {
+  color: #005cc5;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #6f42c1;
+}
+
+.hljs-function .hljs-keyword {
+  color: #d73a49;
+}
+
+.hljs-function .hljs-title {
+  color: #6f42c1;
+}
+
+.hljs-class .hljs-title {
+  color: #6f42c1;
+}
+
+.hljs-attr,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #22863a;
+}
+
+.hljs-tag {
+  color: #22863a;
+}
+
+.hljs-tag .hljs-name {
+  color: #22863a;
+}
+
+.hljs-tag .hljs-attr {
+  color: #6f42c1;
+}
+
+.hljs-deletion {
+  color: #b31d28;
+  background-color: #ffeef0;
+}
+
+.hljs-addition {
+  color: #22863a;
+  background-color: #f0fff4;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* Dark mode syntax colors (GitHub Dark) */
+.dark .hljs {
+  color: #e1e4e8;
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: #6a737d;
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-literal,
+.dark .hljs-section,
+.dark .hljs-link {
+  color: #f97583;
+}
+
+.dark .hljs-string,
+.dark .hljs-title,
+.dark .hljs-name,
+.dark .hljs-type,
+.dark .hljs-attribute,
+.dark .hljs-symbol,
+.dark .hljs-bullet,
+.dark .hljs-variable,
+.dark .hljs-template-tag,
+.dark .hljs-template-variable {
+  color: #9ecbff;
+}
+
+.dark .hljs-number,
+.dark .hljs-regexp,
+.dark .hljs-meta {
+  color: #79b8ff;
+}
+
+.dark .hljs-built_in,
+.dark .hljs-builtin-name {
+  color: #b392f0;
+}
+
+.dark .hljs-function .hljs-keyword {
+  color: #f97583;
+}
+
+.dark .hljs-function .hljs-title {
+  color: #b392f0;
+}
+
+.dark .hljs-class .hljs-title {
+  color: #b392f0;
+}
+
+.dark .hljs-attr,
+.dark .hljs-selector-id,
+.dark .hljs-selector-class,
+.dark .hljs-selector-attr,
+.dark .hljs-selector-pseudo {
+  color: #85e89d;
+}
+
+.dark .hljs-tag {
+  color: #85e89d;
+}
+
+.dark .hljs-tag .hljs-name {
+  color: #85e89d;
+}
+
+.dark .hljs-tag .hljs-attr {
+  color: #b392f0;
+}
+
+.dark .hljs-deletion {
+  color: #fdaeb7;
+  background-color: #86181d;
+}
+
+.dark .hljs-addition {
+  color: #85e89d;
+  background-color: #144620;
+}
+
+/* Sepia light mode syntax colors (warm tones) */
+.sepia-light .hljs,
+[data-theme="sepia-light"] .hljs {
+  color: #4a443d;
+}
+
+.sepia-light .hljs-comment,
+.sepia-light .hljs-quote,
+[data-theme="sepia-light"] .hljs-comment,
+[data-theme="sepia-light"] .hljs-quote {
+  color: #8a7f73;
+  font-style: italic;
+}
+
+.sepia-light .hljs-keyword,
+.sepia-light .hljs-selector-tag,
+.sepia-light .hljs-literal,
+[data-theme="sepia-light"] .hljs-keyword,
+[data-theme="sepia-light"] .hljs-selector-tag,
+[data-theme="sepia-light"] .hljs-literal {
+  color: #9b4d2a;
+}
+
+.sepia-light .hljs-string,
+.sepia-light .hljs-title,
+.sepia-light .hljs-name,
+.sepia-light .hljs-type,
+[data-theme="sepia-light"] .hljs-string,
+[data-theme="sepia-light"] .hljs-title,
+[data-theme="sepia-light"] .hljs-name,
+[data-theme="sepia-light"] .hljs-type {
+  color: #1a5f3d;
+}
+
+.sepia-light .hljs-number,
+.sepia-light .hljs-regexp,
+[data-theme="sepia-light"] .hljs-number,
+[data-theme="sepia-light"] .hljs-regexp {
+  color: #996633;
+}
+
+.sepia-light .hljs-built_in,
+.sepia-light .hljs-builtin-name,
+[data-theme="sepia-light"] .hljs-built_in,
+[data-theme="sepia-light"] .hljs-builtin-name {
+  color: #6b4d8a;
+}
+
+/* Sepia dark mode syntax colors */
+.sepia-dark .hljs,
+[data-theme="sepia-dark"] .hljs {
+  color: #d4cab9;
+}
+
+.sepia-dark .hljs-comment,
+.sepia-dark .hljs-quote,
+[data-theme="sepia-dark"] .hljs-comment,
+[data-theme="sepia-dark"] .hljs-quote {
+  color: #8a7f73;
+  font-style: italic;
+}
+
+.sepia-dark .hljs-keyword,
+.sepia-dark .hljs-selector-tag,
+.sepia-dark .hljs-literal,
+[data-theme="sepia-dark"] .hljs-keyword,
+[data-theme="sepia-dark"] .hljs-selector-tag,
+[data-theme="sepia-dark"] .hljs-literal {
+  color: #d4a574;
+}
+
+.sepia-dark .hljs-string,
+.sepia-dark .hljs-title,
+.sepia-dark .hljs-name,
+.sepia-dark .hljs-type,
+[data-theme="sepia-dark"] .hljs-string,
+[data-theme="sepia-dark"] .hljs-title,
+[data-theme="sepia-dark"] .hljs-name,
+[data-theme="sepia-dark"] .hljs-type {
+  color: #8fbc8f;
+}
+
+.sepia-dark .hljs-number,
+.sepia-dark .hljs-regexp,
+[data-theme="sepia-dark"] .hljs-number,
+[data-theme="sepia-dark"] .hljs-regexp {
+  color: #daa520;
+}
+
+.sepia-dark .hljs-built_in,
+.sepia-dark .hljs-builtin-name,
+[data-theme="sepia-dark"] .hljs-built_in,
+[data-theme="sepia-dark"] .hljs-builtin-name {
+  color: #c9a0dc;
+}
+
+/* Terminal light (amber) syntax colors */
+.terminal-light .hljs,
+[data-theme="terminal-light"] .hljs {
+  color: #ffb800;
+}
+
+.terminal-light .hljs-comment,
+.terminal-light .hljs-quote,
+[data-theme="terminal-light"] .hljs-comment,
+[data-theme="terminal-light"] .hljs-quote {
+  color: #997700;
+  font-style: italic;
+}
+
+.terminal-light .hljs-keyword,
+.terminal-light .hljs-selector-tag,
+.terminal-light .hljs-literal,
+[data-theme="terminal-light"] .hljs-keyword,
+[data-theme="terminal-light"] .hljs-selector-tag,
+[data-theme="terminal-light"] .hljs-literal {
+  color: #ffdd00;
+  font-weight: bold;
+}
+
+.terminal-light .hljs-string,
+.terminal-light .hljs-title,
+.terminal-light .hljs-name,
+.terminal-light .hljs-type,
+[data-theme="terminal-light"] .hljs-string,
+[data-theme="terminal-light"] .hljs-title,
+[data-theme="terminal-light"] .hljs-name,
+[data-theme="terminal-light"] .hljs-type {
+  color: #ffcc00;
+}
+
+.terminal-light .hljs-number,
+.terminal-light .hljs-regexp,
+[data-theme="terminal-light"] .hljs-number,
+[data-theme="terminal-light"] .hljs-regexp {
+  color: #ff9900;
+}
+
+.terminal-light .hljs-built_in,
+.terminal-light .hljs-builtin-name,
+[data-theme="terminal-light"] .hljs-built_in,
+[data-theme="terminal-light"] .hljs-builtin-name {
+  color: #ffe066;
+}
+
+/* Terminal dark (green) syntax colors */
+.terminal-dark .hljs,
+[data-theme="terminal-dark"] .hljs {
+  color: #00ff41;
+}
+
+.terminal-dark .hljs-comment,
+.terminal-dark .hljs-quote,
+[data-theme="terminal-dark"] .hljs-comment,
+[data-theme="terminal-dark"] .hljs-quote {
+  color: #00aa2a;
+  font-style: italic;
+}
+
+.terminal-dark .hljs-keyword,
+.terminal-dark .hljs-selector-tag,
+.terminal-dark .hljs-literal,
+[data-theme="terminal-dark"] .hljs-keyword,
+[data-theme="terminal-dark"] .hljs-selector-tag,
+[data-theme="terminal-dark"] .hljs-literal {
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.terminal-dark .hljs-string,
+.terminal-dark .hljs-title,
+.terminal-dark .hljs-name,
+.terminal-dark .hljs-type,
+[data-theme="terminal-dark"] .hljs-string,
+[data-theme="terminal-dark"] .hljs-title,
+[data-theme="terminal-dark"] .hljs-name,
+[data-theme="terminal-dark"] .hljs-type {
+  color: #88ff88;
+}
+
+.terminal-dark .hljs-number,
+.terminal-dark .hljs-regexp,
+[data-theme="terminal-dark"] .hljs-number,
+[data-theme="terminal-dark"] .hljs-regexp {
+  color: #00ee44;
+}
+
+.terminal-dark .hljs-built_in,
+.terminal-dark .hljs-builtin-name,
+[data-theme="terminal-dark"] .hljs-built_in,
+[data-theme="terminal-dark"] .hljs-builtin-name {
+  color: #aaffaa;
+}
+
+/* Oceanic Light syntax colors */
+.oceanic-light .hljs,
+[data-theme="oceanic-light"] .hljs {
+  color: #1e3a4f;
+}
+
+.oceanic-light .hljs-comment,
+.oceanic-light .hljs-quote,
+[data-theme="oceanic-light"] .hljs-comment,
+[data-theme="oceanic-light"] .hljs-quote {
+  color: #64748b;
+  font-style: italic;
+}
+
+.oceanic-light .hljs-keyword,
+.oceanic-light .hljs-selector-tag,
+.oceanic-light .hljs-literal,
+[data-theme="oceanic-light"] .hljs-keyword,
+[data-theme="oceanic-light"] .hljs-selector-tag,
+[data-theme="oceanic-light"] .hljs-literal {
+  color: #0891b2;
+  font-weight: 500;
+}
+
+.oceanic-light .hljs-string,
+.oceanic-light .hljs-title,
+.oceanic-light .hljs-name,
+.oceanic-light .hljs-type,
+[data-theme="oceanic-light"] .hljs-string,
+[data-theme="oceanic-light"] .hljs-title,
+[data-theme="oceanic-light"] .hljs-name,
+[data-theme="oceanic-light"] .hljs-type {
+  color: #0d9488;
+}
+
+.oceanic-light .hljs-number,
+.oceanic-light .hljs-regexp,
+[data-theme="oceanic-light"] .hljs-number,
+[data-theme="oceanic-light"] .hljs-regexp {
+  color: #0369a1;
+}
+
+.oceanic-light .hljs-built_in,
+.oceanic-light .hljs-builtin-name,
+[data-theme="oceanic-light"] .hljs-built_in,
+[data-theme="oceanic-light"] .hljs-builtin-name {
+  color: #7c3aed;
+}
+
+/* Oceanic Dark syntax colors */
+.oceanic-dark .hljs,
+[data-theme="oceanic-dark"] .hljs {
+  color: #e0f2fe;
+}
+
+.oceanic-dark .hljs-comment,
+.oceanic-dark .hljs-quote,
+[data-theme="oceanic-dark"] .hljs-comment,
+[data-theme="oceanic-dark"] .hljs-quote {
+  color: #64748b;
+  font-style: italic;
+}
+
+.oceanic-dark .hljs-keyword,
+.oceanic-dark .hljs-selector-tag,
+.oceanic-dark .hljs-literal,
+[data-theme="oceanic-dark"] .hljs-keyword,
+[data-theme="oceanic-dark"] .hljs-selector-tag,
+[data-theme="oceanic-dark"] .hljs-literal {
+  color: #22d3ee;
+  font-weight: 500;
+}
+
+.oceanic-dark .hljs-string,
+.oceanic-dark .hljs-title,
+.oceanic-dark .hljs-name,
+.oceanic-dark .hljs-type,
+[data-theme="oceanic-dark"] .hljs-string,
+[data-theme="oceanic-dark"] .hljs-title,
+[data-theme="oceanic-dark"] .hljs-name,
+[data-theme="oceanic-dark"] .hljs-type {
+  color: #2dd4bf;
+}
+
+.oceanic-dark .hljs-number,
+.oceanic-dark .hljs-regexp,
+[data-theme="oceanic-dark"] .hljs-number,
+[data-theme="oceanic-dark"] .hljs-regexp {
+  color: #38bdf8;
+}
+
+.oceanic-dark .hljs-built_in,
+.oceanic-dark .hljs-builtin-name,
+[data-theme="oceanic-dark"] .hljs-built_in,
+[data-theme="oceanic-dark"] .hljs-builtin-name {
+  color: #a78bfa;
+}
+
+
+/* Search highlight flash animation */
+@keyframes search-highlight-pulse {
+
+  0%,
+  100% {
+    background-color: transparent;
+  }
+
+  25%,
+  75% {
+    background-color: rgba(34, 211, 238, 0.3);
+  }
+
+  50% {
+    background-color: rgba(34, 211, 238, 0.5);
+  }
+}
+
+.search-highlight-flash {
+  animation: search-highlight-pulse 2s ease-in-out;
+  border-radius: 4px;
+}
+
+.dark .search-highlight-flash {
+  animation: search-highlight-pulse 2s ease-in-out;
+}
+
+@keyframes search-highlight-pulse-dark {
+
+  0%,
+  100% {
+    background-color: transparent;
+  }
+
+  25%,
+  75% {
+    background-color: rgba(34, 211, 238, 0.2);
+  }
+
+  50% {
+    background-color: rgba(34, 211, 238, 0.35);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AUTOMATIC GALLERY WALL
+   Art Deco style gallery for 3+ consecutive images in prose content
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Gallery container - wraps consecutive images */
+.prose .image-gallery,
+[class*="prose"] .image-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  background: linear-gradient(135deg,
+      rgba(24, 24, 27, 0.03) 0%,
+      rgba(24, 24, 27, 0.08) 100%);
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .prose .image-gallery,
+.dark [class*="prose"] .image-gallery {
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.02) 0%,
+      rgba(255, 255, 255, 0.06) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gallery images */
+.prose .image-gallery img,
+[class*="prose"] .image-gallery img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.prose .image-gallery img:hover,
+[class*="prose"] .image-gallery img:hover {
+  transform: scale(1.03);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.15),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Art Deco frame accent */
+.prose .image-gallery::before,
+[class*="prose"] .image-gallery::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #d4af37, #f0d78c, #d4af37);
+  border-radius: 2px;
+}
+
+/* Relative positioning for the accent */
+.prose .image-gallery,
+[class*="prose"] .image-gallery {
+  position: relative;
+}
+
+/* Large gallery - more than 4 images */
+.prose .image-gallery.gallery-large,
+[class*="prose"] .image-gallery.gallery-large {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.prose .image-gallery.gallery-large img,
+[class*="prose"] .image-gallery.gallery-large img {
+  height: 150px;
+}
+
+/* CSS-only consecutive image gallery using :has() */
+/* This styles images that are siblings (consecutive in markup) */
+.prose p:has(> img)+p:has(> img),
+[class*="prose"] p:has(> img)+p:has(> img) {
+  margin-top: -0.5rem;
+}
+
+/* Create a gallery effect for images inside wrapper elements */
+.prose figure+figure,
+[class*="prose"] figure+figure {
+  margin-top: 0.5rem;
+}
+
+/* Consecutive images without wrapper paragraphs */
+.prose img+img,
+[class*="prose"] img+img {
+  margin-top: 0.75rem;
+}
+
+/* When we have at least 3 consecutive images, apply gallery grid */
+/* Note: This uses the :has() selector - for browsers that support it */
+@supports selector(:has(*)) {
+
+  .prose p:has(> img):has(+ p:has(> img) + p:has(> img)),
+  [class*="prose"] p:has(> img):has(+ p:has(> img) + p:has(> img)) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg,
+        rgba(212, 175, 55, 0.05) 0%,
+        rgba(240, 215, 140, 0.08) 100%);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+  }
+
+  .dark .prose p:has(> img):has(+ p:has(> img) + p:has(> img)),
+  .dark [class*="prose"] p:has(> img):has(+ p:has(> img) + p:has(> img)) {
+    background: linear-gradient(135deg,
+        rgba(212, 175, 55, 0.03) 0%,
+        rgba(240, 215, 140, 0.05) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   READER MODE HIGHLIGHT ANIMATION
+   Flash highlight when clicking block in reader panel to scroll to content
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.reader-highlight {
+  animation: reader-highlight-pulse 2s ease-out;
+  border-radius: 4px;
+}
+
+@keyframes reader-highlight-pulse {
+  0% {
+    background-color: rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+  }
+
+  50% {
+    background-color: rgba(6, 182, 212, 0.15);
+    box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.1);
+  }
+
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.dark .reader-highlight {
+  animation: reader-highlight-pulse-dark 2s ease-out;
+}
+
+@keyframes reader-highlight-pulse-dark {
+  0% {
+    background-color: rgba(6, 182, 212, 0.25);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+  }
+
+  50% {
+    background-color: rgba(6, 182, 212, 0.12);
+    box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.08);
+  }
+
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   READER PANEL ACTIVE BLOCK SYNC INDICATOR
+   Visual feedback when a block is the current active reading position
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Active block in content area (synced with reader panel) */
+[data-block-id].reader-sync-active {
+  position: relative;
+}
+
+[data-block-id].reader-sync-active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, rgb(6, 182, 212), rgb(14, 165, 233));
+  border-radius: 2px;
+  animation: reader-sync-indicator 0.3s ease-out;
+}
+
+@keyframes reader-sync-indicator {
+  from {
+    opacity: 0;
+    transform: scaleY(0.5);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* Smooth scroll-margin for block navigation */
+[data-block-id] {
+  scroll-margin-top: 80px;
+  scroll-margin-bottom: 40px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PREMIUM GLASSMORPHISM UTILITIES
+   Modern glass/blur effects for sidebar and premium UI components
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Base glass effect - light mode */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+}
+
+/* Dark mode glass effects */
+.dark .glass {
+  background: rgba(9, 9, 11, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.dark .glass-subtle {
+  background: rgba(9, 9, 11, 0.7);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+.dark .glass-strong {
+  background: rgba(9, 9, 11, 0.92);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+}
+
+/* Frosted glass panel - for headers and elevated surfaces */
+.glass-frosted {
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.8) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-frosted {
+  background: linear-gradient(135deg,
+      rgba(24, 24, 27, 0.9) 0%,
+      rgba(24, 24, 27, 0.8) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PREMIUM PAPER TEXTURE OVERLAYS
+   Subtle noise textures for paper-like premium feel
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Paper texture using SVG noise filter */
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  z-index: 1;
+}
+
+.dark .paper-texture::before {
+  opacity: 0.035;
+}
+
+/* Paper texture needs relative positioning */
+.paper-texture {
+  position: relative;
+}
+
+/* Ensure content is above texture */
+.paper-texture>* {
+  position: relative;
+  z-index: 2;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PREMIUM SHADOW SYSTEM
+   Layered, soft shadows for depth and elegance
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Premium layered shadows */
+.shadow-premium {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.02),
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 4px 8px rgba(0, 0, 0, 0.03),
+    0 8px 16px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-premium-lg {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 4px 8px rgba(0, 0, 0, 0.03),
+    0 8px 16px rgba(0, 0, 0, 0.04),
+    0 16px 32px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-premium-xl {
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.02),
+    0 8px 16px rgba(0, 0, 0, 0.03),
+    0 16px 32px rgba(0, 0, 0, 0.05),
+    0 32px 64px rgba(0, 0, 0, 0.08);
+}
+
+.dark .shadow-premium {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-premium-lg {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 8px 16px rgba(0, 0, 0, 0.16),
+    0 16px 32px rgba(0, 0, 0, 0.25);
+}
+
+.dark .shadow-premium-xl {
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.14),
+    0 16px 32px rgba(0, 0, 0, 0.2),
+    0 32px 64px rgba(0, 0, 0, 0.35);
+}
+
+/* Inner shadow for pressed/inset states */
+.shadow-inner-premium {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.dark .shadow-inner-premium {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.25),
+    inset 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PREMIUM BORDER EFFECTS
+   Subtle gradient and glow borders
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Subtle gradient border */
+.border-gradient {
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--tw-gradient-stops)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* Glow border on hover */
+.border-glow {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.border-glow:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.1);
+}
+
+.dark .border-glow:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SIDEBAR PREMIUM UTILITIES
+   Specific utilities for sidebar refinement
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Sidebar container with glass and paper texture */
+.sidebar-premium {
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(250, 250, 250, 0.9) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .sidebar-premium {
+  background: linear-gradient(180deg,
+      rgba(15, 15, 18, 0.95) 0%,
+      rgba(9, 9, 11, 0.9) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Sidebar header with frosted glass */
+.sidebar-header-premium {
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.7) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .sidebar-header-premium {
+  background: linear-gradient(180deg,
+      rgba(24, 24, 27, 0.9) 0%,
+      rgba(24, 24, 27, 0.7) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   REFINED GLASS PAPER COMPONENTS
+   Premium glass with paper-like texture for sidebar elements
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Glass paper - main sidebar container */
+.glass-paper {
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.97) 0%,
+      rgba(252, 252, 253, 0.95) 50%,
+      rgba(250, 250, 251, 0.93) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.glass-paper-dark {
+  background: linear-gradient(180deg,
+      rgba(15, 15, 18, 0.97) 0%,
+      rgba(12, 12, 15, 0.95) 50%,
+      rgba(9, 9, 11, 0.93) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Glass header - sidebar top section */
+.glass-header-light {
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(250, 250, 252, 0.88) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.glass-header-dark {
+  background: linear-gradient(180deg,
+      rgba(24, 24, 27, 0.92) 0%,
+      rgba(18, 18, 21, 0.88) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+/* Glass footer - sidebar bottom section */
+.glass-footer-light {
+  background: linear-gradient(0deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(250, 250, 252, 0.90) 100%);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+
+.glass-footer-dark {
+  background: linear-gradient(0deg,
+      rgba(15, 15, 18, 0.95) 0%,
+      rgba(12, 12, 15, 0.90) 100%);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+}
+
+/* Glass active state - for pressed/selected elements */
+.glass-active {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dark .glass-active {
+  background: rgba(39, 39, 42, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Sidebar shadows */
+.shadow-sidebar-light {
+  box-shadow:
+    1px 0 2px rgba(0, 0, 0, 0.02),
+    2px 0 4px rgba(0, 0, 0, 0.02),
+    4px 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.shadow-sidebar-dark {
+  box-shadow:
+    1px 0 2px rgba(0, 0, 0, 0.08),
+    2px 0 4px rgba(0, 0, 0, 0.08),
+    4px 0 8px rgba(0, 0, 0, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE TOUCH OPTIMIZATIONS
+   Enhanced touch interactions and smooth scrolling for mobile devices
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Touch manipulation for all interactive elements */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text selection during swipe gestures */
+.no-select-on-swipe {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Swipe indicator styling */
+.swipe-indicator {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 4px;
+  background: rgba(161, 161, 170, 0.4);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.swipe-indicator:hover {
+  background: rgba(161, 161, 170, 0.6);
+}
+
+.dark .swipe-indicator {
+  background: rgba(113, 113, 122, 0.4);
+}
+
+.dark .swipe-indicator:hover {
+  background: rgba(113, 113, 122, 0.6);
+}
+
+/* Mobile scroll fade indicators */
+@media (max-width: 768px) {
+
+  .scroll-fade-top::before,
+  .scroll-fade-bottom::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 24px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .scroll-fade-top::before {
+    top: 0;
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.95) 0%,
+        transparent 100%);
+  }
+
+  .scroll-fade-bottom::after {
+    bottom: 0;
+    background: linear-gradient(to top,
+        rgba(255, 255, 255, 0.95) 0%,
+        transparent 100%);
+  }
+
+  .dark .scroll-fade-top::before {
+    background: linear-gradient(to bottom,
+        rgba(9, 9, 11, 0.95) 0%,
+        transparent 100%);
+  }
+
+  .dark .scroll-fade-bottom::after {
+    background: linear-gradient(to top,
+        rgba(9, 9, 11, 0.95) 0%,
+        transparent 100%);
+  }
+}
+
+/* Sidebar footer with glass effect */
+.sidebar-footer-premium {
+  background: linear-gradient(0deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.8) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .sidebar-footer-premium {
+  background: linear-gradient(0deg,
+      rgba(15, 15, 18, 0.95) 0%,
+      rgba(15, 15, 18, 0.8) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Tree item hover with subtle lift */
+.tree-item-premium {
+  transition: all 0.15s ease;
+  border-radius: 0.5rem;
+}
+
+.tree-item-premium:hover {
+  background: rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.dark .tree-item-premium:hover {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tree item active/selected state */
+.tree-item-premium.active,
+.tree-item-premium[data-selected="true"] {
+  background: linear-gradient(135deg,
+      rgba(16, 185, 129, 0.08) 0%,
+      rgba(6, 182, 212, 0.06) 100%);
+  box-shadow: inset 0 1px 2px rgba(16, 185, 129, 0.1);
+}
+
+.dark .tree-item-premium.active,
+.dark .tree-item-premium[data-selected="true"] {
+  background: linear-gradient(135deg,
+      rgba(16, 185, 129, 0.12) 0%,
+      rgba(6, 182, 212, 0.08) 100%);
+  box-shadow: inset 0 1px 2px rgba(16, 185, 129, 0.15);
+}
+
+/* Touch-optimized button with premium feel */
+.btn-touch-premium {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.btn-touch-premium:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.btn-touch-premium:active {
+  transform: scale(0.96);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.dark .btn-touch-premium:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dark .btn-touch-premium:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Mode tab with premium styling */
+.mode-tab-premium {
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mode-tab-premium:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.mode-tab-premium.active {
+  background: linear-gradient(135deg,
+      rgba(16, 185, 129, 0.1) 0%,
+      rgba(6, 182, 212, 0.08) 100%);
+  color: rgb(16, 185, 129);
+}
+
+.dark .mode-tab-premium:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dark .mode-tab-premium.active {
+  background: linear-gradient(135deg,
+      rgba(16, 185, 129, 0.15) 0%,
+      rgba(6, 182, 212, 0.1) 100%);
+  color: rgb(52, 211, 153);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE SWIPE GESTURE SUPPORT
+   Utilities for swipe-to-close sidebar behavior
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.swipe-container {
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+}
+
+.swipe-handle {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.swipe-handle:hover,
+.swipe-handle:active {
+  opacity: 0.7;
+}
+
+/* Smooth momentum scroll for mobile */
+.momentum-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+}
+/* ═══════════════════════════════════════════════════════════════════════════════
+   INLINE HASHTAG BADGES
+   Styled inline #hashtags in markdown content (controlled by showBlockTags)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Inline hashtag badges - visible by default */
+.inline-hashtag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  margin: 0 0.125rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(6, 182, 212, 0.15);
+  color: rgb(34, 211, 238);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.inline-hashtag:hover {
+  background: rgba(6, 182, 212, 0.25);
+  transform: scale(1.02);
+}
+
+.inline-hashtag:focus {
+  outline: 2px solid rgba(6, 182, 212, 0.5);
+  outline-offset: 1px;
+}
+
+/* Light mode hashtags */
+:root .inline-hashtag {
+  background: rgba(6, 182, 212, 0.1);
+  color: rgb(14, 116, 144);
+}
+
+:root .inline-hashtag:hover {
+  background: rgba(6, 182, 212, 0.2);
+}
+
+/* Dark mode hashtags */
+.dark .inline-hashtag {
+  background: rgba(6, 182, 212, 0.15);
+  color: rgb(34, 211, 238);
+}
+
+.dark .inline-hashtag:hover {
+  background: rgba(6, 182, 212, 0.25);
+}
+
+/* Sepia Light hashtags */
+.sepia-light .inline-hashtag,
+[data-theme="sepia-light"] .inline-hashtag {
+  background: rgba(180, 83, 9, 0.12);
+  color: rgb(180, 83, 9);
+}
+
+.sepia-light .inline-hashtag:hover,
+[data-theme="sepia-light"] .inline-hashtag:hover {
+  background: rgba(180, 83, 9, 0.22);
+}
+
+/* Sepia Dark hashtags */
+.sepia-dark .inline-hashtag,
+[data-theme="sepia-dark"] .inline-hashtag {
+  background: rgba(217, 160, 90, 0.15);
+  color: rgb(245, 195, 110);
+}
+
+.sepia-dark .inline-hashtag:hover,
+[data-theme="sepia-dark"] .inline-hashtag:hover {
+  background: rgba(217, 160, 90, 0.25);
+}
+
+/* Oceanic Light hashtags */
+.oceanic-light .inline-hashtag,
+[data-theme="oceanic-light"] .inline-hashtag {
+  background: rgba(8, 145, 178, 0.12);
+  color: rgb(8, 145, 178);
+}
+
+.oceanic-light .inline-hashtag:hover,
+[data-theme="oceanic-light"] .inline-hashtag:hover {
+  background: rgba(8, 145, 178, 0.22);
+}
+
+/* Oceanic Dark hashtags */
+.oceanic-dark .inline-hashtag,
+[data-theme="oceanic-dark"] .inline-hashtag {
+  background: rgba(34, 211, 238, 0.15);
+  color: rgb(125, 211, 252);
+}
+
+.oceanic-dark .inline-hashtag:hover,
+[data-theme="oceanic-dark"] .inline-hashtag:hover {
+  background: rgba(34, 211, 238, 0.25);
+}
+
+/* Hidden state - when showBlockTags is false */
+.hide-block-tags .inline-hashtag {
+  display: none !important;
+}

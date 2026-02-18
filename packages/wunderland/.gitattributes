@@ -1,0 +1,55 @@
+# Git LFS - Large File Storage
+# Track media assets to keep repository lightweight
+# Run `git lfs install` if not already set up
+# ============================================================================
+# WRITING PROMPT IMAGES
+# ============================================================================
+# Existing prompt images for writing mode (~200 images, ~13MB optimized)
+apps/frame.dev/public/prompts/*.webp filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/prompts/*.jpg filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/prompts/*.png filter=lfs diff=lfs merge=lfs -text
+# ============================================================================
+# MEDITATION BACKGROUND IMAGES
+# ============================================================================
+# Optimized 4K WebP backgrounds for meditation/focus mode (~300 images)
+apps/frame.dev/public/media/backgrounds/**/*.webp filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/media/backgrounds/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/media/backgrounds/**/*.png filter=lfs diff=lfs merge=lfs -text
+# ============================================================================
+# ORIGINAL BACKUPS (Hi-res source files)
+# ============================================================================
+# Full resolution originals for reprocessing if needed
+media-backups/**/*.webp filter=lfs diff=lfs merge=lfs -text
+media-backups/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+media-backups/**/*.png filter=lfs diff=lfs merge=lfs -text
+media-backups/**/*.gif filter=lfs diff=lfs merge=lfs -text
+# ============================================================================
+# AUDIO FILES
+# ============================================================================
+# Ambient sounds, music, and audio assets
+apps/frame.dev/public/audio/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/audio/**/*.wav filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/audio/**/*.ogg filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/audio/**/*.m4a filter=lfs diff=lfs merge=lfs -text
+# ============================================================================
+# VIDEO FILES
+# ============================================================================
+apps/frame.dev/public/video/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/video/**/*.webm filter=lfs diff=lfs merge=lfs -text
+# ============================================================================
+# OTHER LARGE ASSETS
+# ============================================================================
+# Fonts (if self-hosted)
+apps/frame.dev/public/fonts/**/*.woff2 filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/fonts/**/*.woff filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/fonts/**/*.ttf filter=lfs diff=lfs merge=lfs -text
+apps/frame.dev/public/fonts/**/*.otf filter=lfs diff=lfs merge=lfs -text
+# PDF documentation or exports
+**/*.pdf filter=lfs diff=lfs merge=lfs -text
+# ============================================================================
+# EXCLUDE FROM LFS (keep in regular git)
+# ============================================================================
+# Note: Files below LFS patterns that are small text/JSON files stay in regular git
+# The patterns above only match binary image files, so catalog.json and SVGs are 
+# automatically excluded (they don't match *.webp, *.jpg, *.png patterns)
+media-backups/**/* filter=lfs diff=lfs merge=lfs -text

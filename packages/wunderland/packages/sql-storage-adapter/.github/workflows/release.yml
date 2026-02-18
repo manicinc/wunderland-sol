@@ -1,0 +1,84 @@
+name: Release sql-storage-adapter
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/release.yml'
+      - 'package.json'
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests with coverage
+        run: npx vitest run --coverage
+        continue-on-error: false
+
+      - name: Build package
+        run: npm run build
+
+      - name: Read package version
+        id: pkg
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check if version is already published
+        id: npm_check
+        env:
+          VERSION: ${{ steps.pkg.outputs.version }}
+        run: |
+          CURRENT=$(npm view @framers/sql-storage-adapter version 2>/dev/null || echo "0.0.0")
+          if [ "$CURRENT" = "$VERSION" ]; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.npm_check.outputs.published == 'false'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          VERSION=${{ steps.pkg.outputs.version }}
+          NOTES=$(awk "/^## \[$VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md)
+          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$NOTES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        if: steps.npm_check.outputs.published == 'false'
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v${{ steps.pkg.outputs.version }}
+          name: sql-storage-adapter v${{ steps.pkg.outputs.version }}
+          body: ${{ steps.changelog.outputs.notes }}
+          allowUpdates: true

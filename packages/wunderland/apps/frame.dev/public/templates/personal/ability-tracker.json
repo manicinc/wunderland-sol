@@ -1,0 +1,85 @@
+{
+  "id": "ability-tracker",
+  "name": "Ability/Skill Tracker",
+  "category": "personal",
+  "icon": "Target",
+  "description": "Track and level up your abilities, skills, and competencies. Monitor progress with checkpoints, milestones, and mastery levels.",
+  "shortDescription": "Track skill progress and mastery",
+  "difficulty": "beginner",
+  "estimatedTime": "10 min",
+  "tags": ["skills", "abilities", "progress", "mastery", "learning", "growth"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 88,
+  "defaultData": {
+    "contentType": "tracker"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Ability Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "What skill are you tracking?"
+    },
+    {
+      "name": "summary",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Why is this ability important to you?"
+    },
+    {
+      "name": "category",
+      "label": "Skill Category",
+      "type": "select",
+      "required": false,
+      "placeholder": "Select category",
+      "options": ["technical", "creative", "physical", "social", "mental", "professional", "personal"],
+      "defaultValue": "personal"
+    },
+    {
+      "name": "currentLevel",
+      "label": "Current Level",
+      "type": "select",
+      "required": false,
+      "placeholder": "Select current level",
+      "options": ["novice", "beginner", "intermediate", "advanced", "expert", "master"],
+      "defaultValue": "novice"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Add tags for organization"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "category", "currentLevel", "targetLevel", "progress", "milestones"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: tracker\nskillCategory: {category}\ncurrentLevel: {currentLevel}\ntargetLevel: master\nprogress: 0\ncreated: {date}\nlastPracticed: {date}\n---\n\n# {title}\n\n{summary}\n\n## Current Status\n\n| Metric | Value |\n|--------|-------|\n| **Current Level** | 🔴 {currentLevel} |\n| **Target Level** | 🎯 Master |\n| **Progress** | ⬜⬜⬜⬜⬜ 0% |\n| **Time Invested** | 0 hours |\n| **Last Practice** | {date} |\n\n---\n\n## Level Progression\n\n### 🔴 Novice (Level 1)\n- [ ] Understand the basics\n- [ ] Complete introductory resources\n- [ ] Practice for 10 hours total\n\n### 🟠 Beginner (Level 2)\n- [ ] Apply basics independently\n- [ ] Complete 3 practice projects\n- [ ] Practice for 50 hours total\n\n### 🟡 Intermediate (Level 3)\n- [ ] Handle common scenarios\n- [ ] Complete 5 substantial projects\n- [ ] Practice for 200 hours total\n\n### 🟢 Advanced (Level 4)\n- [ ] Solve complex problems\n- [ ] Create something original\n- [ ] Practice for 500 hours total\n\n### 🔵 Expert (Level 5)\n- [ ] Teach others effectively\n- [ ] Recognized by peers\n- [ ] Practice for 1000 hours total\n\n### 🟣 Master (Level 6)\n- [ ] Push boundaries of the field\n- [ ] Innovate or create new approaches\n- [ ] Practice for 5000+ hours\n\n---\n\n## Practice Log\n\n| Date | Duration | Focus Area | Notes |\n|------|----------|------------|-------|\n| {date} | 0 min | Getting started | Initial setup |\n\n---\n\n## Milestones & Achievements\n\n- [ ] 🏆 First practice session\n- [ ] 🏆 10 hours invested\n- [ ] 🏆 First project completed\n- [ ] 🏆 100 hours invested\n- [ ] 🏆 Taught someone else\n\n---\n\n## Resources\n\n### Books & Courses\n- [ ] Resource 1\n- [ ] Resource 2\n\n### Practice Exercises\n- [ ] Exercise 1\n- [ ] Exercise 2\n\n### Mentors & Communities\n- Community/person to follow\n\n---\n\n## Reflections\n\n### What's working well?\n\n\n### What's challenging?\n\n\n### Next focus area?\n\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

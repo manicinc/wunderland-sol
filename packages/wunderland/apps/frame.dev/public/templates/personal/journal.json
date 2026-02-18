@@ -1,0 +1,40 @@
+{
+  "id": "journal",
+  "name": "Journal Entry",
+  "category": "personal",
+  "icon": "PenLine",
+  "description": "Daily reflection, thoughts, and personal documentation",
+  "shortDescription": "Daily reflection and thought capture",
+  "difficulty": "beginner",
+  "estimatedTime": "10 min",
+  "tags": ["journal", "diary", "reflection", "personal"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 90,
+  "defaultData": {
+    "contentType": "journal"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, journal, personal]\ncontentType: journal\ndate: {date}\nmood: {mood}\nenergy: {energy}\n---\n\n# {title}\n\n📅 **Date:** {date}\n\n## Mood Check-In\n\n**How am I feeling?**\n\n| Aspect | Rating | Notes |\n|--------|--------|-------|\n| Mood | 😊 😐 😔 | |\n| Energy | 🔋🔋🔋🔋🔋 | /5 |\n| Stress | 📊📊📊📊📊 | /5 |\n| Sleep Quality | ⭐⭐⭐⭐⭐ | /5 |\n\n**One word to describe today:** \n\n## Morning Intentions\n\n*What do I want from today?*\n\n1. \n2. \n3. \n\n## What Happened Today\n\n### Highlights ✨\n\nThe best parts of today...\n\n### Challenges 🏔️\n\nWhat was difficult...\n\n### Surprises 🎁\n\nUnexpected moments...\n\n## Gratitude\n\n*Three things I'm grateful for today:*\n\n1. **Person/Relationship:** \n2. **Experience/Moment:** \n3. **Simple Pleasure:** \n\n## Reflections\n\n### What I Learned\n\nNew insights or lessons...\n\n### What I'd Do Differently\n\nIf I could redo today...\n\n### Proud Moments\n\nWhere I showed up well...\n\n## Connections & Conversations\n\n**Who did I connect with?** \n\n**Quality of interactions:** \n\n**Conversation worth remembering:** \n\n## Mind Dump\n\n*Everything else on my mind...*\n\n## Tomorrow\n\n### Priorities\n\n1. [ ] Most important task\n2. [ ] Second priority\n3. [ ] Third priority\n\n### Looking Forward To\n\n\n### Concern to Address\n\n\n## Closing Thought\n\n> *End-of-day reflection or quote that resonates...*\n\n---\n\n*Journal entry complete. Good night, future me.* 🌙\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

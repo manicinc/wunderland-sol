@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "Ocorreu um erro desconhecido",
+    "tryAgain": "Tente novamente mais tarde",
+    "contactSupport": "Se o problema persistir, entre em contato com o suporte"
+  },
+  "network": {
+    "offline": "Parece que você está offline",
+    "timeout": "A solicitação expirou",
+    "serverError": "Erro no servidor",
+    "connectionFailed": "Falha na conexão"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "invalidEmail": "E-mail inválido",
+    "passwordTooShort": "A senha deve ter pelo menos {{min}} caracteres",
+    "passwordMismatch": "As senhas não coincidem",
+    "invalidFormat": "Formato inválido",
+    "numberOnly": "Deve ser um número",
+    "minLength": "Deve ter pelo menos {{min}} caracteres",
+    "maxLength": "Deve ter no máximo {{max}} caracteres"
+  },
+  "auth": {
+    "unauthorized": "Acesso não autorizado",
+    "sessionExpired": "Sua sessão expirou",
+    "invalidCredentials": "E-mail ou senha incorretos",
+    "accountLocked": "A conta foi bloqueada",
+    "emailNotVerified": "Verifique seu e-mail",
+    "tokenInvalid": "Token inválido ou expirado"
+  },
+  "api": {
+    "rateLimited": "Muitas solicitações. Tente novamente mais tarde",
+    "notFound": "Recurso não encontrado",
+    "methodNotAllowed": "Método não permitido",
+    "serverError": "Erro interno do servidor",
+    "badRequest": "Requisição inválida",
+    "forbidden": "Acesso negado"
+  },
+  "file": {
+    "tooLarge": "O arquivo excede o limite de tamanho",
+    "invalidType": "Tipo de arquivo inválido",
+    "uploadFailed": "Falha no upload",
+    "notFound": "Arquivo não encontrado"
+  }
+}

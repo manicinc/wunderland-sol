@@ -1,0 +1,68 @@
+{
+  "id": "trip-planner",
+  "name": "Trip Planner",
+  "category": "dynamic",
+  "icon": "Map",
+  "description": "Dynamic trip planning with @mentions for places, interactive maps, weather formulas, and route calculations. Inspired by Ink & Switch's Embark research.",
+  "shortDescription": "Plan trips with maps, weather, and routes",
+  "difficulty": "intermediate",
+  "estimatedTime": "20 min",
+  "tags": ["travel", "trip", "vacation", "maps", "weather", "embark", "dynamic-docs", "mentions", "formulas"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 95,
+  "defaultData": {
+    "contentType": "trip"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Trip Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "What's your trip called?"
+    },
+    {
+      "name": "summary",
+      "label": "Trip Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "What's this trip about?"
+    },
+    {
+      "name": "startDate",
+      "label": "Start Date",
+      "type": "date",
+      "required": true,
+      "placeholder": "When does the trip start?"
+    },
+    {
+      "name": "endDate",
+      "label": "End Date",
+      "type": "date",
+      "required": false,
+      "placeholder": "When does the trip end?"
+    },
+    {
+      "name": "travelers",
+      "label": "Travelers",
+      "type": "text",
+      "required": false,
+      "placeholder": "Who's going? (comma-separated)"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Categorize this trip"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title", "startDate"],
+    "optional": ["summary", "tags", "endDate", "travelers", "budget"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: trip\nstartDate: {startDate}\nendDate: {endDate}\ntravelers: [{travelers}]\ncreated: {date}\nlastUpdated: {date}\n---\n\n# {title}\n\n{summary}\n\n---\n\n## 🗺️ Trip Overview\n\n| Field | Value |\n|-------|-------|\n| **Start** | @[{startDate}](date-start) |\n| **End** | @[{endDate}](date-end) |\n| **Travelers** | {travelers} |\n| **Status** | 📝 Planning |\n\n---\n\n## 📍 Destinations\n\n> **Tip:** Add destinations using @mentions like @[San Francisco](place-sf) to see them on the map below!\n\n### Day 1: Arrival\n\n- Arrive at @[San Francisco International Airport](place-sfo)\n- Check in at @[The Hotel Nikko](place-hotel-nikko)\n- Dinner at @[Fisherman's Wharf](place-fishermans-wharf)\n\n### Day 2: Explore\n\n- Morning: @[Golden Gate Bridge](place-ggb) 🌉\n- Lunch: @[Ghirardelli Square](place-ghirardelli)\n- Afternoon: @[Alcatraz Island](place-alcatraz) tour\n\n### Day 3: Departure\n\n- Brunch at @[Ferry Building Marketplace](place-ferry-building)\n- Depart from @[San Francisco International Airport](place-sfo)\n\n---\n\n## 🗺️ Trip Map\n\n> This map shows all your @mentioned places!\n\n```view-map\n{\n  \"type\": \"map\",\n  \"title\": \"Trip Destinations\",\n  \"scope\": \"document\",\n  \"settings\": {\n    \"zoom\": 12,\n    \"center\": { \"lat\": 37.7749, \"lng\": -122.4194 },\n    \"showMarkers\": true,\n    \"markerStyle\": \"pins\"\n  },\n  \"filter\": { \"types\": [\"place\"] }\n}\n```\n\n---\n\n## 🌤️ Weather Forecast\n\n> Computed weather for each destination using formulas!\n\n### San Francisco\n\n```formula:sf_weather\n=WEATHER(\"San Francisco, CA\", \"{startDate}\")\n```\n\n### Day 2 Weather\n\n```formula:day2_weather\n=WEATHER(\"San Francisco, CA\", =ADD_DAYS(\"{startDate}\", 1))\n```\n\n---\n\n## 📅 Itinerary Calendar\n\n> All your events on a calendar view!\n\n```view-calendar\n{\n  \"type\": \"calendar\",\n  \"title\": \"Trip Schedule\",\n  \"scope\": \"document\",\n  \"settings\": {\n    \"view\": \"week\",\n    \"startDate\": \"{startDate}\",\n    \"showWeekends\": true\n  },\n  \"filter\": { \"types\": [\"event\", \"date\"] }\n}\n```\n\n---\n\n## 🚗 Routes & Distances\n\n> Calculate routes between destinations!\n\n### Day 1 Route\n\n```formula:day1_route\n=ROUTE(\"San Francisco International Airport\", \"The Hotel Nikko, San Francisco\")\n```\n\n### Day 2 Distance\n\n```formula:day2_total\n=ADD(\n  =DISTANCE(\"The Hotel Nikko\", \"Golden Gate Bridge\"),\n  =DISTANCE(\"Golden Gate Bridge\", \"Ghirardelli Square\"),\n  =DISTANCE(\"Ghirardelli Square\", \"Fisherman's Wharf\")\n)\n```\n\n---\n\n## 💰 Budget Tracker\n\n| Item | Cost |\n|------|------|\n| ✈️ Flights | $500 |\n| 🏨 Hotel (2 nights) | $400 |\n| 🍽️ Food & Dining | $200 |\n| 🎟️ Activities | $150 |\n| 🚕 Transportation | $100 |\n\n### Total Budget\n\n```formula:trip_total\n=ADD(500, 400, 200, 150, 100)\n```\n\n---\n\n## 📋 Packing List\n\n- [ ] Passport / ID\n- [ ] Phone charger\n- [ ] Camera\n- [ ] Comfortable walking shoes\n- [ ] Jacket (SF is cold!)\n- [ ] Sunglasses\n- [ ] Medications\n\n---\n\n## 📝 Trip Notes\n\n### Reservations\n- Hotel confirmation: #ABC123\n- Restaurant reservations: 7pm @ Fisherman's Wharf\n\n### Tips & Reminders\n- Dress in layers - SF weather changes quickly!\n- Book Alcatraz tickets in advance\n- BART from airport to downtown is $10\n\n---\n\n## 🔗 Resources\n\n- [SF Travel Guide](https://www.sftravel.com/)\n- [BART Schedule](https://www.bart.gov/)\n- [Weather.com](https://weather.com/)\n\n---\n\n> 💡 **Powered by Dynamic Documents**\n> This template uses Embark-style features: @mentions for places and dates, formula computations for weather and routes, and rich views for maps and calendars.\n> Learn more in the [Dynamic Documents Guide](/docs/frame-architecture/DYNAMIC_DOCUMENTS_GUIDE.md)\n"
+}
+

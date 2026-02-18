@@ -1,0 +1,1741 @@
+// File: frontend/src/components/voice-input/styles/voice-input.scss
+/**
+ * @file voice-input.scss
+ * @description Complete styles for VoiceInput component with theme integration and refined visuals.
+ * @version 4.2.0 - Added breathing animations, holographic effects, and proper gradients
+ */
+
+@use '../../../styles/abstracts/variables' as var;
+@use '../../../styles/abstracts/mixins' as mixins;
+
+// -----------------------------------------------------------------------------
+// Z-index hierarchy
+// -----------------------------------------------------------------------------
+$z-background-layers: 1;
+$z-geometric-patterns: 2;
+$z-visualization-canvas: 3;
+$z-status-bar: 5;
+$z-controls-wrapper: 10;
+$z-input-wrapper: 10;
+$z-toolbar-wrapper: 20;
+$z-transcription-confirmation: 25;
+$z-ptt-preview-modal: 30;
+
+// -----------------------------------------------------------------------------
+// Main Voice Input Panel
+// -----------------------------------------------------------------------------
+.voice-input-panel {
+  position: relative;
+  background: hsla(
+    var(--color-bg-secondary-h, var.$default-color-bg-secondary-h),
+    var(--color-bg-secondary-s, var.$default-color-bg-secondary-s),
+    var(--color-bg-secondary-l, var.$default-color-bg-secondary-l),
+    0.85
+  );
+  --vi-label-strong-color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  --vi-label-color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.88);
+  --vi-muted-color: hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.78);
+  --vi-control-bg: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.65);
+  --vi-panel-border: hsla(var(--color-border-glass-h), var(--color-border-glass-s), var(--color-border-glass-l), 0.35);
+  --vi-chip-bg-browser: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.42);
+  backdrop-filter: blur(20px) saturate(1.8);
+  border-radius: var.$radius-xl;
+  padding: 20px;
+  overflow: visible;
+  transition: all 0.5s var.$ease-out-quint;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  
+  // Holographic depth effect
+  box-shadow: 
+    0 2px 8px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.1),
+    0 8px 32px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.15),
+    inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.1),
+    inset 0 -1px 0 hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.2);
+  
+  // Add subtle border for depth
+  border: 1px solid hsla(var(--color-border-glass-h), var(--color-border-glass-s), var(--color-border-glass-l), 0.2);
+
+  // State-based animations
+  &.state-idle {
+    // Subtle idle breathing
+    animation: panel-idle-breathe 4s ease-in-out infinite;
+  }
+  
+  &.state-stt-active {
+    animation: panel-active-pulse 2s ease-in-out infinite;
+    box-shadow: 
+      0 2px 8px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.2),
+      0 8px 32px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.3),
+      inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.15),
+      inset 0 -1px 0 hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.2);
+  }
+  
+  &.state-vad-listening {
+    animation: panel-vad-listen 3s ease-in-out infinite;
+  }
+
+  &.state-transcribing {
+    animation: panel-transcribing-sheen 1.6s linear infinite;
+    background-image: linear-gradient(
+      120deg,
+      hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.16) 0%,
+      hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.02) 45%,
+      hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.22) 100%
+    );
+    background-size: 200% 200%;
+    box-shadow:
+      0 3px 14px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.22),
+      0 10px 32px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.28),
+      inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.22),
+      inset 0 -1px 0 hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.16);
+  }
+
+  &.state-tts-speaking {
+    animation: panel-speaking-bloom 2.2s ease-in-out infinite;
+    background-image: radial-gradient(
+      circle at 20% 20%,
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.2),
+      transparent 60%
+    );
+    background-size: 180% 180%;
+    box-shadow:
+      0 4px 16px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.35),
+      0 14px 42px hsla(var(--color-voice-user-secondary-h, var(--color-accent-secondary-h)), var(--color-voice-user-secondary-s, var(--color-accent-secondary-s)), var(--color-voice-user-secondary-l, var(--color-accent-secondary-l)), 0.3),
+      inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.18);
+  }
+
+  &.state-error {
+    animation: panel-error-glow 1.8s ease-in-out infinite;
+    box-shadow:
+      0 4px 20px hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.3),
+      inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.18),
+      inset 0 -1px 0 hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.25);
+  }
+  
+  &.state-llm-processing {
+    animation: panel-llm-think 2.5s ease-in-out infinite;
+    opacity: 0.95;
+  }
+
+  // Clean style for continuous mode - no animations or effects
+  &.vi-mode-continuous {
+    background: hsla(
+      var(--color-bg-secondary-h, var.$default-color-bg-secondary-h),
+      var(--color-bg-secondary-s, var.$default-color-bg-secondary-s),
+      var(--color-bg-secondary-l, var.$default-color-bg-secondary-l),
+      0.95
+    );
+
+    &.state-stt-active {
+      animation: none;
+      box-shadow:
+        0 2px 8px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.15),
+        0 4px 16px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.1);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Background Layers & Effects
+// -----------------------------------------------------------------------------
+.vi-background-layers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: $z-background-layers;
+}
+
+.vi-gradient-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  transition: all 0.8s var.$ease-out-quint;
+  border-radius: inherit;
+  
+  // Dynamic gradients based on state
+  .state-idle & {
+    opacity: 0.3;
+    background: radial-gradient(ellipse at 50% 50%, 
+      hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.1) 0%, 
+      transparent 70%);
+  }
+  
+  .state-stt-active & {
+    opacity: 0.3;
+    background: radial-gradient(ellipse at 50% 50%,
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.2) 0%,
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.05) 50%,
+      transparent 100%);
+    // Removed annoying animation
+  }
+
+  .state-vad-listening & {
+    opacity: 0.3;
+    background: radial-gradient(ellipse at 50% 100%,
+      hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.15) 0%,
+      transparent 80%);
+    // Removed annoying animation
+  }
+
+  .state-llm-processing & {
+    opacity: 0.2;
+    background: radial-gradient(ellipse at 50% 50%,
+      hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.1) 0%,
+      transparent 70%);
+    // Removed annoying animation
+  }
+}
+
+.voice-input-panel[data-theme^='aurora'],
+.voice-input-panel[data-theme^='warm'] {
+  --vi-label-color: hsla(var(--color-text-primary-h), var(--color-text-primary-s), calc(var(--color-text-primary-l) - 10%), 0.9);
+  --vi-muted-color: hsla(var(--color-text-muted-h), var(--color-text-muted-s), calc(var(--color-text-muted-l) - 10%), 0.8);
+  --vi-control-bg: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 8%), 0.94);
+  --vi-panel-border: hsla(var(--color-border-primary-h), var(--color-border-primary-s), calc(var(--color-border-primary-l) - 8%), 0.45);
+  --vi-chip-bg-browser: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), calc(var(--color-bg-tertiary-l) + 5%), 0.55);
+}
+
+.vi-transcribing-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+.vi-transcribing-overlay__label {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  background: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.65);
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 12px 28px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.35);
+}
+
+.vi-transcribing-overlay__spinner {
+  width: 1rem;
+  height: 1rem;
+  animation: spin 0.9s linear infinite;
+  opacity: 0.9;
+}
+
+.vi-transcribing-overlay__line {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 2px;
+  top: calc(12% + (var(--line-index) - 1) * 18%);
+  background: linear-gradient(
+    90deg,
+    hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0) 0%,
+    hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.22) 25%,
+    hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.6) 50%,
+    hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.24) 75%,
+    hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0) 100%
+  );
+  filter: blur(0.3px);
+  animation: transcribing-stripe-flow 1.45s linear infinite;
+  animation-delay: calc((var(--line-index) - 1) * 0.18s);
+}
+
+.vi-speaking-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vi-speaking-overlay__ring {
+  position: absolute;
+  width: calc(32% + (var(--ring-index) - 1) * 18%);
+  height: calc(32% + (var(--ring-index) - 1) * 18%);
+  border-radius: 50%;
+  border: 1.6px solid hsla(var(--color-voice-user-h, var(--color-accent-primary-h)), var(--color-voice-user-s, var(--color-accent-primary-s)), var(--color-voice-user-l, var(--color-accent-primary-l)), 0.55);
+  box-shadow: 0 0 18px hsla(var(--color-voice-user-h, var(--color-accent-primary-h)), var(--color-voice-user-s, var(--color-accent-primary-s)), var(--color-voice-user-l, var(--color-accent-primary-l)), 0.25);
+  animation: speaking-ring-pulse 2.5s ease-in-out infinite;
+  animation-delay: calc((var(--ring-index) - 1) * 0.45s);
+}
+
+.vi-floating-status {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  z-index: $z-status-bar;
+}
+
+.vi-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--vi-label-strong-color);
+  background: var(--vi-control-bg);
+  border: 1px solid var(--vi-panel-border);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 10px 24px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.25);
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.vi-status-pill--pending,
+.vi-status-pill--info {
+  background: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.22);
+  border-color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.4);
+}
+
+.vi-status-pill--success {
+  background: hsla(var(--color-success-h), var(--color-success-s), var(--color-success-l), 0.25);
+  border-color: hsla(var(--color-success-h), var(--color-success-s), var(--color-success-l), 0.5);
+  color: hsl(var(--color-success-h), var(--color-success-s), calc(var(--color-success-l) - 12%));
+}
+
+.vi-status-pill--warning {
+  background: hsla(var(--color-warning-h), var(--color-warning-s), var(--color-warning-l), 0.25);
+  border-color: hsla(var(--color-warning-h), var(--color-warning-s), var(--color-warning-l), 0.45);
+  color: hsl(var(--color-warning-text-h, var(--color-warning-h)), var(--color-warning-text-s, 85%), var(--color-warning-text-l, 22%));
+}
+
+.vi-status-pill--error {
+  background: hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.3);
+  border-color: hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.6);
+  color: hsl(var(--color-danger-h), var(--color-danger-s), calc(var(--color-danger-l) + 30%));
+}
+
+.vi-status-pill__icon {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.9;
+}
+
+.vi-status-pill__icon--spinner {
+  animation: vi-spinner-rotate 1s linear infinite;
+}
+
+.vi-status-pill__text {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  color: inherit;
+}
+
+// Orbs for ambient animation
+.vi-orb {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  mix-blend-mode: screen;
+  filter: blur(80px);
+  animation: orb-float 20s infinite ease-in-out alternate;
+  transition: opacity 1s ease;
+
+  &.vi-orb-1 {
+    width: 300px; height: 300px;
+    background: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.3);
+    top: -100px; left: -100px;
+    animation-delay: 0s;
+  }
+  
+  &.vi-orb-2 {
+    width: 250px; height: 250px;
+    background: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.25);
+    bottom: -80px; right: -80px;
+    animation-delay: -10s;
+  }
+  
+  &.vi-orb-3 {
+    width: 200px; height: 200px;
+    background: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.2);
+    top: 30%; right: 20%;
+    animation-delay: -5s;
+  }
+
+  .state-stt-active & { 
+    opacity: 0.4;
+    animation-duration: 12s;
+  }
+  
+  .state-vad-listening & { 
+    opacity: 0.3;
+    animation-name: orb-pulse-soft;
+    animation-duration: 6s;
+  }
+  
+  .state-llm-processing & {
+    opacity: 0.2;
+    animation-duration: 8s;
+  }
+}
+
+// Geometric patterns
+.vi-geometric-patterns {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: $z-geometric-patterns;
+  opacity: 0.8;
+}
+
+// -----------------------------------------------------------------------------
+// Visualization Canvas
+// -----------------------------------------------------------------------------
+.vi-visualization-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: $z-visualization-canvas;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+
+  &.viz-active { opacity: 0.7; }
+  &.viz-listening { opacity: 0.5; }
+  &.viz-recording { opacity: 0.8; }
+}
+
+.vi-mode-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: $z-visualization-canvas + 2;
+
+  &__ring {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    z-index: 4;
+    border-top-color: hsla(var(--color-accent-interactive-h, 190), var(--color-accent-interactive-s, 90%), var(--color-accent-interactive-l, 65%), 0.75);
+    border-left-color: hsla(var(--color-accent-interactive-h, 190), var(--color-accent-interactive-s, 90%), var(--color-accent-interactive-l, 65%), 0.35);
+    border-right-color: hsla(var(--color-accent-interactive-h, 190), var(--color-accent-interactive-s, 90%), var(--color-accent-interactive-l, 65%), 0.15);
+    box-shadow: 0 0 16px hsla(var(--color-accent-interactive-h, 190), var(--color-accent-interactive-s, 90%), var(--color-accent-interactive-l, 65%), 0.28);
+    animation: vi-spinner-rotate 1.4s linear infinite;
+  }
+}
+
+@keyframes vi-spinner-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// -----------------------------------------------------------------------------
+// Status Bar
+// -----------------------------------------------------------------------------
+.vi-status-bar {
+  height: 32px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: $z-status-bar;
+  overflow: hidden;
+}
+
+.vi-status-content {
+  padding: 6px 16px;
+  background: var(--vi-control-bg);
+  border-radius: var.$radius-lg;
+  backdrop-filter: blur(8px);
+  font-size: 0.875rem;
+  color: var(--vi-label-color);
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.1);
+}
+
+.vi-hint-icon { margin-right: 8px; font-weight: bold; }
+.vi-hint-error { color: var(--color-error); }
+.vi-hint-warning { color: var(--color-warning); }
+.vi-hint-success { color: var(--color-success); }
+.vi-hint-info { color: var(--color-info); }
+
+// -----------------------------------------------------------------------------
+// Microphone Button with Breathing Effects
+// -----------------------------------------------------------------------------
+.vi-mic-button {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border: none;
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+  border-radius: 50%;
+  color: var(--color-text-on-primary);
+  cursor: pointer;
+  transition: all 0.3s var.$ease-out-quad;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 
+    0 4px 16px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.3),
+    inset 0 1px 0 hsla(255, 100%, 100%, 0.2),
+    inset 0 -2px 4px hsla(0, 0%, 0%, 0.1);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 
+      0 6px 24px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.4),
+      inset 0 1px 0 hsla(255, 100%, 100%, 0.3),
+      inset 0 -2px 4px hsla(0, 0%, 0%, 0.15);
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.98) translateY(0);
+    box-shadow: 
+      0 2px 8px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.3),
+      inset 0 1px 0 hsla(255, 100%, 100%, 0.1),
+      inset 0 -1px 2px hsla(0, 0%, 0%, 0.1);
+  }
+
+  // Breathing animation when active
+  &.vi-breathing {
+    animation: mic-breathe 2s ease-in-out infinite;
+    
+    .vi-mic-rings circle {
+      animation-name: ring-breathe;
+    }
+  }
+
+  &.vi-mic-active {
+    background: linear-gradient(135deg, var(--color-voice-user), var(--color-voice-user-secondary, var(--color-voice-user)));
+    animation: mic-active-glow 1.5s ease-in-out infinite;
+    
+    .vi-mic-rings circle { 
+      animation-name: ring-pulse;
+      opacity: 0.6;
+    }
+  }
+  
+  &.vi-mic-listening {
+    background: linear-gradient(135deg, var(--color-accent-interactive), var(--color-accent-interactive-secondary, var(--color-accent-interactive)));
+    animation: mic-vad-breathe 3s ease-in-out infinite;
+    
+    .vi-mic-rings circle { 
+      animation-name: ring-breathe;
+    }
+  }
+  
+  &.vi-mic-processing {
+    background: linear-gradient(135deg, var(--color-text-muted), var(--color-text-secondary));
+    cursor: wait;
+    animation: mic-llm-pulse 2s ease-in-out infinite;
+    opacity: 0.8;
+  }
+  
+  &.vi-mic-error {
+    background: linear-gradient(135deg, var(--color-error), hsla(var(--color-error-h), var(--color-error-s), calc(var(--color-error-l) - 10%), 1));
+    animation: error-shake 0.5s ease-in-out;
+  }
+  
+  &:disabled:not(.vi-mic-processing) {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--color-bg-disabled, #999);
+  }
+}
+
+.vi-mic-icon {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.vi-mic-rings {
+  position: absolute;
+  inset: -30px;
+  pointer-events: none;
+  
+  circle {
+    transform-origin: center;
+    opacity: 0;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-out;
+  }
+}
+
+// VAD volume bars
+.vi-vad-volume-bars {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.vi-ptt-timer {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: hsla(var(--color-bg-overlay-h), var(--color-bg-overlay-s), var(--color-bg-overlay-l), 0.9);
+  color: var(--color-text-on-overlay);
+  padding: 3px 8px;
+  border-radius: var.$radius-md;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+// -----------------------------------------------------------------------------
+// Toolbar Shell (persona, speech, session controls)
+// -----------------------------------------------------------------------------
+.vi-toolbar-shell {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto 18px;
+  position: relative;
+  z-index: 6;
+  display: flex;
+  justify-content: center;
+
+  .persona-voice-toolbar--compact {
+    width: 100%;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Controls Wrapper
+// -----------------------------------------------------------------------------
+.vi-controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin: 0 auto 16px;
+  color: var(--vi-label-color);
+  position: relative;
+  z-index: $z-controls-wrapper;
+  width: 100%;
+}
+
+.vi-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.vi-inline-controls {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.vi-mic-wrapper {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .mic-input-button {
+    position: relative;
+    z-index: 3;
+  }
+}
+
+.vi-continuous-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 118px;
+  height: 118px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+
+  &__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid hsla(var(--color-accent-interactive-h, 190), var(--color-accent-interactive-s, 88%), var(--color-accent-interactive-l, 65%), 0.32);
+    opacity: 0;
+    transform: scale(0.55);
+    animation: vi-continuous-wave 3.4s ease-out infinite;
+    mix-blend-mode: screen;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      box-shadow: 0 0 18px hsla(var(--color-accent-interactive-h, 190), var(--color-accent-interactive-s, 88%), var(--color-accent-interactive-l, 65%), 0.18);
+    }
+
+    &--delay-medium { animation-delay: 1.1s; }
+    &--delay-long { animation-delay: 2.2s; }
+  }
+}
+
+@keyframes vi-continuous-wave {
+  0% { transform: scale(0.55); opacity: 0; }
+  20% { opacity: 0.35; }
+  55% { opacity: 0.18; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.vi-mode-selector {
+  position: relative;
+  z-index: $z-controls-wrapper + 1;
+}
+
+.vi-engine-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.vi-engine-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid hsla(var(--color-border-secondary-h), var(--color-border-secondary-s), var(--color-border-secondary-l), 0.35);
+  background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.35);
+  box-shadow: 0 6px 16px -12px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.45);
+  color: var(--vi-label-strong-color);
+  backdrop-filter: blur(12px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 40px;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -18px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.55);
+  }
+
+  &__icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    opacity: 0.85;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.65);
+    color: var(--vi-label-strong-color);
+    font-weight: 700;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+  }
+
+  &--browser {
+    background: var(--vi-chip-bg-browser);
+    border-color: hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.45);
+  }
+
+  &--whisper {
+    background: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.16);
+    border-color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.35);
+    color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), calc(var(--color-accent-secondary-l) + 12%));
+  }
+
+  &--openai {
+    background: linear-gradient(
+      135deg,
+      hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.22),
+      hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.28)
+    );
+    border-color: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.5);
+    color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+    box-shadow: 0 10px 26px -16px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.45);
+
+    .vi-engine-chip__icon {
+      opacity: 0.95;
+    }
+  }
+}
+
+.vi-tts-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--vi-panel-border);
+  background: var(--vi-control-bg);
+  color: var(--vi-label-strong-color);
+  cursor: pointer;
+  transition: all 0.22s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -16px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.45);
+  }
+
+  &:focus-visible {
+    outline: 2px solid hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.7);
+    outline-offset: 2px;
+  }
+
+  &__icon {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  &--active {
+    background:
+      linear-gradient(
+        135deg,
+        hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.24),
+        hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.22)
+      );
+    border-color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.55);
+    color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+
+    .vi-tts-toggle__icon {
+      opacity: 0.95;
+    }
+  }
+}
+
+.vi-live-transcription {
+  flex-grow: 1;
+  padding: 10px 16px;
+  background: var(--vi-control-bg);
+  border: 1px solid var(--vi-panel-border);
+  border-radius: var.$radius-lg;
+  font-size: 0.95rem;
+  color: var(--vi-label-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 120px;
+  text-align: left;
+  transition: all 0.3s ease;
+  
+  &.vi-transcription-ephemeral {
+    opacity: 0.8;
+    font-style: italic;
+    color: var(--vi-muted-color);
+  }
+}
+
+.vi-transcription-text { 
+  color: var(--vi-label-strong-color);
+  font-weight: 500;
+}
+
+.vi-transcription-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: var(--color-accent-primary);
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+}
+
+// -----------------------------------------------------------------------------
+// Input Area with Breathing Effect
+// -----------------------------------------------------------------------------
+.vi-input-wrapper {
+  position: relative;
+  z-index: $z-input-wrapper;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+
+  &.vi-input-disabled {
+    .vi-input-container { 
+      opacity: 0.7;
+      background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.2);
+    }
+    .vi-textarea {
+      color: var(--color-text-muted);
+      &::placeholder { color: var(--color-text-disabled); }
+    }
+  }
+}
+
+.vi-input-container {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--vi-control-bg);
+  border-radius: var.$radius-lg;
+  box-shadow: 
+    inset 2px 2px 6px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.15),
+    inset -1px -1px 4px hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid var(--vi-panel-border);
+
+  &:focus-within {
+    box-shadow: 
+      inset 2px 2px 6px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.2),
+      inset -1px -1px 4px hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.1),
+      0 0 0 3px hsla(var(--color-accent-focus-h), var(--color-accent-focus-s), var(--color-accent-focus-l), 0.3);
+    border-color: hsla(var(--color-accent-focus-h), var(--color-accent-focus-s), var(--color-accent-focus-l), 0.3);
+  }
+  
+  &.vi-input-breathing {
+    animation: none;
+    background: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.96);
+    background-image: none;
+    backdrop-filter: none;
+    box-shadow: 0 6px 20px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.18);
+    border: 1px solid hsla(var(--color-border-glass-h), var(--color-border-glass-s), var(--color-border-glass-l), 0.32);
+  }
+}
+
+
+.vi-input-container.vi-input-breathing .vi-textarea {
+  background: transparent;
+  color: var(--vi-label-strong-color);
+}
+
+.vi-input-container.vi-input-breathing .vi-textarea::placeholder {
+  color: var(--vi-muted-color);
+  opacity: 0.8;
+}
+
+.vi-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--vi-label-strong-color);
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  min-height: 28px;
+  max-height: 140px;
+  padding: 0;
+  font-family: inherit;
+  
+  &::placeholder { 
+    color: var(--vi-muted-color);
+    opacity: 0.85;
+  }
+  
+  &:read-only {
+    cursor: default;
+  }
+}
+
+.vi-send-button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: all 0.2s var.$ease-out-quad;
+  flex-shrink: 0;
+  
+  svg { width: 24px; height: 24px; }
+
+  &:hover:not(:disabled) { 
+    transform: scale(1.15) rotate(-5deg);
+  }
+  
+  &:active:not(:disabled) { 
+    transform: scale(0.95);
+  }
+  
+  &:disabled { 
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.vi-settings-button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.6);
+  color: var(--color-text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.1);
+  
+  svg { width: 22px; height: 22px; }
+
+  &:hover:not(:disabled) {
+    background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), calc(var(--color-bg-tertiary-l) + 5%), 0.8);
+    color: var(--color-text-primary);
+    transform: rotate(15deg);
+    box-shadow: 0 4px 12px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.15);
+  }
+  
+  &.vi-settings-active {
+    background: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.2);
+    color: var(--color-accent-primary);
+    transform: rotate(90deg);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--color-bg-disabled);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Toolbar
+// -----------------------------------------------------------------------------
+.vi-toolbar-wrapper {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  z-index: $z-toolbar-wrapper;
+  min-width: 300px;
+}
+
+.vi-toolbar {
+  background: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var.$radius-lg;
+  box-shadow: 
+    0 8px 32px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.2),
+    inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.1);
+  padding: 12px;
+  border: 1px solid hsla(var(--color-border-glass-h), var(--color-border-glass-s), var(--color-border-glass-l), 0.2);
+}
+
+// -----------------------------------------------------------------------------
+// PTT Preview Modal
+// -----------------------------------------------------------------------------
+.vi-ptt-preview-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-ptt-preview-modal;
+}
+
+.vi-preview-backdrop {
+  position: absolute;
+  inset: 0;
+  background: hsla(var(--color-bg-overlay-h), var(--color-bg-overlay-s), var(--color-bg-overlay-l), 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.vi-preview-content {
+  position: relative;
+  background: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.98);
+  backdrop-filter: blur(24px);
+  border-radius: var.$radius-xl;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 
+    0 12px 48px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.3),
+    inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.1);
+  border: 1px solid hsla(var(--color-border-h), var(--color-border-s), var(--color-border-l), 0.2);
+}
+
+// -----------------------------------------------------------------------------
+// Keyframe Animations
+// -----------------------------------------------------------------------------
+
+// Panel breathing animations
+@keyframes panel-idle-breathe {
+  0%, 100% { 
+    background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.85);
+  }
+  50% { 
+    background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), calc(var(--color-bg-secondary-l) + 2%), 0.88);
+  }
+}
+
+@keyframes panel-active-pulse {
+  0%, 100% { 
+    background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.85);
+  }
+  50% { 
+    background-color: hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.08);
+  }
+}
+
+@keyframes panel-vad-listen {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+@keyframes panel-llm-think {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.9; }
+}
+
+@keyframes panel-transcribing-sheen {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes panel-speaking-bloom {
+  0%, 100% { background-color: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.85); }
+  50% { background-color: hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.08); }
+}
+
+@keyframes panel-error-glow {
+  0%, 100% {
+    box-shadow:
+      0 4px 20px hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.26),
+      inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.18),
+      inset 0 -1px 0 hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.22);
+  }
+  50% {
+    box-shadow:
+      0 6px 28px hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.38),
+      inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.22),
+      inset 0 -1px 0 hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.3);
+  }
+}
+
+@keyframes transcribing-stripe-flow {
+  0% { transform: translateX(-20%) skewX(-14deg); opacity: 0; }
+  20% { opacity: 0.5; }
+  100% { transform: translateX(120%) skewX(-14deg); opacity: 0; }
+}
+
+@keyframes speaking-ring-pulse {
+  0% { transform: scale(0.85); opacity: 0.4; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+// Gradient animations - REMOVED (were annoying)
+// @keyframes gradient-shift {
+//   0%, 100% { transform: rotate(0deg) scale(1); }
+//   50% { transform: rotate(180deg) scale(1.1); }
+// }
+
+// @keyframes gradient-pulse {
+//   0%, 100% { opacity: 0.5; }
+//   50% { opacity: 0.7; }
+// }
+
+// @keyframes gradient-think {
+//   0%, 100% { transform: scale(1) translateY(0); }
+//   50% { transform: scale(1.05) translateY(-5px); }
+// }
+
+// Orb animations
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+  25% { transform: translate(30px, -40px) scale(1.1); opacity: 0.3; }
+  50% { transform: translate(-20px, 30px) scale(0.95); opacity: 0.25; }
+  75% { transform: translate(-40px, -20px) scale(1.05); opacity: 0.35; }
+}
+
+@keyframes orb-pulse-soft {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.2); }
+}
+
+// Mic button animations
+@keyframes mic-breathe {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 
+      0 4px 16px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.3),
+      inset 0 1px 0 hsla(255, 100%, 100%, 0.2);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 
+      0 6px 24px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.4),
+      inset 0 1px 0 hsla(255, 100%, 100%, 0.25);
+  }
+}
+
+@keyframes mic-active-glow {
+  0%, 100% { 
+    box-shadow: 
+      0 4px 16px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.4),
+      0 0 32px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.3);
+  }
+  50% { 
+    box-shadow: 
+      0 6px 24px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.5),
+      0 0 48px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.4);
+  }
+}
+
+@keyframes mic-vad-breathe {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 
+      0 4px 16px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3),
+      0 0 24px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.2);
+  }
+  50% { 
+    transform: scale(1.03);
+    box-shadow: 
+      0 6px 20px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.4),
+      0 0 36px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3);
+  }
+}
+
+@keyframes mic-llm-pulse {
+  0%, 100% { 
+    opacity: 0.8;
+    box-shadow: 0 2px 8px hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.2);
+  }
+  50% { 
+    opacity: 0.9;
+    box-shadow: 0 4px 12px hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.3);
+  }
+}
+
+// Ring animations
+@keyframes ring-pulse {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 0.6; }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
+@keyframes ring-breathe {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+// Input breathing
+@keyframes input-breathe {
+  0%, 100% { 
+    background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.5);
+  }
+  50% { 
+    background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), calc(var(--color-bg-tertiary-l) + 3%), 0.6);
+  }
+}
+
+// Other animations
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes blink {
+  50% { background-color: transparent; }
+}
+
+// -----------------------------------------------------------------------------
+// Transitions
+// -----------------------------------------------------------------------------
+.status-slide-enter-active, .status-slide-leave-active { 
+  transition: all 0.3s var.$ease-out-quad;
+}
+.status-slide-enter-from, .status-slide-leave-to { 
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.fade-enter-active, .fade-leave-active { 
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to { 
+  opacity: 0;
+}
+
+.scale-enter-active, .scale-leave-active { 
+  transition: all 0.2s var.$ease-out-back;
+}
+.scale-enter-from, .scale-leave-to { 
+  transform: scale(0.5);
+  opacity: 0;
+}
+
+.timer-fade-enter-active, .timer-fade-leave-active { 
+  transition: opacity 0.3s ease;
+}
+.timer-fade-enter-from, .timer-fade-leave-to { 
+  opacity: 0;
+}
+
+.toolbar-slide-enter-active, .toolbar-slide-leave-active { 
+  transition: all 0.3s var.$ease-out-quint;
+}
+.toolbar-slide-enter-from, .toolbar-slide-leave-to { 
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+.preview-modal-enter-active, .preview-modal-leave-active { 
+  transition: opacity 0.3s ease;
+}
+.preview-modal-enter-active .vi-preview-content,
+.preview-modal-leave-active .vi-preview-content { 
+  transition: all 0.3s var.$ease-out-quint;
+}
+.preview-modal-enter-from, .preview-modal-leave-to { 
+  opacity: 0;
+}
+.preview-modal-enter-from .vi-preview-content,
+.preview-modal-leave-to .vi-preview-content { 
+  opacity: 0;
+  transform: translateY(30px) scale(0.9);
+}
+
+// -----------------------------------------------------------------------------
+// Responsive adjustments
+// -----------------------------------------------------------------------------
+@media (max-width: var.$breakpoint-sm) {
+  .voice-input-panel { 
+    padding: 16px;
+    border-radius: var.$radius-lg;
+  }
+  
+  .vi-mic-button { 
+    width: 64px;
+    height: 64px;
+  }
+  
+  .vi-mic-icon { 
+    width: 28px;
+    height: 28px;
+  }
+  
+  .vi-controls-wrapper { gap: 12px; }
+  .vi-controls-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .vi-inline-controls {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .vi-engine-badges {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .vi-engine-chip {
+    justify-content: space-between;
+    min-height: 36px;
+  }
+
+  .vi-tts-toggle {
+    justify-self: center;
+  }
+
+  .vi-inline-controls > .vi-live-transcription {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 4px;
+  }
+  
+  .vi-input-container { padding: 10px 12px; }
+  .vi-textarea { font-size: 0.95rem; }
+  
+  .vi-send-button, .vi-settings-button { 
+    width: 38px;
+    height: 38px;
+    svg { width: 20px; height: 20px; }
+  }
+  
+  .vi-toolbar-wrapper { min-width: 260px; }
+  .vi-status-bar { height: auto; min-height: 28px; margin-bottom: 12px; }
+  .vi-status-content { font-size: 0.8rem; padding: 4px 12px; }
+}
+
+// -----------------------------------------------------------------------------
+// Reduced motion
+// -----------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .vi-mic-button, .vi-send-button, .vi-settings-button,
+  .vi-orb, .vi-mic-rings circle, .vi-transcription-cursor,
+  .vi-gradient-bg, .vi-input-container {
+    animation: none !important;
+  }
+  
+  .voice-input-panel, .vi-mic-button, .vi-send-button, .vi-settings-button,
+  .vi-status-bar, .vi-gradient-bg, .vi-visualization-canvas,
+  .toolbar-slide-enter-active, .toolbar-slide-leave-active,
+  .preview-modal-enter-active, .preview-modal-leave-active,
+  .preview-modal-enter-active .vi-preview-content,
+  .preview-modal-leave-active .vi-preview-content {
+    transition-duration: 0.01s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+// Icon utilities
+.icon-sm { width: 1.25rem; height: 1.25rem; }
+
+// -----------------------------------------------------------------------------
+// State "Animations" (NO PANEL MOVEMENT - focus on opacity/color)
+// -----------------------------------------------------------------------------
+.voice-input-panel {
+  // These are subtle background/opacity effects, not panel movements.
+  // The actual gradient changes are handled by --vi-gradient-bg-* variables.
+  &.state-idle {
+    // animation: state-idle-breathe 4s ease-in-out infinite; // Removed scale
+  }
+  &.state-stt-active {
+    // animation: state-active-pulse 2s ease-in-out infinite; // Removed scale
+  }
+  &.state-vad-listening {
+    // animation: state-vad-breathe 3s ease-in-out infinite; // Removed scale
+  }
+  &.state-llm-processing {
+    // animation: state-llm-shimmer 2.5s ease-in-out infinite; // Removed scale
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Keyframe Animations (Mostly for internal elements or subtle BG effects)
+// -----------------------------------------------------------------------------
+@keyframes orb-float { // For background orbs
+  0%, 100% { transform: translate(0,0) scale(1); opacity: 0.1; }
+  25% { transform: translate(20px, -30px) scale(1.1); opacity: 0.25; }
+  50% { transform: translate(-10px, 20px) scale(0.95); opacity: 0.15; }
+  75% { transform: translate(-30px, -10px) scale(1.05); opacity: 0.2; }
+}
+@keyframes orb-pulse-soft { // For VAD listening orbs
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.15); }
+}
+
+@keyframes mic-active-glow { // Glow for active mic button
+  0%, 100% { box-shadow: var.$shadow-depth-sm, 0 0 15px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.3); }
+  50% { box-shadow: var.$shadow-depth-sm, 0 0 25px hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.5); }
+}
+@keyframes mic-vad-breathe { // Glow/breathe for VAD mic button
+  0%, 100% { box-shadow: var.$shadow-depth-sm, 0 0 10px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.2); }
+  50% { box-shadow: var.$shadow-depth-sm, 0 0 20px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.4); }
+}
+@keyframes mic-llm-pulse {
+  0%, 100% { box-shadow: var.$shadow-depth-xs, 0 0 5px hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.1); }
+  50% { box-shadow: var.$shadow-depth-xs, 0 0 10px hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.2); }
+}
+
+
+@keyframes ring-pulse { // For mic button rings when STT active
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { opacity: 0.6; } // More visible
+  100% { opacity: 0; transform: scale(1.6); } // Larger expansion
+}
+@keyframes ring-breathe { // For mic button rings when VAD listening
+  0%, 100% { opacity: 0.2; transform: scale(0.9); }
+  50% { opacity: 0.5; transform: scale(1.15); }
+}
+
+@keyframes error-shake { // No change, this is fine for button
+  0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); }
+}
+@keyframes blink { 50% { background-color: transparent; } }
+
+
+// -----------------------------------------------------------------------------
+// Transitions (Fade, Slide, Scale for internal elements)
+// -----------------------------------------------------------------------------
+.status-slide-enter-active, .status-slide-leave-active { transition: all 0.3s var.$ease-out-quad; }
+.status-slide-enter-from, .status-slide-leave-to { opacity: 0; transform: translateY(-10px); }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.scale-enter-active, .scale-leave-active { transition: transform 0.2s var.$ease-out-back; }
+.scale-enter-from, .scale-leave-to { transform: scale(0.5); opacity: 0; }
+
+.timer-fade-enter-active, .timer-fade-leave-active { transition: opacity 0.3s ease; }
+.timer-fade-enter-from, .timer-fade-leave-to { opacity: 0; }
+
+.toolbar-slide-enter-active, .toolbar-slide-leave-active { transition: all 0.3s var.$ease-out-quint; }
+.toolbar-slide-enter-from, .toolbar-slide-leave-to { opacity: 0; transform: translateY(20px) scale(0.95); }
+
+.preview-modal-enter-active, .preview-modal-leave-active { transition: opacity 0.3s ease; }
+.preview-modal-enter-active .vi-preview-content,
+.preview-modal-leave-active .vi-preview-content { transition: transform 0.3s var.$ease-out-quint, opacity 0.2s ease; }
+.preview-modal-enter-from, .preview-modal-leave-to { opacity: 0; }
+.preview-modal-enter-from .vi-preview-content,
+.preview-modal-leave-to .vi-preview-content { opacity: 0; transform: translateY(30px) scale(0.9); }
+
+
+// -----------------------------------------------------------------------------
+// Responsive adjustments
+// -----------------------------------------------------------------------------
+@media (max-width: var.$breakpoint-sm) {
+  .voice-input-panel { padding: 12px; border-radius: var.$radius-lg; }
+  .vi-mic-button { width: 56px; height: 56px; }
+  .vi-mic-icon { width: 26px; height: 26px; }
+  .vi-controls-wrapper { gap: 8px; }
+  .vi-controls-row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .vi-engine-badges { flex-direction: column; gap: 8px; width: 100%; }
+  .vi-engine-chip { justify-content: center; }
+  .vi-tts-toggle { width: 100%; justify-content: center; }
+  .vi-live-transcription { text-align: center; flex-basis: 100%; order: 3; margin-top: 8px;}
+  .vi-mode-selector { order: 2; } // mic button (order 1 implicit), then mode selector
+  .vi-input-container { padding: 8px; }
+  .vi-textarea { font-size: 0.95rem; }
+  .vi-send-button, .vi-settings-button { width: 36px; height: 36px; svg {width: 18px; height: 18px;} }
+  .vi-toolbar-wrapper { min-width: 240px; /* Adjust as needed */ }
+  .vi-status-bar { height: auto; min-height: 24px; margin-bottom: 8px; }
+  .vi-status-content { font-size: 0.75rem; padding: 3px 8px; }
+}
+
+// -----------------------------------------------------------------------------
+// Transcription Confirmation Modal (inline, no overlay)
+// -----------------------------------------------------------------------------
+.vi-transcription-confirmation {
+  position: fixed;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: $z-transcription-confirmation;
+  width: 90%;
+  max-width: 500px;
+  pointer-events: auto;
+}
+
+.vi-confirmation-content {
+  background: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.98);
+  backdrop-filter: blur(24px);
+  border-radius: var.$radius-lg;
+  padding: 16px;
+  box-shadow:
+    0 8px 32px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.25),
+    0 2px 8px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.15),
+    inset 0 1px 0 hsla(var(--color-highlight-h), var(--color-highlight-s), var(--color-highlight-l), 0.1);
+  border: 1px solid hsla(var(--color-border-h), var(--color-border-s), var(--color-border-l), 0.3);
+}
+
+.vi-confirmation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid hsla(var(--color-border-h), var(--color-border-s), var(--color-border-l), 0.15);
+}
+
+.vi-confirmation-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsla(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l), 0.9);
+}
+
+.vi-confirmation-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  background: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.15);
+  color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 1);
+  border-radius: var.$radius-full;
+  font-size: 13px;
+  font-weight: 600;
+  animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+.vi-confirmation-transcript {
+  padding: 12px;
+  margin-bottom: 12px;
+  background: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.5);
+  border-radius: var.$radius-md;
+  font-size: 14px;
+  line-height: 1.5;
+  color: hsla(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l), 0.95);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.vi-confirmation-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.vi-confirmation-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var.$radius-md;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.vi-confirmation-edit {
+    background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.8);
+    color: hsla(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l), 0.9);
+
+    &:hover {
+      background: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 1);
+    }
+  }
+
+  &.vi-confirmation-append {
+    background: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.15);
+    color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 1);
+
+    &:hover {
+      background: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.25);
+    }
+  }
+
+  &.vi-confirmation-cancel {
+    background: hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.1);
+    color: hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.9);
+
+    &:hover {
+      background: hsla(var(--color-danger-h), var(--color-danger-s), var(--color-danger-l), 0.15);
+    }
+  }
+
+  &.vi-confirmation-send {
+    background: linear-gradient(
+      135deg,
+      hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.9),
+      hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.9)
+    );
+    color: white;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.3);
+    }
+  }
+}
+
+@keyframes countdown-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+// Keyboard shortcut indicators
+.vi-confirmation-shortcuts {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.7);
+
+  .vi-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  line-height: 1.2;
+  color: hsla(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l), 0.9);
+  background: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.5);
+  border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.3);
+  border-radius: 4px;
+  box-shadow: inset 0 -1px 0 hsla(0, 0%, 0%, 0.1);
+  font-weight: 500;
+}
+
+.vi-kbd-inline {
+  margin-left: 0.5rem;
+  opacity: 0.7;
+  font-size: 0.75rem;
+}
+
+// Improved transition for confirmation modal
+.confirmation-fade-scale-enter-active {
+  transition: all 0.3s var.$ease-out-back;
+}
+
+.confirmation-fade-scale-leave-active {
+  transition: all 0.2s var.$ease-in-quad;
+}
+
+.confirmation-fade-scale-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.9) translateY(20px);
+}
+
+.confirmation-fade-scale-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.95) translateY(10px);
+}
+
+// -----------------------------------------------------------------------------
+// Reduced motion (Keep this for accessibility)
+// -----------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .vi-mic-button, .vi-send-button, .vi-settings-button,
+  .vi-orb, .vi-mic-rings circle, .vi-transcription-cursor {
+    animation: none !important;
+  }
+  .voice-input-panel, .vi-mic-button, .vi-send-button, .vi-settings-button,
+  .vi-status-bar, .vi-gradient-bg, .vi-visualization-canvas,
+  .toolbar-slide-enter-active, .toolbar-slide-leave-active,
+  .preview-modal-enter-active, .preview-modal-leave-active,
+  .preview-modal-enter-active .vi-preview-content,
+  .preview-modal-leave-active .vi-preview-content {
+    transition-duration: 0.01s !important; // Make transitions very fast but not none
+    transition-delay: 0s !important;
+  }
+}

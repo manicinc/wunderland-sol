@@ -1,0 +1,118 @@
+/**
+ * Custom Callouts Plugin Styles
+ *
+ * Provides additional styling for callout blocks.
+ * Most styling is handled via Tailwind classes in the component,
+ * but these provide fallbacks and custom animations.
+ */
+
+/* Callout base styles */
+.callout {
+  transition: all 0.2s ease-in-out;
+}
+
+.callout:hover {
+  transform: translateX(2px);
+}
+
+/* Callout type indicators */
+.callout-tip {
+  --callout-accent: #f59e0b;
+}
+
+.callout-warning {
+  --callout-accent: #eab308;
+}
+
+.callout-danger {
+  --callout-accent: #ef4444;
+}
+
+.callout-info {
+  --callout-accent: #3b82f6;
+}
+
+.callout-note {
+  --callout-accent: #71717a;
+}
+
+.callout-success {
+  --callout-accent: #22c55e;
+}
+
+.callout-error {
+  --callout-accent: #ef4444;
+}
+
+/* Callout icon pulse animation for important callouts */
+.callout-danger .callout-icon,
+.callout-error .callout-icon {
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Collapse transition */
+.callout-content {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+  overflow: hidden;
+}
+
+.callout-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Print styles */
+@media print {
+  .callout {
+    break-inside: avoid;
+    border: 1px solid var(--callout-accent, #ccc);
+    page-break-inside: avoid;
+  }
+
+  .callout-content {
+    max-height: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .callout {
+    border-left-width: 6px;
+  }
+
+  .callout-tip,
+  .callout-warning,
+  .callout-danger,
+  .callout-info,
+  .callout-note,
+  .callout-success,
+  .callout-error {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .callout {
+    transition: none;
+  }
+
+  .callout:hover {
+    transform: none;
+  }
+
+  .callout-danger .callout-icon,
+  .callout-error .callout-icon {
+    animation: none;
+  }
+}

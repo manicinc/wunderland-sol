@@ -1,0 +1,54 @@
+// File: frontend/src/styles/components/agents/_main-content-view.scss
+/**
+ * @file _main-content-view.scss
+ * @version 1.1.0
+ * @description Styles for MainContentView.vue.
+ * Ensures it fills height and applies responsive max-width and centering for its content
+ * on larger screens, remaining compact on mobile, aligning with "Ephemeral Harmony".
+ */
+
+@use '../../abstracts/variables' as var;
+@use '../../abstracts/mixins' as mixins;
+
+.main-content-view-ephemeral {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden; // This container does not scroll.
+
+  // The direct child (slotted component like ChatWindow or custom agent view)
+  // will handle its own scrolling and internal layout.
+  > :deep(*) {
+    flex-grow: 1;
+    height: 100%;
+    width: 100%; // Takes full width of .main-content-view-ephemeral
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; // The slotted component is responsible for its scroll
+    
+    // Responsive margins are now primarily handled by the parent (.unified-main-content-area > *)
+    // This component ensures its child can fill the space it's given.
+    // If specific padding is needed *inside* MainContentView for all its children, add it here.
+    // For example:
+    // padding: var.$spacing-xs; // Universal internal padding if needed
+    // @media (min-width: var.$breakpoint-md) {
+    //   padding: var.$spacing-sm;
+    // }
+
+    @include mixins.custom-scrollbar(
+      '--color-accent-secondary',
+      0.4,
+      0.65,
+      '--color-bg-primary',
+      0.08,
+      7px
+    );
+  }
+
+  .main-content-fallback-ephemeral {
+    // Styles are fine from Batch 2
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "An unknown error occurred",
+    "tryAgain": "Please try again later",
+    "contactSupport": "If the problem persists, please contact support"
+  },
+  "network": {
+    "offline": "You appear to be offline",
+    "timeout": "Request timed out",
+    "serverError": "Server error",
+    "connectionFailed": "Connection failed"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least {{min}} characters",
+    "passwordMismatch": "Passwords do not match",
+    "invalidFormat": "Invalid format",
+    "numberOnly": "Must be a number",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be no more than {{max}} characters"
+  },
+  "auth": {
+    "unauthorized": "Unauthorized access",
+    "sessionExpired": "Your session has expired",
+    "invalidCredentials": "Invalid email or password",
+    "accountLocked": "Account has been locked",
+    "emailNotVerified": "Please verify your email",
+    "tokenInvalid": "Invalid or expired token"
+  },
+  "api": {
+    "rateLimited": "Too many requests. Please try again later",
+    "notFound": "Resource not found",
+    "methodNotAllowed": "Method not allowed",
+    "serverError": "Internal server error",
+    "badRequest": "Bad request",
+    "forbidden": "Access forbidden"
+  },
+  "file": {
+    "tooLarge": "File size exceeds limit",
+    "invalidType": "Invalid file type",
+    "uploadFailed": "Upload failed",
+    "notFound": "File not found"
+  }
+}

@@ -1,0 +1,45 @@
+// File: frontend/src/styles/components/_voice-controls-dropdown.scss
+/**
+ * @file _voice-controls-dropdown.scss
+ * @description Styles for the VoiceControlsDropdown component, including global mute.
+ * @version 1.1.0 - Added styles for new sections and mute button.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use './buttons' as buttonsFile; // For potential button includes
+
+// The .voice-controls-trigger-button inherits from .btn-ghost-ephemeral.btn-icon-ephemeral
+// (defined in _header.scss or _buttons.scss)
+
+// The main dropdown panel uses .dropdown-panel-ephemeral from _dropdowns.scss
+// Items use .dropdown-item-ephemeral from _dropdowns.scss
+
+// Specific styling for setting groups within the dropdown
+.setting-group-in-dropdown {
+  // Using scoped styles in VoiceControlsDropdown.vue for this now
+}
+
+.options-grid-dropdown {
+  // Using scoped styles in VoiceControlsDropdown.vue for this now
+}
+
+.option-button-dropdown {
+  // Using scoped styles in VoiceControlsDropdown.vue for this now
+}
+
+// Global Mute Button specific styling (if any beyond .dropdown-item-ephemeral)
+// Example: if it needs a slightly different hover or active color
+.dropdown-item-ephemeral.global-mute-button { // If you add this class to the button
+  &.is-muted { // When TTS is muted
+    .dropdown-item-icon {
+      color: hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l)); // Red icon when muted
+    }
+    &:hover {
+       background-color: hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.1) !important;
+    }
+  }
+}
+.status-dot-indicator {
+    // Using scoped styles in VoiceControlsDropdown.vue for this now
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.voice.telnyx",
+  "name": "Telnyx Voice Call Extension",
+  "version": "0.1.0",
+  "description": "Telnyx telephony provider for voice calls via Call Control v2 — outbound/inbound calls, TTS speak commands, and bidirectional media streaming.",
+  "categories": ["voice", "telephony"],
+  "platforms": ["telnyx"],
+  "sdk": "telnyx",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "telnyxVoiceCall",
+      "displayName": "Telnyx Voice Call"
+    },
+    {
+      "kind": "voice-provider",
+      "id": "telnyxVoiceProvider",
+      "displayName": "Telnyx Voice Provider"
+    }
+  ],
+  "requiredSecrets": ["telnyx.apiKey", "telnyx.connectionId"],
+  "features": [
+    "Outbound calls via Call Control v2",
+    "Inbound call handling with webhook verification",
+    "In-call TTS via speak command",
+    "Ed25519 webhook signature verification",
+    "AMD (answering machine detection)",
+    "Bidirectional media streaming",
+    "Conversation mode with STT + LLM + TTS loop",
+    "Notify mode with one-way TTS message"
+  ]
+}

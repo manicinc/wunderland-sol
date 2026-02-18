@@ -1,0 +1,29 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-creative" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef3c7"/>
+      <stop offset="100%" style="stop-color:#fde68a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg-creative)"/>
+  <!-- Paint palette -->
+  <ellipse cx="200" cy="220" rx="120" ry="90" fill="#f5f5f4" stroke="#78716c" stroke-width="3"/>
+  <ellipse cx="200" cy="220" rx="110" ry="80" fill="#fafaf9"/>
+  <!-- Thumb hole -->
+  <ellipse cx="140" cy="260" rx="25" ry="20" fill="#fef3c7"/>
+  <!-- Paint blobs -->
+  <circle cx="180" cy="170" r="18" fill="#ef4444"/>
+  <circle cx="230" cy="160" r="16" fill="#f97316"/>
+  <circle cx="275" cy="175" r="15" fill="#eab308"/>
+  <circle cx="290" cy="220" r="14" fill="#22c55e"/>
+  <circle cx="275" cy="265" r="16" fill="#3b82f6"/>
+  <circle cx="220" cy="280" r="15" fill="#8b5cf6"/>
+  <!-- Paintbrush -->
+  <rect x="80" y="100" width="12" height="100" fill="#92400e" rx="2" transform="rotate(-30 86 150)"/>
+  <path d="M50 70 Q60 90 70 85 L85 130 Q75 135 65 130 Z" fill="#78716c" transform="rotate(-30 67 100)"/>
+  <rect x="78" y="95" width="16" height="15" fill="#c4b5a4" rx="1" transform="rotate(-30 86 102)"/>
+  <!-- Sparkles -->
+  <circle cx="320" cy="100" r="4" fill="#fbbf24"/>
+  <circle cx="100" cy="320" r="3" fill="#fbbf24"/>
+  <circle cx="340" cy="300" r="5" fill="#fbbf24"/>
+</svg>

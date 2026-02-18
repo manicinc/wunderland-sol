@@ -1,0 +1,75 @@
+{
+  "id": "checklist",
+  "name": "Checklist",
+  "category": "general",
+  "icon": "ListChecks",
+  "description": "Create a task list or checklist for any purpose",
+  "shortDescription": "Organize tasks and track completion",
+  "difficulty": "beginner",
+  "estimatedTime": "5 min",
+  "tags": ["checklist", "tasks", "todo", "organize"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": false,
+  "popularity": 85,
+  "defaultData": {
+    "contentType": "checklist"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Checklist Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "What is this checklist for?"
+    },
+    {
+      "name": "summary",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Context or purpose of this checklist"
+    },
+    {
+      "name": "dueDate",
+      "label": "Due Date",
+      "type": "date",
+      "required": false,
+      "placeholder": "When should this be completed?"
+    },
+    {
+      "name": "priority",
+      "label": "Priority",
+      "type": "select",
+      "required": false,
+      "options": ["low", "medium", "high", "urgent"],
+      "defaultValue": "medium"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "dueDate", "priority", "contentType"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: checklist\npriority: {priority}\ndueDate: {dueDate}\n---\n\n# {title}\n\n{summary}\n\n## Tasks\n\n### High Priority\n\n- [ ] Critical task 1\n- [ ] Critical task 2\n\n### Medium Priority\n\n- [ ] Standard task 1\n- [ ] Standard task 2\n\n### Low Priority\n\n- [ ] Nice to have 1\n- [ ] Nice to have 2\n\n## Notes\n\nAdditional context or reminders...\n\n## Completion Criteria\n\nWhat defines \"done\" for this checklist?\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

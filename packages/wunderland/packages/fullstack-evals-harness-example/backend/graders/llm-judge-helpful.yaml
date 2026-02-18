@@ -1,0 +1,20 @@
+name: Helpfulness Judge
+description: LLM evaluates if response is helpful and accurate
+type: llm-judge
+rubric: |
+  Evaluate if the response is helpful, accurate, and addresses the user's question.
+
+  Pass if:
+  - The response directly answers the question
+  - Information is accurate and relevant
+  - Response is clear and well-structured
+
+  Fail if:
+  - Response is off-topic or doesn't answer the question
+  - Contains factual errors
+  - Is confusing or poorly written
+inspiration: |
+  LLM-as-Judge pattern (Zheng et al., 2023). Uses a capable model to evaluate
+  responses against a human-written rubric. Also inspired by promptfoo's LLM
+  assertion pattern.
+reference: https://arxiv.org/abs/2306.05685

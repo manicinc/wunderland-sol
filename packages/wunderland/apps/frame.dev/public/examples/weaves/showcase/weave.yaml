@@ -1,0 +1,73 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# SHOWCASE WEAVE - Visual Styling Examples
+# ═══════════════════════════════════════════════════════════════════════════════
+# This weave demonstrates all the visual customization options available
+# for weaves and looms in Frame Codex.
+
+name: Showcase Gallery
+description: Visual styling examples for weaves, looms, and strands
+
+style:
+  # Lucide icon name - choose from 1500+ icons
+  # See: https://lucide.dev/icons
+  icon: Sparkles
+  
+  # Emoji alternative (use either icon OR emoji, not both)
+  # emoji: "✨"
+  
+  # Accent color - used for badges, buttons, highlights
+  accentColor: "#8b5cf6"
+  
+  # Background color for the weave card
+  backgroundColor: "#faf5ff"
+  
+  # Optional: Background gradient (CSS gradient string)
+  # backgroundGradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+  
+  # Optional: Background image URL
+  # backgroundImage: "https://example.com/bg.jpg"
+  # backgroundOpacity: 0.3
+  
+  # Text color override
+  # textColor: "#1f2937"
+  
+  # Use dark text on light backgrounds
+  darkText: true
+
+metadata:
+  author: Frame Codex Team
+  created: "2025-01-15"
+  updated: "2025-01-27"
+  tags:
+    - examples
+    - showcase
+    - visual-styling
+    - documentation
+  license: MIT
+
+# Sort order (lower = appears first)
+order: 0
+
+# Featured weaves get highlighted in the UI
+featured: true
+
+# Set to true to hide from navigation
+hidden: false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

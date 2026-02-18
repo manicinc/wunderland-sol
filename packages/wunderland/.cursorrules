@@ -1,0 +1,118 @@
+# Voice Chat Assistant & Frame.dev Project Rules
+
+## Frontend Design Philosophy
+
+Create distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Every interface should feel intentionally designed with a clear aesthetic point-of-view.
+
+### Design Thinking Process
+Before coding any frontend:
+1. **Purpose**: What problem does this interface solve? Who uses it?
+2. **Tone**: Commit to a bold direction (brutally minimal, maximalist, retro-futuristic, luxury/refined, editorial, brutalist, art deco, organic, industrial, etc.)
+3. **Differentiation**: What's the ONE thing someone will remember?
+
+### Typography
+- **NEVER USE**: Inter, Roboto, Arial, system-ui, sans-serif defaults
+- **PREFER**: Distinctive choices that elevate aesthetics
+  - Display: Playfair Display, Fraunces, Clash Display, Cabinet Grotesk, Space Grotesk, Syne
+  - Body: Crimson Pro, Source Serif Pro, IBM Plex Sans, DM Sans
+  - Mono: JetBrains Mono, Fira Code, IBM Plex Mono
+- Pair a distinctive display font with a refined body font
+- Use font-feature-settings for refinement
+
+### Color & Theme
+- Commit to a cohesive aesthetic with CSS variables
+- Dominant colors with sharp accents (not timid, evenly-distributed palettes)
+- **AVOID**: Purple gradients on white backgrounds (overused AI aesthetic)
+- Use HSL for better color manipulation
+- Ensure proper contrast ratios for accessibility
+
+### Motion & Animation
+- High-impact moments over scattered micro-interactions
+- Staggered reveals on page load (animation-delay)
+- Scroll-triggered animations that surprise
+- Use Framer Motion for React components
+- CSS-only for simple hover/focus states
+- Meaningful easing curves (not just ease-in-out)
+
+### Spatial Composition
+- Unexpected layouts, asymmetry, overlap
+- Grid-breaking hero elements
+- Generous negative space OR controlled density (pick one, commit)
+- Diagonal flow and dynamic visual hierarchy
+
+### Backgrounds & Visual Details
+- Create atmosphere (gradient meshes, noise textures, geometric patterns)
+- Layered transparencies and dramatic shadows
+- Contextual effects matching the aesthetic
+- Grain overlays, decorative borders when appropriate
+- Custom cursors for interactive elements
+
+---
+
+## Frame.dev Specific Guidelines
+
+### Theme System
+Frame Codex supports 8 themes:
+- `light`, `dark` (standard)
+- `sepia-light`, `sepia-dark` (vintage/book)
+- `terminal-light`, `terminal-dark` (CRT/retro)
+- `oceanic-light`, `oceanic-dark` (ocean-inspired)
+
+All colors MUST use CSS variables from the theme system.
+
+### OpenStrand Schema
+- **Fabric**: The entire knowledge repository
+- **Weave**: Top-level knowledge universe (e.g., weaves/technology/)
+- **Loom**: Subdirectory/module within a weave
+- **Strand**: Atomic knowledge unit (markdown file or folder with strand.yml)
+
+### Component Conventions
+- Use Framer Motion for animations
+- Tailwind CSS with custom design tokens
+- Lucide React for icons
+- Support all 8 themes in every component
+- Mobile-first responsive design
+- 44px minimum touch targets
+
+### File Structure
+```
+apps/frame.dev/
+  components/codex/      # Core Codex components
+    ui/                  # Reusable UI components
+    hooks/               # Custom React hooks
+    tree/                # Tree navigation components
+  app/codex/             # Next.js pages
+  lib/codex/             # Utilities, data, helpers
+  styles/                # Global styles, theme CSS
+  types/                 # TypeScript definitions
+```
+
+---
+
+## Code Quality
+
+### TypeScript
+- Strict mode enabled
+- Explicit return types on exported functions
+- Use `interface` for object shapes, `type` for unions/intersections
+- Document complex functions with JSDoc
+
+### React
+- Functional components only
+- Custom hooks for shared logic
+- Memoize expensive computations (useMemo, useCallback)
+- Proper dependency arrays in effects
+
+### CSS/Tailwind
+- Use design tokens from tailwind.config.ts
+- Avoid arbitrary values when tokens exist
+- Group related classes logically
+- Use @apply sparingly, prefer utility classes
+
+### Accessibility
+- Semantic HTML elements
+- ARIA labels where needed
+- Keyboard navigation support
+- Focus indicators on interactive elements
+- Color contrast compliance
+

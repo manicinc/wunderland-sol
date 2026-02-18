@@ -1,0 +1,4 @@
+name: Research Paper Extraction
+description: >
+  5 real AI paper abstracts for structured JSON extraction
+  (each row includes an arXiv source URL in metadata).

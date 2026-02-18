@@ -1,0 +1,10 @@
+# https://rabbithole.inc robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /app/
+Disallow: /admin/
+Disallow: /admin-login
+Disallow: /_next/
+
+Sitemap: https://rabbithole.inc/sitemap.xml

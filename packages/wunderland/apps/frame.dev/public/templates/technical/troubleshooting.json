@@ -1,0 +1,74 @@
+{
+  "id": "troubleshooting",
+  "name": "Troubleshooting Guide",
+  "category": "technical",
+  "icon": "Bug",
+  "description": "Problem-solution guide for debugging and fixing common issues",
+  "shortDescription": "Solve problems with structured solutions",
+  "difficulty": "intermediate",
+  "estimatedTime": "15 min",
+  "tags": ["troubleshooting", "debugging", "problems", "solutions"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": false,
+  "popularity": 80,
+  "defaultData": {
+    "contentType": "troubleshooting"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Guide Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "Troubleshooting [Feature/System/Process]"
+    },
+    {
+      "name": "summary",
+      "label": "Overview",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "What issues does this guide address?"
+    },
+    {
+      "name": "system",
+      "label": "System/Component",
+      "type": "text",
+      "required": false,
+      "placeholder": "What system or component is this for?"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Error types, technologies"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "system", "contentType", "lastVerified"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: troubleshooting\nsystem: \"{system}\"\nlastVerified: {date}\n---\n\n# {title}\n\n{summary}\n\n## Quick Diagnostic\n\nRun these checks first:\n\n```bash\n# Quick diagnostic commands\ncommand 1  # Check X\ncommand 2  # Verify Y\ncommand 3  # Test Z\n```\n\n**Healthy output should show:** Description of expected results\n\n---\n\n## Issue 1: [Problem Name]\n\n### Symptoms\n\n- ❌ Symptom 1\n- ❌ Symptom 2\n- ❌ Error message: `specific error text`\n\n### Cause\n\n**Why this happens:** Explanation of the root cause...\n\n**Common triggers:**\n- Trigger 1\n- Trigger 2\n\n### Solution\n\n**Option A: Quick Fix**\n\n```bash\nquick fix command\n```\n\n**Option B: Thorough Fix**\n\n1. Step 1:\n   ```bash\n   command\n   ```\n\n2. Step 2:\n   ```bash\n   command\n   ```\n\n3. Verify the fix:\n   ```bash\n   verification command\n   ```\n\n### Prevention\n\nTo avoid this in the future:\n- Preventive measure 1\n- Preventive measure 2\n\n---\n\n## Issue 2: [Problem Name]\n\n### Symptoms\n\n- ❌ Symptom description\n- ❌ Error: `error message`\n\n### Cause\n\nExplanation...\n\n### Solution\n\n1. Step 1\n2. Step 2\n\n---\n\n## Issue 3: [Problem Name]\n\n### Symptoms\n\n- ❌ Symptom description\n\n### Cause\n\nExplanation...\n\n### Solution\n\n1. Step 1\n2. Step 2\n\n---\n\n## Error Code Reference\n\n| Code | Message | Meaning | Solution |\n|------|---------|---------|----------|\n| E001 | Message | What it means | Link to section |\n| E002 | Message | What it means | Link to section |\n| E003 | Message | What it means | Link to section |\n\n## Log Analysis\n\n### Where to Find Logs\n\n```bash\n# Log locations\npath/to/logs/\npath/to/error.log\n```\n\n### What to Look For\n\n```\n[ERROR] Pattern to search for\n[WARN] Another pattern\n```\n\n## Escalation Path\n\nIf self-service troubleshooting doesn't resolve the issue:\n\n1. **Gather information:**\n   - Error messages\n   - Steps to reproduce\n   - Environment details\n\n2. **Check known issues:** [Link to issues tracker](#)\n\n3. **Contact support:**\n   - Community: [Forum/Discord](#)\n   - Enterprise: [Support portal](#)\n\n## Related Resources\n\n- [[System Architecture]]\n- [[Configuration Guide]]\n- [External Documentation](#)\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

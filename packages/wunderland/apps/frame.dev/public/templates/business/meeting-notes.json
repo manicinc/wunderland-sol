@@ -1,0 +1,40 @@
+{
+  "id": "meeting-notes",
+  "name": "Meeting Notes",
+  "category": "business",
+  "icon": "MessageSquare",
+  "description": "Capture meeting discussions, decisions, and action items",
+  "shortDescription": "Structured meeting documentation",
+  "difficulty": "beginner",
+  "estimatedTime": "10 min",
+  "tags": ["meeting", "notes", "business", "collaboration"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 92,
+  "defaultData": {
+    "contentType": "meeting"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, meeting, notes]\ncontentType: meeting\ndate: {date}\nattendees: [{attendees}]\n---\n\n# {title}\n\n## Meeting Details\n\n| Field | Value |\n|-------|-------|\n| **Date** | {date} |\n| **Time** | {time} |\n| **Duration** | {duration} |\n| **Location** | {location} |\n| **Meeting Type** | Standup/Planning/Review/Decision/Brainstorm |\n\n### Attendees\n\n| Name | Role | Present |\n|------|------|--------|\n| [Name] | Organizer | ✅ |\n| [Name] | Participant | ✅ |\n| [Name] | Participant | ❌ (Sent regrets) |\n\n### Meeting Roles\n\n- **Facilitator:** [Name]\n- **Note Taker:** [Name]\n- **Timekeeper:** [Name]\n\n## Agenda\n\n| # | Topic | Owner | Time | Status |\n|---|-------|-------|------|--------|\n| 1 | Topic 1 | [Name] | 10 min | ✅ |\n| 2 | Topic 2 | [Name] | 15 min | ✅ |\n| 3 | Topic 3 | [Name] | 10 min | ⏭️ Deferred |\n\n## Discussion Notes\n\n### Topic 1: [Title]\n\n**Context:** Brief background\n\n**Discussion:**\n- Point raised by [Name]\n- Counterpoint by [Name]\n- Consensus reached on...\n\n**Key Insights:**\n- Insight 1\n- Insight 2\n\n---\n\n### Topic 2: [Title]\n\n**Context:** Brief background\n\n**Discussion:**\n- Point raised by [Name]\n- Question: [Important question asked]\n- Answer: [Response]\n\n**Key Insights:**\n- Insight 1\n\n---\n\n### Topic 3: [Title]\n\n**Status:** Deferred to next meeting\n\n**Reason:** [Why it was deferred]\n\n## Decisions Made\n\n| # | Decision | Rationale | Owner | Date |\n|---|----------|-----------|-------|------|\n| D1 | [Decision text] | [Why] | [Name] | {date} |\n| D2 | [Decision text] | [Why] | [Name] | {date} |\n\n## Action Items\n\n| # | Action | Owner | Due Date | Priority | Status |\n|---|--------|-------|----------|----------|--------|\n| A1 | [Specific action] | [Name] | [Date] | 🔴 High | ⬜ |\n| A2 | [Specific action] | [Name] | [Date] | 🟡 Med | ⬜ |\n| A3 | [Specific action] | [Name] | [Date] | 🟢 Low | ⬜ |\n\n## Open Questions\n\n*Items requiring follow-up or research:*\n\n| Question | Owner | Due | Status |\n|----------|-------|-----|--------|\n| [Question needing answer] | [Name] | [Date] | ⬜ |\n| [Research needed] | [Name] | [Date] | ⬜ |\n\n## Parking Lot\n\n*Topics raised but not discussed—saved for later:*\n\n- Topic for future discussion\n- Idea to explore later\n\n## Key Takeaways\n\n**TL;DR of this meeting:**\n\n1. Main outcome 1\n2. Main outcome 2\n3. Main outcome 3\n\n## Next Meeting\n\n| Field | Value |\n|-------|-------|\n| **Date** | [Date] |\n| **Time** | [Time] |\n| **Agenda Preview** | [Topics to cover] |\n| **Pre-work** | [What attendees should prepare] |\n\n## Attachments & References\n\n- [Document/Link 1](#)\n- [Document/Link 2](#)\n- [Presentation slides](#)\n\n---\n\n*Notes taken by [Name] | Distributed on {date}*\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

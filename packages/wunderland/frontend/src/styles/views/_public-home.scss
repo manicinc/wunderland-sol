@@ -1,0 +1,522 @@
+// File: frontend/src/styles/views/_private-home.scss
+/**
+ * @file _private-home.scss
+ * @description Styles specific to the PrivateHome view.
+ * Focuses on responsive layout, thematic background, and providing a clear structure
+ * for either a dashboard placeholder or agent-specific content views.
+ * Utilizes global SCSS variables and mixins.
+ * @version 1.2.0 - Added flex-grow for root, refined padding/margins, improved prose styles.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+// Assuming these are used if PrivateHome directly includes buttons or cards not part of sub-components.
+// @use '../components/buttons' as buttonsFile;
+@use '../components/cards' as cardsFile; // Used for .has-framed-content
+
+// Root container for the PrivateHome view
+.private-home-view-ephemeral {
+  display: flex;          // Enable flex behavior for its children
+  flex-direction: column; // Stack children vertically
+  flex-grow: 1;           // CRITICAL: Allows this view to fill the space given by App.vue's main content area
+  height: 100%;           // Ensures it tries to use all of the parent's height if parent is also flex item
+  width: 100%;
+  background-color: hsl(
+    var(--color-bg-primary-h, #{var.$default-color-bg-primary-h})
+    var(--color-bg-primary-s, #{var.$default-color-bg-primary-s})
+    var(--color-bg-primary-l, #{var.$default-color-bg-primary-l})
+  );
+  overflow: hidden;       // This view itself should not scroll; UnifiedChatLayout inside it will manage scrolling.
+}
+
+// Styles for the dashboard placeholder content (when no agent content is primary)
+.private-dashboard-placeholder-ephemeral {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-grow: 1; // Takes available space if it's the main displayed content
+  width: 100%;
+  padding: var.$spacing-lg var.$spacing-md; // Responsive padding
+
+  .dashboard-content-wrapper { // Added wrapper for better control over text block width
+    width: 100%;
+    max-width: 580px; // Max width for the placeholder's text content
+    @media (min-width: var.$breakpoint-sm) {
+      max-width: 680px;
+    }
+    @media (min-width: var.$breakpoint-md) {
+      max-width: 780px;
+    }
+  }
+
+  .dashboard-icon-ephemeral { // Styles for the icon (e.g., ShieldCheckIcon)
+    width: clamp(calc( (#{var.$spacing-xl}) * 1.5), 10vw, calc( (#{var.$spacing-xl}) * 2.5 )); // Responsive icon size    margin-bottom: var.$spacing-lg;
+    color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+    filter: drop-shadow(0 5px 15px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.25));
+  }
+  .dashboard-title-ephemeral {
+    color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+font-size: clamp(calc( (#{var.$font-size-xl}) * 1.2), 4vw, calc( (#{var.$font-size-display-default}) * 0.9 )); // Responsive title    font-weight: 700; // Bold title
+    margin-bottom: var.$spacing-sm;
+  }
+  .dashboard-subtitle-ephemeral {
+    color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+    font-size: clamp(#{var.$font-size-base-default}, 2.5vw, #{var.$font-size-lg}); // Responsive subtitle
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+  .btn.btn-secondary-ephemeral { // Assuming .btn and .btn-secondary-ephemeral provide base button styles
+    margin-top: var.$spacing-xl; // More space above the button
+    padding: var.$spacing-sm calc(#{var.$spacing-md} * 1.5); // Generous padding for primary action
+    font-size: var.$font-size-base-default;
+  }
+}
+
+// Wrapper for MainContentView when it's the primary content
+// This class is on MainContentView.vue's root element when used in PrivateHome or PublicHome.
+.main-content-view-wrapper-ephemeral {
+  height: 100%; // Expects to fill its container within private-home-view-ephemeral
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Wrapper itself shouldn't scroll; its child (.content-renderer-container-ephemeral) will.
+
+  // Default state: content is not in a distinct "card" or "frame"
+  &:not(.has-framed-content) {
+    // Padding is applied to .content-renderer-container-ephemeral inside for scrolling content
+  }
+
+  // Framed content: applies card styling to this wrapper
+  &.has-framed-content {
+    @include cardsFile.card-base-styles; // Assumes this mixin provides base structure (e.g., border-radius)
+    @include cardsFile.card-glass-look;   // Assumes this mixin provides glassmorphic appearance
+    margin: var.$spacing-sm;              // Margin for the frame on mobile
+    // No direct padding here; padding is for the scrollable child.
+    // The card styles should handle background.
+    overflow: hidden; // Crucial for child with border-radius and overflow:auto to not show scrollbars over rounded corners
+
+    @media (min-width: var.$breakpoint-md) {
+      margin: var.$spacing-md; // Larger margin for the frame on bigger screens
+    }
+
+    // The direct child of .has-framed-content is expected to be the scrollable area.
+    // This would typically be .content-renderer-container-ephemeral if MainContentView is structured this way.
+    > .content-renderer-container-ephemeral, // Target if directly child
+    > *:first-child:not(.content-renderer-container-ephemeral) .content-renderer-container-ephemeral { // Target if nested
+      height: 100%; // Fill the frame
+      width: 100%;
+      overflow-y: auto; // Make this child scrollable
+      @include mixins.custom-scrollbar(
+        '--color-accent-interactive', 0.4, 0.65, // Thumb
+        '--color-bg-card-frame-track', 0.1, // Track (needs --color-bg-card-frame-track-h/s/l defined, or use a more generic one)
+        6px, var.$radius-md // Width, radius (match card's inner radius if applicable)
+      );
+      // Internal padding for the scrollable content within the frame
+      padding: var.$spacing-md;
+      @media (min-width: var.$breakpoint-sm) {
+        padding: var.$spacing-lg;
+      }
+    }
+  }
+}
+
+// Actual container for rendered content (markdown, custom components etc.)
+// This is expected to be a child of .main-content-view-wrapper-ephemeral.
+.content-renderer-container-ephemeral {
+  flex-grow: 1; // Takes up available space in its parent (either directly in wrapper or within a frame)
+  // overflow-y: auto; // Moved to .main-content-view-wrapper-ephemeral.has-framed-content > :first-child OR to .main-content-view-wrapper-ephemeral:not(.has-framed-content) directly if it's the scroll container.
+  // If :not(.has-framed-content), then MainContentView's root needs to be the scroll container:
+  .main-content-view-wrapper-ephemeral:not(.has-framed-content) & {
+      overflow-y: auto;
+      padding: var.$spacing-sm; // Padding for non-framed content directly in the renderer
+      @media (min-width: var.$breakpoint-sm) { padding: var.$spacing-md; }
+      @media (min-width: var.$breakpoint-lg) { padding: var.$spacing-lg; }
+      @include mixins.custom-scrollbar(
+        '--color-accent-interactive', 0.4, 0.65,
+        '--color-bg-primary', 0.1, // Track for non-framed content
+        6px, var.$radius-sm
+      );
+  }
+
+  display: flex; // Allows content like .prose to be centered if it has margin auto
+  flex-direction: column; // Stack content vertically
+}
+
+// Prose styling for markdown content within the content renderer
+.prose-ephemeral.content-renderer-ephemeral, // If .prose is applied directly to the renderer
+.content-renderer-container-ephemeral .prose-ephemeral { // If .prose is a child
+  width: 100%;
+  max-width: 85ch; // Increased slightly for better line length with some fonts
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: var.$spacing-md;    // Ensure vertical spacing for prose blocks
+  padding-bottom: var.$spacing-xl; // Ample space at the bottom
+
+  h1, h2, h3, h4, h5, h6 {
+    color: hsl(var(--color-text-heading-h, var.$default-color-text-primary-h), var(--color-text-heading-s, var.$default-color-text-primary-s), var(--color-text-heading-l, var.$default-color-text-primary-l));
+    font-family: var.$font-family-display; // Use display font for headings
+    font-weight: 600; // Default heading weight
+  }
+  p, li, blockquote {
+    color: hsl(var(--color-text-secondary-h, var.$default-color-text-secondary-h), var(--color-text-secondary-s, var.$default-color-text-secondary-s), var(--color-text-secondary-l, var.$default-color-text-secondary-l));
+    font-size: calc(#{var.$font-size-base-default} * 1.035); // Fine-tuned base size for prose
+    line-height: 1.75; // Increased for readability
+    margin-bottom: var.$spacing-md;
+  }
+  a {
+    color: hsl(var(--color-accent-interactive-h, var.$default-color-accent-interactive-h), var(--color-accent-interactive-s, var.$default-color-accent-interactive-s), var(--color-accent-interactive-l, var.$default-color-accent-interactive-l));
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1.5px solid hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.35);
+    transition: color var.$duration-quick, border-color var.$duration-quick;
+    &:hover {
+      color: hsl(var(--color-accent-primary-light-h, var.$default-color-accent-primary-light-h), var(--color-accent-primary-light-s, var.$default-color-accent-primary-light-s), var(--color-accent-primary-light-l, var.$default-color-accent-primary-light-l));
+      border-bottom-color: hsla(var(--color-accent-primary-light-h), var(--color-accent-primary-light-s), var(--color-accent-primary-light-l), 0.6);
+    }
+  }
+  // Add styles for code blocks, blockquotes, lists etc. as needed, ensuring they use theme variables.
+  pre, code {
+    font-family: var.$font-family-mono;
+    background-color: hsl(var(--color-bg-code-block-h, var.$default-color-bg-code-block-h), var(--color-bg-code-block-s, var.$default-color-bg-code-block-s), var(--color-bg-code-block-l, var.$default-color-bg-code-block-l), var(--color-bg-code-block-a, var.$default-color-bg-code-block-a));
+    color: hsl(var(--color-text-code-block-h, var.$default-color-text-code-block-h), var(--color-text-code-block-s, var.$default-color-text-code-block-s), var(--color-text-code-block-l, var.$default-color-text-code-block-l), var(--color-text-code-block-a, var.$default-color-text-code-block-a));
+    border-radius: var.$radius-md;
+    padding: var.$spacing-sm var.$spacing-md;
+  }
+  code:not(pre > code) { // Inline code
+    padding: 0.2em 0.4em;
+    font-size: 0.875em;
+    background-color: hsl(var(--color-bg-code-inline-h, var.$default-color-bg-code-inline-h), var(--color-bg-code-inline-s, var.$default-color-bg-code-inline-s), var(--color-bg-code-inline-l, var.$default-color-bg-code-inline-l), var(--color-bg-code-inline-a, var.$default-color-bg-code-inline-a));
+    color: hsl(var(--color-text-code-inline-h, var.$default-color-text-code-inline-h), var(--color-text-code-inline-s, var.$default-color-text-code-inline-s), var(--color-text-code-inline-l, var.$default-color-text-code-inline-l), var(--color-text-code-inline-a, var.$default-color-text-code-inline-a));
+    border-radius: var.$radius-sm;
+  }
+  blockquote {
+    border-left: 3px solid hsl(var(--color-border-interactive-h), var(--color-border-interactive-s), var(--color-border-interactive-l));
+    padding-left: var.$spacing-md;
+    margin-left: 0;
+    font-style: italic;
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  }
+}
+
+// Generic loading placeholder if used within PrivateHome's main content
+.loading-placeholder-ephemeral {
+  // Styles as per PublicHome, ensure thematic colors
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding: var.$spacing-lg;
+  .loading-text-ephemeral {
+    color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+    margin-top: var.$spacing-md;
+  }
+  .loading-spinner-ephemeral {
+    color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  }
+}
+.guest-pill-ephemeral {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) + 5%), 0.25), hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), calc(var(--color-accent-secondary-l) + 10%), 0.35));
+  border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.35);
+  color: var(--color-text-primary);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(6px);
+  width: max-content;
+}
+
+.guest-pill-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-accent-primary);
+}
+
+.guest-pill-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.demo-usage-banner {
+  display: flex;
+  align-items: center;
+  gap: var.$spacing-sm;
+  margin-bottom: var.$spacing-md;
+  padding: var.$spacing-sm var.$spacing-md;
+  border-radius: var.$radius-lg;
+  background: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.85);
+  border: 1px solid hsla(var(--color-border-secondary-h), var(--color-border-secondary-s), var(--color-border-secondary-l), 0.4);
+  color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+}
+
+.demo-usage-banner--warning {
+  color: hsl(var(--color-warning-h), var(--color-warning-s), var(--color-warning-l));
+  border-color: hsla(var(--color-warning-h), var(--color-warning-s), var(--color-warning-l), 0.5);
+}
+
+.demo-usage-banner--error {
+  color: hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l));
+  background: hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.12);
+  border-color: hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.55);
+}
+
+.demo-usage-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.demo-usage-text {
+  flex: 1;
+  font-size: var.$font-size-sm;
+}
+
+.demo-usage-link {
+  @apply underline font-semibold;
+  color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+}
+
+
+
+.public-pricing-showcase-ephemeral {
+  margin-top: var.$spacing-2xl;
+  padding: clamp(var.$spacing-lg, 4vw, calc(var.$spacing-xl * 1.1)) var.$spacing-lg;
+  border-radius: calc(var.$radius-2xl * 1.05);
+  background: linear-gradient(
+    180deg,
+    hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), calc(var(--color-bg-secondary-l) + 6%), 0.65),
+    hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), calc(var(--color-bg-secondary-l) - 2%), 0.55)
+  );
+  border: 1px solid hsla(var(--color-border-glass-h), var(--color-border-glass-s), var(--color-border-glass-l), 0.35);
+  box-shadow: 0 32px 60px -45px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.55);
+  backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var.$spacing-lg, 3vw, var.$spacing-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.public-pricing-header {
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-md;
+
+  @media (min-width: var.$breakpoint-lg) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.public-pricing-heading {
+  max-width: 560px;
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+
+  h3 {
+    font-size: clamp(calc(var.$font-size-display-default * 0.6), 2.6vw, calc(var.$font-size-display-default * 0.72));
+    font-weight: 700;
+  }
+
+  p {
+    margin-top: var.$spacing-sm;
+    font-size: clamp(var.$font-size-base-default, 1.1vw, calc(var.$font-size-lg * 0.95));
+    line-height: 1.6;
+    color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.9);
+  }
+}
+
+.public-pricing-starting {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.65rem 1.25rem;
+  background: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 4%), 0.75);
+  border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.35);
+  font-size: 0.95rem;
+  box-shadow: 0 18px 36px -26px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.45);
+
+  strong {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .public-pricing-period {
+    font-size: 0.85rem;
+    color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.85);
+  }
+}
+
+.public-pricing-grid-ephemeral {
+  display: grid;
+  gap: clamp(var.$spacing-md, 2.2vw, var.$spacing-lg);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.public-pricing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-md;
+  padding: clamp(var.$spacing-md, 3vw, calc(var.$spacing-lg * 0.95));
+  border-radius: var.$radius-xl;
+  border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.35);
+  background: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 2%), 0.65);
+  box-shadow: 0 22px 45px -32px hsla(var(--color-shadow-h), var(--color-shadow-s), var(--color-shadow-l), 0.35);
+  transform: translateY(24px) scale(0.96);
+  opacity: 0;
+  animation: publicPricingCardIn 0.85s cubic-bezier(0.26, 0.75, 0.36, 1) forwards;
+  animation-delay: var(--plan-stagger, 0ms);
+  overflow: hidden;
+}
+
+.public-pricing-card--featured {
+  border-color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.6);
+  background: linear-gradient(
+    180deg,
+    hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.18),
+    hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), calc(var(--color-bg-primary-l) + 8%), 0.65)
+  );
+}
+
+.public-pricing-card__badge {
+  position: absolute;
+  top: var.$spacing-md;
+  right: var.$spacing-md;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  background: linear-gradient(135deg,
+    hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l)),
+    hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l)));
+}
+
+.public-pricing-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+}
+
+.public-pricing-card__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.public-pricing-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.public-pricing-card__price-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.public-pricing-card__price-period {
+  font-size: 0.9rem;
+  color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.75);
+}
+
+.public-pricing-card__allowance {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.9);
+}
+
+.public-pricing-card__note {
+  font-size: 0.75rem;
+  color: hsla(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l), 0.9);
+  line-height: 1.4;
+}
+
+.public-pricing-card__features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
+  font-size: 0.85rem;
+  color: hsla(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l), 0.9);
+
+  li {
+    position: relative;
+    padding-left: 1.35rem;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.45rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg,
+        hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l)),
+        hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l)));
+      opacity: 0.8;
+      box-shadow: 0 0 0 4px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.15);
+    }
+  }
+}
+
+.public-pricing-card__cta {
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 0.75rem 1.45rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  background: hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 38px -26px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.5);
+  }
+}
+
+.public-pricing-card__cta--primary {
+  background: linear-gradient(135deg,
+    hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l)),
+    hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l)));
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+}
+
+.public-pricing-card__cta--ghost {
+  border: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.4);
+  background: transparent;
+
+  &:hover {
+    border-color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.6);
+  }
+}
+
+@keyframes publicPricingCardIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

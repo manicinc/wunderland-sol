@@ -1,0 +1,28 @@
+# llms.txt — guidance for AI crawlers and LLM usage
+# This file is advisory. Enforceable rules are in robots.txt for compatible crawlers.
+#
+# Project: AgentOS (https://agentos.sh)
+# Contact: team@frame.dev
+
+[general]
+policy = "allow"
+purpose = "indexing, search, summarization, educational use"
+disallowed = "verbatim bulk reproduction of full pages; redistribution of paid or private content"
+attribution = "link back to https://agentos.sh with page URL"
+contact = "team@frame.dev"
+last_updated = "2025-11-12"
+
+[training]
+policy = "allow"
+note = "We permit reasonable use in model training datasets by reputable organizations that honor robots.txt and takedown requests."
+opt_out = "email team@frame.dev for removal/takedown requests"
+
+[rate_limits]
+recommended_rps = "1"
+burst = "5"
+respect_crawl_delay = "true"
+
+[sitemaps]
+primary = "https://agentos.sh/sitemap.xml"
+
+

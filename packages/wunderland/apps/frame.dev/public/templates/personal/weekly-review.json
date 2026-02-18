@@ -1,0 +1,76 @@
+{
+  "id": "weekly-review",
+  "name": "Weekly Review",
+  "category": "personal",
+  "icon": "CalendarCheck",
+  "description": "Reflect on your week, celebrate wins, learn from challenges, and plan ahead. Essential for continuous improvement.",
+  "shortDescription": "Weekly reflection and planning",
+  "difficulty": "beginner",
+  "estimatedTime": "15 min",
+  "tags": ["weekly", "review", "reflection", "planning", "goals"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 86,
+  "defaultData": {
+    "contentType": "review"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Week Of",
+      "type": "date",
+      "required": true,
+      "placeholder": "Select the start of the week"
+    },
+    {
+      "name": "summary",
+      "label": "Week Summary",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Brief overview of the week"
+    },
+    {
+      "name": "rating",
+      "label": "Week Rating",
+      "type": "select",
+      "required": false,
+      "placeholder": "Rate your week",
+      "options": ["1", "2", "3", "4", "5"],
+      "defaultValue": "3"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Add tags"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "rating", "tags", "wins", "challenges", "lessons"]
+  },
+  "template": "---\ntitle: \"Weekly Review - {title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: review\nweekOf: {title}\nrating: {rating}\ncreated: {date}\n---\n\n# 📊 Weekly Review — Week of {title}\n\n**Overall Rating:** {'⭐'.repeat(parseInt('{rating}') || 3)}\n\n---\n\n## 📈 Week at a Glance\n\n| Area | Score (1-5) | Notes |\n|------|-------------|-------|\n| **Work/Career** | ⭐⭐⭐ | |\n| **Health** | ⭐⭐⭐ | |\n| **Relationships** | ⭐⭐⭐ | |\n| **Personal Growth** | ⭐⭐⭐ | |\n| **Finance** | ⭐⭐⭐ | |\n| **Fun/Recreation** | ⭐⭐⭐ | |\n\n---\n\n## 🎉 Wins & Accomplishments\n\n### Big Wins\n1. \n2. \n3. \n\n### Small Wins (Don't forget these!)\n- \n- \n\n---\n\n## 📝 Goal Progress\n\n| Goal | Progress | Status |\n|------|----------|--------|\n| Goal 1 | ▓▓▓░░ 60% | 🟡 On track |\n| Goal 2 | ▓░░░░ 20% | 🔴 Behind |\n| Goal 3 | ▓▓▓▓░ 80% | 🟢 Ahead |\n\n---\n\n## 🚧 Challenges & Blockers\n\n### What didn't go well?\n1. \n2. \n\n### What blocked progress?\n- \n\n### How can I address these?\n- \n\n---\n\n## 💡 Lessons Learned\n\n### Key Insights\n1. \n2. \n\n### What would I do differently?\n- \n\n---\n\n## 📋 Task Completion Review\n\n### Completed ✅\n- [x] Task 1\n- [x] Task 2\n\n### Incomplete ❌\n- [ ] Rolled to next week: Task 3\n- [ ] Cancelled: Task 4\n\n**Completion Rate:** ___ / ___ tasks (____%)\n\n---\n\n## 🎯 Next Week Planning\n\n### Top 3 Priorities\n1. \n2. \n3. \n\n### Focus Areas\n- \n\n### Schedule Highlights\n| Day | Key Event/Task |\n|-----|----------------|\n| Mon | |\n| Tue | |\n| Wed | |\n| Thu | |\n| Fri | |\n| Sat | |\n| Sun | |\n\n---\n\n## 🙏 Gratitude\n\nThree things I'm grateful for this week:\n1. \n2. \n3. \n\n---\n\n## 💭 Additional Notes\n\n\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

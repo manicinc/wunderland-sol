@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "Grabando...",
+    "processing": "Procesando voz...",
+    "transcribing": "Transcribiendo audio...",
+    "listening": "Escuchando...",
+    "speakNow": "Habla ahora",
+    "clickToSpeak": "Haz clic para hablar",
+    "stopRecording": "Detener grabación",
+    "microphoneAccess": "Se requiere acceso al micrófono",
+    "noSpeechDetected": "No se detectó habla",
+    "transcriptionComplete": "Transcripción completa"
+  },
+  "chat": {
+    "thinking": "Pensando...",
+    "generating": "Generando respuesta...",
+    "messageEmpty": "El mensaje no puede estar vacío",
+    "sendMessage": "Enviar mensaje",
+    "newChat": "Nuevo chat",
+    "clearHistory": "Limpiar historial",
+    "typingIndicator": "La IA está escribiendo...",
+    "copyCode": "Copiar código",
+    "codeCopied": "Código copiado al portapapeles",
+    "retry": "Reintentar",
+    "regenerate": "Regenerar respuesta"
+  },
+  "modes": {
+    "coding": "Preguntas de programación",
+    "codingDesc": "Obtén ayuda con preguntas de programación y ejemplos de código",
+    "systemDesign": "Diseño de sistemas",
+    "systemDesignDesc": "Diseña arquitectura y crea diagramas",
+    "meetingSummary": "Resumen de reunión",
+    "meetingSummaryDesc": "Resume reuniones y extrae puntos clave",
+    "general": "General",
+    "generalDesc": "Conversación general y preguntas"
+  },
+  "cost": {
+    "title": "Uso de API",
+    "current": "Sesión actual",
+    "total": "Uso total",
+    "threshold": "Límite de costo",
+    "warning": "Aproximándose al límite de costo",
+    "exceeded": "Límite de costo excedido",
+    "reset": "Reiniciar contador"
+  },
+  "settings": {
+    "speechRecognition": "Reconocimiento de voz",
+    "whisperAPI": "API Whisper",
+    "browserSpeech": "Voz del navegador",
+    "textToSpeech": "Texto a voz",
+    "openAITTS": "TTS de OpenAI",
+    "browserTTS": "TTS del navegador",
+    "apiKeys": "Claves de API",
+    "openAIKey": "Clave de API de OpenAI",
+    "anthropicKey": "Clave de API de Anthropic",
+    "modelPreferences": "Preferencias de modelo",
+    "costLimits": "Límites de costo",
+    "sessionLimit": "Límite de sesión",
+    "dailyLimit": "Límite diario",
+    "monthlyLimit": "Límite mensual"
+  }
+}

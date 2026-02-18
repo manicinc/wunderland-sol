@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-12-31",
+  "categories": [
+    {
+      "id": "dynamic",
+      "name": "Dynamic Documents",
+      "description": "Embark-style templates with @mentions, formulas, maps, and rich views",
+      "icon": "Sparkles",
+      "color": "#F97316",
+      "featured": true
+    },
+    {
+      "id": "general",
+      "name": "General",
+      "description": "Universal templates for any type of content",
+      "icon": "FileText",
+      "color": "#6B7280"
+    },
+    {
+      "id": "technical",
+      "name": "Technical",
+      "description": "Documentation, tutorials, and reference materials",
+      "icon": "Code",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "creative",
+      "name": "Creative",
+      "description": "Writing, storytelling, and artistic projects",
+      "icon": "Palette",
+      "color": "#EC4899"
+    },
+    {
+      "id": "personal",
+      "name": "Personal",
+      "description": "Self-improvement, journaling, and life planning",
+      "icon": "Heart",
+      "color": "#EF4444"
+    },
+    {
+      "id": "business",
+      "name": "Business",
+      "description": "Professional documentation and planning",
+      "icon": "Briefcase",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "learning",
+      "name": "Learning",
+      "description": "Study materials and educational content",
+      "icon": "GraduationCap",
+      "color": "#10B981"
+    },
+    {
+      "id": "lifestyle",
+      "name": "Lifestyle",
+      "description": "Health, travel, cooking, and daily life",
+      "icon": "Compass",
+      "color": "#F59E0B"
+    }
+  ],
+  "templates": [
+    "dynamic/trip-planner.json",
+    "dynamic/budget-tracker.json",
+    "general/blank.json",
+    "general/quick-note.json",
+    "general/checklist.json",
+    "general/todo-list.json",
+    "general/project-tracker.json",
+    "general/collection.json",
+    "technical/concept.json",
+    "technical/tutorial.json",
+    "technical/reference.json",
+    "technical/troubleshooting.json",
+    "technical/architecture.json",
+    "creative/story-outline.json",
+    "creative/character-profile.json",
+    "personal/journal.json",
+    "personal/goal-setting.json",
+    "personal/ability-tracker.json",
+    "personal/progress-tracker.json",
+    "personal/daily-planner.json",
+    "personal/weekly-review.json",
+    "business/meeting-notes.json",
+    "business/project-plan.json",
+    "learning/study-notes.json",
+    "lifestyle/recipe.json"
+  ]
+}

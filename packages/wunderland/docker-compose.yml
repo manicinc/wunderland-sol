@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: ./apps/gitpaywidget
+      dockerfile: Dockerfile.dev
+    environment:
+      FRONTEND_URL: http://localhost:3000
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./apps/gitpaywidget:/app
+      - /app/node_modules

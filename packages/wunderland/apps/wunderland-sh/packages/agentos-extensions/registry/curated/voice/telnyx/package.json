@@ -1,0 +1,31 @@
+{
+  "name": "@framers/agentos-ext-voice-telnyx",
+  "version": "0.1.0",
+  "description": "Telnyx voice call provider for AgentOS — outbound/inbound calls via Telnyx Call Control v2",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["agentos", "extension", "voice", "telnyx", "telephony"],
+  "author": { "name": "Framers AI", "url": "https://frame.dev" },
+  "license": "MIT",
+  "files": ["dist", "manifest.json"],
+  "peerDependencies": {
+    "@framers/agentos": "^0.1.0"
+  },
+  "dependencies": {
+    "telnyx": "^2.0.0"
+  },
+  "devDependencies": {
+    "@framers/agentos": "workspace:*",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "engines": { "node": ">=18.0.0" }
+}

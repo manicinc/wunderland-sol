@@ -1,0 +1,90 @@
+# syntax=docker/dockerfile:1
+
+# Wunderland Sol — Next.js 15 frontend, standalone repo build.
+# The app lives in app/ (submodule).
+# SDK at sdk/ must be built first.
+
+FROM node:22-bookworm-slim AS builder
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ ca-certificates git \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@10.15.1 --activate
+
+# Copy the full workspace (filtered by .dockerignore).
+COPY . .
+
+RUN pnpm install --no-frozen-lockfile --node-linker=hoisted
+
+# Build SDK first, then the Next.js app.
+RUN pnpm --filter @wunderland-sol/sdk build
+RUN pnpm --filter @wunderland-sol/app build
+
+# Resolve all symlinks in standalone output to real files so Docker COPY works.
+# In the builder all targets exist; we replace symlinks with their real content.
+RUN cd /repo/app/.next/standalone && \
+    find . -type l | while IFS= read -r lnk; do \
+      target=$(readlink -f "$lnk"); \
+      rm "$lnk"; \
+      if [ -d "$target" ]; then cp -r "$target" "$lnk"; \
+      elif [ -f "$target" ]; then mkdir -p "$(dirname "$lnk")"; cp "$target" "$lnk"; \
+      fi; \
+    done
+
+# Patch: standalone tracer misses some Next.js deps in pnpm monorepo.
+# In standalone monorepo output the app node_modules live under repo/app/.
+RUN STANDALONE=/repo/app/.next/standalone/repo/app/node_modules && \
+    if [ ! -d "$STANDALONE" ]; then STANDALONE=/repo/app/.next/standalone/app/node_modules; fi && \
+    for pkg in @swc/helpers @next/env caniuse-lite postcss; do \
+      if [ ! -d "$STANDALONE/$pkg" ]; then \
+        SRC="/repo/node_modules/$pkg"; \
+        if [ -d "$SRC" ] || [ -L "$SRC" ]; then \
+          mkdir -p "$STANDALONE/$(dirname $pkg)"; \
+          cp -rL "$SRC" "$STANDALONE/$pkg"; \
+          echo "Patched missing dep: $pkg"; \
+        fi; \
+      fi; \
+    done
+
+# Replace instrumentation hook with no-op — the frontend standalone image
+# doesn't have backend deps (better-sqlite3 etc.) that the hook imports.
+# Check both monorepo (repo/app/) and flat (app/) standalone paths.
+RUN INSTR_DIR=/repo/app/.next/standalone/repo/app/.next/server && \
+    if [ ! -d "$(dirname "$INSTR_DIR")" ]; then \
+      INSTR_DIR=/repo/app/.next/standalone/app/.next/server; \
+    fi && \
+    mkdir -p "$INSTR_DIR" && \
+    echo '"use strict"; exports.register = function() {}; exports.onRequestError = function() {};' \
+    > "$INSTR_DIR/instrumentation.js"
+
+# Detect standalone server.js path — monorepo puts it under repo/app/.
+# Print debug info and store the relative path for CMD.
+RUN cd /repo/app/.next/standalone && \
+    SERVER=$(find . -name 'server.js' -path '*/app/server.js' | head -1) && \
+    echo "Standalone server.js at: $SERVER" && \
+    echo "${SERVER#./}" > /tmp/server-path
+
+# -----------------------------------------------------------------------------
+
+FROM node:22-bookworm-slim
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --from=builder /repo/app/.next/standalone ./
+# Static assets must be co-located with the .next directory next to server.js.
+# In monorepo standalone: repo/app/.next/static; in flat: app/.next/static.
+COPY --from=builder /repo/app/.next/static ./repo/app/.next/static
+COPY --from=builder /repo/app/.next/static ./app/.next/static
+COPY --from=builder /repo/app/public ./repo/app/public
+COPY --from=builder /repo/app/public ./app/public
+COPY --from=builder /tmp/server-path /tmp/server-path
+
+EXPOSE 3011
+
+ENV PORT=3011
+# Use detected server path (repo/app/server.js in monorepo mode).
+CMD ["sh", "-c", "node $(cat /tmp/server-path)"]

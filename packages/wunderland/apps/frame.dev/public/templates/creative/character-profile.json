@@ -1,0 +1,40 @@
+{
+  "id": "character-profile",
+  "name": "Character Profile",
+  "category": "creative",
+  "icon": "Users",
+  "description": "Deep character development sheet for fiction writing",
+  "shortDescription": "Comprehensive character building",
+  "difficulty": "intermediate",
+  "estimatedTime": "25 min",
+  "tags": ["character", "fiction", "writing", "development"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 80,
+  "defaultData": {
+    "contentType": "creative"
+  },
+  "template": "---\ntitle: \"Character Profile: {title}\"\nsummary: \"{summary}\"\ntags: [{tags}, character, fiction]\ncontentType: creative\ncharacterType: {characterType}\n---\n\n# {title}\n\n> {summary}\n\n## Quick Reference Card\n\n| Attribute | Value |\n|-----------|-------|\n| Full Name | {title} |\n| Nickname(s) | |\n| Age | |\n| Role in Story | Protagonist/Antagonist/Supporting |\n| Archetype | Hero/Mentor/Trickster/etc. |\n\n## Physical Description\n\n### Appearance\n\n- **Height:** \n- **Build:** \n- **Hair:** Color, style, length\n- **Eyes:** Color, shape, expression\n- **Skin:** Tone, notable features\n- **Distinguishing Features:** Scars, birthmarks, tattoos\n\n### Presentation\n\n- **Typical Clothing:** Style preferences\n- **Accessories:** Always wears/carries\n- **Grooming:** Level of care, habits\n- **Body Language:** How they carry themselves\n\n### First Impression\n\nWhat do people notice first? What assumptions do they make?\n\n## Personality\n\n### Core Traits\n\n| Trait | Description | How It Manifests |\n|-------|-------------|------------------|\n| Trait 1 | Definition | Specific behavior |\n| Trait 2 | Definition | Specific behavior |\n| Trait 3 | Definition | Specific behavior |\n\n### MBTI/Enneagram (Optional)\n\n- **Type:** \n- **How it shows:** \n\n### Strengths\n\n1. **Strength 1:** How it helps them\n2. **Strength 2:** How it helps them\n3. **Strength 3:** How it helps them\n\n### Weaknesses\n\n1. **Weakness 1:** How it hinders them\n2. **Weakness 2:** How it hinders them\n3. **Weakness 3:** How it hinders them\n\n### The Wound\n\nWhat past trauma shapes their behavior?\n\n### The Lie They Believe\n\nWhat false belief do they hold about themselves or the world?\n\n### The Truth They Need\n\nWhat must they learn to complete their arc?\n\n## Background\n\n### Origin\n\n- **Birthplace:** \n- **Family Status:** \n- **Socioeconomic Background:** \n\n### Family\n\n| Relation | Name | Status | Relationship Quality |\n|----------|------|--------|---------------------|\n| Mother | | Living/Deceased | Close/Distant/Estranged |\n| Father | | Living/Deceased | Close/Distant/Estranged |\n| Sibling | | Living/Deceased | Close/Distant/Estranged |\n\n### Childhood\n\nKey events and experiences that shaped them...\n\n### Defining Moments\n\n1. **Event:** Impact on character\n2. **Event:** Impact on character\n3. **Event:** Impact on character\n\n### Education & Skills\n\n- **Formal Education:** \n- **Special Training:** \n- **Skills:** What they're good at\n- **Expertise:** What they're exceptional at\n\n## Psychology\n\n### Motivation\n\n- **External Want:** What they're pursuing\n- **Internal Need:** What they truly need (may not know it)\n- **Why It Matters:** Stakes if they fail\n\n### Fears\n\n1. **Surface Fear:** What they admit to fearing\n2. **Deep Fear:** What truly terrifies them (hidden)\n\n### Desires\n\n1. **Immediate Desire:** Short-term goal\n2. **Long-term Desire:** Life goal\n3. **Secret Desire:** What they won't admit\n\n### Moral Code\n\n- **Will do:** Lines they'll cross\n- **Won't do:** Lines they won't cross\n- **Gray areas:** Where they struggle\n\n## Voice & Mannerisms\n\n### Speech Patterns\n\n- **Vocabulary Level:** Simple/Complex/Technical\n- **Accent/Dialect:** \n- **Pace:** Fast/Slow/Measured\n- **Catchphrases:** Repeated expressions\n\n### Verbal Tics\n\n- Filler words (um, like, you know)\n- Unique expressions\n- Swearing habits\n\n### Physical Habits\n\n- Nervous habits\n- Comfort behaviors\n- Signature gestures\n\n### Sample Dialogue\n\n> \"[Example line that captures their voice]\"\n\n> \"[Another example showing different emotion]\"\n\n## Relationships\n\n### Relationship Map\n\n| Character | Relationship | Dynamic |\n|-----------|--------------|----------|\n| [Name] | Friend/Enemy/Love | How they interact |\n| [Name] | Mentor/Student | How they interact |\n| [Name] | Rival | How they interact |\n\n### Relationship Style\n\n- **Attachment Style:** Secure/Anxious/Avoidant\n- **Trust:** Easy/Difficult to gain\n- **Conflict Style:** Fight/Flight/Freeze/Fawn\n\n## Character Arc\n\n### Starting Point\n\nWho are they at the beginning of the story?\n\n### Catalyst\n\nWhat forces them to change?\n\n### Struggle\n\nHow do they resist change?\n\n### Growth\n\nWhat do they learn?\n\n### End Point\n\nWho do they become?\n\n### Arc Type\n\n- [ ] Positive (grows and succeeds)\n- [ ] Negative (falls or fails)\n- [ ] Flat (tests but doesn't change)\n- [ ] Disillusionment (positive to negative worldview)\n\n## Extras\n\n### Favorites\n\n- Food:\n- Music:\n- Color:\n- Book/Movie:\n- Place:\n\n### Daily Life\n\n- Morning routine:\n- Job/Occupation:\n- Hobbies:\n- Evening routine:\n\n### Random Details\n\n- Pet peeves:\n- Guilty pleasures:\n- Unpopular opinions:\n- Party behavior:\n\n## Writer Notes\n\n### Inspiration\n\nReal people, fictional characters, or concepts that inspired this character...\n\n### Challenges\n\nWhat's difficult about writing this character?\n\n### Questions to Explore\n\n- Unresolved aspects to develop\n- Scenes that would reveal character\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

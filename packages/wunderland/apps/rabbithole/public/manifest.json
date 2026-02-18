@@ -1,0 +1,26 @@
+{
+  "name": "Rabbit Hole Inc",
+  "short_name": "RabbitHole",
+  "description": "Human-AI Collaboration Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#c9a227",
+  "background_color": "#030305",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

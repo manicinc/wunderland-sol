@@ -1,0 +1,43 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.channels.slack",
+  "name": "Slack Channel Extension",
+  "version": "0.1.0",
+  "description": "Bidirectional Slack messaging via @slack/bolt — supports text, rich text, images, documents, threads, reactions, and group chat.",
+  "categories": ["channel", "communication"],
+  "platforms": ["slack"],
+  "sdk": "@slack/bolt",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "slackChannelSendMessage",
+      "displayName": "Send Slack Message"
+    },
+    {
+      "kind": "tool",
+      "id": "slackChannelSendMedia",
+      "displayName": "Send Slack Media"
+    },
+    {
+      "kind": "messaging-channel",
+      "id": "slackChannel",
+      "displayName": "Slack Channel Adapter"
+    }
+  ],
+  "requiredSecrets": [
+    "slack.botToken",
+    "slack.signingSecret",
+    "slack.appToken"
+  ],
+  "features": [
+    "Text messages with rich text formatting",
+    "Block Kit message layouts",
+    "File uploads via files.uploadV2",
+    "Socket Mode and HTTP support",
+    "Thread replies via thread_ts",
+    "Group chat and channel support",
+    "Message editing and deletion",
+    "Emoji reactions",
+    "Mentions support"
+  ]
+}

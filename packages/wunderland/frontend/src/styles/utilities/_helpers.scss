@@ -1,0 +1,111 @@
+// File: frontend/src/styles/utilities/_helpers.scss
+/**
+ * @file _helpers.scss
+ * @description Utility helper classes for the "Ephemeral Harmony" design system.
+ * Includes common utilities like screen-reader only text, clearfix,
+ * and custom themeable text color/size utilities.
+ * @version 1.1.0 - Added .text-muted, .text-md, .text-xxs themeable utility classes.
+ */
+
+@use '../abstracts/variables' as var; // For SCSS fallbacks if needed by custom utilities
+
+// Screen-reader only text
+// Use this class to hide text visually but keep it accessible to screen readers.
+// Useful for icon buttons, landmark labels, etc.
+.sr-only,
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important; // Use -1px to prevent layout shifts if the element has a border or outline
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important; // Prevent line breaks
+  border: 0 !important;
+}
+
+// Unhide screen-reader only text when it's focused (e.g., skip links)
+.sr-only-focusable:active,
+.sr-only-focusable:focus,
+.visually-hidden-focusable:active,
+.visually-hidden-focusable:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+// Clearfix: For containing floats
+// While modern layouts (flexbox, grid) reduce the need for clearfixes,
+// it can still be useful in some legacy situations or with third-party content.
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+// Example: Forced word break (if not handled by Tailwind's break-words/break-all)
+.force-word-break {
+  word-break: break-word; // More common
+  // or overflow-wrap: break-word; (standard)
+  // or word-wrap: break-word; (legacy)
+}
+
+// Example: Disable pointer events (useful for overlaying elements that shouldn't be interactive)
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.pointer-events-auto {
+  pointer-events: auto;
+}
+
+// Example: A simple class to hide an element completely (display: none)
+// Tailwind has `hidden`, so this might be redundant unless you need a specific non-Tailwind class.
+.u-hidden {
+  display: none !important;
+}
+
+// ----------------------------------------------------------------------------
+// ADDED: Custom Text Color & Size Utilities (Themeable)
+// ----------------------------------------------------------------------------
+@layer utilities {
+  .text-muted {
+    color: hsl(
+      var(--color-text-muted-h, #{var.$default-color-text-muted-h}),
+      var(--color-text-muted-s, #{var.$default-color-text-muted-s}),
+      var(--color-text-muted-l, #{var.$default-color-text-muted-l}),
+      var(--color-text-muted-a, #{var.$default-color-text-muted-a}) // Uses alpha from your theme, defaults to 1
+    );
+    // Example: If "muted" also implies a specific opacity (distinct from the color's alpha)
+    // opacity: var(--text-muted-opacity, 1); // Default to 1 if not specified
+  }
+
+  .text-md {
+    font-size: var(--font-size-base, #{var.$font-size-base-default}); // Maps to your base font size (typically 1rem)
+                                                                    // Equivalent to Tailwind's `text-base`
+    // If text-md should be distinct from text-base, define its specific font-size here, e.g.:
+    // font-size: 0.9375rem; // 15px
+    // line-height: 1.375rem;
+  }
+
+  .text-xxs {
+    font-size: 0.625rem; // 10px
+    line-height: 0.875rem; // Adjust line height accordingly (14px)
+  }
+
+  // You can add other custom text utilities here, for example:
+  // .text-accent-primary {
+  //   color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  // }
+  // .text-accent-secondary {
+  //   color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l));
+  // }
+}
+
+// Add other general-purpose utility classes as your project needs them.

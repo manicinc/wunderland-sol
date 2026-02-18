@@ -1,0 +1,242 @@
+// File: frontend/src/styles/components/agents/_agent-hub.scss
+/**
+ * @file _agent-hub.scss
+ * @description Styles for the AgentHub.vue modal/panel.
+ * @version 1.0.0
+ */
+
+@use '../../abstracts/variables' as var;
+@use '../../abstracts/mixins' as mixins;
+@use '../buttons' as buttonsFile;
+@use '../cards' as cardsFile;
+
+.agent-hub-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.3); // Semi-transparent backdrop
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: var.$z-index-modal-backdrop; // Ensure it's above most UI but below critical modals if any
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var.$spacing-lg;
+
+  @media (max-width: var.$breakpoint-sm) {
+    padding: var.$spacing-md;
+  }
+}
+
+.agent-hub-panel {
+  // Uses .card-neo-raised-ephemeral (or similar) from Header.vue for base styling
+  // This class is applied in AgentHub.vue template.
+  // If not, apply card styles here:
+  @include cardsFile.card-base-styles;
+  @include cardsFile.card-neo-look; // Or card-glass-look
+  // background-color: var.$default-color-bg-secondary-h !important;
+  width: 100%;
+  max-width: 900px; // Max width for the hub
+  height: clamp(70vh, 85vh, 900px); // Responsive height, max 900px
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Panel itself clips, internal areas scroll
+  // Adding a more prominent border/effect for the hub panel itself
+  @include mixins.holographic-border-glow(
+    '--color-accent-primary', 
+    '--color-accent-secondary', 
+    2px, 4s, var.$radius-xl
+    ); // Using card's radius
+}
+
+.agent-hub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var.$spacing-md var.$spacing-lg;
+  border-bottom: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.15);
+  flex-shrink: 0;
+
+  .hub-title-ephemeral {
+    font-size: calc(var.$font-size-xl * 1.1);
+    font-weight: 600;
+    color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+    @include mixins.text-glow('--color-accent-primary', 5px, var.$default-color-accent-primary-h,var.$default-color-accent-primary-s,var.$default-color-accent-primary-l,0.4);
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-sm;
+    .hub-title-icon {
+      width: 1.5em; height: 1.5em;
+      opacity: 0.8;
+      color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+    }
+  }
+  .close-hub-button-ephemeral {
+    // Uses .btn .btn-ghost-ephemeral .btn-icon-ephemeral
+    // Make it slightly more prominent or distinct if needed
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+    &:hover {
+      color: hsl(var(--color-error-h), var(--color-error-s), var(--color-error-l)); // Red on hover for close
+      background-color: hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.1);
+    }
+    .icon-lg { width: 1.75rem; height: 1.75rem; } // Larger close icon
+  }
+}
+
+.agent-hub-controls-ephemeral {
+  padding: var.$spacing-md var.$spacing-lg;
+  border-bottom: 1px solid hsla(var(--color-border-primary-h), var(--color-border-primary-s), var(--color-border-primary-l), 0.1);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-md;
+
+  .search-bar-wrapper-ephemeral {
+    position: relative;
+    display: flex;
+    align-items: center;
+    .search-icon-ephemeral {
+      position: absolute;
+      left: var.$spacing-md;
+      width: 1.25rem; height: 1.25rem;
+      color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .search-input-ephemeral {
+      // Use styles similar to select-input-ephemeral from _settings-page.scss
+      @include mixins.neomorphic-inset(
+        '--color-bg-secondary', 4px, 2px, '--shadow-opacity-soft', var.$radius-lg,
+        '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+        var.$default-color-bg-secondary-h, var.$default-color-bg-secondary-s, var.$default-color-bg-secondary-l,
+        var.$default-shadow-opacity-soft, var.$default-shadow-color-h, var.$default-shadow-color-s, var.$default-shadow-color-l, var.$default-shadow-highlight-l-factor
+      );
+      width: 100%;
+      padding: var.$spacing-sm var.$spacing-md var.$spacing-sm calc(var.$spacing-md + 1.25rem + #{var.$spacing-sm}); // Left padding for icon
+      font-size: var.$font-size-base-default;
+      color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+      border: 1px solid hsla(var(--color-border-secondary-h),var(--color-border-secondary-s),var(--color-border-secondary-l), 0.3);
+      &:focus {
+        outline: none;
+        border-color: hsla(var(--color-accent-interactive-h),var(--color-accent-interactive-s),var(--color-accent-interactive-l), 0.7);
+        @include mixins.focus-ring('--color-bg-secondary', '--color-accent-interactive', 0px, 2px, 0.5);
+      }
+    }
+  }
+
+  .category-filters-ephemeral {
+    display: flex;
+    gap: var.$spacing-sm;
+    overflow-x: auto; // Allow horizontal scrolling for many categories
+    padding-bottom: var.$spacing-xs; // For scrollbar visibility
+    
+    .filter-chip-ephemeral {
+      @include buttonsFile.btn-secondary; // Use secondary button as base for chips
+      padding: calc(var.$spacing-xs * 0.8) var.$spacing-md !important;
+      font-size: var.$font-size-xs !important;
+      border-radius: var.$radius-full !important; // Pill shape
+      white-space: nowrap;
+      opacity: 0.8;
+      &:hover { opacity: 1; filter: brightness(1.08); }
+      &.active {
+        background-color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l)) !important;
+        color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l)) !important;
+        @include mixins.neomorphic-inset(
+          '--color-accent-interactive', 3px, 2px, '--shadow-opacity-soft', var.$radius-full,
+           '--shadow-color-h', '--shadow-color-s', '--shadow-color-l', '--shadow-highlight-modifier',
+           var.$default-color-accent-interactive-h,var.$default-color-accent-interactive-s,var.$default-color-accent-interactive-l,
+           var.$default-shadow-opacity-soft,var.$default-shadow-color-h,var.$default-shadow-color-s,var.$default-shadow-color-l,var.$default-shadow-highlight-l-factor
+        );
+        opacity: 1;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.agent-grid-container-ephemeral {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var.$spacing-lg;
+  
+  .agent-card-grid { // The actual grid for cards
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: var.$spacing-lg;
+  }
+}
+
+.loading-agents-message,
+.no-results-message-ephemeral {
+  text-align: center;
+  padding: var.$spacing-xl;
+  font-size: var.$font-size-base-default;
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  font-style: italic;
+}
+
+// Placeholder for Agent Card - To be moved to _agent-card.scss
+.agent-card-placeholder {
+  @include cardsFile.card-base-styles;
+  @include cardsFile.card-glass-look; // Or card-neo-look
+  padding: var.$spacing-md !important;
+  display: flex;
+  flex-direction: column;
+  gap: var.$spacing-sm;
+  cursor: pointer;
+
+  &.is-active-agent {
+    border-color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+    box-shadow: 0 0 15px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.3),
+                var(--shadow-depth-md); // Keep original shadow too
+  }
+  &.is-locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+  }
+
+  .agent-card-header { display: flex; align-items: center; gap: var.$spacing-sm; margin-bottom: var.$spacing-xs;}
+  .agent-icon-placeholder { width: 2.5rem; height: 2.5rem; color: hsl(var(--color-accent-primary-h)); flex-shrink: 0; }
+  .agent-name-placeholder { font-size: var.$font-size-lg; font-weight: 600; color: hsl(var(--color-text-primary-h)); flex-grow: 1; }
+  .agent-card-selected-check { width: 1.5rem; height: 1.5rem; color: hsl(var(--color-success-h)); margin-left:auto; }
+  .agent-card-locked-icon { width: 1.25rem; height: 1.25rem; color: hsl(var(--color-text-muted-h)); margin-left:auto; }
+  .agent-desc-placeholder { font-size: var.$font-size-sm; color: hsl(var(--color-text-secondary-h)); line-height: 1.5; flex-grow: 1; }
+  
+  .agent-card-tags { display: flex; flex-wrap: wrap; gap: var.$spacing-xs; margin-top: var.$spacing-sm; align-items: center; }
+  .tags-icon { width: 0.9rem; height: 0.9rem; opacity: 0.6; margin-right: calc(var.$spacing-xs / 2); }
+  .tag-chip-ephemeral {
+    font-size: calc(var.$font-size-xs * 0.85);
+    padding: 0.15rem 0.5rem;
+    border-radius: var.$radius-full;
+    background-color: hsla(var(--color-bg-tertiary-h), var(--color-bg-tertiary-s), var(--color-bg-tertiary-l), 0.7);
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  }
+  .more-tags-chip { font-style: italic; }
+  .tag-access-member {
+    @extend .tag-chip-ephemeral; // Example extend
+    background-color: hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.2);
+    color: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l));
+    font-weight: 500;
+  }
+
+  .agent-card-capabilities { margin-top: var.$spacing-sm; display: flex; flex-wrap: wrap; gap: var.$spacing-xs;}
+  .capability-chip-ephemeral { /* Similar to tag-chip */ 
+    font-size: calc(var.$font-size-xs * 0.85); padding: 0.15rem 0.5rem; border-radius: var.$radius-sm;
+    background-color: hsla(var(--color-info-h),var(--color-info-s),var(--color-info-l), 0.1);
+    color: hsl(var(--color-info-h),var(--color-info-s),var(--color-info-l));
+    display: inline-flex; align-items: center; gap: calc(var.$spacing-xs / 2);
+    .capability-icon { width: 0.8rem; height: 0.8rem; opacity: 0.7;}
+  }
+  .agent-card-access-tier { margin-top: auto; padding-top: var.$spacing-sm; text-align: right; }
+  .access-tier-badge {
+    font-size: calc(var.$font-size-xs * 0.8);
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: var.$radius-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    &.tier--public { background-color: hsla(var(--color-success-h), var(--color-success-s), var(--color-success-l), 0.2); color: hsl(var(--color-success-h), var(--color-success-s), calc(var(--color-success-l) - 10%));}
+    &.tier--member { background-color: hsla(var(--color-info-h), var(--color-info-s), var(--color-info-l), 0.2); color: hsl(var(--color-info-h), var(--color-info-s), calc(var(--color-info-l) - 10%));}
+    &.tier--premium { background-color: hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.2); color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) - 10%));}
+  }
+}

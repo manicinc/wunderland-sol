@@ -1,0 +1,121 @@
+// File: frontend/src/styles/animations/_transitions.scss
+/**
+ * @file _transitions.scss
+ * @description Defines common transition utility classes for consistent animation behavior
+ * across the "Ephemeral Harmony" application. These utilities leverage SCSS variables
+ * for durations and easing functions, promoting a cohesive and dynamic user experience.
+ * Includes handling for user motion preferences (`prefers-reduced-motion`).
+ *
+ * @role Provides reusable CSS transition utility classes.
+ * @dependencies `../abstracts/variables` (for $duration-*, $ease-* SCSS variables, which themselves can reference CSS custom properties).
+ * @assumptions SCSS variables for durations and easing functions are defined in `_variables.scss`.
+ * Keyframe animations referenced by page transitions (e.g., slideInUp) are defined in `_keyframes.scss`.
+ * Application uses CSS custom properties for theme-specific transition parameters where needed.
+ * @version 2.1.2 - Added `forwards` to fadeOut animation in slide-up leave-active.
+ */
+
+@use '../abstracts/variables' as var;
+
+.transition-default {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform, filter;
+  transition-duration: var(--transition-duration-default, #{var.$duration-smooth});
+  transition-timing-function: var(--transition-ease-default, #{var.$ease-out-cubic});
+}
+
+.transition-quick {
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-duration: var(--transition-duration-quick, #{var.$duration-quick});
+  transition-timing-function: var(--transition-ease-quick, #{var.$ease-out-quad});
+}
+
+.transition-opacity {
+  transition-property: opacity;
+  transition-duration: var(--transition-duration-opacity, #{var.$duration-smooth});
+  transition-timing-function: var(--transition-ease-opacity, #{var.$ease-out-quad});
+}
+
+.transition-transform {
+  transition-property: transform;
+  transition-duration: var(--transition-duration-transform, #{var.$duration-smooth});
+  transition-timing-function: var(--transition-ease-transform, #{var.$ease-out-expo});
+}
+
+.transition-transform-elastic {
+  transition-property: transform;
+  transition-duration: var(--transition-duration-elastic, #{var.$duration-movement});
+  transition-timing-function: var(--transition-ease-elastic, #{var.$ease-elastic});
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color, fill, stroke;
+  transition-duration: var(--transition-duration-colors, #{var.$duration-smooth});
+  transition-timing-function: var(--transition-ease-colors, #{var.$ease-out-quad});
+}
+
+.transition-shadow {
+  transition-property: box-shadow;
+  transition-duration: var(--transition-duration-shadow, calc(#{var.$duration-smooth} + 50ms));
+  transition-timing-function: var(--transition-ease-shadow, #{var.$ease-out-cubic});
+}
+
+// --- Page/View Transition Base Classes ---
+.view-transition-fade-enter-active,
+.view-transition-fade-leave-active {
+  transition: opacity var(--transition-duration-view-fade, #{var.$duration-movement}) var(--transition-ease-view-fade, #{var.$ease-in-out-sine});
+}
+.view-transition-fade-enter-from,
+.view-transition-fade-leave-to {
+  opacity: 0;
+}
+
+.view-transition-slide-up-enter-active {
+  animation: slideInUp var(--transition-duration-view-slide, #{var.$duration-movement}) var(--transition-ease-view-slide, #{var.$ease-out-expo}) forwards;
+}
+.view-transition-slide-up-leave-active {
+  animation: fadeOut var(--transition-duration-view-slide-fade-out, #{var.$duration-smooth}) var(--transition-ease-view-slide-fade-out, #{var.$ease-in-quint}) forwards;
+}
+
+// Ensure scaleBounceIn keyframe is defined in _keyframes.scss
+// @keyframes scaleBounceIn {
+//   0% { opacity: 0; transform: scale(0.7); }
+//   70% { opacity: 1; transform: scale(1.05); }
+//   100% { opacity: 1; transform: scale(1); }
+// }
+.view-transition-scale-bounce-enter-active {
+  animation: scaleBounceIn var(--transition-duration-view-scale, #{var.$duration-movement}) var(--transition-ease-view-scale, #{var.$ease-elastic}) forwards;
+}
+.view-transition-scale-bounce-leave-active {
+  transition: opacity var(--transition-duration-view-scale-fade-out, #{var.$duration-quick}) var(--transition-ease-view-scale-fade-out, #{var.$ease-in-quad}),
+              transform var(--transition-duration-view-scale-fade-out, #{var.$duration-quick}) var(--transition-ease-view-scale-fade-out, #{var.$ease-in-quad});
+  opacity: 1; // Start from opaque for leave transition
+  transform: scale(1); // Start from normal scale
+}
+.view-transition-scale-bounce-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+// --- Respect User's Motion Preferences ---
+@media (prefers-reduced-motion: reduce) {
+  .transition-default,
+  .transition-quick,
+  .transition-opacity,
+  .transition-transform,
+  .transition-transform-elastic,
+  .transition-colors,
+  .transition-shadow,
+  *[class*="-enter-active"],
+  *[class*="-leave-active"],
+  [class*="animate-"] {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    will-change: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+}

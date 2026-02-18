@@ -1,0 +1,45 @@
+{
+  "general": {
+    "unknown": "Ocurrió un error desconocido",
+    "tryAgain": "Por favor, inténtalo de nuevo más tarde",
+    "contactSupport": "Si el problema persiste, por favor contacta al soporte técnico"
+  },
+  "network": {
+    "offline": "Parece que estás desconectado",
+    "timeout": "Tiempo de espera agotado",
+    "serverError": "Error del servidor",
+    "connectionFailed": "Conexión fallida"
+  },
+  "validation": {
+    "required": "Este campo es requerido",
+    "invalidEmail": "Dirección de correo electrónico inválida",
+    "passwordTooShort": "La contraseña debe tener al menos {{min}} caracteres",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "invalidFormat": "Formato inválido",
+    "numberOnly": "Debe ser un número",
+    "minLength": "Debe tener al menos {{min}} caracteres",
+    "maxLength": "No debe tener más de {{max}} caracteres"
+  },
+  "auth": {
+    "unauthorized": "Acceso no autorizado",
+    "sessionExpired": "Tu sesión ha expirado",
+    "invalidCredentials": "Correo electrónico o contraseña inválidos",
+    "accountLocked": "La cuenta ha sido bloqueada",
+    "emailNotVerified": "Por favor verifica tu correo electrónico",
+    "tokenInvalid": "Token inválido o expirado"
+  },
+  "api": {
+    "rateLimited": "Demasiadas solicitudes. Por favor, inténtalo de nuevo más tarde",
+    "notFound": "Recurso no encontrado",
+    "methodNotAllowed": "Método no permitido",
+    "serverError": "Error interno del servidor",
+    "badRequest": "Solicitud incorrecta",
+    "forbidden": "Acceso prohibido"
+  },
+  "file": {
+    "tooLarge": "El tamaño del archivo excede el límite",
+    "invalidType": "Tipo de archivo inválido",
+    "uploadFailed": "Error al subir el archivo",
+    "notFound": "Archivo no encontrado"
+  }
+}

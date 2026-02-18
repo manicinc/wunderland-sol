@@ -1,0 +1,291 @@
+// File: frontend/src/styles/utilities/_reactive-states.scss
+/**
+ * @file _reactive-states.scss
+ * @description Utility classes for applying reactive state effects
+ * Quick application of state-based visual feedback
+ * @version 1.0.0
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use '../components/reactive-effects' as reactive;
+
+// ============================================
+// State Application Classes
+// ============================================
+
+// Apply reactive state to any element
+@each $state in ('idle', 'listening', 'transcribing', 'thinking', 'responding', 'speaking', 'vad-wake', 'vad-active', 'processing', 'error', 'connecting') {
+  .is-#{$state} {
+    &[data-reactive="true"] {
+      @include reactive.apply-state-effects($state);
+    }
+  }
+  
+  // Direct state application
+  .state-#{$state} {
+    @include reactive.apply-state-effects($state);
+  }
+}
+
+// ============================================
+// Intensity Modifiers
+// ============================================
+
+.reactive-intensity {
+  &-low {
+    --reactive-intensity: 0.3;
+    --reactive-glow-intensity: 0.2;
+    --reactive-pulse-intensity: 0.3;
+  }
+  
+  &-medium {
+    --reactive-intensity: 0.6;
+    --reactive-glow-intensity: 0.5;
+    --reactive-pulse-intensity: 0.6;
+  }
+  
+  &-high {
+    --reactive-intensity: 0.9;
+    --reactive-glow-intensity: 0.8;
+    --reactive-pulse-intensity: 0.9;
+  }
+  
+  &-max {
+    --reactive-intensity: 1;
+    --reactive-glow-intensity: 1;
+    --reactive-pulse-intensity: 1;
+  }
+}
+
+// ============================================
+// Effect Toggle Classes
+// ============================================
+
+.enable-particles {
+  --reactive-particle-activity: 0.5;
+}
+
+.disable-particles {
+  --reactive-particle-activity: 0;
+}
+
+.enable-neural {
+  --reactive-neural-activity: 0.5;
+}
+
+.disable-neural {
+  --reactive-neural-activity: 0;
+}
+
+.enable-glow {
+  @extend .has-reactive-glow;
+}
+
+.enable-ripple {
+  @extend .has-reactive-ripple;
+}
+
+.enable-border-pulse {
+  @extend .has-reactive-border;
+}
+
+// ============================================
+// Animation Speed Modifiers
+// ============================================
+
+.animation-speed {
+  &-slow {
+    --reactive-pulse-duration: 3s;
+    --reactive-gradient-speed: 0.3;
+    --reactive-text-stream-speed: 0.5;
+  }
+  
+  &-normal {
+    --reactive-pulse-duration: 2s;
+    --reactive-gradient-speed: 0.5;
+    --reactive-text-stream-speed: 0.7;
+  }
+  
+  &-fast {
+    --reactive-pulse-duration: 1s;
+    --reactive-gradient-speed: 0.8;
+    --reactive-text-stream-speed: 1;
+  }
+}
+
+// ============================================
+// Mood State Classes
+// ============================================
+
+@each $mood in ('calm', 'engaged', 'excited', 'contemplative', 'attentive', 'curious', 'warm') {
+  .mood-#{$mood} {
+    @if $mood == 'calm' {
+      --reactive-warmth: 0.5;
+      --reactive-gradient-speed: 0.4;
+    } @else if $mood == 'engaged' {
+      --reactive-warmth: 0.6;
+      --reactive-intensity: calc(var(--reactive-intensity) * 1.1);
+    } @else if $mood == 'excited' {
+      --reactive-warmth: 0.7;
+      --reactive-pulse-rate: calc(var(--reactive-pulse-rate) * 1.2);
+    } @else if $mood == 'contemplative' {
+      --reactive-warmth: 0.65;
+      --reactive-neural-activity: calc(var(--reactive-neural-activity) * 1.3);
+    } @else if $mood == 'attentive' {
+      --reactive-warmth: 0.6;
+      --reactive-glow-intensity: calc(var(--reactive-glow-intensity) * 1.2);
+    } @else if $mood == 'curious' {
+      --reactive-warmth: 0.55;
+      --reactive-particle-activity: calc(var(--reactive-particle-activity) * 1.3);
+    } @else if $mood == 'warm' {
+      --reactive-warmth: 0.8;
+      --reactive-glow-intensity: calc(var(--reactive-glow-intensity) * 1.1);
+    }
+  }
+}
+
+// ============================================
+// Combined Effect Classes
+// ============================================
+
+// Listening mode full effect
+.reactive-listening-mode {
+  @extend .state-listening;
+  @extend .enable-glow;
+  @extend .enable-border-pulse;
+  @extend .mood-engaged;
+}
+
+// Thinking mode full effect
+.reactive-thinking-mode {
+  @extend .state-thinking;
+  @extend .enable-neural;
+  @extend .enable-particles;
+  @extend .mood-contemplative;
+}
+
+// Response mode full effect
+.reactive-response-mode {
+  @extend .state-responding;
+  @extend .enable-glow;
+  @extend .enable-ripple;
+  @extend .mood-warm;
+}
+
+// ============================================
+// Interactive Feedback Classes
+// ============================================
+
+.reactive-hover {
+  transition: all var.$duration-quick ease-out;
+  
+  &:hover {
+    --reactive-glow-intensity: calc(var(--reactive-glow-intensity) * 1.3);
+    transform: translateY(-1px);
+    @extend .has-reactive-glow;
+  }
+}
+
+.reactive-active {
+  &:active {
+    --reactive-pulse-intensity: 1;
+    transform: scale(0.98);
+  }
+}
+
+.reactive-focus {
+  &:focus-visible {
+    @extend .has-reactive-glow;
+    --reactive-glow-radius: 15px;
+  }
+}
+
+// ============================================
+// Container-Specific Reactive Classes
+// ============================================
+
+.reactive-chat-container {
+  position: relative;
+  
+  &.is-streaming {
+    @extend .state-responding;
+    @extend .enable-border-pulse;
+  }
+  
+  &.is-waiting {
+    @extend .state-thinking;
+    @extend .enable-neural;
+  }
+}
+
+.reactive-input-container {
+  position: relative;
+  
+  &.is-focused {
+    @extend .state-listening;
+    @extend .enable-glow;
+  }
+  
+  &.is-processing {
+    @extend .state-processing;
+    @extend .enable-border-pulse;
+  }
+}
+
+// ============================================
+// Responsive Reactive States
+// ============================================
+
+// Reduce effects on mobile for performance
+@media (max-width: var.$breakpoint-md) {
+  .reactive-mobile-optimize {
+    --reactive-particle-activity: calc(var(--reactive-particle-activity) * 0.5);
+    --reactive-neural-activity: calc(var(--reactive-neural-activity) * 0.5);
+    --reactive-glow-radius: calc(var(--reactive-glow-radius) * 0.7);
+  }
+}
+
+// Disable heavy effects on low-end devices
+@media (hover: none) and (pointer: coarse) {
+  .reactive-touch-optimize {
+    --reactive-particle-activity: 0;
+    --reactive-neural-activity: 0;
+    --reactive-blur-amount: 0;
+  }
+}
+
+// ============================================
+// Debug Classes
+// ============================================
+
+.debug-reactive {
+  &::after {
+    content: attr(data-reactive-state);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 2px 8px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    font-size: 10px;
+    font-family: monospace;
+    pointer-events: none;
+    z-index: 9999;
+  }
+}
+
+.show-reactive-values {
+  &::before {
+    content: 'Intensity: ' var(--reactive-intensity) ' | Glow: ' var(--reactive-glow-intensity);
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ff00;
+    font-family: monospace;
+    font-size: 11px;
+    z-index: 9999;
+  }
+}

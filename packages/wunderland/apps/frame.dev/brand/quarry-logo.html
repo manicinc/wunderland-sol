@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarry - Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f8f8;
+            color: #1a1a1a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #e8e8e8;
+        }
+        
+        h2 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+        }
+        
+        h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #999;
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-box {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 0.75rem;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-box.dark {
+            background: #0F0F0F;
+            border-color: #2a2a2a;
+        }
+        
+        .preview-label {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: 500;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+        
+        .download-btn {
+            background: #1A7F4B;
+            color: #ffffff;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .download-btn:hover {
+            background: #156B3E;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 127, 75, 0.25);
+        }
+        
+        .download-btn.red {
+            background: #C93A3A;
+        }
+        
+        .download-btn.red:hover {
+            background: #A82E2E;
+            box-shadow: 0 4px 12px rgba(201, 58, 58, 0.25);
+        }
+        
+        .download-btn.secondary {
+            background: #e8e8e8;
+            color: #333;
+        }
+        
+        .download-btn.secondary:hover {
+            background: #d8d8d8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .icon-item {
+            text-align: center;
+        }
+        
+        .icon-box {
+            background: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+        }
+        
+        .icon-box.dark {
+            background: #0F0F0F;
+            border-color: #2a2a2a;
+        }
+        
+        .color-swatches {
+            display: flex;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .swatch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .swatch-color {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .swatch-label {
+            font-size: 0.7rem;
+            color: #888;
+            font-weight: 500;
+        }
+        
+        code {
+            background: #f0f0f0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: #1A7F4B;
+        }
+        
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .usage-item {
+            background: #f8f8f8;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .usage-item h4 {
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            color: #1A7F4B;
+            font-weight: 600;
+        }
+        
+        .usage-item p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .font-info {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .font-preview {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+        
+        .font-details {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .css-code {
+            background: #1a1a1a;
+            color: #7DDBA3;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+        }
+        
+        .variant-label {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .variant-label.green { background: #e6f4ec; color: #1A7F4B; }
+        .variant-label.red { background: #fce8e8; color: #C93A3A; }
+        .variant-label.mono { background: #e8e8e8; color: #555; }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a1a1a;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quarry</h1>
+            <p class="subtitle">Logo Export System</p>
+        </header>
+        
+        <!-- Primary Logo Section -->
+        <section class="section">
+            <h2>Primary Logo</h2>
+            
+            <div class="preview-grid">
+                <!-- Light Green -->
+                <div class="preview-item">
+                    <span class="variant-label green">Light · Green</span>
+                    <div class="preview-box">
+                        <svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0, 0)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.4"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#22A55D" stroke="#1D9050" stroke-width="0.4"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#2DB86A" stroke="#28A35F" stroke-width="0.4"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#4FCA85" stroke="#45B577" stroke-width="0.4"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.4"/>
+                            </g>
+                            <text x="58" y="32" font-family="Fraunces, Georgia, serif" font-size="32" font-weight="400" fill="#1a1a1a">Quarry</text>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <!-- Dark Red -->
+                <div class="preview-item">
+                    <span class="variant-label red">Dark · Red</span>
+                    <div class="preview-box dark">
+                        <svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0, 0)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#C93A3A" stroke="#A82E2E" stroke-width="0.4"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#E05555" stroke="#C94848" stroke-width="0.4"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#E87070" stroke="#D06363" stroke-width="0.4"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#F09090" stroke="#D88080" stroke-width="0.4"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#F5B0B0" stroke="#DDA0A0" stroke-width="0.4"/>
+                            </g>
+                            <text x="58" y="32" font-family="Fraunces, Georgia, serif" font-size="32" font-weight="400" fill="#F5F5F5">Quarry</text>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <!-- Mono Light -->
+                <div class="preview-item">
+                    <span class="variant-label mono">Mono · Light</span>
+                    <div class="preview-box">
+                        <svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0, 0)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#1a1a1a" stroke="#111" stroke-width="0.4"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#3d3d3d" stroke="#2d2d2d" stroke-width="0.4"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#555555" stroke="#454545" stroke-width="0.4"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#777777" stroke="#676767" stroke-width="0.4"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#999999" stroke="#898989" stroke-width="0.4"/>
+                            </g>
+                            <text x="58" y="32" font-family="Fraunces, Georgia, serif" font-size="32" font-weight="400" fill="#1a1a1a">Quarry</text>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <!-- Mono Dark -->
+                <div class="preview-item">
+                    <span class="variant-label mono">Mono · Dark</span>
+                    <div class="preview-box dark">
+                        <svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0, 0)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.4"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.4"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.4"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.4"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.4"/>
+                            </g>
+                            <text x="58" y="32" font-family="Fraunces, Georgia, serif" font-size="32" font-weight="400" fill="#F5F5F5">Quarry</text>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+            </div>
+            
+            <h3>Download Primary Logo</h3>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('light')">SVG Green</button>
+                <button class="download-btn red" onclick="downloadSVG('dark')">SVG Red</button>
+                <button class="download-btn secondary" onclick="downloadSVG('mono-light')">SVG Mono Light</button>
+                <button class="download-btn secondary" onclick="downloadSVG('mono-dark')">SVG Mono Dark</button>
+            </div>
+            <div class="download-grid" style="margin-top: 0.6rem;">
+                <button class="download-btn secondary" onclick="downloadPNG('light', 1)">PNG Green 1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('light', 2)">PNG Green 2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('light', 4)">PNG Green 4x</button>
+            </div>
+            <div class="download-grid" style="margin-top: 0.6rem;">
+                <button class="download-btn secondary" onclick="downloadPNG('dark', 1)">PNG Red 1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('dark', 2)">PNG Red 2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('dark', 4)">PNG Red 4x</button>
+            </div>
+        </section>
+        
+        <!-- Icon / Favicon Section -->
+        <section class="section">
+            <h2>Icon / Favicon</h2>
+            
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <div class="icon-box">
+                        <svg width="48" height="48" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(7, 7)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.5"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#22A55D" stroke="#1D9050" stroke-width="0.5"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#2DB86A" stroke="#28A35F" stroke-width="0.5"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#4FCA85" stroke="#45B577" stroke-width="0.5"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.5"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Green 48px</p>
+                </div>
+                
+                <div class="icon-item">
+                    <div class="icon-box dark">
+                        <svg width="48" height="48" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(7, 7)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#C93A3A" stroke="#A82E2E" stroke-width="0.5"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#E05555" stroke="#C94848" stroke-width="0.5"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#E87070" stroke="#D06363" stroke-width="0.5"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#F09090" stroke="#D88080" stroke-width="0.5"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#F5B0B0" stroke="#DDA0A0" stroke-width="0.5"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Red 48px</p>
+                </div>
+                
+                <div class="icon-item">
+                    <div class="icon-box">
+                        <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(7, 7)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#1a1a1a" stroke="#111" stroke-width="0.5"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#3d3d3d" stroke="#2d2d2d" stroke-width="0.5"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#555555" stroke="#454545" stroke-width="0.5"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#777777" stroke="#676767" stroke-width="0.5"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#999999" stroke="#898989" stroke-width="0.5"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Mono 32px</p>
+                </div>
+                
+                <div class="icon-item">
+                    <div class="icon-box dark">
+                        <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(7, 7)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.5"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.5"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.5"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.5"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.5"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">Mono Dark 32px</p>
+                </div>
+                
+                <div class="icon-item">
+                    <div class="icon-box">
+                        <svg width="16" height="16" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(7, 7)">
+                                <polygon points="0,0 22,0 19,19 0,17" fill="#1A7F4B"/>
+                                <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#22A55D"/>
+                                <polygon points="0,17 19,19 17,39 0,39" fill="#2DB86A"/>
+                                <polygon points="19,19 27,19 30,39 17,39" fill="#4FCA85"/>
+                                <polygon points="27,19 50,14 50,39 30,39" fill="#7DDBA3"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="preview-label">16px Favicon</p>
+                </div>
+            </div>
+            
+            <h3>Download Icons</h3>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadIconSVG('green')">SVG Green</button>
+                <button class="download-btn red" onclick="downloadIconSVG('red')">SVG Red</button>
+                <button class="download-btn secondary" onclick="downloadIconSVG('mono-light')">SVG Mono Light</button>
+                <button class="download-btn secondary" onclick="downloadIconSVG('mono-dark')">SVG Mono Dark</button>
+            </div>
+            <div class="download-grid" style="margin-top: 0.6rem;">
+                <button class="download-btn secondary" onclick="downloadIconPNG('green', 16)">PNG 16×16</button>
+                <button class="download-btn secondary" onclick="downloadIconPNG('green', 32)">PNG 32×32</button>
+                <button class="download-btn secondary" onclick="downloadIconPNG('green', 64)">PNG 64×64</button>
+                <button class="download-btn secondary" onclick="downloadIconPNG('green', 128)">PNG 128×128</button>
+                <button class="download-btn secondary" onclick="downloadIconPNG('green', 256)">PNG 256×256</button>
+                <button class="download-btn secondary" onclick="downloadIconPNG('green', 512)">PNG 512×512</button>
+            </div>
+        </section>
+        
+        <!-- Brand Colors Section -->
+        <section class="section">
+            <h2>Brand Colors</h2>
+            
+            <h3>Primary Palette (Green)</h3>
+            <div class="color-swatches">
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #1A7F4B;"></div>
+                    <span class="swatch-label">Deep Green</span>
+                    <code>#1A7F4B</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #22A55D;"></div>
+                    <span class="swatch-label">Forest</span>
+                    <code>#22A55D</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #2DB86A;"></div>
+                    <span class="swatch-label">Emerald</span>
+                    <code>#2DB86A</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #4FCA85;"></div>
+                    <span class="swatch-label">Mint</span>
+                    <code>#4FCA85</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #7DDBA3;"></div>
+                    <span class="swatch-label">Light Mint</span>
+                    <code>#7DDBA3</code>
+                </div>
+            </div>
+            
+            <h3>Secondary Palette (Red)</h3>
+            <div class="color-swatches">
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #C93A3A;"></div>
+                    <span class="swatch-label">Deep Red</span>
+                    <code>#C93A3A</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #E05555;"></div>
+                    <span class="swatch-label">Crimson</span>
+                    <code>#E05555</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #E87070;"></div>
+                    <span class="swatch-label">Coral</span>
+                    <code>#E87070</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #F09090;"></div>
+                    <span class="swatch-label">Salmon</span>
+                    <code>#F09090</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #F5B0B0;"></div>
+                    <span class="swatch-label">Blush</span>
+                    <code>#F5B0B0</code>
+                </div>
+            </div>
+            
+            <h3>Neutral Colors</h3>
+            <div class="color-swatches">
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #0F0F0F;"></div>
+                    <span class="swatch-label">Black</span>
+                    <code>#0F0F0F</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #1a1a1a;"></div>
+                    <span class="swatch-label">Charcoal</span>
+                    <code>#1a1a1a</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #F5F5F5;"></div>
+                    <span class="swatch-label">Off White</span>
+                    <code>#F5F5F5</code>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-color" style="background: #FFFFFF; border-color: #ccc;"></div>
+                    <span class="swatch-label">White</span>
+                    <code>#FFFFFF</code>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Typography Section -->
+        <section class="section">
+            <h2>Typography</h2>
+            
+            <div class="font-info">
+                <div class="font-preview">Quarry</div>
+                <div class="font-details">
+                    <strong>Font Family:</strong> Fraunces<br>
+                    <strong>Weight:</strong> 400 (Regular)<br>
+                    <strong>Optical Size:</strong> 9–144<br>
+                    <strong>Style:</strong> Soft serif with elegant curves
+                </div>
+            </div>
+            
+            <h3>CSS Implementation</h3>
+            <div class="css-code">/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&display=swap');
+
+/* Logo Text */
+.quarry-logo-text {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: #1a1a1a; /* Light mode */
+    /* color: #F5F5F5; Dark mode */
+}
+
+/* Brand Green */
+.quarry-green {
+    color: #1A7F4B;
+}
+
+/* Brand Red */
+.quarry-red {
+    color: #C93A3A;
+}</div>
+            
+            <h3>Font CDN</h3>
+            <div class="css-code">&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&display=swap" rel="stylesheet"&gt;</div>
+        </section>
+        
+        <!-- Usage Guidelines Section -->
+        <section class="section">
+            <h2>Usage Guidelines</h2>
+            
+            <div class="usage-grid">
+                <div class="usage-item">
+                    <h4>Minimum Size</h4>
+                    <p>Primary logo: <code>120px</code> width<br>Icon: <code>16px</code> minimum</p>
+                </div>
+                <div class="usage-item">
+                    <h4>Clear Space</h4>
+                    <p>Maintain padding equal to the height of the "Q" around all sides</p>
+                </div>
+                <div class="usage-item">
+                    <h4>Light Backgrounds</h4>
+                    <p>Use Green or Mono Light variants on white/light gray backgrounds</p>
+                </div>
+                <div class="usage-item">
+                    <h4>Dark Backgrounds</h4>
+                    <p>Use Red or Mono Dark variants on black/dark backgrounds</p>
+                </div>
+                <div class="usage-item">
+                    <h4>Social Media</h4>
+                    <p>Use 512×512 icon for profiles. Full logo for banners and covers</p>
+                </div>
+                <div class="usage-item">
+                    <h4>Favicon</h4>
+                    <p>Use simplified icon at 16×16 and 32×32 for browser tabs</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <div class="toast" id="toast">Downloaded!</div>
+    
+    <script>
+        // Primary Logo SVGs (Horizontal Layout)
+        const logoSVGs = {
+            'light': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(0, 0)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.4"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#22A55D" stroke="#1D9050" stroke-width="0.4"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#2DB86A" stroke="#28A35F" stroke-width="0.4"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#4FCA85" stroke="#45B577" stroke-width="0.4"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.4"/>
+    </g>
+    <text x="58" y="32" font-family="Georgia, serif" font-size="32" font-weight="400" fill="#1a1a1a">Quarry</text>
+</svg>`,
+            'dark': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(0, 0)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#C93A3A" stroke="#A82E2E" stroke-width="0.4"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#E05555" stroke="#C94848" stroke-width="0.4"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#E87070" stroke="#D06363" stroke-width="0.4"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#F09090" stroke="#D88080" stroke-width="0.4"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#F5B0B0" stroke="#DDA0A0" stroke-width="0.4"/>
+    </g>
+    <text x="58" y="32" font-family="Georgia, serif" font-size="32" font-weight="400" fill="#F5F5F5">Quarry</text>
+</svg>`,
+            'mono-light': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(0, 0)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#1a1a1a" stroke="#111" stroke-width="0.4"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#3d3d3d" stroke="#2d2d2d" stroke-width="0.4"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#555555" stroke="#454545" stroke-width="0.4"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#777777" stroke="#676767" stroke-width="0.4"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#999999" stroke="#898989" stroke-width="0.4"/>
+    </g>
+    <text x="58" y="32" font-family="Georgia, serif" font-size="32" font-weight="400" fill="#1a1a1a">Quarry</text>
+</svg>`,
+            'mono-dark': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="194" height="56" viewBox="0 0 194 56" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(0, 0)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.4"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.4"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.4"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.4"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.4"/>
+    </g>
+    <text x="58" y="32" font-family="Georgia, serif" font-size="32" font-weight="400" fill="#F5F5F5">Quarry</text>
+</svg>`
+        };
+        
+        // Icon SVGs
+        const iconSVGs = {
+            'green': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(7, 12)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#1A7F4B" stroke="#156B3E" stroke-width="0.5"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#22A55D" stroke="#1D9050" stroke-width="0.5"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#2DB86A" stroke="#28A35F" stroke-width="0.5"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#4FCA85" stroke="#45B577" stroke-width="0.5"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#7DDBA3" stroke="#6EC894" stroke-width="0.5"/>
+    </g>
+</svg>`,
+            'red': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(7, 12)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#C93A3A" stroke="#A82E2E" stroke-width="0.5"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#E05555" stroke="#C94848" stroke-width="0.5"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#E87070" stroke="#D06363" stroke-width="0.5"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#F09090" stroke="#D88080" stroke-width="0.5"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#F5B0B0" stroke="#DDA0A0" stroke-width="0.5"/>
+    </g>
+</svg>`,
+            'mono-light': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(7, 12)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#1a1a1a" stroke="#111" stroke-width="0.5"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#3d3d3d" stroke="#2d2d2d" stroke-width="0.5"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#555555" stroke="#454545" stroke-width="0.5"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#777777" stroke="#676767" stroke-width="0.5"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#999999" stroke="#898989" stroke-width="0.5"/>
+    </g>
+</svg>`,
+            'mono-dark': `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(7, 12)">
+        <polygon points="0,0 22,0 19,19 0,17" fill="#F5F5F5" stroke="#e5e5e5" stroke-width="0.5"/>
+        <polygon points="22,0 50,0 50,14 27,19 19,19" fill="#D4D4D4" stroke="#c4c4c4" stroke-width="0.5"/>
+        <polygon points="0,17 19,19 17,39 0,39" fill="#B0B0B0" stroke="#a0a0a0" stroke-width="0.5"/>
+        <polygon points="19,19 27,19 30,39 17,39" fill="#8C8C8C" stroke="#7c7c7c" stroke-width="0.5"/>
+        <polygon points="27,19 50,14 50,39 30,39" fill="#6B6B6B" stroke="#5b5b5b" stroke-width="0.5"/>
+    </g>
+</svg>`
+        };
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+        
+        function downloadSVG(type) {
+            const blob = new Blob([logoSVGs[type]], { type: 'image/svg+xml' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `quarry-logo-${type}.svg`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('Downloaded SVG');
+        }
+        
+        function downloadPNG(type, scale) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            const baseWidth = 194;
+            const baseHeight = 56;
+            canvas.width = baseWidth * scale;
+            canvas.height = baseHeight * scale;
+            
+            // Add background for dark variant
+            if (type === 'dark' || type === 'mono-dark') {
+                ctx.fillStyle = '#0F0F0F';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            const svgBlob = new Blob([logoSVGs[type]], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                URL.revokeObjectURL(url);
+                
+                canvas.toBlob(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `quarry-logo-${type}@${scale}x.png`;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                    showToast(`Downloaded PNG @${scale}x`);
+                }, 'image/png');
+            };
+            
+            img.src = url;
+        }
+        
+        function downloadIconSVG(type) {
+            const blob = new Blob([iconSVGs[type]], { type: 'image/svg+xml' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `quarry-icon-${type}.svg`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('Downloaded Icon SVG');
+        }
+        
+        function downloadIconPNG(type, size) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            const svgBlob = new Blob([iconSVGs[type]], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, size, size);
+                URL.revokeObjectURL(url);
+                
+                canvas.toBlob(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `quarry-icon-${type}-${size}x${size}.png`;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                    showToast(`Downloaded ${size}×${size} PNG`);
+                }, 'image/png');
+            };
+            
+            img.src = url;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+name: Auto-Categorize Inbox Strands
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'weaves/inbox/**/*.md'
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      file_path:
+        description: 'Path to specific file to categorize (optional)'
+        required: false
+        type: string
+      force_llm:
+        description: 'Force LLM analysis (skip static fallback)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  categorize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install --no-save @anthropic-ai/sdk openai natural compromise
+
+      - name: Get changed files
+        id: changed-files
+        if: github.event_name == 'push'
+        run: |
+          git fetch origin master
+          CHANGED_FILES=$(git diff --name-only HEAD^..HEAD | grep '^weaves/inbox/.*\.md$' || echo "")
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No inbox files changed"
+            exit 0
+          fi
+          
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Set files to process
+        id: files
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ inputs.file_path }}" ]; then
+            echo "files<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ inputs.file_path }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_files=true" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.changed-files.outputs.has_changes }}" == "true" ]; then
+            echo "files<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ steps.changed-files.outputs.files }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "has_files=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_files=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run intelligent categorization
+        if: steps.files.outputs.has_files == 'true'
+        id: categorize
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          FORCE_LLM: ${{ inputs.force_llm || 'false' }}
+          FILES_TO_PROCESS: ${{ steps.files.outputs.files }}
+        run: |
+          mkdir -p .categorization-results
+
+          # Write files to temp file to avoid subshell issues
+          echo "$FILES_TO_PROCESS" > /tmp/files_to_process.txt
+
+          while IFS= read -r file; do
+            if [ -z "$file" ]; then continue; fi
+            if [ ! -f "$file" ]; then
+              echo "File $file not found, skipping"
+              continue
+            fi
+
+            echo "📁 Processing: $file"
+
+            # Run categorization with LLM-first approach
+            result_file=".categorization-results/$(basename "$file" .md).json"
+            if node scripts/categorize-strand.js "$file" > "$result_file" 2>/dev/null; then
+              echo "✓ Categorized $file"
+            else
+              echo "❌ Categorization failed for $file"
+              echo '{"action":"error","error":"Categorization script failed"}' > "$result_file"
+            fi
+          done < /tmp/files_to_process.txt
+
+      - name: Process categorization results
+        if: steps.files.outputs.has_files == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT || github.token }}
+          FILES_TO_PROCESS: ${{ steps.files.outputs.files }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Write files to temp file to avoid subshell issues
+          echo "$FILES_TO_PROCESS" > /tmp/files_to_process.txt
+
+          while IFS= read -r file; do
+            if [ -z "$file" ]; then continue; fi
+            result_file=".categorization-results/$(basename "$file" .md).json"
+            
+            if [ ! -f "$result_file" ]; then
+              echo "⚠️  No result for $file, skipping"
+              continue
+            fi
+            
+            action=$(jq -r '.action // "error"' "$result_file")
+            suggested_path=$(jq -r '.suggestion.path // ""' "$result_file")
+            confidence=$(jq -r '.suggestion.confidence // 0' "$result_file")
+            reasoning=$(jq -r '.suggestion.reasoning // ""' "$result_file")
+            method=$(jq -r '.method // "unknown"' "$result_file")
+            
+            filename=$(basename "$file")
+            confidence_pct=$(echo "$confidence * 100" | bc | cut -d. -f1)
+            
+            echo "📊 Result: action=$action, path=$suggested_path, confidence=${confidence_pct}%, method=$method"
+            
+            if [ "$action" == "auto-move" ] && [ -n "$suggested_path" ]; then
+              echo "🚀 Auto-moving $file -> $suggested_path (${confidence_pct}% confidence)"
+              
+              # Create branch
+              branch_name="auto-categorize/$(basename "$file" .md)-$(date +%s)"
+              git checkout -b "$branch_name"
+              
+              # Ensure target directory exists
+              target_dir=$(dirname "${suggested_path}")
+              mkdir -p "$target_dir"
+              
+              # Move file
+              git mv "$file" "$suggested_path"
+              
+              # Commit
+              git commit -m "feat(categorize): Auto-categorize $(basename "$file") [${confidence_pct}%]"
+
+              # Push
+              git push -u origin "$branch_name"
+
+              # Create PR
+              pr_body="## Auto-Categorization\n\n**Source:** \`$file\`\n**Destination:** \`$suggested_path\`\n**Confidence:** ${confidence_pct}%\n**Method:** $method\n\n**Reasoning:** $reasoning"
+              pr_url=$(gh pr create \
+                --title "🤖 Auto-categorize: $filename → $suggested_path" \
+                --body "$(echo -e "$pr_body")" \
+                --base master 2>&1)
+              
+              pr_number=$(echo "$pr_url" | grep -oP 'pull/\K[0-9]+' || gh pr list --head "$branch_name" --json number -q '.[0].number')
+              
+              # Auto-merge if confidence >= 70%
+              if [ "$confidence_pct" -ge 70 ] && [ -n "$pr_number" ]; then
+                echo "✅ Auto-merging PR #$pr_number (confidence: ${confidence_pct}%)"
+                gh pr merge "$pr_number" --squash --delete-branch || echo "⚠️ Auto-merge failed, PR remains open"
+              else
+                echo "👀 PR #$pr_number created, awaiting manual review (confidence: ${confidence_pct}%)"
+              fi
+
+              # Return to master and sync with remote for next file
+              git checkout master
+              git pull origin master || true
+              
+            elif [ "$action" == "suggest" ]; then
+              echo "💡 Creating suggestion issue for $file (${confidence_pct}% confidence)"
+              issue_body="## Categorization Suggestion\n\n**File:** \`$file\`\n**Suggested Path:** \`$suggested_path\`\n**Confidence:** ${confidence_pct}%\n**Method:** $method\n\n**Reasoning:** $reasoning"
+              gh issue create \
+                --title "📂 Categorization suggestion: $filename" \
+                --body "$(echo -e "$issue_body")" || true
+
+            else
+              echo "⚠️  Manual triage needed for $file"
+              error_msg=$(jq -r '.error // .suggestion.reasoning // "Could not determine appropriate category"' "$result_file")
+              issue_body="## Manual Triage Required\n\n**File:** \`$file\`\n**Method:** $method\n\n**Issue:** $error_msg"
+              gh issue create \
+                --title "🔍 Manual triage needed: $filename" \
+                --body "$(echo -e "$issue_body")" || true
+            fi
+          done < /tmp/files_to_process.txt
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf .categorization-results
+          git checkout master 2>/dev/null || true

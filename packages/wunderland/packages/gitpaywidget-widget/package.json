@@ -1,0 +1,22 @@
+{
+  "name": "@gitpaywidget/widget",
+  "version": "0.1.0-alpha.0",
+  "description": "Embeddable payment widget for GitPayWidget projects.",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,iife --global-name GitPayWidget --minify --dts --treeshake",
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@gitpaywidget/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "typescript": "^5.6.3",
+    "rimraf": "^6.0.1"
+  }
+}

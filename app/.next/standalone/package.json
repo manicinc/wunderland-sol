@@ -1,0 +1,92 @@
+{
+  "name": "openstrand",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenStrand monorepo - AI-native knowledge infrastructure.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --prefix-colors bgBlue.bold,bgGreen.bold,bgMagenta.bold --names backend,frontend,agentos-workbench \"pnpm --filter voice-chat-assistant-backend dev\" \"pnpm --filter voice-chat-assistant-frontend dev\" \"pnpm --filter @framersai/agentos-workbench dev\"",
+    "dev:qdrant:up": "docker compose -f deployment/qdrant/docker-compose.yml up -d",
+    "dev:qdrant:down": "docker compose -f deployment/qdrant/docker-compose.yml down",
+    "dev:qdrant:logs": "docker compose -f deployment/qdrant/docker-compose.yml logs -f --tail=200",
+    "dev:admin": "npm run dev --workspace openstrand-admin",
+    "dev:plugin": "npm run dev:plugin --workspace @framers/openstrand-plugins",
+    "build": "npm run build --workspaces --if-present",
+    "prepare": "husky install",
+    "install:hooks": "node scripts/installHooks.mjs",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=100",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "lint:packages": "pnpm --filter @framers/agentos lint && pnpm --filter @framers/sql-storage-adapter lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "typecheck": "npm run type-check --workspaces --if-present",
+    "clean": "rimraf .devcache node_modules packages/**/dist packages/**/node_modules openstrand-app/.next openstrand-app/node_modules openstrand-admin/.next openstrand-admin/node_modules"
+  },
+  "workspaces": [
+    "openstrand-app",
+    "openstrand-admin",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@eslint/js": "^9.11.0",
+    "@secretlint/secretlint-rule-preset-recommend": "^7.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.3.2",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^13.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.9",
+    "prettier": "^3.3.0",
+    "remark-cli": "^12.0.1",
+    "remark-preset-lint-recommended": "^6.1.2",
+    "rimraf": "^5.0.5",
+    "secretlint": "^7.0.0",
+    "semantic-release": "^24.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix --max-warnings=50"
+    ],
+    "*.vue": [
+      "eslint --fix --max-warnings=50"
+    ],
+    "*.{json,md}": [
+      "prettier --write --ignore-unknown"
+    ],
+    "*": "secretlint --maskSecrets"
+  },
+  "packageManager": "pnpm@10.15.1",
+  "dependencies": {
+    "color-thief-node": "^1.0.4",
+    "sharp": "^0.33.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^18.3.12",
+      "@types/react-dom": "^18.3.1"
+    },
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "sharp",
+      "esbuild"
+    ]
+  }
+}

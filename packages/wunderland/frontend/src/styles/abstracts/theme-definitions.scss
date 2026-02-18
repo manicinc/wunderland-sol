@@ -1,0 +1,765 @@
+/**
+ * @file _theme-definitions.scss
+ * @version 5.0.0
+ * @description Refined theme definitions with improved contrast, readability, and modern aesthetics
+ * Major fixes:
+ * - Terminus Dark: Reduced button brightness for readable white text
+ * - Terminus Light: Proper terminal typography with monospace fonts
+ * - Twilight Neo: Fixed secondary text contrast
+ * - Enhanced "HER" aesthetic across applicable themes
+ * - Added CRT scanline effects for retro terminal experience
+ * 
+ * CRT Effects Usage:
+ * - Apply selectively to enhance the terminal aesthetic
+ * - Best used on: code blocks, modal windows, terminal outputs
+ * - Avoid on: main content areas, long reading sections
+ * - Can be toggled based on user preference or performance
+ */
+
+// --- Sakura Sunset (Her-Inspired Pink Theme - Enhanced Dark) ---
+// Warmer, more intimate, with vibrant pink blossoms
+$theme-sakura-sunset: (
+  // Backgrounds - Warmer, more pink-shifted dark tones
+  '--color-bg-primary-h': '345',       // Shifted more pink from 340
+  '--color-bg-primary-s': '35%',       // Increased saturation from 25%
+  '--color-bg-primary-l': '18%',       // Slightly brighter from 16%
+  '--color-bg-primary-a': '1',
+ 
+  '--color-bg-secondary-h': '342',     // More pink
+  '--color-bg-secondary-s': '32%',     // More saturated from 22%
+  '--color-bg-secondary-l': '24%',     // Brighter from 22%
+  '--color-bg-secondary-a': '1',
+ 
+  '--color-bg-tertiary-h': '340', '--color-bg-tertiary-s': '30%', '--color-bg-tertiary-l': '30%', '--color-bg-tertiary-a': '1',
+  '--color-bg-quaternary-h': '338', '--color-bg-quaternary-s': '28%', '--color-bg-quaternary-l': '36%', '--color-bg-quaternary-a': '1',
+  '--color-bg-quinary-h': '338', '--color-bg-quinary-s': '26%', '--color-bg-quinary-l': '42%', '--color-bg-quinary-a': '1',
+  '--color-bg-senary-h': '338', '--color-bg-senary-s': '24%', '--color-bg-senary-l': '48%', '--color-bg-senary-a': '1',
+
+  // Glassmorphism - Enhanced for warmth
+  '--color-bg-glass-h': '345', '--color-bg-glass-s': '30%', '--color-bg-glass-l': '22%', '--color-bg-glass-a': '0.85',
+  '--color-border-glass-h': '340', '--color-border-glass-s': '65%', '--color-border-glass-l': '60%', '--color-border-glass-a': '0.35',
+  '--blur-glass': '10px',
+  '--color-bg-holographic-accent-h': '340', '--color-bg-holographic-accent-s': '90%', '--color-bg-holographic-accent-l': '75%', '--color-bg-holographic-accent-a': '0.18',
+
+  // Text - Warmer, more intimate
+  '--color-text-primary-h': '20',      // Warmer peach/cream (was 25)
+  '--color-text-primary-s': '75%',     // More saturated (was 70%)
+  '--color-text-primary-l': '94%',
+  '--color-text-primary-a': '1',
+  '--color-text-secondary-h': '350',   // Pink-tinted secondary (was 345)
+  '--color-text-secondary-s': '40%',   // More saturated (was 35%)
+  '--color-text-secondary-l': '82%',   // Slightly brighter (was 80%)
+  '--color-text-secondary-a': '1',
+  '--color-text-muted-h': '340', '--color-text-muted-s': '25%', '--color-text-muted-l': '68%', '--color-text-muted-a': '1',
+  '--color-text-on-primary-h': '335', '--color-text-on-primary-s': '20%', '--color-text-on-primary-l': '95%', '--color-text-on-primary-a': '1',
+  '--color-text-on-secondary-h': '345', '--color-text-on-secondary-s': '25%', '--color-text-on-secondary-l': '20%', '--color-text-on-secondary-a': '1',
+  '--color-text-accent-h': '340', '--color-text-accent-s': '90%', '--color-text-accent-l': '75%', '--color-text-accent-a': '1',
+  '--color-input-placeholder-focused-h': '340', '--color-input-placeholder-focused-s': '75%', '--color-input-placeholder-focused-l': '85%', '--color-input-placeholder-focused-a': '1',
+
+  // Accents & Glows - More vibrant, blooming pinks
+  '--color-accent-primary-h': '340',   // Pure vibrant pink
+  '--color-accent-primary-s': '92%',   // Very saturated (was 85%)
+  '--color-accent-primary-l': '76%',   // Bright, blooming (was 70%)
+  '--color-accent-primary-a': '1',
+  '--color-accent-primary-light-h': '340', '--color-accent-primary-light-s': '95%', '--color-accent-primary-light-l': '82%', '--color-accent-primary-light-a': '1',
+  '--color-accent-primary-dark-h': '340', '--color-accent-primary-dark-s': '88%', '--color-accent-primary-dark-l': '68%', '--color-accent-primary-dark-a': '1',
+  '--color-accent-secondary-h': '355', // Pink-red coral
+  '--color-accent-secondary-s': '88%', // High saturation (was 80%)
+  '--color-accent-secondary-l': '82%', // Bright (was 78%)
+  '--color-accent-secondary-a': '1',
+  '--color-accent-interactive-h': '335', '--color-accent-interactive-s': '95%', '--color-accent-interactive-l': '72%', '--color-accent-interactive-a': '1',
+  '--color-accent-glow-h': '345', '--color-accent-glow-s': '95%', '--color-accent-glow-l': '78%', '--color-accent-glow-a': '0.7',
+ 
+  // Enhanced glow colors for "Her" effect
+  '--color-holographic-glow-1-h': '335', '--color-holographic-glow-1-s': '90%', '--color-holographic-glow-1-l': '80%', '--color-holographic-glow-1-a': '0.5',
+  '--color-holographic-glow-2-h': '350', '--color-holographic-glow-2-s': '85%', '--color-holographic-glow-2-l': '85%', '--color-holographic-glow-2-a': '0.4',
+
+  // NEW: Petal colors for blossom particle effects
+  '--color-petal-1-h': '350', '--color-petal-1-s': '90%', '--color-petal-1-l': '85%', '--color-petal-1-a': '0.8',
+  '--color-petal-2-h': '340', '--color-petal-2-s': '85%', '--color-petal-2-l': '80%', '--color-petal-2-a': '0.7',
+  '--color-petal-3-h': '330', '--color-petal-3-s': '88%', '--color-petal-3-l': '75%', '--color-petal-3-a': '0.6',
+  '--color-petal-4-h': '345', '--color-petal-4-s': '92%', '--color-petal-4-l': '88%', '--color-petal-4-a': '0.5',
+
+  // Logo colors enhanced
+  '--color-logo-primary-h': '340', '--color-logo-primary-s': '90%', '--color-logo-primary-l': '75%', '--color-logo-primary-a': '1',
+  '--color-logo-secondary-h': '355', '--color-logo-secondary-s': '85%', '--color-logo-secondary-l': '82%', '--color-logo-secondary-a': '1',
+  '--color-logo-main-text-h': '340', '--color-logo-main-text-s': '90%', '--color-logo-main-text-l': '75%', '--color-logo-main-text-a': '1',
+  '--color-logo-subtitle-text-h': '350', '--color-logo-subtitle-text-s': '40%', '--color-logo-subtitle-text-l': '82%', '--color-logo-subtitle-text-a': '1',
+
+  // Borders - Softer, warmer
+  '--color-border-primary-h': '340', '--color-border-primary-s': '25%', '--color-border-primary-l': '35%', '--color-border-primary-a': '0.7',
+  '--color-border-secondary-h': '340', '--color-border-secondary-s': '20%', '--color-border-secondary-l': '45%', '--color-border-secondary-a': '0.5',
+  '--color-border-interactive-h': '340', '--color-border-interactive-s': '90%', '--color-border-interactive-l': '75%', '--color-border-interactive-a': '0.85',
+  '--color-border-translucent-h': '340', '--color-border-translucent-s': '35%', '--color-border-translucent-l': '75%', '--color-border-translucent-a': '0.25',
+
+  // Buttons - Enhanced pink vibrancy
+  '--color-button-primary-bg-h': '340', '--color-button-primary-bg-s': '90%', '--color-button-primary-bg-l': '74%', '--color-button-primary-bg-a': '1',
+  '--color-button-primary-text-h': '335', '--color-button-primary-text-s': '20%', '--color-button-primary-text-l': '95%', '--color-button-primary-text-a': '1',
+  '--color-button-secondary-bg-h': '350', '--color-button-secondary-bg-s': '30%', '--color-button-secondary-bg-l': '25%', '--color-button-secondary-bg-a': '1',
+  '--color-button-secondary-text-h': '345', '--color-button-secondary-text-s': '25%', '--color-button-secondary-text-l': '92%', '--color-button-secondary-text-a': '1',
+  '--color-button-accent-bg-h': '335', '--color-button-accent-bg-s': '95%', '--color-button-accent-bg-l': '70%', '--color-button-accent-bg-a': '1',
+  '--color-button-accent-text-h': '335', '--color-button-accent-text-s': '20%', '--color-button-accent-text-l': '95%', '--color-button-accent-text-a': '1',
+  '--color-button-glow-h': '340', '--color-button-glow-s': '90%', '--color-button-glow-l': '75%', '--color-button-glow-a': '0.7',
+
+  // Shadows - Warmer
+  '--shadow-color-h': '340', '--shadow-color-s': '20%', '--shadow-color-l': '8%',
+  '--shadow-highlight-modifier': '+35%',
+  '--shadow-opacity-soft': '0.35', '--shadow-opacity-medium': '0.45', '--shadow-opacity-strong': '0.55', '--shadow-opacity-deep': '0.65',
+
+  // Voice Viz - Warm, intimate
+  '--color-voice-user-h': '15', '--color-voice-user-s': '75%', '--color-voice-user-l': '80%', '--color-voice-user-a': '1',
+  '--color-voice-ai-speaking-h': '350', '--color-voice-ai-speaking-s': '80%', '--color-voice-ai-speaking-l': '78%', '--color-voice-ai-speaking-a': '1',
+  '--color-voice-ai-thinking-h': '340', '--color-voice-ai-thinking-s': '40%', '--color-voice-ai-thinking-l': '60%', '--color-voice-ai-thinking-a': '1',
+  '--voice-pulse-opacity': '0.85',
+
+  // Semantic Colors
+  '--color-info-h': '200', '--color-info-s': '90%', '--color-info-l': '70%', '--color-info-a': '1',
+  '--color-success-h': '130', '--color-success-s': '75%', '--color-success-l': '65%', '--color-success-a': '1',
+  '--color-warning-h': '40', '--color-warning-s': '95%', '--color-warning-l': '68%', '--color-warning-a': '1',
+  '--color-error-h': '0', '--color-error-s': '85%', '--color-error-l': '68%', '--color-error-a': '1',
+  '--color-error-text-h': '0', '--color-error-text-s': '100%', '--color-error-text-l': '92%', '--color-error-text-a': '1',
+  '--color-danger-h': '0', '--color-danger-s': '85%', '--color-danger-l': '68%', '--color-danger-a': '1',
+  '--color-danger-text-h': '0', '--color-danger-text-s': '100%', '--color-danger-text-l': '92%', '--color-danger-text-a': '1',
+  '--color-warning-text-h': '40', '--color-warning-text-s': '95%', '--color-warning-text-l': '90%', '--color-warning-text-a': '1',
+
+  // Code Blocks - Warmer dark
+  '--color-bg-code-block-h': '340', '--color-bg-code-block-s': '25%', '--color-bg-code-block-l': '14%', '--color-bg-code-block-a': '1',
+  '--color-text-code-block-h': '25', '--color-text-code-block-s': '60%', '--color-text-code-block-l': '90%', '--color-text-code-block-a': '1',
+  '--color-bg-code-inline-h': '340', '--color-bg-code-inline-s': '30%', '--color-bg-code-inline-l': '28%', '--color-bg-code-inline-a': '0.9',
+  '--color-text-code-inline-h': '340', '--color-text-code-inline-s': '75%', '--color-text-code-inline-l': '80%', '--color-text-code-inline-a': '1',
+  '--color-border-code-inline-h': '340', '--color-border-code-inline-s': '25%', '--color-border-code-inline-l': '40%', '--color-border-code-inline-a': '0.4',
+);
+
+// --- Twilight Neo (FIXED: Better contrast for secondary text) ---
+$theme-twilight-neo: (
+  // Backgrounds (unchanged)
+  '--color-bg-primary-h': '220', '--color-bg-primary-s': '30%', '--color-bg-primary-l': '8%', '--color-bg-primary-a': '1',
+  '--color-bg-secondary-h': '220', '--color-bg-secondary-s': '25%', '--color-bg-secondary-l': '12%', '--color-bg-secondary-a': '1',
+  '--color-bg-tertiary-h': '220', '--color-bg-tertiary-s': '22%', '--color-bg-tertiary-l': '16%', '--color-bg-tertiary-a': '1',
+  '--color-bg-quaternary-h': '220', '--color-bg-quaternary-s': '20%', '--color-bg-quaternary-l': '20%', '--color-bg-quaternary-a': '1',
+  '--color-bg-quinary-h': '220', '--color-bg-quinary-s': '20%', '--color-bg-quinary-l': '24%', '--color-bg-quinary-a': '1',
+  '--color-bg-senary-h': '220', '--color-bg-senary-s': '20%', '--color-bg-senary-l': '28%', '--color-bg-senary-a': '1',
+
+  // Glassmorphism (unchanged)
+  '--color-bg-glass-h': '220', '--color-bg-glass-s': '25%', '--color-bg-glass-l': '12%', '--color-bg-glass-a': '0.18',
+  '--color-border-glass-h': '190', '--color-border-glass-s': '70%', '--color-border-glass-l': '55%', '--color-border-glass-a': '0.25',
+  '--blur-glass': '12px',
+  '--color-bg-holographic-accent-h': '180', '--color-bg-holographic-accent-s': '95%', '--color-bg-holographic-accent-l': '60%', '--color-bg-holographic-accent-a': '0.12',
+
+  // Text - FIXED: Much brighter secondary text for dark backgrounds
+  '--color-text-primary-h': '200', '--color-text-primary-s': '60%', '--color-text-primary-l': '90%', '--color-text-primary-a': '1',
+  '--color-text-secondary-h': '200',   // FIXED: Changed from dark to light
+  '--color-text-secondary-s': '50%',   // Slightly less saturated
+  '--color-text-secondary-l': '78%',   // Much brighter (was way too dark)
+  '--color-text-secondary-a': '1',
+  '--color-text-muted-h': '200', '--color-text-muted-s': '30%', '--color-text-muted-l': '60%', '--color-text-muted-a': '1',
+  '--color-text-on-primary-h': '220', '--color-text-on-primary-s': '40%', '--color-text-on-primary-l': '15%', '--color-text-on-primary-a': '1', 
+  '--color-text-on-secondary-h': '220', '--color-text-on-secondary-s': '15%', '--color-text-on-secondary-l': '88%', '--color-text-on-secondary-a': '1',
+  '--color-text-accent-h': '180', '--color-text-accent-s': '90%', '--color-text-accent-l': '75%', '--color-text-accent-a': '1',
+  '--color-input-placeholder-focused-h': '180', '--color-input-placeholder-focused-s': '70%', '--color-input-placeholder-focused-l': '82%', '--color-input-placeholder-focused-a': '1',
+
+  // Accents & Glows (unchanged)
+  '--color-accent-primary-h': '180', '--color-accent-primary-s': '95%', '--color-accent-primary-l': '60%', '--color-accent-primary-a': '1',
+  '--color-accent-primary-light-h':'180', '--color-accent-primary-light-s':'95%', '--color-accent-primary-light-l':'70%', '--color-accent-primary-light-a':'1',
+  '--color-accent-primary-dark-h':'180', '--color-accent-primary-dark-s':'95%', '--color-accent-primary-dark-l':'50%', '--color-accent-primary-dark-a':'1',
+  '--color-accent-secondary-h': '270', '--color-accent-secondary-s': '85%', '--color-accent-secondary-l': '65%', '--color-accent-secondary-a': '1',
+  '--color-accent-interactive-h': '185', '--color-accent-interactive-s': '100%', '--color-accent-interactive-l': '55%', '--color-accent-interactive-a': '1',
+  '--color-accent-glow-h': '180', '--color-accent-glow-s': '95%', '--color-accent-glow-l': '65%', '--color-accent-glow-a': '0.55',
+  '--color-holographic-glow-1-h': '180', '--color-holographic-glow-1-s': '100%', '--color-holographic-glow-1-l': '62%', '--color-holographic-glow-1-a': '0.35',
+  '--color-holographic-glow-2-h': '270', '--color-holographic-glow-2-s': '90%', '--color-holographic-glow-2-l': '68%', '--color-holographic-glow-2-a': '0.3',
+
+  // Logo (unchanged)
+  '--color-logo-primary-h': '180', '--color-logo-primary-s': '95%', '--color-logo-primary-l': '60%', '--color-logo-primary-a': '1',
+  '--color-logo-secondary-h': '270', '--color-logo-secondary-s': '85%', '--color-logo-secondary-l': '65%', '--color-logo-secondary-a': '1',
+  '--color-logo-main-text-h': 'var(--color-text-primary-h)', '--color-logo-main-text-s': 'var(--color-text-primary-s)', '--color-logo-main-text-l': 'var(--color-text-primary-l)', '--color-logo-main-text-a': 'var(--color-text-primary-a)',
+  '--color-logo-subtitle-text-h': 'var(--color-text-secondary-h)', '--color-logo-subtitle-text-s': 'var(--color-text-secondary-s)', '--color-logo-subtitle-text-l': 'var(--color-text-secondary-l)', '--color-logo-subtitle-text-a': 'var(--color-text-secondary-a)',
+
+  // Buttons - Already corrected
+  '--color-button-primary-bg-h': '180',
+  '--color-button-primary-bg-s': '85%',
+  '--color-button-primary-bg-l': '45%',
+  '--color-button-primary-bg-a': '0.95',
+  '--color-button-primary-text-h': '220', '--color-button-primary-text-s': '15%', '--color-button-primary-text-l': '98%', '--color-button-primary-text-a': '1',
+  '--color-button-secondary-bg-h': '270',
+  '--color-button-secondary-bg-s': '75%',
+  '--color-button-secondary-bg-l': '50%',
+  '--color-button-secondary-bg-a': '0.95',
+  '--color-button-secondary-text-h': '220', '--color-button-secondary-text-s': '15%', '--color-button-secondary-text-l': '96%', '--color-button-secondary-text-a': '1',
+  '--color-button-accent-bg-h': '185',
+  '--color-button-accent-bg-s': '90%',
+  '--color-button-accent-bg-l': '42%',
+  '--color-button-accent-bg-a': '1',
+  '--color-button-accent-text-h': '220', '--color-button-accent-text-s': '15%', '--color-button-accent-text-l': '98%', '--color-button-accent-text-a': '1',
+  '--color-button-glow-h': '180', '--color-button-glow-s': '95%', '--color-button-glow-l': '65%', '--color-button-glow-a': '0.5',
+
+  // Borders (unchanged)
+  '--color-border-primary-h': '220', '--color-border-primary-s': '20%', '--color-border-primary-l': '25%', '--color-border-primary-a': '0.75',
+  '--color-border-secondary-h': '220', '--color-border-secondary-s': '18%', '--color-border-secondary-l': '30%', '--color-border-secondary-a': '0.55',
+  '--color-border-interactive-h': '185', '--color-border-interactive-s': '80%', '--color-border-interactive-l': '62%', '--color-border-interactive-a': '0.65',
+  '--color-border-translucent-h': '190', '--color-border-translucent-s': '60%', '--color-border-translucent-l': '50%', '--color-border-translucent-a': '0.12',
+
+  // Shadows (unchanged)
+  '--shadow-color-h': '220', '--shadow-color-s': '45%', '--shadow-color-l': '2%',
+  '--shadow-highlight-modifier': '+7%',
+  '--shadow-opacity-soft': '0.4', '--shadow-opacity-medium': '0.55', '--shadow-opacity-strong': '0.65', '--shadow-opacity-deep': '0.7',
+
+  // Voice Viz (unchanged)
+  '--color-voice-user-h': '270', '--color-voice-user-s': '90%', '--color-voice-user-l': '72%', '--color-voice-user-a': '1',
+  '--color-voice-ai-speaking-h': '180', '--color-voice-ai-speaking-s': '95%', '--color-voice-ai-speaking-l': '62%', '--color-voice-ai-speaking-a': '1',
+  '--color-voice-ai-thinking-h': '220', '--color-voice-ai-thinking-s': '50%', '--color-voice-ai-thinking-l': '60%', '--color-voice-ai-thinking-a': '1',
+  '--voice-pulse-opacity': '0.85',
+
+  // Semantic Colors (unchanged)
+  '--color-info-h': '200', '--color-info-s': '85%', '--color-info-l': '72%', '--color-info-a': '1',
+  '--color-success-h': '140', '--color-success-s': '75%', '--color-success-l': '62%', '--color-success-a': '1',
+  '--color-warning-h': '40', '--color-warning-s': '95%', '--color-warning-l': '62%', '--color-warning-a': '1',
+  '--color-error-h': '0', '--color-error-s': '85%', '--color-error-l': '68%', '--color-error-a': '1',
+  '--color-error-text-h': '0', '--color-error-text-s': '100%', '--color-error-text-l': '90%', '--color-error-text-a': '1',
+  '--color-danger-h': '0', '--color-danger-s': '85%', '--color-danger-l': '68%', '--color-danger-a': '1',
+  '--color-danger-text-h': '0', '--color-danger-text-s': '100%', '--color-danger-text-l': '90%', '--color-danger-text-a': '1',
+  '--color-warning-text-h': '40', '--color-warning-text-s': '95%', '--color-warning-text-l': '88%', '--color-warning-text-a': '1',
+
+  // Code Blocks (unchanged)
+  '--color-bg-code-block-h': '220', '--color-bg-code-block-s': '20%', '--color-bg-code-block-l': '7%', '--color-bg-code-block-a': '1',
+  '--color-text-code-block-h': '200', '--color-text-code-block-s': '40%', '--color-text-code-block-l': '88%', '--color-text-code-block-a': '1',
+  '--color-bg-code-inline-h': '220', '--color-bg-code-inline-s': '25%', '--color-bg-code-inline-l': '12%', '--color-bg-code-inline-a': '0.9',
+  '--color-text-code-inline-h': '180', '--color-text-code-inline-s': '80%', '--color-text-code-inline-l': '85%', '--color-text-code-inline-a': '1',
+  '--color-border-code-inline-h': '220', '--color-border-code-inline-s': '20%', '--color-border-code-inline-l': '20%', '--color-border-code-inline-a': '0.4',
+);
+
+// --- Aurora Daybreak (Enhanced Light) ---
+// Keeping as is since no issues reported
+$theme-aurora-daybreak: (
+  // Backgrounds - Warmer, pink-tinted whites
+  '--color-bg-primary-h': '340',       // Pink-tinted white (was 210 blue)
+  '--color-bg-primary-s': '25%',       // Some saturation for warmth
+  '--color-bg-primary-l': '97%',       // Very light
+  '--color-bg-primary-a': '1',
+ 
+  '--color-bg-secondary-h': '330',     // Pink-tinted grays (was 200)
+  '--color-bg-secondary-s': '20%',
+  '--color-bg-secondary-l': '93%',
+  '--color-bg-secondary-a': '1',
+ 
+  '--color-bg-tertiary-h': '320',      // More pink shift
+  '--color-bg-tertiary-s': '18%',      // Reduced from 40%
+  '--color-bg-tertiary-l': '90%',
+  '--color-bg-tertiary-a': '1',
+ 
+  '--color-bg-quaternary-h': '310', '--color-bg-quaternary-s': '15%', '--color-bg-quaternary-l': '88%', '--color-bg-quaternary-a': '1',
+  '--color-bg-quinary-h': '310', '--color-bg-quinary-s': '15%', '--color-bg-quinary-l': '85%', '--color-bg-quinary-a': '1',
+  '--color-bg-senary-h': '310', '--color-bg-senary-s': '15%', '--color-bg-senary-l': '82%', '--color-bg-senary-a': '1',
+
+  // Glassmorphism - Pink/violet tinted
+  '--color-bg-glass-h': '330', '--color-bg-glass-s': '30%', '--color-bg-glass-l': '94%', '--color-bg-glass-a': '0.6',
+  '--color-border-glass-h': '330', '--color-border-glass-s': '45%', '--color-border-glass-l': '85%', '--color-border-glass-a': '0.4',
+  '--blur-glass': '10px',
+  '--color-bg-holographic-accent-h': '330', '--color-bg-holographic-accent-s': '90%', '--color-bg-holographic-accent-l': '75%', '--color-bg-holographic-accent-a': '0.1',
+
+  // Text - Better contrast with warmer tones
+  '--color-text-primary-h': '340',     // Warm dark with pink tint (was 220 blue)
+  '--color-text-primary-s': '30%',     // Increased from 35%
+  '--color-text-primary-l': '18%',     // Darker for better contrast (was 20%)
+  '--color-text-primary-a': '1',
+  
+  '--color-text-secondary-h': '330',   // Pink-tinted secondary (was 220)
+  '--color-text-secondary-s': '25%',   // Reduced from 28%
+  '--color-text-secondary-l': '35%',   // Darker for contrast (was 38%)
+  '--color-text-secondary-a': '1',
+  
+  '--color-text-muted-h': '320', '--color-text-muted-s': '20%', '--color-text-muted-l': '52%', '--color-text-muted-a': '1',
+  '--color-text-on-primary-h': '340', '--color-text-on-primary-s': '20%', '--color-text-on-primary-l': '96%', '--color-text-on-primary-a': '1',
+  '--color-text-on-secondary-h': '330', '--color-text-on-secondary-s': '15%', '--color-text-on-secondary-l': '94%', '--color-text-on-secondary-a': '1',
+  '--color-text-accent-h': '330', '--color-text-accent-s': '85%', '--color-text-accent-l': '50%', '--color-text-accent-a': '1',
+  '--color-input-placeholder-focused-h': '330', '--color-input-placeholder-focused-s': '75%', '--color-input-placeholder-focused-l': '78%', '--color-input-placeholder-focused-a': '1',
+
+  // Accents - Vibrant pink/violet
+  '--color-accent-primary-h': '330',   // Vibrant pink (was 330)
+  '--color-accent-primary-s': '90%',   // High saturation
+  '--color-accent-primary-l': '65%',   // Darker for contrast
+  '--color-accent-primary-a': '1',
+  '--color-accent-primary-light-h':'330', '--color-accent-primary-light-s':'85%', '--color-accent-primary-light-l':'75%', '--color-accent-primary-light-a':'1',
+  '--color-accent-primary-dark-h':'330', '--color-accent-primary-dark-s':'95%', '--color-accent-primary-dark-l':'55%', '--color-accent-primary-dark-a':'1',
+  
+  '--color-accent-secondary-h': '270', // True violet (was 260)
+  '--color-accent-secondary-s': '85%', // Increased saturation
+  '--color-accent-secondary-l': '70%', // Slightly darker
+  '--color-accent-secondary-a': '1',
+  
+  '--color-accent-interactive-h': '340', '--color-accent-interactive-s': '92%', '--color-accent-interactive-l': '68%', '--color-accent-interactive-a': '1',
+  '--color-accent-glow-h': '330', '--color-accent-glow-s': '90%', '--color-accent-glow-l': '80%', '--color-accent-glow-a': '0.45',
+  
+  // NEW: Aurora burst colors for particle effects
+  '--color-burst-pink-h': '340', '--color-burst-pink-s': '95%', '--color-burst-pink-l': '75%', '--color-burst-pink-a': '0.6',
+  '--color-burst-violet-h': '280', '--color-burst-violet-s': '90%', '--color-burst-violet-l': '72%', '--color-burst-violet-a': '0.5',
+  '--color-burst-coral-h': '350', '--color-burst-coral-s': '88%', '--color-burst-coral-l': '70%', '--color-burst-coral-a': '0.4',
+  '--color-burst-lavender-h': '260', '--color-burst-lavender-s': '85%', '--color-burst-lavender-l': '78%', '--color-burst-lavender-a': '0.35',
+  
+  // Enhanced glow colors
+  '--color-holographic-glow-1-h': '330', '--color-holographic-glow-1-s': '90%', '--color-holographic-glow-1-l': '75%', '--color-holographic-glow-1-a': '0.3',
+  '--color-holographic-glow-2-h': '260', '--color-holographic-glow-2-s': '80%', '--color-holographic-glow-2-l': '80%', '--color-holographic-glow-2-a': '0.25',
+
+  // Logo - Inherit pink/violet theme
+  '--color-logo-primary-h': '330', '--color-logo-primary-s': '90%', '--color-logo-primary-l': '65%', '--color-logo-primary-a': '1',
+  '--color-logo-secondary-h': '270', '--color-logo-secondary-s': '85%', '--color-logo-secondary-l': '70%', '--color-logo-secondary-a': '1',
+  '--color-logo-main-text-h': 'var(--color-text-primary-h)', '--color-logo-main-text-s': 'var(--color-text-primary-s)', '--color-logo-main-text-l': 'var(--color-text-primary-l)', '--color-logo-main-text-a': 'var(--color-text-primary-a)',
+  '--color-logo-subtitle-text-h': 'var(--color-text-secondary-h)', '--color-logo-subtitle-text-s': 'var(--color-text-secondary-s)', '--color-logo-subtitle-text-l': 'var(--color-text-secondary-l)', '--color-logo-subtitle-text-a': 'var(--color-text-secondary-a)',
+
+  // Buttons - High contrast pink/violet
+  '--color-button-primary-bg-h': '330', '--color-button-primary-bg-s': '90%', '--color-button-primary-bg-l': '65%', '--color-button-primary-bg-a': '1',
+  '--color-button-primary-text-h': '340', '--color-button-primary-text-s': '20%', '--color-button-primary-text-l': '98%', '--color-button-primary-text-a': '1',
+  '--color-button-secondary-bg-h': '270', '--color-button-secondary-bg-s': '85%', '--color-button-secondary-bg-l': '70%', '--color-button-secondary-bg-a': '1',
+  '--color-button-secondary-text-h': '330', '--color-button-secondary-text-s': '15%', '--color-button-secondary-text-l': '96%', '--color-button-secondary-text-a': '1',
+  '--color-button-accent-bg-h': '340', '--color-button-accent-bg-s': '92%', '--color-button-accent-bg-l': '68%', '--color-button-accent-bg-a': '1',
+  '--color-button-accent-text-h': '340', '--color-button-accent-text-s': '20%', '--color-button-accent-text-l': '98%', '--color-button-accent-text-a': '1',
+  '--color-button-glow-h': '330', '--color-button-glow-s': '90%', '--color-button-glow-l': '80%', '--color-button-glow-a': '0.5',
+
+  // Borders - More visible with pink tints
+  '--color-border-primary-h': '330', '--color-border-primary-s': '35%', '--color-border-primary-l': '78%', '--color-border-primary-a': '0.95',
+  '--color-border-secondary-h': '320', '--color-border-secondary-s': '30%', '--color-border-secondary-l': '85%', '--color-border-secondary-a': '0.8',
+  '--color-border-interactive-h': '330', '--color-border-interactive-s': '75%', '--color-border-interactive-l': '55%', '--color-border-interactive-a': '0.85',
+  '--color-border-translucent-h': '330', '--color-border-translucent-s': '40%', '--color-border-translucent-l': '75%', '--color-border-translucent-a': '0.3',
+
+  // Shadows - Warmer
+  '--shadow-color-h': '330', '--shadow-color-s': '35%', '--shadow-color-l': '45%',
+  '--shadow-highlight-modifier': '+40%',
+  '--shadow-opacity-soft': '0.1', '--shadow-opacity-medium': '0.14', '--shadow-opacity-strong': '0.17', '--shadow-opacity-deep': '0.2',
+
+  // Voice Viz - Pink/violet theme
+  '--color-voice-user-h': '260', '--color-voice-user-s': '75%', '--color-voice-user-l': '75%', '--color-voice-user-a': '1',
+  '--color-voice-ai-speaking-h': '340', '--color-voice-ai-speaking-s': '80%', '--color-voice-ai-speaking-l': '70%', '--color-voice-ai-speaking-a': '1',
+  '--color-voice-ai-thinking-h': '320', '--color-voice-ai-thinking-s': '60%', '--color-voice-ai-thinking-l': '72%', '--color-voice-ai-thinking-a': '1',
+  '--voice-pulse-opacity': '0.6',
+
+  // Semantic Colors - Higher contrast for light theme
+  '--color-info-h': '195', '--color-info-s': '85%', '--color-info-l': '50%', '--color-info-a': '1',
+  '--color-success-h': '130', '--color-success-s': '70%', '--color-success-l': '45%', '--color-success-a': '1',
+  '--color-warning-h': '40', '--color-warning-s': '92%', '--color-warning-l': '52%', '--color-warning-a': '1',
+  '--color-error-h': '0', '--color-error-s': '85%', '--color-error-l': '55%', '--color-error-a': '1',
+  '--color-error-text-h': '0', '--color-error-text-s': '100%', '--color-error-text-l': '96%', '--color-error-text-a': '1',
+  '--color-danger-h': '0', '--color-danger-s': '85%', '--color-danger-l': '55%', '--color-danger-a': '1',
+  '--color-danger-text-h': '0', '--color-danger-text-s': '100%', '--color-danger-text-l': '96%', '--color-danger-text-a': '1',
+  '--color-warning-text-h': '40', '--color-warning-text-s': '100%', '--color-warning-text-l': '96%', '--color-warning-text-a': '1',
+
+  // Code Blocks - Light with pink tint
+  '--color-bg-code-block-h': '340', '--color-bg-code-block-s': '20%', '--color-bg-code-block-l': '93%', '--color-bg-code-block-a': '1',
+  '--color-text-code-block-h': '340', '--color-text-code-block-s': '30%', '--color-text-code-block-l': '25%', '--color-text-code-block-a': '1',
+  '--color-bg-code-inline-h': '340', '--color-bg-code-inline-s': '28%', '--color-bg-code-inline-l': '90%', '--color-bg-code-inline-a': '0.9',
+  '--color-text-code-inline-h': '330', '--color-text-code-inline-s': '70%', '--color-text-code-inline-l': '45%', '--color-text-code-inline-a': '1',
+  '--color-border-code-inline-h': '330', '--color-border-code-inline-s': '35%', '--color-border-code-inline-l': '78%', '--color-border-code-inline-a': '0.4',
+);
+
+// --- NEW: Retro Terminus Dark (REFINED: Modern Terminal with Subtle Glow) ---
+$theme-terminus-dark: (
+  // Backgrounds - Deep blacks with subtle depth
+  '--color-bg-primary-h': '0', '--color-bg-primary-s': '0%', '--color-bg-primary-l': '3%', '--color-bg-primary-a': '1',
+  '--color-bg-secondary-h': '0', '--color-bg-secondary-s': '0%', '--color-bg-secondary-l': '7%', '--color-bg-secondary-a': '1',
+  '--color-bg-tertiary-h': '0', '--color-bg-tertiary-s': '0%', '--color-bg-tertiary-l': '10%', '--color-bg-tertiary-a': '1',
+  '--color-bg-quaternary-h': '0', '--color-bg-quaternary-s': '0%', '--color-bg-quaternary-l': '12%', '--color-bg-quaternary-a': '1',
+  '--color-bg-quinary-h': '0', '--color-bg-quinary-s': '0%', '--color-bg-quinary-l': '14%', '--color-bg-quinary-a': '1',
+  '--color-bg-senary-h': '0', '--color-bg-senary-s': '0%', '--color-bg-senary-l': '16%', '--color-bg-senary-a': '1',
+
+  // Glassmorphism - Minimal for terminal aesthetic
+  '--color-bg-glass-h': '0', '--color-bg-glass-s': '0%', '--color-bg-glass-l': '5%', '--color-bg-glass-a': '0.95',
+  '--color-border-glass-h': '0', '--color-border-glass-s': '0%', '--color-border-glass-l': '100%', '--color-border-glass-a': '0.15',
+  '--blur-glass': '0px',
+  '--color-bg-holographic-accent-h': '0', '--color-bg-holographic-accent-s': '0%', '--color-bg-holographic-accent-l': '100%', '--color-bg-holographic-accent-a': '0.05',
+
+  // Text - White and greys with subtle neon accents
+  '--color-text-primary-h': '0', '--color-text-primary-s': '0%', '--color-text-primary-l': '95%', '--color-text-primary-a': '1',
+  '--color-text-secondary-h': '0', '--color-text-secondary-s': '0%', '--color-text-secondary-l': '75%', '--color-text-secondary-a': '1',
+  '--color-text-muted-h': '0', '--color-text-muted-s': '0%', '--color-text-muted-l': '55%', '--color-text-muted-a': '1',
+  '--color-text-on-primary-h': '0', '--color-text-on-primary-s': '0%', '--color-text-on-primary-l': '95%', '--color-text-on-primary-a': '1',
+  '--color-text-on-secondary-h': '0', '--color-text-on-secondary-s': '0%', '--color-text-on-secondary-l': '90%', '--color-text-on-secondary-a': '1',
+  '--color-text-accent-h': '180', '--color-text-accent-s': '100%', '--color-text-accent-l': '65%', '--color-text-accent-a': '1',
+
+  // Neon accent colors for emphasis
+  '--color-neon-cyan-h': '180', '--color-neon-cyan-s': '100%', '--color-neon-cyan-l': '65%',
+  '--color-neon-pink-h': '330', '--color-neon-pink-s': '100%', '--color-neon-pink-l': '70%',
+  '--color-neon-purple-h': '270', '--color-neon-purple-s': '100%', '--color-neon-purple-l': '70%',
+  '--color-neon-green-h': '120', '--color-neon-green-s': '100%', '--color-neon-green-l': '60%',
+
+  // Accents - Subtle neon cyan primary
+  '--color-accent-primary-h': '180', '--color-accent-primary-s': '100%', '--color-accent-primary-l': '65%', '--color-accent-primary-a': '1',
+  '--color-accent-primary-light-h': '180', '--color-accent-primary-light-s': '100%', '--color-accent-primary-light-l': '75%', '--color-accent-primary-light-a': '1',
+  '--color-accent-primary-dark-h': '180', '--color-accent-primary-dark-s': '100%', '--color-accent-primary-dark-l': '55%', '--color-accent-primary-dark-a': '1',
+  '--color-accent-secondary-h': '270', '--color-accent-secondary-s': '90%', '--color-accent-secondary-l': '65%', '--color-accent-secondary-a': '1',
+  '--color-accent-interactive-h': '180', '--color-accent-interactive-s': '100%', '--color-accent-interactive-l': '70%', '--color-accent-interactive-a': '1',
+  '--color-accent-glow-h': '180', '--color-accent-glow-s': '100%', '--color-accent-glow-l': '65%', '--color-accent-glow-a': '0.4',
+
+  // Typography for terminal aesthetic
+  '--font-family-sans': '"JetBrains Mono", "Fira Code", "IBM Plex Mono", monospace',
+  '--font-family-mono': '"JetBrains Mono", "Fira Code", "IBM Plex Mono", monospace',
+  '--font-family-display': '"JetBrains Mono", "Share Tech Mono", monospace',
+  '--font-size-base': '0.9rem',
+  '--letter-spacing-base': '0.025em',
+  '--line-height-base': '1.5',
+
+  // Borders - Minimal radius, clean lines
+  '--radius-xs': '2px', '--radius-sm': '2px', '--radius-md': '3px',
+  '--radius-lg': '4px', '--radius-xl': '4px', '--radius-2xl': '6px',
+  '--radius-3xl': '8px', '--radius-full': '8px',
+  '--radius-holo': '2px',
+  
+  '--color-border-primary-h': '0', '--color-border-primary-s': '0%', '--color-border-primary-l': '25%', '--color-border-primary-a': '0.8',
+  '--color-border-secondary-h': '0', '--color-border-secondary-s': '0%', '--color-border-secondary-l': '20%', '--color-border-secondary-a': '0.6',
+  '--color-border-interactive-h': '180', '--color-border-interactive-s': '100%', '--color-border-interactive-l': '65%', '--color-border-interactive-a': '0.8',
+  '--color-border-translucent-h': '0', '--color-border-translucent-s': '0%', '--color-border-translucent-l': '100%', '--color-border-translucent-a': '0.1',
+
+  // Buttons - FIXED: Much darker with better contrast
+  '--color-button-primary-bg-h': '180', 
+  '--color-button-primary-bg-s': '80%',    // Reduced saturation
+  '--color-button-primary-bg-l': '20%',    // Much darker for white text visibility
+  '--color-button-primary-bg-a': '1',
+  '--color-button-primary-text-h': '0', '--color-button-primary-text-s': '0%', '--color-button-primary-text-l': '95%', '--color-button-primary-text-a': '1',
+  
+  '--color-button-secondary-bg-h': '0', '--color-button-secondary-bg-s': '0%', '--color-button-secondary-bg-l': '15%', '--color-button-secondary-bg-a': '1',
+  '--color-button-secondary-text-h': '0', '--color-button-secondary-text-s': '0%', '--color-button-secondary-text-l': '85%', '--color-button-secondary-text-a': '1',
+  
+  '--color-button-accent-bg-h': '180', 
+  '--color-button-accent-bg-s': '100%', 
+  '--color-button-accent-bg-l': '65%',     // Kept brighter for accent
+  '--color-button-accent-bg-a': '0.1',     // Very low opacity background
+  '--color-button-accent-text-h': '180', '--color-button-accent-text-s': '100%', '--color-button-accent-text-l': '70%', '--color-button-accent-text-a': '1',
+  '--color-button-glow-h': '180', '--color-button-glow-s': '100%', '--color-button-glow-l': '65%', '--color-button-glow-a': '0.3',
+
+  // Terminal effects - Subtle and modern
+  '--terminal-glow-intensity': '0.15',
+  '--text-shadow-neon': '0 0 3px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.4)',
+  '--box-shadow-neon': '0 0 10px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.2)',
+  
+  // CRT Effects
+  '--crt-scanline-opacity': '0.08',          // Subtle scanlines
+  '--crt-scanline-size': '2px',              // Scanline thickness
+  '--crt-scanline-gap': '2px',               // Gap between scanlines
+  '--crt-flicker-intensity': '0.03',         // Subtle flicker
+  '--crt-curve-amount': '0.02',              // Slight screen curve
+  '--crt-vignette-opacity': '0.2',           // Edge darkening
+  '--crt-chromatic-aberration': '0.5px',     // RGB shift effect
+  '--crt-noise-opacity': '0.02',             // Static noise
+  '--crt-glow-blur': '0.5px',                // Text glow amount
+  '--crt-refresh-flicker': '0.01',           // Refresh rate simulation
+
+  // Shadows - Sharp, minimal
+  '--shadow-color-h': '0', '--shadow-color-s': '0%', '--shadow-color-l': '0%',
+  '--shadow-highlight-modifier': '+5%',
+  '--shadow-opacity-soft': '0.8', '--shadow-opacity-medium': '0.9', '--shadow-opacity-strong': '1', '--shadow-opacity-deep': '1',
+
+  // Voice Viz - Neon accents
+  '--color-voice-user-h': '330', '--color-voice-user-s': '100%', '--color-voice-user-l': '70%', '--color-voice-user-a': '1',
+  '--color-voice-ai-speaking-h': '180', '--color-voice-ai-speaking-s': '100%', '--color-voice-ai-speaking-l': '65%', '--color-voice-ai-speaking-a': '1',
+  '--color-voice-ai-thinking-h': '270', '--color-voice-ai-thinking-s': '90%', '--color-voice-ai-thinking-l': '65%', '--color-voice-ai-thinking-a': '0.8',
+  '--voice-pulse-opacity': '0.9',
+
+  // Logo colors
+  '--color-logo-primary-h': '180', '--color-logo-primary-s': '100%', '--color-logo-primary-l': '65%', '--color-logo-primary-a': '1',
+  '--color-logo-secondary-h': '270', '--color-logo-secondary-s': '90%', '--color-logo-secondary-l': '65%', '--color-logo-secondary-a': '0.9',
+  '--color-logo-main-text-h': '0', '--color-logo-main-text-s': '0%', '--color-logo-main-text-l': '95%', '--color-logo-main-text-a': '1',
+  '--color-logo-subtitle-text-h': '0', '--color-logo-subtitle-text-s': '0%', '--color-logo-subtitle-text-l': '75%', '--color-logo-subtitle-text-a': '1',
+
+  // Semantic Colors - Neon style
+  '--color-info-h': '200', '--color-info-s': '100%', '--color-info-l': '60%', '--color-info-a': '1',
+  '--color-success-h': '120', '--color-success-s': '80%', '--color-success-l': '50%', '--color-success-a': '1',
+  '--color-warning-h': '45', '--color-warning-s': '100%', '--color-warning-l': '60%', '--color-warning-a': '1',
+  '--color-error-h': '0', '--color-error-s': '100%', '--color-error-l': '65%', '--color-error-a': '1',
+  '--color-error-text-h': '0', '--color-error-text-s': '0%', '--color-error-text-l': '95%', '--color-error-text-a': '1',
+  '--color-danger-h': '0', '--color-danger-s': '100%', '--color-danger-l': '65%', '--color-danger-a': '1',
+  '--color-danger-text-h': '0', '--color-danger-text-s': '0%', '--color-danger-text-l': '95%', '--color-danger-text-a': '1',
+  '--color-warning-text-h': '0', '--color-warning-text-s': '0%', '--color-warning-text-l': '95%', '--color-warning-text-a': '1',
+
+  // Code Blocks - Terminal style
+  '--color-bg-code-block-h': '0', '--color-bg-code-block-s': '0%', '--color-bg-code-block-l': '5%', '--color-bg-code-block-a': '1',
+  '--color-text-code-block-h': '180', '--color-text-code-block-s': '60%', '--color-text-code-block-l': '75%', '--color-text-code-block-a': '1',
+  '--color-bg-code-inline-h': '0', '--color-bg-code-inline-s': '0%', '--color-bg-code-inline-l': '10%', '--color-bg-code-inline-a': '1',
+  '--color-text-code-inline-h': '180', '--color-text-code-inline-s': '100%', '--color-text-code-inline-l': '70%', '--color-text-code-inline-a': '1',
+  '--color-border-code-inline-h': '180', '--color-border-code-inline-s': '100%', '--color-border-code-inline-l': '65%', '--color-border-code-inline-a': '0.3',
+);
+
+// --- NEW: Retro Terminus Light (REFINED: Inverted Terminal) ---
+$theme-terminus-light: (
+  // Backgrounds - Light grey terminal
+  '--color-bg-primary-h': '0', '--color-bg-primary-s': '0%', '--color-bg-primary-l': '96%', '--color-bg-primary-a': '1',
+  '--color-bg-secondary-h': '0', '--color-bg-secondary-s': '0%', '--color-bg-secondary-l': '92%', '--color-bg-secondary-a': '1',
+  '--color-bg-tertiary-h': '0', '--color-bg-tertiary-s': '0%', '--color-bg-tertiary-l': '89%', '--color-bg-tertiary-a': '1',
+  '--color-bg-quaternary-h': '0', '--color-bg-quaternary-s': '0%', '--color-bg-quaternary-l': '86%', '--color-bg-quaternary-a': '1',
+  '--color-bg-quinary-h': '0', '--color-bg-quinary-s': '0%', '--color-bg-quinary-l': '83%', '--color-bg-quinary-a': '1',
+  '--color-bg-senary-h': '0', '--color-bg-senary-s': '0%', '--color-bg-senary-l': '80%', '--color-bg-senary-a': '1',
+
+  // Glassmorphism - Minimal for terminal aesthetic
+  '--color-bg-glass-h': '0', '--color-bg-glass-s': '0%', '--color-bg-glass-l': '94%', '--color-bg-glass-a': '0.95',
+  '--color-border-glass-h': '0', '--color-border-glass-s': '0%', '--color-border-glass-l': '20%', '--color-border-glass-a': '0.3',
+  '--blur-glass': '0px',
+  '--color-bg-holographic-accent-h': '0', '--color-bg-holographic-accent-s': '0%', '--color-bg-holographic-accent-l': '0%', '--color-bg-holographic-accent-a': '0.08',
+
+  // Text - Dark greys and blacks for terminal
+  '--color-text-primary-h': '0', '--color-text-primary-s': '0%', '--color-text-primary-l': '8%', '--color-text-primary-a': '1',
+  '--color-text-secondary-h': '0', '--color-text-secondary-s': '0%', '--color-text-secondary-l': '20%', '--color-text-secondary-a': '1',
+  '--color-text-muted-h': '0', '--color-text-muted-s': '0%', '--color-text-muted-l': '35%', '--color-text-muted-a': '1',
+  '--color-text-on-primary-h': '0', '--color-text-on-primary-s': '0%', '--color-text-on-primary-l': '96%', '--color-text-on-primary-a': '1',
+  '--color-text-on-secondary-h': '0', '--color-text-on-secondary-s': '0%', '--color-text-on-secondary-l': '92%', '--color-text-on-secondary-a': '1',
+  '--color-text-accent-h': '0', '--color-text-accent-s': '0%', '--color-text-accent-l': '0%', '--color-text-accent-a': '1',
+
+  // Accents - Deep blacks
+  '--color-accent-primary-h': '0', '--color-accent-primary-s': '0%', '--color-accent-primary-l': '10%', '--color-accent-primary-a': '1',
+  '--color-accent-primary-light-h': '0', '--color-accent-primary-light-s': '0%', '--color-accent-primary-light-l': '20%', '--color-accent-primary-light-a': '1',
+  '--color-accent-primary-dark-h': '0', '--color-accent-primary-dark-s': '0%', '--color-accent-primary-dark-l': '0%', '--color-accent-primary-dark-a': '1',
+  '--color-accent-secondary-h': '0', '--color-accent-secondary-s': '0%', '--color-accent-secondary-l': '25%', '--color-accent-secondary-a': '1',
+  '--color-accent-interactive-h': '0', '--color-accent-interactive-s': '0%', '--color-accent-interactive-l': '15%', '--color-accent-interactive-a': '1',
+  '--color-accent-glow-h': '0', '--color-accent-glow-s': '0%', '--color-accent-glow-l': '0%', '--color-accent-glow-a': '0.3',
+
+  // Typography - Terminal monospace like dark mode
+  '--font-family-sans': '"JetBrains Mono", "Fira Code", "IBM Plex Mono", monospace',
+  '--font-family-mono': '"JetBrains Mono", "Fira Code", "IBM Plex Mono", monospace',
+  '--font-family-display': '"JetBrains Mono", "Share Tech Mono", monospace',
+  '--font-size-base': '0.9rem',
+  '--letter-spacing-base': '0.025em',
+  '--line-height-base': '1.5',
+
+  // Borders - Minimal radius, clean lines
+  '--radius-xs': '2px', '--radius-sm': '2px', '--radius-md': '3px',
+  '--radius-lg': '4px', '--radius-xl': '4px', '--radius-2xl': '6px',
+  '--radius-3xl': '8px', '--radius-full': '8px',
+  '--radius-holo': '2px',
+  
+  '--color-border-primary-h': '0', '--color-border-primary-s': '0%', '--color-border-primary-l': '70%', '--color-border-primary-a': '1',
+  '--color-border-secondary-h': '0', '--color-border-secondary-s': '0%', '--color-border-secondary-l': '80%', '--color-border-secondary-a': '1',
+  '--color-border-interactive-h': '0', '--color-border-interactive-s': '0%', '--color-border-interactive-l': '20%', '--color-border-interactive-a': '1',
+  '--color-border-translucent-h': '0', '--color-border-translucent-s': '0%', '--color-border-translucent-l': '0%', '--color-border-translucent-a': '0.15',
+
+  // Buttons - High contrast terminal style
+  '--color-button-primary-bg-h': '0', '--color-button-primary-bg-s': '0%', '--color-button-primary-bg-l': '10%', '--color-button-primary-bg-a': '1',
+  '--color-button-primary-text-h': '0', '--color-button-primary-text-s': '0%', '--color-button-primary-text-l': '96%', '--color-button-primary-text-a': '1',
+  '--color-button-secondary-bg-h': '0', '--color-button-secondary-bg-s': '0%', '--color-button-secondary-bg-l': '88%', '--color-button-secondary-bg-a': '1',
+  '--color-button-secondary-text-h': '0', '--color-button-secondary-text-s': '0%', '--color-button-secondary-text-l': '10%', '--color-button-secondary-text-a': '1',
+  '--color-button-accent-bg-h': '0', '--color-button-accent-bg-s': '0%', '--color-button-accent-bg-l': '96%', '--color-button-accent-bg-a': '1',
+  '--color-button-accent-text-h': '0', '--color-button-accent-text-s': '0%', '--color-button-accent-text-l': '10%', '--color-button-accent-text-a': '1',
+  '--color-button-glow-h': '0', '--color-button-glow-s': '0%', '--color-button-glow-l': '50%', '--color-button-glow-a': '0.2',
+
+  // Terminal effects - Subtle on light
+  '--terminal-glow-intensity': '0.1',
+  '--text-shadow-terminal': '0 0 1px rgba(0, 0, 0, 0.2)',
+  '--box-shadow-terminal': '0 0 3px rgba(0, 0, 0, 0.1)',
+  
+  // CRT Effects (adjusted for light theme)
+  '--crt-scanline-opacity': '0.05',          // Lighter scanlines
+  '--crt-scanline-size': '1px',              // Thinner for light mode
+  '--crt-scanline-gap': '3px',               // Wider gap for subtlety
+  '--crt-flicker-intensity': '0.02',         // Less flicker on light
+  '--crt-curve-amount': '0.015',             // Slightly less curve
+  '--crt-vignette-opacity': '0.1',           // Lighter vignette
+  '--crt-chromatic-aberration': '0.3px',     // Less RGB shift
+  '--crt-noise-opacity': '0.015',            // Less visible noise
+  '--crt-glow-blur': '0',                    // No glow on light
+  '--crt-refresh-flicker': '0.008',          // Subtle refresh
+
+  // Shadows - Sharp
+  '--shadow-color-h': '0', '--shadow-color-s': '0%', '--shadow-color-l': '50%',
+  '--shadow-highlight-modifier': '+30%',
+  '--shadow-opacity-soft': '0.15', '--shadow-opacity-medium': '0.2', '--shadow-opacity-strong': '0.25', '--shadow-opacity-deep': '0.3',
+
+  // Voice Viz - Monochrome terminal
+  '--color-voice-user-h': '0', '--color-voice-user-s': '0%', '--color-voice-user-l': '30%', '--color-voice-user-a': '1',
+  '--color-voice-ai-speaking-h': '0', '--color-voice-ai-speaking-s': '0%', '--color-voice-ai-speaking-l': '15%', '--color-voice-ai-speaking-a': '1',
+  '--color-voice-ai-thinking-h': '0', '--color-voice-ai-thinking-s': '0%', '--color-voice-ai-thinking-l': '40%', '--color-voice-ai-thinking-a': '0.8',
+  '--voice-pulse-opacity': '0.7',
+
+  // Logo colors
+  '--color-logo-primary-h': '0', '--color-logo-primary-s': '0%', '--color-logo-primary-l': '10%', '--color-logo-primary-a': '1',
+  '--color-logo-secondary-h': '0', '--color-logo-secondary-s': '0%', '--color-logo-secondary-l': '25%', '--color-logo-secondary-a': '1',
+  '--color-logo-main-text-h': '0', '--color-logo-main-text-s': '0%', '--color-logo-main-text-l': '8%', '--color-logo-main-text-a': '1',
+  '--color-logo-subtitle-text-h': '0', '--color-logo-subtitle-text-s': '0%', '--color-logo-subtitle-text-l': '20%', '--color-logo-subtitle-text-a': '1',
+
+  // Semantic Colors - High contrast terminal
+  '--color-info-h': '200', '--color-info-s': '80%', '--color-info-l': '35%', '--color-info-a': '1',
+  '--color-success-h': '120', '--color-success-s': '60%', '--color-success-l': '30%', '--color-success-a': '1',
+  '--color-warning-h': '40', '--color-warning-s': '90%', '--color-warning-l': '40%', '--color-warning-a': '1',
+  '--color-error-h': '0', '--color-error-s': '85%', '--color-error-l': '45%', '--color-error-a': '1',
+  '--color-error-text-h': '0', '--color-error-text-s': '0%', '--color-error-text-l': '96%', '--color-error-text-a': '1',
+  '--color-danger-h': '0', '--color-danger-s': '85%', '--color-danger-l': '45%', '--color-danger-a': '1',
+  '--color-danger-text-h': '0', '--color-danger-text-s': '0%', '--color-danger-text-l': '96%', '--color-danger-text-a': '1',
+  '--color-warning-text-h': '0', '--color-warning-text-s': '0%', '--color-warning-text-l': '8%', '--color-warning-text-a': '1',
+
+  // Code Blocks - Terminal style
+  '--color-bg-code-block-h': '0', '--color-bg-code-block-s': '0%', '--color-bg-code-block-l': '94%', '--color-bg-code-block-a': '1',
+  '--color-text-code-block-h': '0', '--color-text-code-block-s': '0%', '--color-text-code-block-l': '15%', '--color-text-code-block-a': '1',
+  '--color-bg-code-inline-h': '0', '--color-bg-code-inline-s': '0%', '--color-bg-code-inline-l': '90%', '--color-bg-code-inline-a': '1',
+  '--color-text-code-inline-h': '0', '--color-text-code-inline-s': '0%', '--color-text-code-inline-l': '10%', '--color-text-code-inline-a': '1',
+  '--color-border-code-inline-h': '0', '--color-border-code-inline-s': '0%', '--color-border-code-inline-l': '70%', '--color-border-code-inline-a': '0.5',
+);
+
+// --- Warm Embrace (Alternative Light) - Keeping as is ---
+$theme-warm-embrace: (
+  // Backgrounds
+  '--color-bg-primary-h': '35', '--color-bg-primary-s': '70%', '--color-bg-primary-l': '96%', '--color-bg-primary-a': '1',      // Creamy off-white
+  '--color-bg-secondary-h': '30', '--color-bg-secondary-s': '60%', '--color-bg-secondary-l': '91%', '--color-bg-secondary-a': '1',  // Slightly darker/contrasted cream for inputs
+  '--color-bg-tertiary-h': '25', '--color-bg-tertiary-s': '50%', '--color-bg-tertiary-l': '87%', '--color-bg-tertiary-a': '1',    // Subtle warm hovers
+  '--color-bg-quaternary-h': '20', '--color-bg-quaternary-s': '40%', '--color-bg-quaternary-l': '84%', '--color-bg-quaternary-a': '1',
+  '--color-bg-quinary-h': '20', '--color-bg-quinary-s': '40%', '--color-bg-quinary-l': '81%', '--color-bg-quinary-a': '1',
+  '--color-bg-senary-h': '20', '--color-bg-senary-s': '40%', '--color-bg-senary-l': '78%', '--color-bg-senary-a': '1',
+
+  // Glassmorphism
+  '--color-bg-glass-h': '30', '--color-bg-glass-s': '60%', '--color-bg-glass-l': '92%', '--color-bg-glass-a': '0.65', // Warmer, more translucent glass
+  '--color-border-glass-h': '30', '--color-border-glass-s': '50%', '--color-border-glass-l': '84%', '--color-border-glass-a': '0.45',
+  '--blur-glass': '9px',
+  '--color-bg-holographic-accent-h': '25', '--color-bg-holographic-accent-s': '75%', '--color-bg-holographic-accent-l': '65%', '--color-bg-holographic-accent-a': '0.08',
+
+  // Text (Corrected for Warm Embrace)
+  '--color-text-primary-h': '30', '--color-text-primary-s': '25%', '--color-text-primary-l': '20%', '--color-text-primary-a': '1',    // Dark warm brown, high contrast
+  '--color-text-secondary-h': '30', '--color-text-secondary-s': '20%', '--color-text-secondary-l': '35%', '--color-text-secondary-a': '1',  // Darker secondary brown
+  '--color-text-muted-h': '30', '--color-text-muted-s': '15%', '--color-text-muted-l': '50%', '--color-text-muted-a': '1',      // Darker muted brown/gray
+  '--color-text-on-primary-h': '35', '--color-text-on-primary-s': '35%', '--color-text-on-primary-l': '95%', '--color-text-on-primary-a': '1', // Text on primary accent (e.g., amber button text -> very light cream)
+  '--color-text-on-secondary-h': '35', '--color-text-on-secondary-s': '30%', '--color-text-on-secondary-l': '92%', '--color-text-on-secondary-a': '1',
+  '--color-text-accent-h': '25', '--color-text-accent-s': '70%', '--color-text-accent-l': '50%', '--color-text-accent-a': '1',   // For text that is an accent itself (darker amber)
+
+  // Accents & Glows (Warm Embrace) - No change from original description
+  '--color-accent-primary-h': '25', '--color-accent-primary-s': '75%', '--color-accent-primary-l': '65%', '--color-accent-primary-a': '1', // Rich Amber/Orange
+  '--color-accent-primary-light-h':'25', '--color-accent-primary-light-s':'75%', '--color-accent-primary-light-l':'75%', '--color-accent-primary-light-a':'1',
+  '--color-accent-primary-dark-h':'25', '--color-accent-primary-dark-s':'75%', '--color-accent-primary-dark-l':'55%', '--color-accent-primary-dark-a':'1',
+  '--color-accent-secondary-h': '45', '--color-accent-secondary-s': '70%', '--color-accent-secondary-l': '60%', '--color-accent-secondary-a': '1', // Softer Gold/Yellow
+  '--color-accent-interactive-h': '30', '--color-accent-interactive-s': '80%', '--color-accent-interactive-l': '60%', '--color-accent-interactive-a': '1',
+  '--color-accent-glow-h': '25', '--color-accent-glow-s': '80%', '--color-accent-glow-l': '70%', '--color-accent-glow-a': '0.4',
+  '--color-holographic-glow-1-h': '25', '--color-holographic-glow-1-s': '85%', '--color-holographic-glow-1-l': '68%', '--color-holographic-glow-1-a': '0.3',
+  '--color-holographic-glow-2-h': '45', '--color-holographic-glow-2-s': '75%', '--color-holographic-glow-2-l': '63%', '--color-holographic-glow-2-a': '0.25',
+
+  // Logo (Warm Embrace) - Text colors inherit from general text
+  '--color-logo-primary-h': '25', '--color-logo-primary-s': '75%', '--color-logo-primary-l': '65%', '--color-logo-primary-a': '1',
+  '--color-logo-secondary-h': '45', '--color-logo-secondary-s': '70%', '--color-logo-secondary-l': '60%', '--color-logo-secondary-a': '1',
+  '--color-logo-main-text-h': 'var(--color-text-primary-h)', '--color-logo-main-text-s': 'var(--color-text-primary-s)', '--color-logo-main-text-l': 'var(--color-text-primary-l)', '--color-logo-main-text-a': 'var(--color-text-primary-a)',
+  '--color-logo-subtitle-text-h': 'var(--color-text-secondary-h)', '--color-logo-subtitle-text-s': 'var(--color-text-secondary-s)', '--color-logo-subtitle-text-l': 'var(--color-text-secondary-l)', '--color-logo-subtitle-text-a': 'var(--color-text-secondary-a)',
+
+  // Buttons (Warm Embrace)
+  '--color-button-primary-bg-h': '25', '--color-button-primary-bg-s': '75%', '--color-button-primary-bg-l': '65%', '--color-button-primary-bg-a': '1',
+  '--color-button-primary-text-h': '35', '--color-button-primary-text-s': '35%', '--color-button-primary-text-l': '95%', '--color-button-primary-text-a': '1',
+  '--color-button-secondary-bg-h': '45', '--color-button-secondary-bg-s': '70%', '--color-button-secondary-bg-l': '60%', '--color-button-secondary-bg-a': '1',
+  '--color-button-secondary-text-h': '35', '--color-button-secondary-text-s': '30%', '--color-button-secondary-text-l': '92%', '--color-button-secondary-text-a': '1',
+  '--color-button-accent-bg-h': '30', '--color-button-accent-bg-s': '80%', '--color-button-accent-bg-l': '60%', '--color-button-accent-bg-a': '1',
+  '--color-button-accent-text-h': '35', '--color-button-accent-text-s': '35%', '--color-button-accent-text-l': '95%', '--color-button-accent-text-a': '1',
+  '--color-button-glow-h': '25', '--color-button-glow-s': '80%', '--color-button-glow-l': '70%', '--color-button-glow-a': '0.5',
+
+  // Borders (Warm Embrace)
+  '--color-border-primary-h': '30', '--color-border-primary-s': '30%', '--color-border-primary-l': '75%', '--color-border-primary-a': '0.9', // More visible borders
+  '--color-border-secondary-h': '30', '--color-border-secondary-s': '25%', '--color-border-secondary-l': '82%', '--color-border-secondary-a': '0.75',
+  '--color-border-interactive-h': '30', '--color-border-interactive-s': '70%', '--color-border-interactive-l': '50%', '--color-border-interactive-a': '0.8', // Darker interactive border
+  '--color-border-translucent-h': '30', '--color-border-translucent-s': '30%', '--color-border-translucent-l': '50%', '--color-border-translucent-a': '0.15',
+
+  // Shadows (Warm Embrace)
+  '--shadow-color-h': '30', '--shadow-color-s': '25%', '--shadow-color-l': '35%', // Warmer, darker shadow base
+  '--shadow-highlight-modifier': '+40%', // Highlights will be lighter shades of this base
+  '--shadow-opacity-soft': '0.08', '--shadow-opacity-medium': '0.11', '--shadow-opacity-strong': '0.13', '--shadow-opacity-deep': '0.15', // Slightly stronger shadows
+
+  // Voice Viz (Warm Embrace)
+  '--color-voice-user-h': '170', '--color-voice-user-s': '60%', '--color-voice-user-l': '65%', '--color-voice-user-a': '1',
+  '--color-voice-ai-speaking-h': '40', '--color-voice-ai-speaking-s': '80%', '--color-voice-ai-speaking-l': '70%', '--color-voice-ai-speaking-a': '1',
+  '--color-voice-ai-thinking-h': '30', '--color-voice-ai-thinking-s': '60%', '--color-voice-ai-thinking-l': '75%', '--color-voice-ai-thinking-a': '1',
+  '--voice-pulse-opacity': '0.6',
+
+  // Semantic Colors (Warm Embrace)
+  '--color-info-h': '190', '--color-info-s': '70%', '--color-info-l': '55%', '--color-info-a': '1', // Darker info
+  '--color-success-h': '100', '--color-success-s': '50%', '--color-success-l': '48%', '--color-success-a': '1', // Darker success
+  '--color-warning-h': '35', '--color-warning-s': '80%', '--color-warning-l': '55%', '--color-warning-a': '1', // Darker warning
+  '--color-error-h': '5', '--color-error-s': '70%', '--color-error-l': '58%', '--color-error-a': '1',     // Darker error
+  '--color-error-text-h': '5', '--color-error-text-s': '100%', '--color-error-text-l': '96%', '--color-error-text-a': '1',
+
+  // Code Blocks (Warm Embrace)
+  '--color-bg-code-block-h': '30', '--color-bg-code-block-s': '25%', '--color-bg-code-block-l': '90%', '--color-bg-code-block-a': '1', // Light warm code bg
+  '--color-text-code-block-h': '30', '--color-text-code-block-s': '22%', '--color-text-code-block-l': '28%', '--color-text-code-block-a': '1', // Darker warm code text
+  '--color-bg-code-inline-h': '30', '--color-bg-code-inline-s': '35%', '--color-bg-code-inline-l': '87%', '--color-bg-code-inline-a': '0.9',
+  '--color-text-code-inline-h': '25', '--color-text-code-inline-s': '65%', '--color-text-code-inline-l': '48%', '--color-text-code-inline-a': '1', // Darker amber for inline code
+  '--color-border-code-inline-h': '30', '--color-border-code-inline-s': '30%', '--color-border-code-inline-l': '78%', '--color-border-code-inline-a': '0.4',
+);
+
+// Update the theme definitions map
+$VCA_THEME_DEFINITIONS: (
+  'sakura-sunset': $theme-sakura-sunset,
+  'twilight-neo': $theme-twilight-neo,
+  'aurora-daybreak': $theme-aurora-daybreak,
+  'warm-embrace': $theme-warm-embrace,
+  'terminus-dark': $theme-terminus-dark,
+  'terminus-light': $theme-terminus-light,
+);
+
+/**
+ * CRT Effect Implementation Example
+ * Apply these effects to specific elements like:
+ * - Modal windows (.modal-content)
+ * - Code blocks (.code-block)
+ * - Terminal output areas (.terminal-output)
+ * - Voice visualization containers (.voice-viz)
+ * 
+ * Example CSS:
+ * 
+ * .crt-effect {
+ *   position: relative;
+ *   
+ *   // Scanlines
+ *   &::before {
+ *     content: "";
+ *     position: absolute;
+ *     inset: 0;
+ *     background: repeating-linear-gradient(
+ *       0deg,
+ *       transparent,
+ *       transparent var(--crt-scanline-gap),
+ *       rgba(0, 0, 0, var(--crt-scanline-opacity)) var(--crt-scanline-gap),
+ *       rgba(0, 0, 0, var(--crt-scanline-opacity)) calc(var(--crt-scanline-gap) + var(--crt-scanline-size))
+ *     );
+ *     pointer-events: none;
+ *     z-index: 1;
+ *   }
+ *   
+ *   // Vignette
+ *   &::after {
+ *     content: "";
+ *     position: absolute;
+ *     inset: 0;
+ *     background: radial-gradient(
+ *       ellipse at center,
+ *       transparent 0%,
+ *       transparent 60%,
+ *       rgba(0, 0, 0, var(--crt-vignette-opacity)) 100%
+ *     );
+ *     pointer-events: none;
+ *     z-index: 2;
+ *   }
+ *   
+ *   // Screen curvature (optional, performance intensive)
+ *   @supports (transform: perspective(1px)) {
+ *     transform: perspective(800px) rotateY(calc(var(--crt-curve-amount) * 1deg));
+ *   }
+ *   
+ *   // Flicker animation
+ *   animation: crt-flicker 0.15s infinite;
+ * }
+ * 
+ * @keyframes crt-flicker {
+ *   0% { opacity: calc(1 - var(--crt-flicker-intensity)); }
+ *   50% { opacity: 1; }
+ *   100% { opacity: calc(1 - var(--crt-flicker-intensity)); }
+ * }
+ * 
+ * // Text glow for dark themes
+ * [data-theme="terminus-dark"] .crt-effect {
+ *   text-shadow: var(--text-shadow-neon);
+ *   
+ *   // Chromatic aberration on text
+ *   .text-content {
+ *     position: relative;
+ *     &::before, &::after {
+ *       content: attr(data-text);
+ *       position: absolute;
+ *       inset: 0;
+ *       opacity: 0.8;
+ *     }
+ *     &::before {
+ *       color: #0ff;
+ *       transform: translateX(calc(var(--crt-chromatic-aberration) * -1));
+ *       mix-blend-mode: screen;
+ *     }
+ *     &::after {
+ *       color: #f0f;
+ *       transform: translateX(var(--crt-chromatic-aberration));
+ *       mix-blend-mode: screen;
+ *     }
+ *   }
+ * }
+ */

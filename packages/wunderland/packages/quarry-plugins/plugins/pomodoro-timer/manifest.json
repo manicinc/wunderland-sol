@@ -1,0 +1,53 @@
+{
+  "id": "com.quarry.pomodoro-timer",
+  "name": "Pomodoro Timer",
+  "version": "1.0.0",
+  "description": "A focus timer widget for your sidebar. Work in focused 25-minute sessions with short breaks.",
+  "author": "Quarry Team",
+  "authorUrl": "https://frame.dev",
+  "minQuarryVersion": "1.0.0",
+  "main": "main.js",
+  "styles": "styles.css",
+  "type": "widget",
+  "position": "sidebar",
+  "license": "MIT",
+  "keywords": ["productivity", "timer", "pomodoro", "focus"],
+  "settings": {
+    "workDuration": {
+      "type": "number",
+      "default": 25,
+      "label": "Work Duration (minutes)",
+      "description": "Length of each work session",
+      "min": 1,
+      "max": 60
+    },
+    "breakDuration": {
+      "type": "number",
+      "default": 5,
+      "label": "Break Duration (minutes)",
+      "description": "Length of short breaks",
+      "min": 1,
+      "max": 30
+    },
+    "longBreakDuration": {
+      "type": "number",
+      "default": 15,
+      "label": "Long Break Duration (minutes)",
+      "description": "Length of long breaks (after 4 sessions)",
+      "min": 5,
+      "max": 60
+    },
+    "autoStartBreaks": {
+      "type": "boolean",
+      "default": true,
+      "label": "Auto-start Breaks",
+      "description": "Automatically start break timer when work session ends"
+    },
+    "soundEnabled": {
+      "type": "boolean",
+      "default": true,
+      "label": "Sound Notifications",
+      "description": "Play a sound when timer ends"
+    }
+  }
+}

@@ -1,0 +1,867 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-02-09T09:49:29.238Z",
+  "categories": {
+    "templates": [
+      "basic-tool",
+      "guardrail",
+      "multi-tool"
+    ],
+    "curated": [
+      "auth",
+      "channels",
+      "communications",
+      "integrations",
+      "media",
+      "productivity",
+      "provenance",
+      "research",
+      "system",
+      "voice"
+    ],
+    "community": []
+  },
+  "extensions": {
+    "curated": [
+      {
+        "id": "com.framers.channels.discord",
+        "name": "Discord Channel Extension",
+        "package": "@framers/agentos-ext-channel-discord",
+        "version": "0.1.0",
+        "category": "channels",
+        "path": "registry/curated/channels/discord",
+        "description": "Bidirectional Discord messaging via discord.js — supports text, embeds, images, documents, threads, reactions, and guild management.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Text messages with Markdown formatting",
+          "Rich embed support with fields and colors",
+          "Image and document attachments",
+          "Thread creation and management",
+          "Message reactions",
+          "Typing indicators",
+          "Guild and DM support",
+          "Message editing and deletion",
+          "User mentions"
+        ],
+        "tools": [
+          "discordChannelSendMessage",
+          "discordChannelSendMedia",
+          "discordChannel"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "channel",
+          "discord",
+          "discord.js",
+          "messaging"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-channel-discord",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/channels/discord",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.channels.slack",
+        "name": "Slack Channel Extension",
+        "package": "@framers/agentos-ext-channel-slack",
+        "version": "0.1.0",
+        "category": "channels",
+        "path": "registry/curated/channels/slack",
+        "description": "Bidirectional Slack messaging via @slack/bolt — supports text, rich text, images, documents, threads, reactions, and group chat.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Text messages with rich text formatting",
+          "Block Kit message layouts",
+          "File uploads via files.uploadV2",
+          "Socket Mode and HTTP support",
+          "Thread replies via thread_ts",
+          "Group chat and channel support",
+          "Message editing and deletion",
+          "Emoji reactions",
+          "Mentions support"
+        ],
+        "tools": [
+          "slackChannelSendMessage",
+          "slackChannelSendMedia",
+          "slackChannel"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "channel",
+          "slack",
+          "bolt",
+          "messaging"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-channel-slack",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/channels/slack",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.channels.telegram",
+        "name": "Telegram Channel Extension",
+        "package": "@framers/agentos-ext-channel-telegram",
+        "version": "0.1.0",
+        "category": "channels",
+        "path": "registry/curated/channels/telegram",
+        "description": "Bidirectional Telegram messaging via grammY — supports text, images, documents, inline keyboards, and groups.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Text messages with Markdown/HTML formatting",
+          "Photo and document sending",
+          "Rate limiting with queue management",
+          "Webhook and polling support",
+          "Group chat and channel support",
+          "Message editing and deletion",
+          "Inline keyboard interactions",
+          "Typing indicators"
+        ],
+        "tools": [
+          "telegramChannelSendMessage",
+          "telegramChannelSendMedia",
+          "telegramChannel"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "channel",
+          "telegram",
+          "grammy",
+          "messaging"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-channel-telegram",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/channels/telegram",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.channels.webchat",
+        "name": "WebChat Channel Extension",
+        "package": "@framers/agentos-ext-channel-webchat",
+        "version": "0.1.0",
+        "category": "channels",
+        "path": "registry/curated/channels/webchat",
+        "description": "Lightweight web chat channel adapter — delegates to WunderlandGateway (Socket.IO) for transport. No external SDK required.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Text messages",
+          "Image attachments",
+          "Typing indicators",
+          "Read receipts",
+          "Gateway-bridged transport via WunderlandGateway",
+          "No external SDK dependencies"
+        ],
+        "tools": [
+          "webchatChannelSendMessage",
+          "webchatChannel"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "channel",
+          "webchat",
+          "messaging",
+          "socket.io"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-channel-webchat",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/channels/webchat",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.channels.whatsapp",
+        "name": "WhatsApp Channel Extension",
+        "package": "@framers/agentos-ext-channel-whatsapp",
+        "version": "0.1.0",
+        "category": "channels",
+        "path": "registry/curated/channels/whatsapp",
+        "description": "Bidirectional WhatsApp messaging via Baileys — supports text, images, documents, typing indicators, and groups.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Text messages",
+          "Image and document sending",
+          "Rate limiting with queue management",
+          "Group chat support",
+          "Typing indicators (composing/paused)",
+          "Read receipts",
+          "Audio message support"
+        ],
+        "tools": [
+          "whatsappChannelSendMessage",
+          "whatsappChannelSendMedia",
+          "whatsappChannel"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "channel",
+          "whatsapp",
+          "baileys",
+          "messaging"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-channel-whatsapp",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/channels/whatsapp",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.communications.telegram",
+        "name": "Telegram Bot Extension",
+        "package": "@framers/agentos-ext-telegram-bot",
+        "version": "1.1.0",
+        "category": "communications",
+        "path": "registry/curated/communications/telegram-bot",
+        "description": "Professional Telegram Bot API integration for AgentOS agents",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [
+          "Send text messages with formatting (Markdown/HTML)",
+          "Send photos, documents, and media",
+          "Manage chat settings and pins",
+          "Poll messages for context awareness",
+          "Rate limiting and retry logic",
+          "Environment variable support for credentials"
+        ],
+        "tools": [
+          "telegramSendMessage",
+          "telegramSendPhoto",
+          "telegramSendDocument",
+          "telegramManageChat",
+          "telegramPollMessages"
+        ],
+        "keywords": [
+          "telegram",
+          "bot",
+          "messaging",
+          "communications",
+          "chat",
+          "channels"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-telegram-bot",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/communications/telegram-bot",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.integrations.telegram",
+        "name": "Telegram Bot Extension",
+        "package": "@framers/agentos-ext-telegram",
+        "version": "1.1.0",
+        "category": "integrations",
+        "path": "registry/curated/integrations/telegram",
+        "description": "Professional Telegram Bot API integration for AgentOS - send messages, manage groups, handle callbacks",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [
+          "Send messages, photos, and documents",
+          "Manage groups (pin, descriptions, titles)",
+          "Handle inline keyboard callbacks",
+          "Flexible bot token configuration (env vars)",
+          "Rate limiting and queue management",
+          "Webhook and polling support",
+          "Markdown and HTML formatting"
+        ],
+        "tools": [
+          "telegramSendMessage",
+          "telegramSendPhoto",
+          "telegramSendDocument",
+          "telegramGetChatInfo",
+          "telegramManageGroup",
+          "telegramHandleCallback"
+        ],
+        "keywords": [
+          "telegram",
+          "bot",
+          "messaging",
+          "chat",
+          "communication",
+          "integration"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-telegram",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/integrations/telegram",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.media.giphy",
+        "name": "Giphy GIF Search Extension",
+        "package": "@framers/agentos-ext-giphy",
+        "version": "1.0.0",
+        "category": "media",
+        "path": "registry/curated/media/giphy",
+        "description": "Search for GIFs and stickers via Giphy API for embedding in agent posts",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [],
+        "tools": [
+          "giphy_search"
+        ],
+        "keywords": [
+          "giphy",
+          "gif",
+          "meme",
+          "media",
+          "sticker"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-giphy",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/media/giphy",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.media.image-search",
+        "name": "Image Search Extension",
+        "package": "@framers/agentos-ext-image-search",
+        "version": "1.0.0",
+        "category": "media",
+        "path": "registry/curated/media/image-search",
+        "description": "Search for stock photos from Pexels, Unsplash, and Pixabay with automatic fallback",
+        "author": {
+          "name": "Frame.dev"
+        },
+        "features": [],
+        "tools": [
+          "image_search"
+        ],
+        "keywords": [
+          "images",
+          "photos",
+          "pexels",
+          "unsplash",
+          "pixabay",
+          "stock"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-image-search",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/media/image-search",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.media.voice-synthesis",
+        "name": "Voice Synthesis Extension",
+        "package": "@framers/agentos-ext-voice-synthesis",
+        "version": "1.0.0",
+        "category": "media",
+        "path": "registry/curated/media/voice-synthesis",
+        "description": "Text-to-speech synthesis via ElevenLabs for generating agent voice audio",
+        "author": {
+          "name": "Frame.dev"
+        },
+        "features": [],
+        "tools": [
+          "text_to_speech"
+        ],
+        "keywords": [
+          "tts",
+          "voice",
+          "speech",
+          "elevenlabs",
+          "audio"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-voice-synthesis",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/media/voice-synthesis",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.productivity.gmail",
+        "name": "Gmail Email Extension",
+        "package": "@framers/agentos-ext-email-gmail",
+        "version": "0.1.0",
+        "category": "productivity",
+        "path": "registry/curated/productivity/gmail",
+        "description": "Gmail email integration with OAuth2 — list, read, send, reply, search messages and manage labels.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "List inbox messages with filtering",
+          "Read full email content with MIME parsing",
+          "Compose and send new emails",
+          "Reply to existing email threads",
+          "Full-text search using Gmail query syntax",
+          "List and inspect email labels/folders",
+          "OAuth2 authentication with refresh token"
+        ],
+        "tools": [
+          "gmailListMessages",
+          "gmailReadMessage",
+          "gmailSendMessage",
+          "gmailReplyMessage",
+          "gmailSearchMessages",
+          "gmailListLabels"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "email",
+          "gmail",
+          "productivity"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-email-gmail",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/productivity/gmail",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.productivity.google-calendar",
+        "name": "Google Calendar Extension",
+        "package": "@framers/agentos-ext-calendar-google",
+        "version": "0.1.0",
+        "category": "productivity",
+        "path": "registry/curated/productivity/google-calendar",
+        "description": "Google Calendar integration with OAuth2 auth and event management — supports event CRUD, free/busy queries, and multi-calendar listing.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "List events within a date range",
+          "Create, update, and delete calendar events",
+          "Multi-calendar support with calendar listing",
+          "Free/busy availability queries across calendars",
+          "Attendee management",
+          "OAuth2 token refresh",
+          "Time zone support"
+        ],
+        "tools": [
+          "calendarListEvents",
+          "calendarCreateEvent",
+          "calendarUpdateEvent",
+          "calendarDeleteEvent",
+          "calendarFindFreeTime",
+          "calendarListCalendars",
+          "googleCalendarService"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "calendar",
+          "google",
+          "productivity"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-calendar-google",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/productivity/google-calendar",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.provenance.anchor-providers",
+        "name": "Provenance Anchor Providers",
+        "package": "@framers/agentos-ext-anchor-providers",
+        "version": "1.1.0",
+        "category": "provenance",
+        "path": "registry/curated/provenance/anchor-providers",
+        "description": "External anchor providers for the AgentOS provenance system — WORM storage, transparency logs, and blockchain timestamping",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [],
+        "tools": [
+          "wormSnapshotProvider",
+          "rekorProvider",
+          "openTimestampsProvider",
+          "ethereumProvider",
+          "solanaProvider"
+        ],
+        "keywords": [
+          "provenance",
+          "anchor",
+          "blockchain",
+          "ethereum",
+          "opentimestamps",
+          "rekor",
+          "sigstore",
+          "worm",
+          "s3-object-lock",
+          "transparency-log",
+          "tamper-evidence"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-anchor-providers",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/provenance/anchor-providers",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.provenance.wunderland-tip-ingestion",
+        "name": "Wunderland Tip Ingestion",
+        "package": "@framers/agentos-ext-tip-ingestion",
+        "version": "1.1.0",
+        "category": "provenance",
+        "path": "registry/curated/provenance/wunderland-tip-ingestion",
+        "description": "Deterministic IPFS pinning and on-chain tip ingestion utilities for Wunderland agents",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [],
+        "tools": [],
+        "keywords": [
+          "wunderland",
+          "agentos",
+          "provenance",
+          "tip-ingestion",
+          "ipfs",
+          "solana",
+          "blockchain"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-tip-ingestion",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/provenance/wunderland-tip-ingestion",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.research.news-search",
+        "name": "News Search Extension",
+        "package": "@framers/agentos-ext-news-search",
+        "version": "1.0.0",
+        "category": "research",
+        "path": "registry/curated/research/news-search",
+        "description": "Search for recent news articles via NewsAPI for agent awareness of current events",
+        "author": {
+          "name": "Frame.dev"
+        },
+        "features": [],
+        "tools": [
+          "news_search"
+        ],
+        "keywords": [
+          "news",
+          "articles",
+          "current-events",
+          "newsapi"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-news-search",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/research/news-search",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.research.web-browser",
+        "name": "Web Browser Extension",
+        "package": "@framers/agentos-ext-web-browser",
+        "version": "1.1.0",
+        "category": "research",
+        "path": "registry/curated/research/web-browser",
+        "description": "Browser automation capabilities for AgentOS - navigate pages, scrape content, click links, and capture screenshots",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [],
+        "tools": [
+          "browser_navigate",
+          "browser_scrape",
+          "browser_click",
+          "browser_screenshot",
+          "browser_type",
+          "browser_snapshot"
+        ],
+        "keywords": [
+          "browser",
+          "scraping",
+          "automation",
+          "puppeteer",
+          "playwright",
+          "web",
+          "navigate"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-web-browser",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/research/web-browser",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.research.web-search",
+        "name": "Web Search Extension",
+        "package": "@framers/agentos-ext-web-search",
+        "version": "1.1.0",
+        "category": "research",
+        "path": "registry/curated/research/web-search",
+        "description": "Professional web search, research aggregation, and fact-checking capabilities for AgentOS",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [],
+        "tools": [
+          "web_search",
+          "research_aggregate",
+          "fact_check"
+        ],
+        "keywords": [
+          "search",
+          "web",
+          "research",
+          "fact-check",
+          "serper",
+          "serpapi",
+          "brave"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-web-search",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/research/web-search",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.system.cli-executor",
+        "name": "CLI Executor Extension",
+        "package": "@framers/agentos-ext-cli-executor",
+        "version": "1.1.0",
+        "category": "system",
+        "path": "registry/curated/system/cli-executor",
+        "description": "Execute shell commands and manage files for AgentOS agents",
+        "author": {
+          "name": "Frame.dev",
+          "email": "support@frame.dev",
+          "url": "https://github.com/framersai"
+        },
+        "features": [],
+        "tools": [
+          "shell_execute",
+          "file_read",
+          "file_write",
+          "list_directory"
+        ],
+        "keywords": [
+          "cli",
+          "shell",
+          "command",
+          "execute",
+          "terminal",
+          "bash",
+          "powershell",
+          "script"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-cli-executor",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/system/cli-executor",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.voice.plivo",
+        "name": "Plivo Voice Provider Extension",
+        "package": "@framers/agentos-ext-voice-plivo",
+        "version": "0.1.0",
+        "category": "voice",
+        "path": "registry/curated/voice/plivo",
+        "description": "Plivo telephony provider for voice calls — supports outbound/inbound calls, XML response generation, notify and conversation modes.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Outbound voice calls via Plivo Voice API",
+          "Inbound call handling with XML responses",
+          "Notify mode (TTS message + hangup)",
+          "Conversation mode (Speak + Gather + Redirect loop)",
+          "HMAC-SHA256 webhook signature verification",
+          "In-call TTS via Plivo Speak API",
+          "Call hangup and status tracking"
+        ],
+        "tools": [
+          "plivoVoiceCall",
+          "plivoVoiceProvider"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "voice",
+          "plivo",
+          "telephony"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-voice-plivo",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/voice/plivo",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.voice.telnyx",
+        "name": "Telnyx Voice Call Extension",
+        "package": "@framers/agentos-ext-voice-telnyx",
+        "version": "0.1.0",
+        "category": "voice",
+        "path": "registry/curated/voice/telnyx",
+        "description": "Telnyx telephony provider for voice calls via Call Control v2 — outbound/inbound calls, TTS speak commands, and bidirectional media streaming.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Outbound calls via Call Control v2",
+          "Inbound call handling with webhook verification",
+          "In-call TTS via speak command",
+          "Ed25519 webhook signature verification",
+          "AMD (answering machine detection)",
+          "Bidirectional media streaming",
+          "Conversation mode with STT + LLM + TTS loop",
+          "Notify mode with one-way TTS message"
+        ],
+        "tools": [
+          "telnyxVoiceCall",
+          "telnyxVoiceProvider"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "voice",
+          "telnyx",
+          "telephony"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-voice-telnyx",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/voice/telnyx",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      },
+      {
+        "id": "com.framers.voice.twilio",
+        "name": "Twilio Voice Call Extension",
+        "package": "@framers/agentos-ext-voice-twilio",
+        "version": "0.1.0",
+        "category": "voice",
+        "path": "registry/curated/voice/twilio",
+        "description": "Twilio telephony provider for voice calls — supports outbound/inbound calls, TwiML, media streams, and bidirectional audio.",
+        "author": {
+          "name": "Framers AI",
+          "url": "https://frame.dev"
+        },
+        "features": [
+          "Outbound phone calls with TwiML",
+          "Inbound call webhook handling",
+          "Notify mode (TTS + hangup)",
+          "Conversation mode (bidirectional media streams)",
+          "HMAC-SHA1 webhook signature verification",
+          "Call status callback processing",
+          "E.164 phone number validation"
+        ],
+        "tools": [
+          "twilioVoiceCall",
+          "twilioVoiceProvider"
+        ],
+        "keywords": [
+          "agentos",
+          "extension",
+          "voice",
+          "twilio",
+          "telephony",
+          "phone-calls"
+        ],
+        "npm": "https://www.npmjs.com/package/@framers/agentos-ext-voice-twilio",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/registry/curated/voice/twilio",
+        "verified": true,
+        "verifiedAt": "2026-02-09T09:49:29.238Z",
+        "verificationChecklistVersion": "1.0.0",
+        "downloads": 0
+      }
+    ],
+    "community": [],
+    "templates": [
+      {
+        "id": "com.framers.template.basic-tool",
+        "name": "Template for creating AgentOS extensions",
+        "package": "@framers/agentos-template-basic-tool",
+        "version": "1.0.0",
+        "path": "templates/basic-tool",
+        "description": "Template for creating AgentOS extensions",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/templates/basic-tool"
+      },
+      {
+        "id": "com.framers.template.guardrail",
+        "name": "Template for creating guardrail AgentOS extensions",
+        "package": "@framers/agentos-template-guardrail",
+        "version": "1.0.0",
+        "path": "templates/guardrail",
+        "description": "Template for creating guardrail AgentOS extensions",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/templates/guardrail"
+      },
+      {
+        "id": "com.framers.template.multi-tool",
+        "name": "Template for creating multi-tool AgentOS extensions",
+        "package": "@framers/agentos-template-multi-tool",
+        "version": "1.0.0",
+        "path": "templates/multi-tool",
+        "description": "Template for creating multi-tool AgentOS extensions",
+        "repository": "https://github.com/framersai/agentos-extensions/tree/master/templates/multi-tool"
+      }
+    ]
+  },
+  "stats": {
+    "totalExtensions": 24,
+    "curatedCount": 21,
+    "communityCount": 0,
+    "templateCount": 3,
+    "totalDownloads": 0
+  }
+}

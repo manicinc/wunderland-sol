@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "Gravando...",
+    "processing": "Processando voz...",
+    "transcribing": "Transcrevendo audio...",
+    "listening": "Ouvindo...",
+    "speakNow": "Fale agora",
+    "clickToSpeak": "Clique para falar",
+    "stopRecording": "Parar gravacao",
+    "microphoneAccess": "Acesso ao microfone necessario",
+    "noSpeechDetected": "Nenhuma fala detectada",
+    "transcriptionComplete": "Transcricao concluida"
+  },
+  "chat": {
+    "thinking": "Pensando...",
+    "generating": "Gerando resposta...",
+    "messageEmpty": "A mensagem nao pode ficar vazia",
+    "sendMessage": "Enviar mensagem",
+    "newChat": "Nova conversa",
+    "clearHistory": "Limpar historico",
+    "typingIndicator": "IA digitando...",
+    "copyCode": "Copiar codigo",
+    "codeCopied": "Codigo copiado para a area de transferencia",
+    "retry": "Tentar novamente",
+    "regenerate": "Gerar resposta novamente"
+  },
+  "modes": {
+    "coding": "Perguntas e respostas de programacao",
+    "codingDesc": "Receba ajuda com duvidas de programacao e exemplos de codigo",
+    "systemDesign": "Design de sistemas",
+    "systemDesignDesc": "Crie arquiteturas e diagramas",
+    "meetingSummary": "Resumo de reuniao",
+    "meetingSummaryDesc": "Resuma reunioes e destaque os pontos principais",
+    "general": "Geral",
+    "generalDesc": "Conversas e perguntas gerais"
+  },
+  "cost": {
+    "title": "Uso da API",
+    "current": "Sessao atual",
+    "total": "Uso total",
+    "threshold": "Limite de custo",
+    "warning": "Limite de custo se aproximando",
+    "exceeded": "Limite de custo ultrapassado",
+    "reset": "Redefinir contador"
+  },
+  "settings": {
+    "speechRecognition": "Reconhecimento de voz",
+    "whisperAPI": "API Whisper",
+    "browserSpeech": "Voz no navegador",
+    "textToSpeech": "Texto para fala",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "TTS no navegador",
+    "apiKeys": "Chaves de API",
+    "openAIKey": "Chave da OpenAI",
+    "anthropicKey": "Chave da Anthropic",
+    "modelPreferences": "Preferencias de modelo",
+    "costLimits": "Limites de custo",
+    "sessionLimit": "Limite de sessao",
+    "dailyLimit": "Limite diario",
+    "monthlyLimit": "Limite mensal"
+  }
+}

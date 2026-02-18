@@ -1,0 +1,120 @@
+// Rabbit Hole Gold colors (local variables to avoid @use issues)
+$rh-gold: #c9a227;
+$rh-gold-light: #e8d48a;
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 44px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.6);
+
+  // Neumorphic dark mode styling
+  background: linear-gradient(145deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 28, 0.9));
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.4),
+    -4px -4px 10px rgba(60, 60, 80, 0.15),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.05),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.toggle:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.5),
+    -5px -5px 12px rgba(60, 60, 80, 0.2),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.08),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.toggle:active {
+  transform: translateY(0);
+  box-shadow:
+    3px 3px 8px rgba(0, 0, 0, 0.4),
+    -2px -2px 6px rgba(60, 60, 80, 0.1),
+    inset 2px 2px 4px rgba(0, 0, 0, 0.3),
+    inset -1px -1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.lit {
+  color: $rh-gold;
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.4),
+    -4px -4px 10px rgba(60, 60, 80, 0.15),
+    0 0 20px rgba($rh-gold, 0.15),
+    0 0 40px rgba($rh-gold, 0.08),
+    inset 1px 1px 2px rgba($rh-gold-light, 0.1),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.lit:hover {
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.5),
+    -5px -5px 12px rgba(60, 60, 80, 0.2),
+    0 0 25px rgba($rh-gold, 0.25),
+    0 0 50px rgba($rh-gold, 0.12),
+    inset 1px 1px 2px rgba($rh-gold-light, 0.15),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dim {
+  color: rgba(180, 160, 120, 0.5);
+}
+
+.icon {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.lit .icon {
+  filter: drop-shadow(0 0 8px rgba($rh-gold, 0.5));
+}
+
+.dim .icon {
+  filter: drop-shadow(0 0 3px rgba($rh-gold, 0.2));
+}
+
+.toggle:hover .icon {
+  transform: scale(1.08);
+}
+
+// Light mode overrides using :global wrapper
+:global(html.light) {
+  .toggle {
+    background: linear-gradient(145deg, #ffffff, #e8e8ec);
+    box-shadow:
+      6px 6px 14px rgba(0, 0, 0, 0.08),
+      -4px -4px 10px rgba(255, 255, 255, 0.9),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.8),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.05);
+    color: rgba(120, 100, 60, 0.6);
+  }
+
+  .toggle:hover {
+    box-shadow:
+      8px 8px 18px rgba(0, 0, 0, 0.1),
+      -5px -5px 12px rgba(255, 255, 255, 0.95),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.9),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .toggle:active {
+    box-shadow:
+      3px 3px 8px rgba(0, 0, 0, 0.06),
+      -2px -2px 6px rgba(255, 255, 255, 0.8),
+      inset 3px 3px 6px rgba(0, 0, 0, 0.08),
+      inset -2px -2px 4px rgba(255, 255, 255, 0.7);
+  }
+
+  .dim {
+    color: rgba(160, 130, 60, 0.6);
+  }
+
+  .dim .icon {
+    filter: drop-shadow(0 0 2px rgba($rh-gold, 0.3));
+  }
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Redirecting... | Quarry</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #09090b;
+      color: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .loader {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #27272a;
+      border-top-color: #06b6d4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <script>
+    // GitHub Pages routing for quarry.space + SPA redirect
+    (function() {
+      var host = window.location.hostname;
+      var path = window.location.pathname;
+      var search = window.location.search;
+      var hash = window.location.hash;
+
+      // Content paths that should route to the SPA viewer
+      var contentPrefixes = ['/weaves', '/docs', '/wiki', '/strands', '/looms'];
+
+      function isContentPath(p) {
+        for (var i = 0; i < contentPrefixes.length; i++) {
+          if (p === contentPrefixes[i] || p.startsWith(contentPrefixes[i] + '/')) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // QUARRY.SPACE DOMAIN ROUTING
+      // Map clean URLs to actual file locations
+      if (host === 'quarry.space' || host.endsWith('.quarry.space') ||
+          host === 'quarry.dev' || host.endsWith('.quarry.dev')) {
+
+        // Static SEO files - DO NOT REDIRECT, these exist at root level
+        // If we're here (404), show the 404 page for these files
+        var staticSeoFiles = ['/sitemap.xml', '/robots.txt', '/llms.txt', '/llms-full.txt', '/manifest.json', '/favicon.ico', '/icon.svg'];
+        if (staticSeoFiles.indexOf(path) !== -1 || path.match(/\.(xml|txt|json|ico|png|svg|jpg|jpeg|webp|woff|woff2|css|js)$/)) {
+          // Don't redirect - let GitHub Pages show the actual file or 404
+          return;
+        }
+
+        // Root → landing page
+        if (path === '/' || path === '') {
+          window.location.replace('/quarry/landing/' + search + hash);
+          return;
+        }
+
+        // Content paths (weaves, docs, wiki) → SPA app with path stored
+        if (isContentPath(path)) {
+          sessionStorage.setItem('quarry-internal-path', path.replace(/^\//, ''));
+          window.location.replace('/quarry/app/' + search + hash);
+          return;
+        }
+
+        // /app and /app/* → /quarry/app (main app viewer)
+        // The SPA router will handle internal paths like /weaves/...
+        if (path === '/app' || path === '/app/' || path.startsWith('/app/')) {
+          // Store the internal path for the SPA to pick up
+          var internalPath = path.substring(4) || '/'; // Remove '/app' prefix
+          if (internalPath && internalPath !== '/') {
+            sessionStorage.setItem('quarry-internal-path', internalPath.replace(/^\//, ''));
+          }
+          window.location.replace('/quarry/app/' + search + hash);
+          return;
+        }
+
+        // /landing → /quarry/landing
+        if (path.startsWith('/landing')) {
+          window.location.replace('/quarry' + path + search + hash);
+          return;
+        }
+
+        // Other non-app paths like /about, /faq → /quarry/about, /quarry/faq
+        if (!path.startsWith('/quarry')) {
+          window.location.replace('/quarry' + path + search + hash);
+          return;
+        }
+
+        // Already prefixed /quarry paths - check if they're content paths
+        var quarryPath = path.substring(7); // Remove '/quarry'
+        if (isContentPath(quarryPath)) {
+          sessionStorage.setItem('quarry-internal-path', quarryPath.replace(/^\//, ''));
+          window.location.replace('/quarry/app/' + search + hash);
+          return;
+        }
+      }
+
+      // SPA REDIRECT (for frame.dev or already-prefixed quarry.space paths)
+      // Store the redirect path and go to root to load the SPA
+      sessionStorage.setItem('spa-redirect-path', path + search + hash);
+      window.location.replace('/');
+    })();
+  </script>
+</head>
+<body>
+  <div class="loader"></div>
+</body>
+</html>

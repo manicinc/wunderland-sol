@@ -1,0 +1,10 @@
+name: "Faithfulness"
+description: "Checks that response claims are grounded in provided context. Adjust threshold in the UI (common values: 0.7 moderate, 0.85 balanced, 0.9+ strict)."
+type: promptfoo
+config:
+  assertion: context-faithfulness
+  threshold: 0.8
+inspiration: |
+  RAGAS framework (Es et al., 2023). Extracts atomic claims from the output
+  and verifies each is supported by the provided context.
+reference: "https://arxiv.org/abs/2309.15217"

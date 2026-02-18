@@ -1,0 +1,75 @@
+{
+  "id": "collection",
+  "name": "Collection",
+  "category": "general",
+  "icon": "LayoutGrid",
+  "description": "Curate and organize a collection of items, links, or resources",
+  "shortDescription": "Organize related items together",
+  "difficulty": "beginner",
+  "estimatedTime": "10 min",
+  "tags": ["collection", "curation", "resources", "links"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": false,
+  "popularity": 75,
+  "defaultData": {
+    "contentType": "collection"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Collection Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Name your collection"
+    },
+    {
+      "name": "summary",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "What does this collection contain?"
+    },
+    {
+      "name": "collectionType",
+      "label": "Collection Type",
+      "type": "select",
+      "required": false,
+      "options": ["links", "resources", "tools", "inspiration", "references", "mixed"],
+      "defaultValue": "mixed"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Categorize this collection"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "collectionType", "contentType"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: collection\ncollectionType: {collectionType}\n---\n\n# {title}\n\n{summary}\n\n## Overview\n\nThis collection brings together...\n\n## Items\n\n### Category 1\n\n| Name | Description | Link |\n|------|-------------|------|\n| Item 1 | Brief description | [Link](#) |\n| Item 2 | Brief description | [Link](#) |\n\n### Category 2\n\n| Name | Description | Link |\n|------|-------------|------|\n| Item 3 | Brief description | [Link](#) |\n| Item 4 | Brief description | [Link](#) |\n\n## How to Use This Collection\n\nGuidance on navigating or using these resources...\n\n## Contribution Guidelines\n\nHow to suggest additions to this collection...\n\n## Last Updated\n\n{date}\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

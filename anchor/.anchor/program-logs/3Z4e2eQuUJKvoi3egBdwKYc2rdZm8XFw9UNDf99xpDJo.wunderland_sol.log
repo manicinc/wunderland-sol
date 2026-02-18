@@ -1,0 +1,826 @@
+Streaming transaction logs mentioning 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo. Confirmed commitment
+Transaction executed in slot 2:
+  Signature: CZCmcdrTszBtktJRZ2UZMZNc3mD4bcGfwpgYFcFkiJtS4SniNrKnJ33TswmQWPh7PxU5ekHmD9c6rS94bgktmbZ
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeConfig
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Warning: program upgrade authority is SystemProgram; skipping upgrade-authority gate for initialize_config
+    Program log: Program config initialized. Authority: AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK (initializer: AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK)
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 39393 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 2:
+  Signature: 3bvyF8VZcoRRoQR3Dit4kDGiLdL4pkLvNAxrAirGrbZuPoyJWFKooX5Gb7Q58938i16UF8UcXSDoLqDzcBiHv918
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeEconomics
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Economics initialized. fee=50000000 max_per_wallet=5 recovery_timelock=300s
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 12902 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 3:
+  Signature: 3bvyF8VZcoRRoQR3Dit4kDGiLdL4pkLvNAxrAirGrbZuPoyJWFKooX5Gb7Q58938i16UF8UcXSDoLqDzcBiHv918
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeEconomics
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Economics initialized. fee=50000000 max_per_wallet=5 recovery_timelock=300s
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 12902 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 3:
+  Signature: 2wG3F545cpN9vT8tgfeu49dLsaKwJmrBR8FoA4iWBRwXve7uCwbBKVHF2HWxTrur2iVaWsY1KoPmPn6mY5wULEUq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 58478 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 4:
+  Signature: 2wG3F545cpN9vT8tgfeu49dLsaKwJmrBR8FoA4iWBRwXve7uCwbBKVHF2HWxTrur2iVaWsY1KoPmPn6mY5wULEUq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 58478 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 5:
+  Signature: 3DaermdALRRdtigdnjojhLJvUaLmSc6mPShALyn6mckPMBQh7HAF3WHmAa6a8NwsGTB5MqCpA7h6yW9Egc9uUXPS
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK agent=DFBBWsGyMe9CRiDVp1v5KutyyVpoVL11dgd14mwHjTxq fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 55582 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 5:
+  Signature: yYK4uTQpEjzHR4G5yWne7Qa9QHfejD9JKRYTnTtH66kwXKaTXxjY7DWNqjTZbDjTzx9foFiDSc6wpJHMrGGrBwq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateEnclave
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Enclave created: G8jswdfe7Merj5d7uP3oepkEH7xabdSfSFK9hqsxdZqj
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32982 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 6:
+  Signature: yYK4uTQpEjzHR4G5yWne7Qa9QHfejD9JKRYTnTtH66kwXKaTXxjY7DWNqjTZbDjTzx9foFiDSc6wpJHMrGGrBwq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateEnclave
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Enclave created: G8jswdfe7Merj5d7uP3oepkEH7xabdSfSFK9hqsxdZqj
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32982 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 6:
+  Signature: 3wgSxmJKsGWWj8YciPu7gnv6MZRLgNmfgvDnYGQBttgzxF48AatnNNe8EwCvsq2qayWa2Bd5Z2mbAqhCoZqEvoZq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: AnchorPost
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Post anchored: 0 by 8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 23968 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 7:
+  Signature: 3wgSxmJKsGWWj8YciPu7gnv6MZRLgNmfgvDnYGQBttgzxF48AatnNNe8EwCvsq2qayWa2Bd5Z2mbAqhCoZqEvoZq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: AnchorPost
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Post anchored: 0 by 8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 23968 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 7:
+  Signature: 4qcVMa83Hyzymtvss3LkzeyBcg9HRgAGVyQ5KPjxC6j62GybJM9JeDMAzFELbuUDWcwxrnVsLQRCne3mAjbnX8Uh
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CastVote
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Vote cast: 1 on entry 0 by agent DFBBWsGyMe9CRiDVp1v5KutyyVpoVL11dgd14mwHjTxq
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 23797 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 8:
+  Signature: 4qcVMa83Hyzymtvss3LkzeyBcg9HRgAGVyQ5KPjxC6j62GybJM9JeDMAzFELbuUDWcwxrnVsLQRCne3mAjbnX8Uh
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CastVote
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Vote cast: 1 on entry 0 by agent DFBBWsGyMe9CRiDVp1v5KutyyVpoVL11dgd14mwHjTxq
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 23797 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 8:
+  Signature: 4zYQTC74oLQBmCogAGeQYdwVrzQaqYhEqvE5kwzVN5ULw85FH9hootyvyiAg36wmk7tmMbKQctxQpMa26Wt5xTyu
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: DepositToVault
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Vault deposit: 1000000000 lamports to GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 17128 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 9:
+  Signature: 4zYQTC74oLQBmCogAGeQYdwVrzQaqYhEqvE5kwzVN5ULw85FH9hootyvyiAg36wmk7tmMbKQctxQpMa26Wt5xTyu
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: DepositToVault
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Vault deposit: 1000000000 lamports to GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 17128 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 9:
+  Signature: 3Sh5mgjAQgiguJBsFZ1EVqvZLiYLedoWDw9YDUc3aLiJs6B7KbmmyrEgy157ziA4Ab7rA4jgytHtvSTpWaRJhPJC
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: WithdrawFromVault
+    Program log: Vault withdraw: 500000000 lamports from GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 15660 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 10:
+  Signature: 3Sh5mgjAQgiguJBsFZ1EVqvZLiYLedoWDw9YDUc3aLiJs6B7KbmmyrEgy157ziA4Ab7rA4jgytHtvSTpWaRJhPJC
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: WithdrawFromVault
+    Program log: Vault withdraw: 500000000 lamports from GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 15660 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 12:
+  Signature: 4Mvt6QLtW9yG5YBJ5hGq6NYEyM2FLxaxkariVvUZB6dFFVTfLHNtDmQUv3AfNF8sKH6Ca1V2ec86DK3aARMTUmcC
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: DonateToAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Donation: donor=Eyk46GkPw2keYaEZNKoCS4En9fv1z3kbf9M3gsob12p2 agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 40038 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 12:
+  Signature: 5zqpu1YJDfFhfVVwma7tsUqAxeJhCbxWnT6VCwpRgaiFG1euGgrwzeoq3jZA5pTX6mKxdF5KqQgXYuVpToMc9sGc
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitTip
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Tip submitted: 15000000 lamports, priority 0, nonce 0
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 26050 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 13:
+  Signature: 5zqpu1YJDfFhfVVwma7tsUqAxeJhCbxWnT6VCwpRgaiFG1euGgrwzeoq3jZA5pTX6mKxdF5KqQgXYuVpToMc9sGc
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitTip
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Tip submitted: 15000000 lamports, priority 0, nonce 0
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 26050 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 13:
+  Signature: 4p85PzyczQ6ajczfVXXcogoiovTr5Z4rcBBGs8hvL2qMWZgeqmN6kR6ZCJuNr7btanLNirCTAAcckQHMmUDReWLW
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SettleTip
+    Program log: Global tip settled: 15000000 lamports to treasury
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 10170 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 14:
+  Signature: 4p85PzyczQ6ajczfVXXcogoiovTr5Z4rcBBGs8hvL2qMWZgeqmN6kR6ZCJuNr7btanLNirCTAAcckQHMmUDReWLW
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SettleTip
+    Program log: Global tip settled: 15000000 lamports to treasury
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 10170 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 14:
+  Signature: 4q5XB7s4irx4fn9QnQuipt1FjwYgwsiG3taCPZj6nm2XcxvzEcL9Wj5bSCv747qEZLAnhoUALMh5qN7d12fHideo
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitTip
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Tip submitted: 15000000 lamports, priority 0, nonce 1
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 20491 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 15:
+  Signature: 4q5XB7s4irx4fn9QnQuipt1FjwYgwsiG3taCPZj6nm2XcxvzEcL9Wj5bSCv747qEZLAnhoUALMh5qN7d12fHideo
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitTip
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Tip submitted: 15000000 lamports, priority 0, nonce 1
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 20491 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 15:
+  Signature: VXA8Rgmf6Ytj6RmgyUJvuPh6e1hmZwMHxVyd3uGBirmNNN6b7b14roq6QMDXH1ggu6Cuu58HeeeQR3o5FMocMuY
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SettleTip
+    Program log: Enclave tip settled: 10500000 to treasury, 4500000 to enclave treasury
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 13006 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 16:
+  Signature: VXA8Rgmf6Ytj6RmgyUJvuPh6e1hmZwMHxVyd3uGBirmNNN6b7b14roq6QMDXH1ggu6Cuu58HeeeQR3o5FMocMuY
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SettleTip
+    Program log: Enclave tip settled: 10500000 to treasury, 4500000 to enclave treasury
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 13006 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 16:
+  Signature: 5eDqV91272udbDRvunhGzPMPPdMZNp78fccxv8U6TPXDMP4RLqi9m6AsH3xRknDMj2sJfEbQgiSVBBEyfbgyTvmf
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PublishRewardsEpoch
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Rewards epoch published: enclave=G8jswdfe7Merj5d7uP3oepkEH7xabdSfSFK9hqsxdZqj epoch=0 amount=4500000 deadline=1770993911
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 25747 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 17:
+  Signature: 5eDqV91272udbDRvunhGzPMPPdMZNp78fccxv8U6TPXDMP4RLqi9m6AsH3xRknDMj2sJfEbQgiSVBBEyfbgyTvmf
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PublishRewardsEpoch
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Rewards epoch published: enclave=G8jswdfe7Merj5d7uP3oepkEH7xabdSfSFK9hqsxdZqj epoch=0 amount=4500000 deadline=1770993911
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 25747 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 18:
+  Signature: 27ZPXAwtqQ4yWRUcfFXZnR2jULu2E42Qb5UYp1xMmNtPxhGX4RwaWPq4v7RpDyz7n2TZuSWaVmKSDQ2eAgUZyDsZ
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ClaimRewards
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Rewards claimed: epoch=EoaNArvT74yMeHDdZBQZqg2WV9DPH9pnFHtmHFnBRyRr index=1 agent=DFBBWsGyMe9CRiDVp1v5KutyyVpoVL11dgd14mwHjTxq amount=2500000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 34535 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 24:
+  Signature: LRjzivGDaPc8cmWg5JmvD3n7hcq4k8DnKSzhpUcRYZa5mqMd9hFgERQqo9zEakG7hoXXuUPcVXrKYF5acskDs9Z
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SweepUnclaimedRewards
+    Program log: Rewards swept: enclave=G8jswdfe7Merj5d7uP3oepkEH7xabdSfSFK9hqsxdZqj epoch=0 amount=2000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 18297 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 25:
+  Signature: 2MuX7kAdTNMunMn5jjnLdQxmSixbvWXoufJNhXVmsVJUoU7FU888s2VqQrQDUaJHNETjX5ZtFBJYa92EwV7evRi3
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PublishGlobalRewardsEpoch
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Global rewards epoch published: epoch=1 amount=3000000 deadline=1770993916
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 13534 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 26:
+  Signature: 5BPxp3bZ69FjsmawbVmDSEGvAFTqYbzQ73Vic3vtzEXYQVGQsNj1LzspPVkm5nowSRboqdQjytaamvKj1c9kGQEQ
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ClaimRewards
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Rewards claimed: epoch=8VUQubvHBvKjfN9PfYLLy9fMHvoC3n5zNfGKMrdeRJzz index=0 agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=1250000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 35940 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 32:
+  Signature: 3KLvw5CgsdqMNTw8s67jU9Zwy9uKxH1EQ1n35Ag6H5RMPtWm27C7KPebQqgXm5AmxU2AhYW3YeN9pR97KqbvsDEA
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SweepUnclaimedGlobalRewards
+    Program log: Global rewards swept: epoch=1 amount=1750000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 9144 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 32:
+  Signature: 2nM4HyrCdRFtQWHY3RkDAm9tPLrrAdy7NyYw6W724eKea9BFhVTMf96hapQ5ggVAUJHnpwB8B1AdNV65mQcuEZjV
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job created: creator=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK nonce=0 budget=10000000 escrow=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 27135 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 33:
+  Signature: 2nM4HyrCdRFtQWHY3RkDAm9tPLrrAdy7NyYw6W724eKea9BFhVTMf96hapQ5ggVAUJHnpwB8B1AdNV65mQcuEZjV
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job created: creator=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK nonce=0 budget=10000000 escrow=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 27135 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 34:
+  Signature: 3jW3d7D1vN4oDvauNjjdCnFeE46riTfJAbe8BzcAeiEzDbgj1gTUWMkRVu9g1SDhibmUmhdHyg3VT34UueGKjG3i
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CancelJob
+    Program log: Job cancelled: job=EYrMM5NeeS5NafwbjAfGpAC1F6UbJYM4mGk989nKDYco refunded=12000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 16973 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 35:
+  Signature: C3Z4teLh2szbbdwzBXpCB6iFDHYFXWQ4hiki4xhohP7g7atDd4hQK1JYTJ7uYA4zSfncBLaMPQQjPitFenSqoPb
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job created: creator=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK nonce=1 budget=12000000 escrow=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 33078 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 35:
+  Signature: 4akT3Ynkbet5zjaw5tVf4RMZGymcLxb2kzt3gLRwT6fGVsYMNgdvLBV7jXZNvzGqo1GhuT7gasvhCALN3HqrEDKo
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PlaceJobBid
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job bid placed: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy bidder=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=9000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 37918 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 36:
+  Signature: 4akT3Ynkbet5zjaw5tVf4RMZGymcLxb2kzt3gLRwT6fGVsYMNgdvLBV7jXZNvzGqo1GhuT7gasvhCALN3HqrEDKo
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PlaceJobBid
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job bid placed: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy bidder=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=9000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 37918 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 36:
+  Signature: 54WC753D3kBkq3bmrGgyknB18Cd7G1A4ErLXrhUazxTsKx7jHnFjR2CdzkhmWzNSmp74UxsawmR11B3EAP7c15sx
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: AcceptJobBid
+    Program log: Job bid accepted: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy bid=CBoM6kc1fhCDihchxtx8y7xgEHmc8dMXt6D59C3enbpL agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 37535 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 37:
+  Signature: 54WC753D3kBkq3bmrGgyknB18Cd7G1A4ErLXrhUazxTsKx7jHnFjR2CdzkhmWzNSmp74UxsawmR11B3EAP7c15sx
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: AcceptJobBid
+    Program log: Job bid accepted: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy bid=CBoM6kc1fhCDihchxtx8y7xgEHmc8dMXt6D59C3enbpL agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 37535 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 37:
+  Signature: 2xgHJvA9Eprrg5Brw5TCYSbEKL4ew5BX4PMKVe241bxReSA3PKdJuYWcbYiCBuqofauzcLbfrWRiHvdhN5oPFQm4
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job submitted: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 31757 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 38:
+  Signature: 2xgHJvA9Eprrg5Brw5TCYSbEKL4ew5BX4PMKVe241bxReSA3PKdJuYWcbYiCBuqofauzcLbfrWRiHvdhN5oPFQm4
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job submitted: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 31757 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 38:
+  Signature: rQUn7QMMavwWDChqBUdndTf7hwWTYcskkFB7WpYaXgne6BHYiAZSqx5oUyLxHkyaqNf1x1iRDuxqyG2KzfFFdXc
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ApproveJobSubmission
+    Program log: Job completed: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy paid=9000000 refunded=3000000 vault=GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32551 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 39:
+  Signature: rQUn7QMMavwWDChqBUdndTf7hwWTYcskkFB7WpYaXgne6BHYiAZSqx5oUyLxHkyaqNf1x1iRDuxqyG2KzfFFdXc
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ApproveJobSubmission
+    Program log: Job completed: job=eodcz4JPZcj6hiSTdJiraHLPBdfEtpfYWhZbm37W5Wy paid=9000000 refunded=3000000 vault=GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32551 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 39:
+  Signature: 5oKrnWWQuARMfitmVg77ei7kC2JG4hKdYzLSXughkfETUBen1ZWTorn77UP84NBmTczYeRH6ebA92AbDwqn4VM3R
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job created: creator=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK nonce=2 budget=10000000 escrow=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 36135 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 40:
+  Signature: 5oKrnWWQuARMfitmVg77ei7kC2JG4hKdYzLSXughkfETUBen1ZWTorn77UP84NBmTczYeRH6ebA92AbDwqn4VM3R
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job created: creator=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK nonce=2 budget=10000000 escrow=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 36135 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 40:
+  Signature: qtYAL6Tn6VDQpNLdxJ7Jvb7Tc3h9Y4gavGfMgGtZcf5f6HQopN1wjzrQGrbiefHhMv7nwatuFHScfwHGa6Z6nTZ
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PlaceJobBid
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Buy-it-now triggered: job=8YzsaemZCRTAYoJigWuStR8UrtTKkBE8eaoNyDSxrSGC agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=12000000
+    Program log: Job bid placed: job=8YzsaemZCRTAYoJigWuStR8UrtTKkBE8eaoNyDSxrSGC bidder=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 53707 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 41:
+  Signature: qtYAL6Tn6VDQpNLdxJ7Jvb7Tc3h9Y4gavGfMgGtZcf5f6HQopN1wjzrQGrbiefHhMv7nwatuFHScfwHGa6Z6nTZ
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PlaceJobBid
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Buy-it-now triggered: job=8YzsaemZCRTAYoJigWuStR8UrtTKkBE8eaoNyDSxrSGC agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=12000000
+    Program log: Job bid placed: job=8YzsaemZCRTAYoJigWuStR8UrtTKkBE8eaoNyDSxrSGC bidder=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 53707 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 42:
+  Signature: ZyqJTyCyKpt7mE6261L3aKWDXKywYAtVzFU8x8EptpbQivMXQUnU2NfZ5MmJGDeYocAdmgazd4rPfNZLn5d2HTx
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job submitted: job=8YzsaemZCRTAYoJigWuStR8UrtTKkBE8eaoNyDSxrSGC agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 33588 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 43:
+  Signature: 3TvT2bn4wtK6XrJ9ubCNHW9nNu1VxtLPqxFDsSSPmhL8ZtszLXPQy54PxpN37SUXtd73DS4K5g36Gi5Cf4bQRQRe
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ApproveJobSubmission
+    Program log: Job completed: job=8YzsaemZCRTAYoJigWuStR8UrtTKkBE8eaoNyDSxrSGC paid=12000000 refunded=0 vault=GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32728 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 44:
+  Signature: 5ceajXgtM7LmHubSrQyDAu8JQuGqupUsY6W4LVVkcEGqHkaLdZuPeQjfZtojMqsi8esFTsKDWkjwLY7wdT5j1c34
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: CreateJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job created: creator=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK nonce=3 budget=10000000 escrow=12000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 34635 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 45:
+  Signature: Cx3o6pXuPkdgog5tr95L2HmicijNMmwvVZF9LhhsB1viPZ9zMCuNqsSAuu6CAE2PNBjk1aGFEWVeiSVbKXNGGJi
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: PlaceJobBid
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job bid placed: job=E6VJxLx2TiKdP8qbvSajppHtNAYoYKncbtfP33NcTFjq bidder=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd amount=9000000
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 33800 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 45:
+  Signature: hq68fPMFBSYKpKqDeEiydmjpTHnwsHcJdbdtQ8YiFSaYjAJcKVud84Rm12JwixjKgyyKXpKkpxReJE9meeizpRd
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: AcceptJobBid
+    Program log: Job bid accepted: job=E6VJxLx2TiKdP8qbvSajppHtNAYoYKncbtfP33NcTFjq bid=E7T6zQMgWrNKV66xUixXvEFXNzMtKNVckJLbsjs3oUmV agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 38650 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 46:
+  Signature: hq68fPMFBSYKpKqDeEiydmjpTHnwsHcJdbdtQ8YiFSaYjAJcKVud84Rm12JwixjKgyyKXpKkpxReJE9meeizpRd
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: AcceptJobBid
+    Program log: Job bid accepted: job=E6VJxLx2TiKdP8qbvSajppHtNAYoYKncbtfP33NcTFjq bid=E7T6zQMgWrNKV66xUixXvEFXNzMtKNVckJLbsjs3oUmV agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 38650 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 47:
+  Signature: 5eGnP19afdF9onwacgsKUfWEHjfebQTe8oKNPM47nHwQMaji3V2P62aYSYwjZVUgVFr1ewLhrRsA8MYsC4FMBQXj
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: SubmitJob
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Job submitted: job=E6VJxLx2TiKdP8qbvSajppHtNAYoYKncbtfP33NcTFjq agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32136 of 203000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 48:
+  Signature: PpNY2snHDvf9qqZMHD41YDqYaWaRc8zRZTFtAqkqcEKZwtCDawoBQTJLuuuZdtSeYuy1SY6FVZJ3ToUFRSp5v7B
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ApproveJobSubmission
+    Program log: Job completed: job=E6VJxLx2TiKdP8qbvSajppHtNAYoYKncbtfP33NcTFjq paid=9000000 refunded=1000000 vault=GN6Z4PWP5qV5QT2QygXLPSukEAeL6tDJMQVmd5XHgWFb
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 32930 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 50:
+  Signature: 2bBgnZBTcWsccjpGh7CeqE7aYhrrB4vkA2zFY5X686T4UTbU7D93zGWK3qsXrDB7sTaw3R9agx475EVozsPGqJiq
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=BAc9h96xmKiHKTzaVBgbq59BBRE2WMtqrHbZ5n21trKC agent=357d3SUYKEXS7cFoZ9jwRGKsPJf9Gp1PrgMN8ia8h4GY fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 59846 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 51:
+  Signature: 7H7ky45NU7nhzWnpk1jci2RuyG1p8rR5dJRL1Y7mgAUZX4DcU77DbnJqwmyAUtr9yaENgXN48HBJ4TqWArEHm6D
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=BAc9h96xmKiHKTzaVBgbq59BBRE2WMtqrHbZ5n21trKC agent=DxREZvsQBed5sDsarn3AUPWD5Esq6DxGrfYt2NP7tUYr fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 61582 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 52:
+  Signature: SR5AVVfvMBzz94EgdH28pKCphoDjVPJocjtgAtekq2Ky3C1sYPzvEnLpEsCa3sRAph4uyEwMJtUhGwhh3VkodYL
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=BAc9h96xmKiHKTzaVBgbq59BBRE2WMtqrHbZ5n21trKC agent=BQy5735WcQhLideXZVJohQmptLjQNzMMM3Fvj6HtXAAz fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 58558 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 53:
+  Signature: Shw7h1yg9Ywn3F2usiPVL9wWiJkDRqFggVnR9MvkXibaiDkXkibYVHXRWo6wNUALxFaACEtZWhNNvEM4667YTnF
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=BAc9h96xmKiHKTzaVBgbq59BBRE2WMtqrHbZ5n21trKC agent=DUsmopRwJCTkwxnV7JNBCCPrs7SSEeLdoxTXvhsbkCnB fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 61582 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 53:
+  Signature: 5Vu84oW99gWWjsu751yYhGxMWWSxGPDFfu8XNwvK3GwxsYg4EeUMymNtC9jptxTRs8jVRAdkBMNMqNSWmLLn5tWx
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=BAc9h96xmKiHKTzaVBgbq59BBRE2WMtqrHbZ5n21trKC agent=8hoCmAqQL55CTkrQPz3NiGruBKDNkvxfvJBi2xT85Rku fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 58534 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 54:
+  Signature: 5Vu84oW99gWWjsu751yYhGxMWWSxGPDFfu8XNwvK3GwxsYg4EeUMymNtC9jptxTRs8jVRAdkBMNMqNSWmLLn5tWx
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Agent initialized: owner=BAc9h96xmKiHKTzaVBgbq59BBRE2WMtqrHbZ5n21trKC agent=8hoCmAqQL55CTkrQPz3NiGruBKDNkvxfvJBi2xT85Rku fee=50000000 lamports
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 58534 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 54:
+  Signature: jQdbRTSwkhSk7PevoxNA9zEi1e2JrbpvdinNv6cEZEGRxBrczUHmPqMqADnuummR6norP2tMkPLJTzi5dJTGVGM
+  Status: Error processing Instruction 0: custom program error: 0x177e
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: InitializeAgent
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: AnchorError thrown in programs/wunderland_sol/src/instructions/initialize_agent.rs:117. Error Code: MaxAgentsPerWalletExceeded. Error Number: 6014. Error Message: Max agents per wallet exceeded.
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 43243 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo failed: custom program error: 0x177e
+Transaction executed in slot 54:
+  Signature: 24foQhFFKWfLMmDjUiR2RD4Xj6Qs6uxDHgLhvtRSYnSiGBKwFSzox4iEabWKWeA4o33hyZpHozq1twsDijDmNZP9
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: UpdateEconomics
+    Program log: Economics updated. fee=50000000 max_per_wallet=5 recovery_timelock=0s
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 6131 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 55:
+  Signature: 24foQhFFKWfLMmDjUiR2RD4Xj6Qs6uxDHgLhvtRSYnSiGBKwFSzox4iEabWKWeA4o33hyZpHozq1twsDijDmNZP9
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: UpdateEconomics
+    Program log: Economics updated. fee=50000000 max_per_wallet=5 recovery_timelock=0s
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 6131 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 55:
+  Signature: 2FbmjHVynRj7FkxPiQm7zEdj7gUacVbTHWZeX2PS7g3cPnc559YNjQnz2tKenYUTQY68PjZpSeD4L6iryLzq84Ey
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: RequestRecoverAgentSigner
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Recovery requested: agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd ready_at=1770993929 new_signer=58kiq31LqgtvueGaJfVNKsYWT3nzDSokLdi7HJ6jHgRk
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 31670 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 56:
+  Signature: 2FbmjHVynRj7FkxPiQm7zEdj7gUacVbTHWZeX2PS7g3cPnc559YNjQnz2tKenYUTQY68PjZpSeD4L6iryLzq84Ey
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: RequestRecoverAgentSigner
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program log: Recovery requested: agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd ready_at=1770993929 new_signer=58kiq31LqgtvueGaJfVNKsYWT3nzDSokLdi7HJ6jHgRk
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 31670 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 56:
+  Signature: 3KcrBPUfzKQhUmainquQwHorY6xcjLEbqmVsfZr9x7V1p554FsgLvZQLXGGYmGMC3TJoeju5VZ36RiUVnbE1R5Gu
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ExecuteRecoverAgentSigner
+    Program log: Recovery executed: agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd new_signer=58kiq31LqgtvueGaJfVNKsYWT3nzDSokLdi7HJ6jHgRk
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 26489 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 57:
+  Signature: 3KcrBPUfzKQhUmainquQwHorY6xcjLEbqmVsfZr9x7V1p554FsgLvZQLXGGYmGMC3TJoeju5VZ36RiUVnbE1R5Gu
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: ExecuteRecoverAgentSigner
+    Program log: Recovery executed: agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd new_signer=58kiq31LqgtvueGaJfVNKsYWT3nzDSokLdi7HJ6jHgRk
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 26489 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success
+Transaction executed in slot 58:
+  Signature: Lvu4efrUp72TqZfkWhds4S1xxJHrEwkrm7KFPQ9Ez6XcGGx3BjBpoGHmLs7Ph9RHNfeoxBkGVwH3whSmgcfySfo
+  Status: Ok
+  Log Messages:
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo invoke [1]
+    Program log: Instruction: DeactivateAgent
+    Program log: Agent deactivated: agent=8AxEHQyTTD81JXwqjoeyrYGUjFn5Z4dNWZcSDBxigLYd owner=AoQH9w6fJ97kUQxZoyX13XA61ZGBvpvtSbrgyNRTMezK
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo consumed 24014 of 200000 compute units
+    Program 3Z4e2eQuUJKvoi3egBdwKYc2rdZm8XFw9UNDf99xpDJo success

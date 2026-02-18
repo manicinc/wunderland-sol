@@ -1,0 +1,140 @@
+name: Validate Plugin PR
+
+on:
+  pull_request:
+    paths:
+      - 'plugins/**'
+      - 'themes/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            plugins/**
+            themes/**
+
+      - name: Validate manifests
+        run: |
+          echo "Validating changed plugins..."
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == */manifest.json ]]; then
+              echo "Validating: $file"
+              node scripts/validate-plugin.js "$file"
+            fi
+          done
+
+      - name: Check for required files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == */manifest.json ]]; then
+              dir=$(dirname "$file")
+
+              # Check for main.js or main.ts
+              if [[ ! -f "$dir/main.js" && ! -f "$dir/main.ts" ]]; then
+                echo "Error: Missing main.js or main.ts in $dir"
+                exit 1
+              fi
+
+              # Check for README
+              if [[ ! -f "$dir/README.md" ]]; then
+                echo "Warning: Missing README.md in $dir"
+              fi
+
+              echo "✓ $dir has required files"
+            fi
+          done
+
+      - name: Security scan
+        run: |
+          echo "Running basic security checks..."
+
+          # Check for suspicious patterns
+          SUSPICIOUS_PATTERNS=(
+            "eval("
+            "new Function("
+            "document.cookie"
+            "localStorage.getItem.*password"
+            "fetch.*credentials"
+            "XMLHttpRequest.*withCredentials"
+          )
+
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == *.js || "$file" == *.ts ]]; then
+              for pattern in "${SUSPICIOUS_PATTERNS[@]}"; do
+                if grep -q "$pattern" "$file" 2>/dev/null; then
+                  echo "⚠️  Warning: Suspicious pattern found in $file: $pattern"
+                  echo "Please review this code carefully before merging."
+                fi
+              done
+            fi
+          done
+
+          echo "Security scan complete"
+
+  build-test:
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Get changed plugins
+        id: changed-plugins
+        uses: tj-actions/changed-files@v41
+        with:
+          files: plugins/**
+          dir_names: true
+          dir_names_max_depth: 2
+
+      - name: Test plugin builds
+        run: |
+          for dir in ${{ steps.changed-plugins.outputs.all_changed_files }}; do
+            if [[ -f "$dir/package.json" ]]; then
+              echo "Building $dir..."
+              cd "$dir"
+              npm install
+              npm run build || echo "No build script found"
+              cd -
+            fi
+          done
+
+  update-registry:
+    runs-on: ubuntu-latest
+    needs: [validate, build-test]
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update registry
+        run: node scripts/build-registry.js
+
+      - name: Commit registry update
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: update plugin registry'
+          file_pattern: registry.json

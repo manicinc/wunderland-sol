@@ -1,0 +1,83 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.system.cli-executor",
+  "name": "CLI Executor Extension",
+  "version": "1.1.0",
+  "description": "Execute shell commands and manage files for AgentOS agents",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": ["cli", "shell", "command", "execute", "terminal", "bash", "powershell", "script"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["system", "automation", "development"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "shell_execute",
+      "displayName": "Execute Shell Command",
+      "description": "Execute a shell command and return output",
+      "entry": "./dist/tools/execute.js"
+    },
+    {
+      "kind": "tool",
+      "id": "file_read",
+      "displayName": "Read File",
+      "description": "Read contents of a file",
+      "entry": "./dist/tools/fileRead.js"
+    },
+    {
+      "kind": "tool",
+      "id": "file_write",
+      "displayName": "Write File",
+      "description": "Write content to a file",
+      "entry": "./dist/tools/fileWrite.js"
+    },
+    {
+      "kind": "tool",
+      "id": "list_directory",
+      "displayName": "List Directory",
+      "description": "List files and directories",
+      "entry": "./dist/tools/listDir.js"
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "shell.defaultShell": {
+        "type": "string",
+        "description": "Default shell to use (bash, powershell, cmd, zsh)",
+        "default": "auto"
+      },
+      "shell.timeout": {
+        "type": "number",
+        "default": 60000,
+        "minimum": 1000,
+        "maximum": 600000,
+        "description": "Default timeout for commands (ms)"
+      },
+      "shell.workingDirectory": {
+        "type": "string",
+        "description": "Default working directory"
+      },
+      "shell.allowedCommands": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Whitelist of allowed commands (empty = all allowed)"
+      },
+      "shell.blockedCommands": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": ["rm -rf /", "format", "del /s /q", "shutdown", "reboot"],
+        "description": "Blacklist of blocked commands"
+      }
+    }
+  }
+}
+
+

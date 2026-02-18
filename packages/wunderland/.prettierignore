@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+coverage/
+
+# Generated files
+*.min.js
+*.min.css
+*.d.ts
+*.map
+
+# Cache
+.cache/
+.turbo/
+.vercel/
+.netlify/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs
+docs/api/
+docs-generated/
+
+# Submodules (handled separately)
+apps/*/node_modules/
+packages/*/node_modules/

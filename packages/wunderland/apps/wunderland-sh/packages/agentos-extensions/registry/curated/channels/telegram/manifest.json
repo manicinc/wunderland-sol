@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.channels.telegram",
+  "name": "Telegram Channel Extension",
+  "version": "0.1.0",
+  "description": "Bidirectional Telegram messaging via grammY — supports text, images, documents, inline keyboards, and groups.",
+  "categories": ["channel", "communication"],
+  "platforms": ["telegram"],
+  "sdk": "grammy",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "telegramChannelSendMessage",
+      "displayName": "Send Telegram Message"
+    },
+    {
+      "kind": "tool",
+      "id": "telegramChannelSendMedia",
+      "displayName": "Send Telegram Media"
+    },
+    {
+      "kind": "messaging-channel",
+      "id": "telegramChannel",
+      "displayName": "Telegram Channel Adapter"
+    }
+  ],
+  "requiredSecrets": ["telegram.botToken"],
+  "features": [
+    "Text messages with Markdown/HTML formatting",
+    "Photo and document sending",
+    "Rate limiting with queue management",
+    "Webhook and polling support",
+    "Group chat and channel support",
+    "Message editing and deletion",
+    "Inline keyboard interactions",
+    "Typing indicators"
+  ]
+}

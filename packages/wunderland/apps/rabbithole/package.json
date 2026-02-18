@@ -1,0 +1,40 @@
+{
+  "name": "rabbithole",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3010",
+    "build": "next build",
+    "start": "next start -p 3010"
+  },
+  "dependencies": {
+    "@slack/bolt": "^4.1.0",
+    "axios": "^1.7.0",
+    "discord.js": "^14.16.3",
+    "eventemitter3": "^5.0.1",
+    "fflate": "^0.8.2",
+    "jose": "^6.1.3",
+    "next": "16.1.6",
+    "next-auth": "5.0.0-beta.30",
+    "openai": "^4.73.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "resend": "^4.0.0",
+    "sass": "^1.97.3",
+    "stripe": "^20.3.0",
+    "telegraf": "^4.16.3",
+    "uuid": "^9.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/uuid": "^9",
+    "@types/ws": "^8",
+    "typescript": "^5",
+    "vitest": "^1.6.0"
+  }
+}

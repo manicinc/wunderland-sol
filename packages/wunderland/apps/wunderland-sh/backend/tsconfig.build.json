@@ -1,0 +1,47 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "strict": false,
+    "paths": {
+      "@prisma/client": [
+        "../packages/agentos/dist/stubs/prismaClient.d.ts",
+        "../../../packages/agentos/dist/stubs/prismaClient.d.ts"
+      ],
+      "@framers/shared": [
+        "../packages/shared/dist/index.d.ts",
+        "../../../packages/shared/dist/index.d.ts"
+      ],
+      "@framers/shared/*": [
+        "../packages/shared/dist/*",
+        "../../../packages/shared/dist/*"
+      ],
+      "@framers/agentos": [
+        "../packages/agentos/dist/index.d.ts",
+        "../../../packages/agentos/dist/index.d.ts"
+      ],
+      "@framers/agentos/*": [
+        "../packages/agentos/dist/*",
+        "../../../packages/agentos/dist/*"
+      ],
+      "@framers/sql-storage-adapter": [
+        "../packages/sql-storage-adapter/dist/index.d.ts",
+        "../../../packages/sql-storage-adapter/dist/index.d.ts"
+      ],
+      "@framers/sql-storage-adapter/*": [
+        "../packages/sql-storage-adapter/dist/*",
+        "../../../packages/sql-storage-adapter/dist/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests/**",
+    "**/__tests__/**",
+    "**/*.spec.ts",
+    "legacy/**"
+  ]
+}

@@ -1,0 +1,168 @@
+// File: frontend/src/styles/components/_reactive-effects-mixins.scss
+/**
+ * @file _reactive-effects-mixins.scss
+ * @description Mixin functions for reactive effects
+ * Used by _reactive-effects.scss and other components
+ * @version 1.0.0
+ */
+
+@use '../abstracts/variables' as var;
+
+// ============================================
+// State Effect Application
+// ============================================
+
+@mixin apply-state-effects($state) {
+  @if $state == 'idle' {
+    --local-intensity: 0.3;
+    --local-pulse-rate: 0.3;
+    --local-glow: 0.2;
+  } @else if $state == 'listening' {
+    --local-intensity: 0.7;
+    --local-pulse-rate: 0.8;
+    --local-glow: 0.6;
+    @include reactive-border-pulse('--color-voice-user');
+    @include reactive-glow('--color-voice-user');
+  } @else if $state == 'transcribing' {
+    --local-intensity: 0.8;
+    --local-pulse-rate: 1.0;
+    --local-glow: 0.7;
+    @include reactive-border-pulse('--color-voice-user', 1.5s);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.8) 50%,
+        transparent 100%
+      );
+      animation: scan-line 2s linear infinite;
+    }
+  } @else if $state == 'thinking' {
+    --local-intensity: 0.6;
+    --local-pulse-rate: 0.4;
+    --local-glow: 0.5;
+    @include reactive-border-pulse('--color-accent-secondary', 3s);
+    
+    &::before {
+      background-size: 400% 400%;
+      animation-duration: 3s;
+    }
+  } @else if $state == 'responding' {
+    --local-intensity: 0.9;
+    --local-pulse-rate: 0.6;
+    --local-glow: 0.8;
+    @include reactive-border-pulse('--color-voice-ai-speaking', 1.5s);
+    @include reactive-glow('--color-voice-ai-speaking', 30px);
+  } @else if $state == 'speaking' {
+    --local-intensity: 1.0;
+    --local-pulse-rate: 0.9;
+    --local-glow: 0.9;
+    @include reactive-border-pulse('--color-voice-ai-speaking', 1s);
+    @include reactive-glow('--color-voice-ai-speaking', 40px, 0.7);
+  } @else if $state == 'vad-wake' {
+    --local-intensity: 0.4;
+    --local-pulse-rate: 0.5;
+    --local-glow: 0.3;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      border: 1px dashed hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.5);
+      animation: rotate-dash 4s linear infinite;
+    }
+  } @else if $state == 'vad-active' {
+    --local-intensity: 0.6;
+    --local-pulse-rate: 0.7;
+    --local-glow: 0.5;
+    @include reactive-border-pulse('--color-accent-interactive', 1.5s);
+  } @else if $state == 'processing' {
+    --local-intensity: 0.7;
+    --local-pulse-rate: 0.5;
+    --local-glow: 0.6;
+    @include reactive-border-pulse('--color-accent-primary', 2s);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.03) 10px,
+        hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.03) 20px
+      );
+      animation: processing-stripes 1s linear infinite;
+      pointer-events: none;
+    }
+  } @else if $state == 'error' {
+    --local-intensity: 0.5;
+    --local-pulse-rate: 0.2;
+    --local-glow: 0.4;
+    @include reactive-glow('--color-error', 20px, 0.6);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      border: 2px solid hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.5);
+      animation: error-flash 0.5s ease-in-out infinite alternate;
+    }
+  } @else if $state == 'connecting' {
+    --local-intensity: 0.5;
+    --local-pulse-rate: 0.6;
+    --local-glow: 0.4;
+    @include reactive-border-pulse('--color-accent-interactive', 2s);
+    
+    &::before {
+      opacity: 0.5;
+      animation-timing-function: steps(4, end);
+    }
+  }
+}
+
+// ============================================
+// Additional Keyframes
+// ============================================
+
+@keyframes scan-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes rotate-dash {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes processing-stripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+@keyframes error-flash {
+  from { opacity: 0.3; }
+  to { opacity: 0.8; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% { 
+    transform: scale(1.5);
+    opacity: 0.8;
+  }
+}

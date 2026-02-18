@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b6914"/>
+      <stop offset="25%" stop-color="#c9a227"/>
+      <stop offset="45%" stop-color="#e8d48a"/>
+      <stop offset="55%" stop-color="#f5e6a3"/>
+      <stop offset="70%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Keyhole frame -->
+  <path d="M 256 56 C 368 56, 456 144, 456 256 C 456 338, 394 408, 318 428 L 318 434 C 318 444, 308 454, 298 454 L 298 494 L 214 494 L 214 454 C 204 454, 194 444, 194 434 L 194 428 C 118 408, 56 338, 56 256 C 56 144, 144 56, 256 56 Z" fill="url(#goldGrad)"/>
+
+  <!-- Inner keyhole cutout -->
+  <path d="M 256 98 C 348 98, 420 170, 420 256 C 420 318, 378 374, 308 390 L 298 390 C 288 390, 278 400, 278 410 L 278 466 L 234 466 L 234 410 C 234 400, 224 390, 214 390 L 204 390 C 134 374, 92 318, 92 256 C 92 170, 164 98, 256 98 Z" fill="#12101a"/>
+
+  <!-- Rabbit silhouette -->
+  <g fill="url(#goldGrad)">
+    <!-- Left ear -->
+    <path d="M174 270 Q170 170 192 120 Q200 96 220 96 Q240 96 240 130 Q240 192 230 270 Q206 266 174 270Z"/>
+    <!-- Right ear -->
+    <path d="M338 270 Q342 170 320 120 Q312 96 292 96 Q272 96 272 130 Q272 192 282 270 Q306 266 338 270Z"/>
+    <!-- Body -->
+    <ellipse cx="256" cy="322" rx="112" ry="92"/>
+  </g>
+</svg>

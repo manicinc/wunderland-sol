@@ -1,0 +1,28 @@
+{
+  "id": "com.yourname.my-renderer",
+  "name": "My Renderer Plugin",
+  "version": "1.0.0",
+  "description": "A sample markdown renderer plugin for Quarry",
+  "author": "Your Name",
+  "authorUrl": "https://yoursite.com",
+  "minQuarryVersion": "1.0.0",
+  "main": "main.js",
+  "styles": "styles.css",
+  "type": "renderer",
+  "position": "content",
+  "settings": {
+    "enableFeature": {
+      "type": "boolean",
+      "default": true,
+      "label": "Enable Feature",
+      "description": "Toggle the custom rendering feature"
+    },
+    "style": {
+      "type": "select",
+      "default": "default",
+      "label": "Style",
+      "description": "Visual style for rendered elements",
+      "options": ["default", "minimal", "fancy"]
+    }
+  }
+}

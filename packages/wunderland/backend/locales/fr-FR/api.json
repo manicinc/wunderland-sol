@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "Enregistrement...",
+    "processing": "Traitement de la voix...",
+    "transcribing": "Transcription de l'audio...",
+    "listening": "Écoute...",
+    "speakNow": "Parlez maintenant",
+    "clickToSpeak": "Cliquez pour parler",
+    "stopRecording": "Arrêter l'enregistrement",
+    "microphoneAccess": "Accès au microphone requis",
+    "noSpeechDetected": "Aucune parole détectée",
+    "transcriptionComplete": "Transcription terminée"
+  },
+  "chat": {
+    "thinking": "Réflexion...",
+    "generating": "Génération de la réponse...",
+    "messageEmpty": "Le message ne peut pas être vide",
+    "sendMessage": "Envoyer le message",
+    "newChat": "Nouvelle discussion",
+    "clearHistory": "Effacer l'historique",
+    "typingIndicator": "L'IA est en train d'écrire...",
+    "copyCode": "Copier le code",
+    "codeCopied": "Code copié dans le presse-papiers",
+    "retry": "Réessayer",
+    "regenerate": "Regénérer la réponse"
+  },
+  "modes": {
+    "coding": "Questions/Réponses de programmation",
+    "codingDesc": "Obtenez de l'aide pour les questions de programmation et des exemples de code",
+    "systemDesign": "Conception de système",
+    "systemDesignDesc": "Concevez des architectures et créez des diagrammes",
+    "meetingSummary": "Compte rendu de réunion",
+    "meetingSummaryDesc": "Résumez les réunions et extrayez les points clés",
+    "general": "Général",
+    "generalDesc": "Conversation générale et questions"
+  },
+  "cost": {
+    "title": "Utilisation de l'API",
+    "current": "Session en cours",
+    "total": "Utilisation totale",
+    "threshold": "Seuil de coût",
+    "warning": "Seuil de coût bientôt atteint",
+    "exceeded": "Seuil de coût dépassé",
+    "reset": "Réinitialiser le compteur"
+  },
+  "settings": {
+    "speechRecognition": "Reconnaissance vocale",
+    "whisperAPI": "API Whisper",
+    "browserSpeech": "Voix du navigateur",
+    "textToSpeech": "Synthèse vocale",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "TTS du navigateur",
+    "apiKeys": "Clés API",
+    "openAIKey": "Clé API OpenAI",
+    "anthropicKey": "Clé API Anthropic",
+    "modelPreferences": "Préférences de modèle",
+    "costLimits": "Limites de coût",
+    "sessionLimit": "Limite de session",
+    "dailyLimit": "Limite quotidienne",
+    "monthlyLimit": "Limite mensuelle"
+  }
+}

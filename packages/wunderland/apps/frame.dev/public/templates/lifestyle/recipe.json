@@ -1,0 +1,40 @@
+{
+  "id": "recipe",
+  "name": "Recipe",
+  "category": "lifestyle",
+  "icon": "Utensils",
+  "description": "Document a recipe with ingredients, steps, nutrition, and tips",
+  "shortDescription": "Complete recipe documentation",
+  "difficulty": "beginner",
+  "estimatedTime": "15 min",
+  "tags": ["recipe", "cooking", "food", "lifestyle"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 85,
+  "defaultData": {
+    "contentType": "recipe"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}, recipe, cooking]\ncontentType: recipe\ncuisine: \"{cuisine}\"\ncourse: \"{course}\"\nprepTime: \"{prepTime}\"\ncookTime: \"{cookTime}\"\nservings: {servings}\ndifficulty: {difficulty}\n---\n\n# {title}\n\n> {summary}\n\n## Quick Facts\n\n| | |\n|---|---|\n| ⏱️ **Prep Time** | {prepTime} |\n| 🍳 **Cook Time** | {cookTime} |\n| ⏰ **Total Time** | {totalTime} |\n| 🍽️ **Servings** | {servings} |\n| 📊 **Difficulty** | {difficulty} |\n| 🌍 **Cuisine** | {cuisine} |\n| 🍴 **Course** | {course} |\n\n## Description\n\n[Describe the dish—what makes it special, origin, when to serve it, personal connection...]\n\n## Ingredients\n\n### Main Ingredients\n\n- [ ] Ingredient 1 (amount, preparation)\n- [ ] Ingredient 2 (amount, preparation)\n- [ ] Ingredient 3 (amount, preparation)\n- [ ] Ingredient 4 (amount, preparation)\n\n### Seasonings & Spices\n\n- [ ] Seasoning 1 (amount)\n- [ ] Seasoning 2 (amount)\n\n### Optional Add-ins\n\n- [ ] Optional ingredient 1\n- [ ] Optional ingredient 2\n\n### Substitutions\n\n| Original | Substitute | Notes |\n|----------|------------|-------|\n| Ingredient X | Alternative | Effect on dish |\n| Ingredient Y | Alternative | Effect on dish |\n\n## Equipment\n\n- [ ] Equipment 1 (size if relevant)\n- [ ] Equipment 2\n- [ ] Equipment 3\n\n## Instructions\n\n### Prep Work\n\n1. **[Action]:** Detailed instruction for prep step 1.\n\n2. **[Action]:** Detailed instruction for prep step 2.\n\n> 💡 **Tip:** Helpful hint for prep phase\n\n### Cooking\n\n1. **[Action]:** \n   - Temperature: [X°F/C]\n   - Duration: [X minutes]\n   - Visual cue: What to look for\n\n2. **[Action]:**\n   - Detailed instruction\n   - What it should look/smell/sound like\n\n3. **[Action]:**\n   - Continue with remaining steps\n\n> ⚠️ **Watch Out:** Common mistake and how to avoid it\n\n### Finishing\n\n1. **[Action]:** Final steps\n\n2. **Resting:** [If applicable—how long and why]\n\n3. **Garnish:** [Finishing touches]\n\n## Serving Suggestions\n\n### Presentation\n\n- Plating tips\n- Garnish ideas\n\n### Pairings\n\n- **Side dishes:** What goes well with this\n- **Wine/Beverage:** Recommended pairings\n- **Bread:** If applicable\n\n## Storage\n\n| Method | Duration | Notes |\n|--------|----------|-------|\n| Refrigerator | X days | How to store |\n| Freezer | X months | Freezing tips |\n| Room temp | X hours | If applicable |\n\n### Reheating\n\nBest method for reheating and maintaining quality...\n\n## Nutrition (Per Serving)\n\n*Approximate values*\n\n| Nutrient | Amount | % Daily Value |\n|----------|--------|---------------|\n| Calories | X kcal | |\n| Protein | Xg | X% |\n| Carbohydrates | Xg | X% |\n| Fat | Xg | X% |\n| Fiber | Xg | X% |\n| Sodium | Xmg | X% |\n\n### Dietary Information\n\n- [ ] Vegetarian\n- [ ] Vegan\n- [ ] Gluten-Free\n- [ ] Dairy-Free\n- [ ] Nut-Free\n- [ ] Low-Carb\n- [ ] Keto-Friendly\n\n## Tips & Tricks\n\n### For Best Results\n\n- Tip 1: Pro advice\n- Tip 2: Secret to success\n- Tip 3: Make it special\n\n### Common Mistakes\n\n- Mistake 1: What goes wrong and how to fix\n- Mistake 2: What to avoid\n\n### Scaling\n\n- **Half recipe:** Adjustments needed\n- **Double recipe:** Adjustments needed\n\n## Variations\n\n### Variation 1: [Name]\n\nHow to modify for different flavor/dietary needs...\n\n### Variation 2: [Name]\n\nAnother modification option...\n\n## Make-Ahead\n\nWhat can be prepped in advance:\n\n- [ ] Component 1: How far ahead, storage\n- [ ] Component 2: How far ahead, storage\n\n## Notes\n\n### Recipe History\n\nWhere did this recipe come from? Adaptations made?\n\n### Personal Notes\n\nYour experience making this, tweaks you've made...\n\n### Date Last Made\n\n[Date] - [Notes from that time]\n\n## Rating\n\n**My Rating:** ⭐⭐⭐⭐⭐ (5/5)\n\n**Family/Guest Feedback:**\n\n---\n\n*Recipe added: {date}*\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

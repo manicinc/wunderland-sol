@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frame - Square Logo Export System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #000000, #0055ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        h2 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .color-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .color-tab {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-tab.active {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        
+        .color-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-box:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        
+        .preview-box.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .preview-box.brand {
+            background: linear-gradient(135deg, #0055ff20, #00ff8820);
+            border-color: #0055ff40;
+        }
+        
+        .preview-label {
+            font-size: 0.875rem;
+            color: #666;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #000, #333);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.813rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .download-btn.primary {
+            background: linear-gradient(135deg, #0055ff, #0044cc);
+        }
+        
+        .download-btn.secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        .download-btn.secondary:hover {
+            background: #dee2e6;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tagline-control {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .tagline-control label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #333;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .tagline-control input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #0055ff;
+        }
+        
+        .tagline-options {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .tagline-select {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .tagline-select select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        
+        .download-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #666;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .usage-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .usage-item {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .usage-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #0055ff;
+        }
+
+        .usage-item p {
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            color: #0055ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Frame</h1>
+            <p class="subtitle">Square Logo Export System</p>
+        </header>
+        
+        <!-- Primary Square Logo Section -->
+        <section class="section">
+            <h2>Square Logo Variations</h2>
+            
+            <div class="tagline-control">
+                <label>
+                    <input type="checkbox" id="includeTagline" checked onchange="updateLogoDisplay()">
+                    Include tagline
+                </label>
+                <div class="tagline-options" id="taglineOptions">
+                    <div class="tagline-select">
+                        <label for="taglineSelect">Tagline:</label>
+                        <select id="taglineSelect" onchange="updateLogoDisplay()">
+                            <option value="Infrastructure for agentic AI">Infrastructure for agentic AI</option>
+                            <option value="Framing the intelligent web">Framing the intelligent web</option>
+                            <option value="Organizing intelligence">Organizing intelligence</option>
+                            <option value="Denoising the web">Denoising the web</option>
+                            <option value="Where AI finds its frame">Where AI finds its frame</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="color-tabs">
+                <button class="color-tab active" onclick="setActiveColor('black')" data-color="black">
+                    <span class="color-dot" style="background: #000"></span>
+                    Classic Black
+                </button>
+                <button class="color-tab" onclick="setActiveColor('blue')" data-color="blue">
+                    <span class="color-dot" style="background: #0055ff"></span>
+                    Electric Blue
+                </button>
+                <button class="color-tab" onclick="setActiveColor('green')" data-color="green">
+                    <span class="color-dot" style="background: #00C896"></span>
+                    Emerald
+                </button>
+                <button class="color-tab" onclick="setActiveColor('purple')" data-color="purple">
+                    <span class="color-dot" style="background: #7C3AED"></span>
+                    Deep Purple
+                </button>
+                <button class="color-tab" onclick="setActiveColor('coral')" data-color="coral">
+                    <span class="color-dot" style="background: #FF6B6B"></span>
+                    Coral
+                </button>
+                <button class="color-tab" onclick="setActiveColor('navy')" data-color="navy">
+                    <span class="color-dot" style="background: #1e293b"></span>
+                    Navy
+                </button>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" id="squareLogoLight">
+                            <!-- Logo content will be dynamically updated -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark">
+                        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" id="squareLogoDark">
+                            <!-- Logo content will be dynamically updated -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box brand">
+                        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" id="squareLogoBrand">
+                            <!-- Logo content will be dynamically updated -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Brand Background</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Vector Formats</div>
+            <div class="download-grid">
+                <button class="download-btn primary" onclick="downloadSVG('square')">Download SVG</button>
+                <button class="download-btn" onclick="downloadSVG('square-dark')">SVG (Dark)</button>
+            </div>
+            
+            <div class="download-section-title">PNG Exports - Square Format</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 512)">512×512</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 1024)">1024×1024</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 2048)">2048×2048</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'white', 512)">512×512 (White)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'dark', 512)">512×512 (Dark)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'brand', 512)">512×512 (Brand)</button>
+            </div>
+            
+            <div class="download-section-title">Social Media Sizes</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 180)">180×180 (Apple)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 192)">192×192 (Android)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 400)">400×400 (Social)</button>
+                <button class="download-btn secondary" onclick="downloadPNG('square', 'transparent', 800)">800×800 (HD Social)</button>
+            </div>
+        </section>
+        
+        <!-- Icon Only Section -->
+        <section class="section">
+            <h2>Icon Only (No Text)</h2>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box" style="min-height: 150px;">
+                        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" id="iconOnlyLight">
+                            <!-- Icon only content -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Icon Light</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark" style="min-height: 150px;">
+                        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" id="iconOnlyDark">
+                            <!-- Icon only content -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Icon Dark</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Icon Downloads</div>
+            <div class="download-grid">
+                <button class="download-btn primary" onclick="downloadSVG('icon')">Icon SVG</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64)">64×64</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128)">128×128</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256)">256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 512)">512×512</button>
+            </div>
+        </section>
+        
+        <!-- Usage Guidelines -->
+        <section class="section">
+            <h2>Usage Guidelines</h2>
+            
+            <div class="usage-section">
+                <div class="usage-grid">
+                    <div class="usage-item">
+                        <h4>Minimum Size</h4>
+                        <p>Square logo: <code>100×100px</code> minimum<br>
+                        Icon only: <code>32×32px</code> minimum</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Clear Space</h4>
+                        <p>Maintain clear space equal to 25% of logo height on all sides</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Applications</h4>
+                        <p>Use square format for: app icons, social media profiles, favicons, PWA icons</p>
+                    </div>
+                    
+                    <div class="usage-item">
+                        <h4>Color Usage</h4>
+                        <p>Black or blue for professional contexts. Colored variants for marketing materials.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Color configurations
+        const colors = {
+            black: { fill: '#000000', name: 'black' },
+            blue: { fill: '#0055ff', name: 'blue' },
+            green: { fill: '#00C896', name: 'green' },
+            purple: { fill: '#7C3AED', name: 'purple' },
+            coral: { fill: '#FF6B6B', name: 'coral' },
+            navy: { fill: '#1e293b', name: 'navy' }
+        };
+        
+        let currentColor = 'black';
+        let includeTagline = true;
+        let currentTagline = 'Infrastructure for agentic AI';
+        
+        // Function to generate Frame square logo SVG
+        function generateSquareLogo(color, isDark = false, includeTag = true) {
+            const fillColor = isDark ? '#ffffff' : colors[color].fill;
+            const taglineColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)';
+            const borderColor = isDark ? '#ffffff' : '#e0e0e0';
+            const innerStrokeColor = '#ffffff';
+            
+            // Position elements for square format with more spacing
+            const iconY = includeTag ? 65 : 80;
+            const textY = includeTag ? 145 : 155;  // Increased gap between icon and text
+            const taglineY = 165;
+            
+            const taglineText = includeTag ? 
+                `<text x="100" y="${taglineY}" font-family="Inter" font-size="9" font-weight="400" fill="${taglineColor}" text-anchor="middle" letter-spacing="0.3">${currentTagline}</text>` 
+                : '';
+            
+            return `
+                <defs>
+                    <filter id="shadow-${color}${isDark ? '-dark' : ''}" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="3" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.2' : '0.15'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                <!-- Icon centered -->
+                <g transform="translate(100, ${iconY})" filter="url(#shadow-${color}${isDark ? '-dark' : ''})">
+                    <rect x="-30" y="-35" width="60" height="70" fill="${colors[color].fill}" stroke="${borderColor}" stroke-width="2"/>
+                    <rect x="-28" y="-33" width="56" height="66" fill="none" stroke="${innerStrokeColor}" stroke-width="2" opacity="0.5"/>
+                    <rect x="-30" y="-35" width="12" height="70" fill="${innerStrokeColor}" opacity="0.15"/>
+                    <line x1="-18" y1="-35" x2="-18" y2="35" stroke="${innerStrokeColor}" stroke-width="2.5"/>
+                    <line x1="6" y1="-35" x2="6" y2="35" stroke="${innerStrokeColor}" stroke-width="2.5"/>
+                    <line x1="-30" y1="0" x2="30" y2="0" stroke="${innerStrokeColor}" stroke-width="2.5"/>
+                </g>
+                <!-- Text below icon -->
+                <text x="100" y="${textY}" font-family="Inter" font-size="36" font-weight="700" fill="${fillColor}" text-anchor="middle">Frame</text>
+                <!-- Tagline -->
+                ${taglineText}
+            `;
+        }
+        
+        // Function to generate icon only
+        function generateIconOnly(color, isDark = false) {
+            const borderColor = isDark ? '#ffffff' : '#d0d0d0';
+            const innerStrokeColor = '#ffffff';
+            
+            return `
+                <rect width="100" height="100" fill="${isDark ? '#1a1a1a' : 'transparent'}"/>
+                <g transform="translate(50, 50)">
+                    <rect x="-30" y="-35" width="60" height="70" fill="${colors[color].fill}" stroke="${borderColor}" stroke-width="2.5"/>
+                    <rect x="-28" y="-33" width="56" height="66" fill="none" stroke="${innerStrokeColor}" stroke-width="2" opacity="0.5"/>
+                    <rect x="-30" y="-35" width="12" height="70" fill="${innerStrokeColor}" opacity="0.15"/>
+                    <line x1="-18" y1="-35" x2="-18" y2="35" stroke="${innerStrokeColor}" stroke-width="2.5"/>
+                    <line x1="6" y1="-35" x2="6" y2="35" stroke="${innerStrokeColor}" stroke-width="2.5"/>
+                    <line x1="-30" y1="0" x2="30" y2="0" stroke="${innerStrokeColor}" stroke-width="2.5"/>
+                </g>
+            `;
+        }
+        
+        // Update logo display
+        function updateLogoDisplay() {
+            includeTagline = document.getElementById('includeTagline').checked;
+            currentTagline = document.getElementById('taglineSelect').value;
+            document.getElementById('taglineOptions').style.display = includeTagline ? 'flex' : 'none';
+            
+            // Update all preview SVGs
+            document.getElementById('squareLogoLight').innerHTML = generateSquareLogo(currentColor, false, includeTagline);
+            document.getElementById('squareLogoDark').innerHTML = generateSquareLogo(currentColor, true, includeTagline);
+            document.getElementById('squareLogoBrand').innerHTML = generateSquareLogo(currentColor, false, includeTagline);
+            
+            // Update icon only
+            document.getElementById('iconOnlyLight').innerHTML = generateIconOnly(currentColor, false);
+            document.getElementById('iconOnlyDark').innerHTML = generateIconOnly(currentColor, true);
+        }
+        
+        // Set active color
+        function setActiveColor(color) {
+            currentColor = color;
+            
+            // Update tabs
+            document.querySelectorAll('.color-tab').forEach(tab => {
+                if (tab.dataset.color === color) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            updateLogoDisplay();
+        }
+        
+        // Download SVG function
+        function downloadSVG(type) {
+            let svgContent, filename;
+            
+            if (type === 'square') {
+                svgContent = '<?xml version="1.0" encoding="UTF-8"?>\n<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateSquareLogo(currentColor, false, includeTagline) + '</svg>';
+                filename = `frame-square-${currentColor}${includeTagline ? '' : '-no-tagline'}.svg`;
+            } else if (type === 'square-dark') {
+                svgContent = '<?xml version="1.0" encoding="UTF-8"?>\n<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateSquareLogo(currentColor, true, includeTagline) + '</svg>';
+                filename = `frame-square-${currentColor}-dark${includeTagline ? '' : '-no-tagline'}.svg`;
+            } else if (type === 'icon') {
+                svgContent = '<?xml version="1.0" encoding="UTF-8"?>\n<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateIconOnly(currentColor, false) + '</svg>';
+                filename = `frame-icon-${currentColor}.svg`;
+            }
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Download PNG function
+        function downloadPNG(type, background, size) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            let svgContent, filename;
+            
+            if (type === 'square') {
+                svgContent = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateSquareLogo(currentColor, background === 'dark', includeTagline) + '</svg>';
+                filename = `frame-square-${currentColor}-${size}x${size}-${background}.png`;
+            } else if (type === 'icon') {
+                svgContent = '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' + 
+                           generateIconOnly(currentColor, background === 'dark') + '</svg>';
+                filename = `frame-icon-${currentColor}-${size}x${size}.png`;
+            }
+            
+            // Fill background if needed
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, size, size);
+            } else if (background === 'dark') {
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, size, size);
+            } else if (background === 'brand') {
+                ctx.fillStyle = colors[currentColor].fill + '10';
+                ctx.fillRect(0, 0, size, size);
+            }
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+                
+                canvas.toBlob(function(pngBlob) {
+                    const a = document.createElement('a');
+                    const pngUrl = URL.createObjectURL(pngBlob);
+                    a.href = pngUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(pngUrl);
+                }, 'image/png');
+                
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLogoDisplay();
+        });
+    </script>
+</body>
+</html>

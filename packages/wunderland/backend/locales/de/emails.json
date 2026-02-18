@@ -1,0 +1,30 @@
+{
+  "welcome": {
+    "subject": "Willkommen beim Voice Chat Assistant",
+    "greeting": "Hallo {{name}}",
+    "body": "Schön, dass du den Voice Chat Assistant nutzt. Dein Konto wurde erfolgreich erstellt.",
+    "action": "Jetzt starten",
+    "footer": "Wenn du Fragen hast, kontaktiere uns jederzeit gerne."
+  },
+  "passwordReset": {
+    "subject": "Passwort zurücksetzen",
+    "greeting": "Hallo {{name}}",
+    "body": "Wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten. Klicke auf den folgenden Link, um ein neues Passwort festzulegen.",
+    "action": "Passwort zurücksetzen",
+    "expire": "Dieser Link läuft in {{hours}} Stunden ab.",
+    "ignore": "Wenn du die Anfrage nicht gestellt hast, ignoriere diese E-Mail bitte."
+  },
+  "verification": {
+    "subject": "Bitte bestätige deine E-Mail-Adresse",
+    "greeting": "Hallo {{name}}",
+    "body": "Bestätige bitte deine E-Mail-Adresse, um deine Registrierung abzuschließen.",
+    "action": "E-Mail bestätigen",
+    "expire": "Dieser Link läuft in {{hours}} Stunden ab."
+  },
+  "notification": {
+    "subject": "Neue Benachrichtigung",
+    "greeting": "Hallo {{name}}",
+    "body": "Du hast eine neue Benachrichtigung erhalten.",
+    "action": "Benachrichtigung ansehen"
+  }
+}

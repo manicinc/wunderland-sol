@@ -1,0 +1,66 @@
+{
+  "id": "budget-tracker",
+  "name": "Budget Tracker",
+  "category": "dynamic",
+  "icon": "Calculator",
+  "description": "Track expenses and income with spreadsheet-like formulas, automatic calculations, and rich table views. Inspired by Ink & Switch's Embark research.",
+  "shortDescription": "Track finances with formulas and tables",
+  "difficulty": "intermediate",
+  "estimatedTime": "15 min",
+  "tags": ["budget", "finance", "money", "expenses", "income", "formulas", "embark", "dynamic-docs", "calculations"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 92,
+  "defaultData": {
+    "contentType": "budget"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Budget Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "What is this budget for?"
+    },
+    {
+      "name": "summary",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Describe this budget"
+    },
+    {
+      "name": "period",
+      "label": "Budget Period",
+      "type": "select",
+      "required": false,
+      "placeholder": "Select period",
+      "options": ["weekly", "monthly", "quarterly", "yearly", "custom"],
+      "defaultValue": "monthly"
+    },
+    {
+      "name": "startDate",
+      "label": "Start Date",
+      "type": "date",
+      "required": false,
+      "placeholder": "Budget start date"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Categorize this budget"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "period", "startDate", "currency"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: budget\nperiod: {period}\nstartDate: {startDate}\ncurrency: USD\ncreated: {date}\nlastUpdated: {date}\n---\n\n# {title}\n\n{summary}\n\n---\n\n## 📊 Budget Overview\n\n| Field | Value |\n|-------|-------|\n| **Period** | {period} |\n| **Start Date** | @[{startDate}](date-start) |\n| **Currency** | USD ($) |\n\n---\n\n## 💵 Income\n\n> Track your income sources below. Formulas automatically calculate totals!\n\n| Source | Amount | Frequency | Monthly |\n|--------|--------|-----------|----------|\n| 💼 Salary | $5,000 | Monthly | $5,000 |\n| 🏠 Side Income | $500 | Monthly | $500 |\n| 📈 Investments | $200 | Monthly | $200 |\n\n### Total Monthly Income\n\n```formula:total_income\n=ADD(5000, 500, 200)\n```\n\n---\n\n## 💳 Expenses\n\n### 🏠 Housing\n\n| Item | Amount | Notes |\n|------|--------|-------|\n| Rent/Mortgage | $1,500 | Fixed |\n| Utilities | $150 | Variable |\n| Internet | $80 | Fixed |\n| Insurance | $100 | Fixed |\n\n```formula:housing_total\n=ADD(1500, 150, 80, 100)\n```\n\n---\n\n### 🚗 Transportation\n\n| Item | Amount | Notes |\n|------|--------|-------|\n| Car Payment | $350 | Fixed |\n| Gas | $150 | Variable |\n| Insurance | $120 | Fixed |\n| Maintenance | $50 | Estimate |\n\n```formula:transport_total\n=ADD(350, 150, 120, 50)\n```\n\n---\n\n### 🍎 Food & Groceries\n\n| Item | Amount | Notes |\n|------|--------|-------|\n| Groceries | $400 | Weekly ~$100 |\n| Dining Out | $150 | Variable |\n| Coffee/Snacks | $50 | Daily habits |\n\n```formula:food_total\n=ADD(400, 150, 50)\n```\n\n---\n\n### 🎯 Other Expenses\n\n| Category | Amount | Notes |\n|----------|--------|-------|\n| 📱 Subscriptions | $80 | Streaming, apps |\n| 👕 Clothing | $100 | Average |\n| 🎮 Entertainment | $100 | Fun money |\n| 🏥 Healthcare | $150 | Premiums, copays |\n| 💰 Savings | $500 | Pay yourself first |\n\n```formula:other_total\n=ADD(80, 100, 100, 150, 500)\n```\n\n---\n\n## 📈 Budget Summary\n\n### Total Expenses\n\n```formula:total_expenses\n=ADD(\n  =ADD(1500, 150, 80, 100),\n  =ADD(350, 150, 120, 50),\n  =ADD(400, 150, 50),\n  =ADD(80, 100, 100, 150, 500)\n)\n```\n\n### Monthly Balance (Income - Expenses)\n\n```formula:monthly_balance\n=SUBTRACT(5700, 4130)\n```\n\n### Savings Rate\n\n```formula:savings_rate\n=MULTIPLY(=DIVIDE(500, 5700), 100)\n```\n\n---\n\n## 📊 Expense Breakdown Chart\n\n> Visualize your spending across categories!\n\n```view-chart\n{\n  \"type\": \"chart\",\n  \"title\": \"Expense Categories\",\n  \"scope\": \"document\",\n  \"settings\": {\n    \"chartType\": \"pie\",\n    \"showLegend\": true,\n    \"showLabels\": true\n  },\n  \"filter\": { \"types\": [\"number\"] }\n}\n```\n\n---\n\n## 📋 Expense Table View\n\n> All expenses in one sortable table!\n\n```view-table\n{\n  \"type\": \"table\",\n  \"title\": \"All Expenses\",\n  \"scope\": \"document\",\n  \"settings\": {\n    \"columns\": [\"category\", \"item\", \"amount\", \"notes\"],\n    \"sortable\": true,\n    \"filterable\": true,\n    \"showTotals\": true\n  }\n}\n```\n\n---\n\n## 📅 Monthly Tracking\n\n### This Month's Status\n\n- [x] Rent paid\n- [x] Utilities paid\n- [ ] Credit card payment\n- [x] Savings transfer\n- [ ] Investment contribution\n\n### Bills Calendar\n\n```view-calendar\n{\n  \"type\": \"calendar\",\n  \"title\": \"Bill Due Dates\",\n  \"scope\": \"document\",\n  \"settings\": {\n    \"view\": \"month\",\n    \"showWeekends\": true\n  },\n  \"filter\": { \"types\": [\"date\", \"event\"] }\n}\n```\n\n---\n\n## 💡 Budget Tips\n\n### 50/30/20 Rule Check\n\n- **50% Needs:** Housing + Transportation + Food = $3,030 (53%)\n- **30% Wants:** Subscriptions + Entertainment + Clothing = $280 (5%)\n- **20% Savings:** Savings transfer = $500 (9%)\n\n```formula:needs_percentage\n=MULTIPLY(=DIVIDE(3030, 5700), 100)\n```\n\n---\n\n## 📝 Notes & Adjustments\n\n### This Month's Observations\n\n- Dining out was higher than expected\n- Gas prices increased\n- Need to reduce streaming subscriptions\n\n### Goals for Next Month\n\n- [ ] Reduce dining out to $100\n- [ ] Cancel unused subscriptions\n- [ ] Increase savings by $100\n\n---\n\n## 🔗 Resources\n\n- [Budget Calculator](https://www.nerdwallet.com/article/finance/budget-worksheet)\n- [50/30/20 Rule Explained](https://www.investopedia.com/ask/answers/022916/what-502030-budget-rule.asp)\n- [Savings Tips](https://www.ramseysolutions.com/budgeting/how-to-save-money)\n\n---\n\n> 💡 **Powered by Dynamic Documents**\n> This template uses Embark-style features: formula computations for automatic calculations, rich table and chart views for data visualization.\n> Learn more in the [Dynamic Documents Guide](/docs/frame-architecture/DYNAMIC_DOCUMENTS_GUIDE.md)\n"
+}
+
+
+
+

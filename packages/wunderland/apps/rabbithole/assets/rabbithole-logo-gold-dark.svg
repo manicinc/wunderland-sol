@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="380" height="80" viewBox="0 0 380 80" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="goldIconGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b6914"/>
+            <stop offset="25%" stop-color="#c9a227"/>
+            <stop offset="45%" stop-color="#e8d48a"/>
+            <stop offset="55%" stop-color="#f5e6a3"/>
+            <stop offset="70%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#8b6914"/>
+        </linearGradient>
+        <linearGradient id="obsidianBaseLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#08050a"/>
+            <stop offset="25%" stop-color="#12101a"/>
+            <stop offset="50%" stop-color="#1a1625"/>
+            <stop offset="75%" stop-color="#12101a"/>
+            <stop offset="100%" stop-color="#08050a"/>
+        </linearGradient>
+        <linearGradient id="obsidianReflectLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(200,195,210,0.0)"/>
+            <stop offset="35%" stop-color="rgba(220,215,230,0.12)"/>
+            <stop offset="45%" stop-color="rgba(245,240,255,0.22)"/>
+            <stop offset="55%" stop-color="rgba(220,215,230,0.12)"/>
+            <stop offset="100%" stop-color="rgba(200,195,210,0.0)"/>
+        </linearGradient>
+        <linearGradient id="obsidianEdgeLogo" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(180,175,195,0.08)"/>
+            <stop offset="50%" stop-color="rgba(160,155,175,0.04)"/>
+            <stop offset="100%" stop-color="rgba(140,135,155,0.0)"/>
+        </linearGradient>
+        <linearGradient id="innerGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#faf7f2"/>
+            <stop offset="50%" stop-color="#f5f0e8"/>
+            <stop offset="100%" stop-color="#ede8e0"/>
+        </linearGradient>
+        <linearGradient id="innerGradCoolLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8f6f4"/>
+            <stop offset="50%" stop-color="#f0eeec"/>
+            <stop offset="100%" stop-color="#e8e6e4"/>
+        </linearGradient>
+    </defs>
+    <g transform="translate(2, 2) scale(0.62)">
+        <path d="M 50 6 C 72 6, 90 24, 90 46 C 90 62, 78 76, 62 80 L 62 82 C 62 84, 60 86, 58 86 L 58 94 L 42 94 L 42 86 C 40 86, 38 84, 38 82 L 38 80 C 22 76, 10 62, 10 46 C 10 24, 28 6, 50 6 Z"
+              fill="url(#goldIconGradLogo)"/>
+        
+        <path d="M 50 14 C 68 14, 82 28, 82 46 C 82 58, 74 70, 60 73 L 58 73 C 56 73, 54 75, 54 77 L 54 88 L 46 88 L 46 77 C 46 75, 44 73, 42 73 L 40 73 C 26 70, 18 58, 18 46 C 18 28, 32 14, 50 14 Z"
+              fill="url(#innerGradLogo)"/>
+        <g fill="url(#goldIconGradLogo)">
+            <path d="M34 50 Q33 30 37 20 Q39 14 43 14 Q47 14 47 22 Q47 34 45 50 Q40 49 34 50Z"/>
+            <path d="M66 50 Q67 30 63 20 Q61 14 57 14 Q53 14 53 22 Q53 34 55 50 Q60 49 66 50Z"/>
+            <ellipse cx="50" cy="60" rx="22" ry="18"/>
+        </g>
+        
+    </g>
+    <text x="72" y="34"
+          font-family="Cormorant Garamond, Georgia, serif"
+          font-size="34"
+          font-weight="600"
+          fill="#c9a227"
+          letter-spacing="4">RABBIT HOLE</text>
+    <text x="74" y="52"
+          font-family="Tenor Sans, Helvetica, Arial, sans-serif"
+          font-size="11"
+          font-weight="400"
+          fill="#c9a227"
+          letter-spacing="4">INC</text>
+    <text x="74" y="72"
+          font-family="Tenor Sans, Helvetica, Arial, sans-serif"
+          font-size="9"
+          font-weight="400"
+          fill="#a6851e"
+          letter-spacing="2">FOUNDER&#039;S CLUB</text>
+</svg>

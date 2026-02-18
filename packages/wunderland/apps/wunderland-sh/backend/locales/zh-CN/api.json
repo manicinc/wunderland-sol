@@ -1,0 +1,62 @@
+{
+  "voice": {
+    "recording": "正在录音...",
+    "processing": "正在处理语音...",
+    "transcribing": "正在转写音频...",
+    "listening": "正在聆听...",
+    "speakNow": "现在开始说话",
+    "clickToSpeak": "点击开始说话",
+    "stopRecording": "停止录音",
+    "microphoneAccess": "需要麦克风权限",
+    "noSpeechDetected": "未检测到语音",
+    "transcriptionComplete": "转写完成"
+  },
+  "chat": {
+    "thinking": "思考中...",
+    "generating": "正在生成回复...",
+    "messageEmpty": "消息不能为空",
+    "sendMessage": "发送消息",
+    "newChat": "新建会话",
+    "clearHistory": "清除历史记录",
+    "typingIndicator": "AI 正在输入...",
+    "copyCode": "复制代码",
+    "codeCopied": "代码已复制到剪贴板",
+    "retry": "重试",
+    "regenerate": "重新生成回复"
+  },
+  "modes": {
+    "coding": "编程问答",
+    "codingDesc": "获取编程问题和代码示例的帮助",
+    "systemDesign": "系统设计",
+    "systemDesignDesc": "设计架构并创建图表",
+    "meetingSummary": "会议摘要",
+    "meetingSummaryDesc": "总结会议并提炼关键要点",
+    "general": "通用",
+    "generalDesc": "日常对话和常见问题"
+  },
+  "cost": {
+    "title": "API 使用情况",
+    "current": "当前会话",
+    "total": "总使用量",
+    "threshold": "成本阈值",
+    "warning": "接近成本阈值",
+    "exceeded": "已超出成本阈值",
+    "reset": "重置计数"
+  },
+  "settings": {
+    "speechRecognition": "语音识别",
+    "whisperAPI": "Whisper API",
+    "browserSpeech": "浏览器语音",
+    "textToSpeech": "文本转语音",
+    "openAITTS": "OpenAI TTS",
+    "browserTTS": "浏览器 TTS",
+    "apiKeys": "API 密钥",
+    "openAIKey": "OpenAI API 密钥",
+    "anthropicKey": "Anthropic API 密钥",
+    "modelPreferences": "模型偏好",
+    "costLimits": "成本限制",
+    "sessionLimit": "会话上限",
+    "dailyLimit": "每日上限",
+    "monthlyLimit": "每月上限"
+  }
+}

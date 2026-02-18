@@ -1,0 +1,35 @@
+# Quarry PostgreSQL Database
+#
+# Deployment:
+#   1. cp .env.example .env
+#   2. Edit .env with secure password
+#   3. docker compose up -d
+#   4. Verify: docker compose logs postgres
+#
+# Backups: Use Linode UI for volume snapshots
+# Or manual: docker exec quarry-postgres pg_dump -U quarry quarry > backup.sql
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: quarry-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-quarry}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-quarry}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      # Only bind to localhost - use SSH tunnel or VPN for remote access
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-quarry}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    name: quarry_postgres_data

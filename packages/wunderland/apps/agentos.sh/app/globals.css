@@ -1,0 +1,489 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Account for fixed header */
+  }
+  
+  body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  :root {
+    color-scheme: light;
+
+    /* --- Light Theme: Clean, High-Tech, Laboratory White --- */
+    
+    /* Backgrounds: Extremely subtle cold tints to avoid sterile hospital feel */
+    --color-background-primary: hsl(220, 30%, 98%);
+    --color-background-secondary: hsl(220, 40%, 96%);
+    --color-background-tertiary: hsl(220, 40%, 93%);
+    --color-background-glass: hsla(220, 30%, 98%, 0.85);
+    --color-background-card: hsl(0, 0%, 100%);
+    --color-background-amber: hsl(35, 100%, 96%);
+
+    /* Text: High contrast, deep blue-grays for readability - WCAG AA compliant (4.5:1 minimum) */
+    --color-text-primary: hsl(222, 47%, 11%); /* Very dark - contrast ratio ~15:1 on white */
+    --color-text-secondary: hsl(220, 35%, 25%); /* Dark - contrast ratio ~9:1 on white */
+    --color-text-muted: hsl(220, 25%, 38%); /* Medium - contrast ratio ~6:1 on light backgrounds */
+    --color-text-placeholder: hsl(220, 20%, 50%); /* Light enough for placeholder, ~4.5:1 */
+    --color-text-contrast: hsl(0, 0%, 100%);
+    --color-text-on-accent: hsl(0, 0%, 100%);
+    --color-text-link: hsl(250, 95%, 35%); /* Darker purple for better contrast ~7:1 */
+
+    /* Accents: Electric Violet & Neon Cyan (adjusted for light mode visibility) */
+    --color-accent-primary: hsl(250, 95%, 55%); /* Darker for better contrast */
+    --color-accent-secondary: hsl(280, 85%, 50%);
+    --color-accent-tertiary: hsl(320, 85%, 50%);
+    --color-accent-warm: hsl(25, 95%, 50%);
+    --color-accent-warm-soft: hsla(25, 95%, 55%, 0.15);
+    
+    --color-accent-hover: hsl(250, 95%, 58%);
+    --color-accent-focus: hsl(250, 95%, 54%);
+    
+    /* Gradients */
+    --color-accent-gradient: linear-gradient(135deg, hsl(250, 95%, 64%), hsl(290, 90%, 60%));
+    --color-accent-gradient-subtle: linear-gradient(135deg, hsla(250, 95%, 64%, 0.1), hsla(290, 90%, 60%, 0.1));
+
+    /* Borders: Crisp and technical with better visibility */
+    --color-border-primary: hsl(220, 25%, 82%);
+    --color-border-subtle: hsl(220, 20%, 88%);
+    --color-border-interactive: hsl(250, 95%, 55%);
+    --color-border-hover: hsl(250, 95%, 65%);
+
+    /* Backgrounds: Elevated Surface for Cards */
+    --color-background-elevated: hsl(0, 0%, 100%);
+
+    /* States */
+    --color-success: hsl(150, 100%, 35%);
+    --color-warning: hsl(40, 100%, 50%);
+    --color-error: hsl(350, 90%, 60%);
+
+    /* Effects */
+    --color-glow-primary: hsla(250, 95%, 64%, 0.25);
+    --color-glow-secondary: hsla(280, 85%, 60%, 0.2);
+    --color-glow-intensity: 0.3;
+    --focus-ring: 0 0 0 3px hsla(250, 95%, 64%, 0.25);
+
+    /* Holographic (Light Mode - iridescent pearl effect with subtle contrast) */
+    --holographic-primary: linear-gradient(135deg, rgba(250,252,255,0.98) 0%, rgba(245,248,255,0.98) 100%);
+    --holographic-secondary: linear-gradient(-45deg, rgba(248,250,255,0.95) 0%, rgba(243,245,255,0.98) 100%);
+    --holographic-overlay: radial-gradient(circle at 50% 30%, rgba(245, 248, 255, 0.7), transparent 60%);
+    --holographic-shimmer: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.95) 50%, transparent 70%);
+    
+    /* Neumorphic Shadows (Light Mode - softer, more elegant borders) */
+    --neumorphic-light-shadow: 0 4px 12px rgba(160, 170, 190, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+    --neumorphic-dark-shadow: 0 2px 6px rgba(160, 170, 190, 0.08);
+    --neumorphic-inset-light: inset 2px 2px 4px rgba(160, 170, 190, 0.06), inset -2px -2px 4px rgba(255, 255, 255, 0.8);
+    --neumorphic-glow-soft: 0 0 20px rgba(99, 102, 241, 0.25);
+    --neumorphic-glow-intense: 0 0 35px rgba(99, 102, 241, 0.4);
+
+    /* Glass - with better contrast */
+    --glass-surface: rgba(252, 253, 255, 0.92);
+    --glass-border: rgba(230, 235, 245, 0.95);
+    --glass-reflection: linear-gradient(105deg, rgba(255,255,255,0.6) 0%, transparent 40%, rgba(255,255,255,0.4) 100%);
+
+    /* Gradients (Light) */
+    --gradient-hero: radial-gradient(circle at 50% 0%, hsla(250, 95%, 64%, 0.08) 0%, transparent 60%);
+    --gradient-section: linear-gradient(to bottom, var(--color-background-primary), var(--color-background-secondary));
+    --gradient-card: linear-gradient(135deg, hsla(0,0%,100%,0.9), hsla(0,0%,100%,0.7));
+    
+    --gradient-organic-1: radial-gradient(ellipse at top left, hsla(250, 95%, 64%, 0.03) 0%, transparent 60%);
+    --gradient-organic-2: radial-gradient(ellipse at bottom right, hsla(320, 85%, 60%, 0.03) 0%, transparent 60%);
+    --gradient-organic-3: radial-gradient(circle at center, hsla(280, 85%, 60%, 0.02) 0%, transparent 70%);
+
+    /* Bridge Legacy */
+    --bg-primary: var(--color-background-primary);
+    --bg-secondary: var(--color-background-secondary);
+    --bg-tertiary: var(--color-background-tertiary);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --text-on-primary: var(--color-text-contrast);
+    --border-primary: var(--color-border-primary);
+    --border-subtle: var(--color-border-subtle);
+    --border-interactive: var(--color-border-interactive);
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* --- Dark Theme: Deep Space / Cyberpunk / Void --- */
+    
+    /* Backgrounds: Rich, cold, void-like blacks (no muddy grays) */
+    --color-background-primary: hsl(240, 20%, 3%); /* Near black with blue tint */
+    --color-background-secondary: hsl(240, 15%, 6%);
+    --color-background-tertiary: hsl(240, 15%, 9%);
+    --color-background-glass: hsla(240, 20%, 3%, 0.8);
+    --color-background-card: hsl(240, 18%, 5%);
+    --color-background-amber: hsl(30, 30%, 10%);
+    --color-background-elevated: hsl(240, 18%, 10%);
+
+    /* Text: Crisp white, soft gray-blues - WCAG AA compliant for dark mode (4.5:1 minimum) */
+    --color-text-primary: hsl(220, 30%, 97%); /* Near-white - contrast ratio ~15:1 on dark bg */
+    --color-text-secondary: hsl(220, 25%, 82%); /* Light gray - contrast ratio ~9:1 on dark bg */
+    --color-text-muted: hsl(220, 22%, 68%); /* Medium gray - contrast ratio ~6:1 on dark bg */
+    --color-text-placeholder: hsl(220, 18%, 55%); /* Dimmer but still ~4.5:1 on dark bg */
+    --color-text-contrast: hsl(0, 0%, 100%); /* Pure white for accents */
+    --color-text-on-accent: hsl(0, 0%, 100%); /* Ensure white on accent colors */
+    --color-text-link: hsl(250, 100%, 75%); /* Bright purple link - ~7:1 contrast */
+
+    /* Accents: Neon, Glowing, Electric */
+    --color-accent-primary: hsl(250, 100%, 70%);
+    --color-accent-secondary: hsl(290, 100%, 70%);
+    --color-accent-tertiary: hsl(330, 100%, 70%);
+    --color-accent-warm: hsl(30, 100%, 65%);
+    --color-accent-warm-soft: hsla(30, 100%, 65%, 0.15);
+    
+    --color-accent-hover: hsl(250, 100%, 75%);
+    --color-accent-focus: hsl(250, 100%, 78%);
+
+    /* Gradients */
+    --color-accent-gradient: linear-gradient(135deg, hsl(250, 100%, 65%), hsl(290, 100%, 65%));
+    --color-accent-gradient-subtle: linear-gradient(135deg, hsla(250, 100%, 65%, 0.15), hsla(290, 100%, 65%, 0.15));
+
+    /* Borders: Subtle, glowing edges */
+    --color-border-primary: hsl(240, 20%, 18%);
+    --color-border-subtle: hsl(240, 20%, 12%);
+    --color-border-interactive: hsl(250, 100%, 60%);
+    --color-border-hover: hsl(250, 100%, 70%);
+
+    /* States */
+    --color-success: hsl(150, 90%, 45%);
+    --color-warning: hsl(40, 100%, 60%);
+    --color-error: hsl(350, 90%, 65%);
+
+    /* Effects */
+    --color-glow-primary: hsla(250, 100%, 70%, 0.4);
+    --color-glow-secondary: hsla(290, 100%, 70%, 0.3);
+    --color-glow-intensity: 0.6;
+    --focus-ring: 0 0 0 3px hsla(250, 100%, 70%, 0.4);
+
+    /* Holographic (Dark Mode) */
+    --holographic-primary: linear-gradient(135deg, rgba(30, 20, 60, 0.8) 0%, rgba(10, 10, 30, 0.9) 100%);
+    --holographic-secondary: linear-gradient(-45deg, rgba(40, 30, 70, 0.7) 0%, rgba(20, 20, 40, 0.8) 100%);
+    --holographic-overlay: radial-gradient(circle at 50% 30%, rgba(100, 100, 255, 0.1), transparent 50%);
+    --holographic-shimmer: linear-gradient(105deg, transparent 35%, rgba(120, 120, 255, 0.15) 50%, transparent 65%);
+    --holographic-iridescent: conic-gradient(from 180deg at 50% 50%, hsla(250, 100%, 70%, 0.1), hsla(200, 100%, 70%, 0.1), hsla(300, 100%, 70%, 0.1), hsla(250, 100%, 70%, 0.1));
+
+    /* Neumorphic Shadows (Dark Mode) */
+    --neumorphic-light-shadow: 5px 5px 15px rgba(0,0,0,0.5), -3px -3px 10px rgba(255,255,255,0.03);
+    --neumorphic-dark-shadow: 8px 8px 20px rgba(0,0,0,0.6), -4px -4px 12px rgba(255,255,255,0.02);
+    --neumorphic-inset-light: inset 4px 4px 10px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.04);
+    --neumorphic-inset-dark: inset 6px 6px 15px rgba(0,0,0,0.8), inset -2px -2px 8px rgba(255,255,255,0.03);
+    --neumorphic-glow-soft: 0 0 25px rgba(120, 100, 255, 0.2);
+    --neumorphic-glow-intense: 0 0 50px rgba(120, 100, 255, 0.35);
+
+    /* Glass */
+    --glass-surface: rgba(20, 20, 40, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-reflection: linear-gradient(105deg, rgba(255,255,255,0.05) 0%, transparent 45%, rgba(255,255,255,0.02) 100%);
+
+    /* Gradients (Dark) */
+    --gradient-hero: radial-gradient(circle at 50% 0%, hsla(250, 100%, 70%, 0.15) 0%, transparent 60%);
+    --gradient-section: linear-gradient(to bottom, var(--color-background-primary), var(--color-background-secondary));
+    --gradient-card: linear-gradient(135deg, hsla(240, 20%, 10%, 0.8), hsla(240, 20%, 5%, 0.9));
+    
+    --gradient-organic-1: radial-gradient(ellipse at top left, hsla(250, 100%, 60%, 0.1) 0%, transparent 60%);
+    --gradient-organic-2: radial-gradient(ellipse at bottom right, hsla(320, 100%, 60%, 0.1) 0%, transparent 60%);
+    --gradient-organic-3: radial-gradient(circle at center, hsla(280, 100%, 60%, 0.08) 0%, transparent 70%);
+
+    /* Bridge Legacy */
+    --bg-primary: var(--color-background-primary);
+    --bg-secondary: var(--color-background-secondary);
+    --bg-tertiary: var(--color-background-tertiary);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --text-muted: var(--color-text-muted);
+    --text-on-primary: var(--color-text-contrast);
+    --border-primary: var(--color-border-primary);
+    --border-subtle: var(--color-border-subtle);
+    --border-interactive: var(--color-border-interactive);
+  }
+}
+
+@layer components {
+  /* --- Modern Glass Card --- */
+  .glass-card {
+    background: var(--glass-surface);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1.5px solid var(--glass-border);
+    border-radius: 1.25rem;
+    box-shadow: var(--neumorphic-light-shadow), 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .dark .glass-card {
+    box-shadow: var(--neumorphic-dark-shadow);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* --- Holographic Card (The "Pop" Feature) --- */
+  .holographic-card {
+    background: var(--glass-surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1.5px solid var(--glass-border);
+    border-radius: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.4s ease, 
+                border-color 0.4s ease;
+  }
+  
+  /* Subtle inner glow */
+  .holographic-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-organic-3);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  
+  /* Shimmer effect */
+  .holographic-card::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: var(--holographic-shimmer);
+    transform: rotate(35deg) translateY(10%);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.6s ease;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  .holographic-card {
+    will-change: transform, opacity;
+  }
+
+  .holographic-card:hover {
+    transform: translateY(-6px) scale(1.01) translateZ(0);
+    box-shadow: var(--neumorphic-glow-soft);
+    border-color: var(--color-accent-primary);
+    z-index: 10;
+  }
+  
+  .holographic-card:hover::before {
+    opacity: 0.6;
+  }
+  
+  .holographic-card:hover::after {
+    opacity: 1;
+    transform: rotate(35deg) translateY(-10%);
+  }
+
+  .dark .holographic-card:hover {
+    box-shadow: var(--neumorphic-glow-intense);
+    border-color: var(--color-accent-primary);
+  }
+
+  /* --- Gradient Text --- */
+  .gradient-text {
+    background: var(--color-accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  /* --- Section Titles --- */
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary) !important;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+  }
+  
+  @media (min-width: 640px) {
+    .section-title {
+      font-size: 3.5rem;
+    }
+  }
+
+  /* --- Code Block --- */
+  .code-block {
+    background: rgba(10, 10, 20, 0.95); /* Always dark for code */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    font-family: 'Geist Mono', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    color: #f0f0f0;
+    overflow-x: auto;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .dark .code-block {
+    background: rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* --- GPU-Accelerated Animations --- */
+  
+/* Gradient animation for text */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  animation: gradient 3s ease infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) translateZ(0); }
+    50% { transform: translateY(-10px) translateZ(0); }
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+    will-change: transform;
+  }
+  
+  @keyframes holographic-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+  
+  @keyframes slow-spin {
+    0% { transform: rotate(0deg) translateZ(0); }
+    100% { transform: rotate(360deg) translateZ(0); }
+  }
+  .animate-slow-spin {
+    animation: slow-spin 60s linear infinite;
+    will-change: transform;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      opacity: 0.6;
+      filter: drop-shadow(0 0 10px var(--color-accent-primary));
+    }
+    50% { 
+      opacity: 1;
+      filter: drop-shadow(0 0 20px var(--color-accent-primary));
+    }
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+  
+  /* --- Accessibility --- */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  
+  /* High quality blurs */
+  .backdrop-blur-xl { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+  
+  /* Glow Utilities */
+  .glow-text { text-shadow: 0 0 20px var(--color-accent-primary); }
+  .glow-box { box-shadow: 0 0 30px var(--color-glow-primary); }
+  
+  /* Text color utilities with important flag for consistency */
+  .text-primary { color: var(--color-text-primary) !important; }
+  .text-secondary { color: var(--color-text-secondary) !important; }
+  .text-muted { color: var(--color-text-muted) !important; }
+  
+  /* Glass morphism utility */
+  .glass-morphism {
+    background: var(--glass-surface);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Content visibility for below-fold sections - major perf optimization */
+  .lazy-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+  
+  .lazy-section-sm {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 300px;
+  }
+  
+  .lazy-section-lg {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 800px;
+  }
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-interactive);
+  border-radius: 99px;
+  opacity: 0.5;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-primary);
+}

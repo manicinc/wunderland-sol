@@ -1,0 +1,82 @@
+{
+  "id": "tutorial",
+  "name": "Tutorial / How-To",
+  "category": "technical",
+  "icon": "GraduationCap",
+  "description": "Step-by-step guide to accomplish a specific task or learn a skill",
+  "shortDescription": "Guided learning with actionable steps",
+  "difficulty": "intermediate",
+  "estimatedTime": "30 min",
+  "tags": ["tutorial", "how-to", "guide", "learning"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 95,
+  "defaultData": {
+    "contentType": "tutorial"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Tutorial Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "How to... / Building... / Creating..."
+    },
+    {
+      "name": "summary",
+      "label": "What You'll Learn",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "By the end of this tutorial, you will be able to..."
+    },
+    {
+      "name": "difficulty",
+      "label": "Difficulty",
+      "type": "select",
+      "required": true,
+      "options": ["beginner", "intermediate", "advanced"],
+      "defaultValue": "intermediate"
+    },
+    {
+      "name": "timeRequired",
+      "label": "Time Required",
+      "type": "text",
+      "required": false,
+      "placeholder": "e.g., 30 minutes, 2 hours"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Technologies, concepts covered"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title", "summary"],
+    "optional": ["tags", "difficulty", "timeRequired", "contentType", "prerequisites", "tools"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ndifficulty: {difficulty}\ncontentType: tutorial\ntimeRequired: \"{timeRequired}\"\n---\n\n# {title}\n\n{summary}\n\n## Overview\n\n**What you'll build/learn:**\n- Outcome 1\n- Outcome 2\n- Outcome 3\n\n**Time required:** {timeRequired}\n\n**Difficulty:** {difficulty}\n\n## Prerequisites\n\nBefore starting, ensure you have:\n\n- [ ] Prerequisite 1 (e.g., software installed)\n- [ ] Prerequisite 2 (e.g., basic knowledge of X)\n- [ ] Prerequisite 3 (e.g., account created)\n\n### Required Tools\n\n| Tool | Version | Purpose |\n|------|---------|----------|\n| Tool 1 | v1.0+ | Main purpose |\n| Tool 2 | Latest | Secondary purpose |\n\n## Quick Start\n\nFor experienced users, here's the TL;DR:\n\n```bash\n# Quick commands to get started\ncommand 1\ncommand 2\ncommand 3\n```\n\n---\n\n## Step 1: Getting Started\n\n### What We're Doing\n\nBrief explanation of this step's purpose...\n\n### Instructions\n\n1. First action:\n   ```\n   code or command\n   ```\n\n2. Second action:\n   ```\n   code or command\n   ```\n\n### Checkpoint\n\n✅ **You should now have:** Description of expected state\n\n> 💡 **Tip:** Helpful hint for this step\n\n---\n\n## Step 2: Core Implementation\n\n### What We're Doing\n\nExplanation of the main work...\n\n### Instructions\n\n1. Action with explanation:\n   ```\n   code example\n   ```\n   \n   **Why this works:** Brief explanation\n\n2. Next action:\n   ```\n   code example\n   ```\n\n### Checkpoint\n\n✅ **You should now have:** Expected outcome\n\n> ⚠️ **Common Issue:** Problem and solution\n\n---\n\n## Step 3: Verification & Testing\n\n### How to Verify\n\n1. Test action:\n   ```\n   test command\n   ```\n\n2. Expected output:\n   ```\n   expected result\n   ```\n\n### Troubleshooting\n\n| Problem | Cause | Solution |\n|---------|-------|----------|\n| Error X | Reason | Fix |\n| Error Y | Reason | Fix |\n\n---\n\n## Step 4: Polish & Enhancement (Optional)\n\n### Improvements\n\n- Enhancement 1: Description and how-to\n- Enhancement 2: Description and how-to\n\n---\n\n## Conclusion\n\n### What You Accomplished\n\n✅ Achievement 1\n✅ Achievement 2\n✅ Achievement 3\n\n### Next Steps\n\n- **Level Up:** [Advanced topic](#)\n- **Related Tutorial:** [Another guide](#)\n- **Deep Dive:** [Detailed documentation](#)\n\n### Full Code/Solution\n\n<details>\n<summary>Click to expand complete solution</summary>\n\n```\n# Complete code or configuration\n```\n\n</details>\n\n## Resources\n\n- [Official Documentation](#)\n- [Community Forum](#)\n- [Video Walkthrough](#)\n\n## Feedback\n\nFound an issue or have suggestions? [Let us know](#)!\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,126 @@
+name: Extension Validation
+
+on:
+  pull_request:
+    paths:
+      - 'packages/ext-*/**'
+
+jobs:
+  validate-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Detect new/modified extensions
+        id: detect
+        run: |
+          # Find all modified ext-* packages
+          EXTENSIONS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '^packages/ext-' | cut -d'/' -f2 | sort -u)
+          echo "extensions=$EXTENSIONS" >> $GITHUB_OUTPUT
+      
+      - name: Validate each extension
+        run: |
+          for ext in ${{ steps.detect.outputs.extensions }}; do
+            echo "Validating $ext..."
+            
+            # Check required files
+            for file in package.json manifest.json README.md LICENSE tsconfig.json; do
+              if [ ! -f "packages/$ext/$file" ]; then
+                echo "❌ Missing required file: $file"
+                exit 1
+              fi
+            done
+            
+            # Check package.json structure
+            cd packages/$ext
+            
+            # Check naming convention
+            NAME=$(node -p "require('./package.json').name")
+            if [[ ! "$NAME" =~ ^@framers/agentos-ext- ]]; then
+              echo "❌ Package name must start with @framers/agentos-ext-"
+              exit 1
+            fi
+            
+            # Check license
+            LICENSE=$(node -p "require('./package.json').license")
+            if [ "$LICENSE" != "MIT" ]; then
+              echo "❌ License must be MIT"
+              exit 1
+            fi
+            
+            # Check manifest
+            ID=$(node -p "require('./manifest.json').id")
+            if [[ ! "$ID" =~ ^com\.framers\.ext\. ]]; then
+              echo "❌ Extension ID must start with com.framers.ext."
+              exit 1
+            fi
+            
+            # Check for secrets
+            if grep -r "api[_-]key\|secret\|password\|token" src/ --include="*.ts" --include="*.js" | grep -v "process.env" | grep -v "options\." | grep -v "config\."; then
+              echo "⚠️ Warning: Possible hardcoded secrets detected"
+            fi
+            
+            cd ../..
+            echo "✅ $ext validation passed"
+          done
+      
+      - name: Test coverage check
+        run: |
+          for ext in ${{ steps.detect.outputs.extensions }}; do
+            cd packages/$ext
+            
+            if [ -f "package.json" ] && grep -q '"test"' package.json; then
+              npm ci || npm install
+              
+              # Run coverage
+              if npm run test:coverage 2>/dev/null; then
+                # Check coverage threshold (80%)
+                if [ -f "coverage/coverage-summary.json" ]; then
+                  COVERAGE=$(node -p "require('./coverage/coverage-summary.json').total.statements.pct")
+                  if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+                    echo "⚠️ Warning: Test coverage is ${COVERAGE}% (minimum 80% recommended)"
+                  else
+                    echo "✅ Test coverage: ${COVERAGE}%"
+                  fi
+                fi
+              fi
+            fi
+            
+            cd ../..
+          done
+      
+      - name: Comment PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const extensions = '${{ steps.detect.outputs.extensions }}'.split(' ').filter(Boolean);
+            
+            if (extensions.length === 0) return;
+            
+            const body = `## 🔍 Extension Validation Results
+            
+            Validated extensions: ${extensions.map(e => `\`${e}\``).join(', ')}
+            
+            ### ✅ All validation checks passed!
+            
+            Thank you for contributing to AgentOS Extensions! Your submission will be reviewed by maintainers.
+            
+            ### 📋 Checklist for maintainers:
+            - [ ] Code quality and best practices
+            - [ ] Security review (no hardcoded secrets)
+            - [ ] Test coverage >80%
+            - [ ] Documentation completeness
+            - [ ] Semantic versioning
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

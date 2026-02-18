@@ -1,0 +1,39 @@
+{
+  "$schema": "../../schemas/plugin.schema.json",
+  "id": "com.yourname.viewer-plugin-name",
+  "name": "Your Viewer Plugin Name",
+  "version": "1.0.0",
+  "description": "Description of what your viewer plugin does",
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "url": "https://your-website.com"
+  },
+  "type": "viewer",
+  "category": "ui-component",
+  "tags": ["viewer", "ui", "your-tags"],
+  "compatibility": {
+    "codexViewer": {
+      "minimum": "1.0.0"
+    },
+    "browser": ["chrome >= 90", "firefox >= 88", "safari >= 14", "edge >= 90"]
+  },
+  "dependencies": [],
+  "conflicts": [],
+  "permissions": [
+    {
+      "name": "storage",
+      "description": "Access to local storage for preferences",
+      "required": false
+    }
+  ],
+  "lazy": true,
+  "priority": "normal",
+  "main": "dist/index.js",
+  "browser": "dist/index.mjs",
+  "style": "dist/styles.css",
+  "repository": "https://github.com/yourusername/your-plugin-repo",
+  "license": "MIT",
+  "verified": false
+}
+

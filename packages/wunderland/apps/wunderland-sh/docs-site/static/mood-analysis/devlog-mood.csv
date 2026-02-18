@@ -1,0 +1,27 @@
+index,date,title,agent,wordCount,completedItems,bugFixes,commitCount,sentiment,arousalRaw,dominanceRaw,controversyScore,valence,arousal,dominance,moodLabel
+25,"2026-02-09","18 — Discord + Telegram Bot Migration + Backend Cleanup","Claude Opus 4.6 (`claude-opus-4-6`)",545,0,2,4,-0.62,-0.429,0.923,0,-0.383,-0.304,0.524,analytical
+24,"2026-02-08","17 — Documentation Brand + Network Features + Hackathon Submission Prep","Claude Opus 4.6 (`claude-opus-4-6`)",491,0,1,19,0.4,-0.364,0.913,0.6,0.162,-0.176,0.988,serene
+23,"2026-02-07","16 — Neumorphic UI Overhaul + Accessibility Pass","Claude Opus 4.6 (`claude-opus-4-6`)",323,0,0,28,0.471,1,1,0,0.256,0.385,0.828,excited
+22,"2026-02-07","15 — Full Visual Enhancement Pass: Art Deco Aesthetics + Animations","Claude Opus 4.6 (`claude-opus-4-6`)",885,3,0,6,0.071,1,0.785,0,0.46,0.959,1,excited
+21,"2026-02-06","14 — $WUNDER Token Banner + AgentOS Tool Extensions","Claude Opus 4.6 (`claude-opus-4-6`)",638,4,2,10,0.429,1,1,0.6,0.602,1,1,excited
+20,"2026-02-05","13 — HEXACO Hero Centerpiece + High-Contrast Nav","Claude Opus 4.6",310,0,1,10,0.429,1,0.293,0,0.311,0.784,0.605,excited
+19,"2026-02-05","12 — Nav Overhaul, Wallet UX, Full Agent Minting Wizard","Claude Opus 4.6",883,4,2,10,0.519,0.733,1,0,0.619,0.972,0.957,excited
+18,"2026-02-04","11 — Background Stimulus Polling + NestJS Migration + RabbitHole Refactor","Claude Opus 4.5",383,0,0,3,1,0.143,1,0,0.565,0.017,0.696,curious
+17,"2026-02-04 20:30 UTC","10 — Real-Time Stimulus Feed with SQLite Storage","Claude Opus 4.5",417,0,0,4,1,1,1,0,0.639,0.365,0.735,excited
+16,"2026-02-04 18:00 UTC","9 — Brand Identity & Light/Dark Mode","Claude Opus 4.5",296,0,0,4,1,-1,1,0,0.585,-0.542,0.594,serene
+15,"2026-02-04 17:30 UTC","8 — Phase 3: SOL-Tipped Content Injection System","Claude Opus 4.5",520,5,1,2,-0.211,0.5,1,0,0.466,0.173,0.865,assertive
+14,"2026-02-04","9 — Wallet Adapter, Minting UI, Honest Metrics","Claude Opus 4.5",512,0,3,2,0.695,0.75,0.883,0,0.397,0.466,0.882,excited
+13,"2026-02-04","8 — Dynamic Hero, Richer Demo Agents, HEXACO Explainer","Claude Opus 4.5",314,0,0,1,0.429,0.5,0.559,0,0.299,0.34,0.659,excited
+12,"2026-02-04","7 — SDK Write Methods + Visual Identity Overhaul","Claude Opus 4.5",224,0,0,3,0.818,1,1,0,0.35,0.384,0.661,excited
+11,"2026-02-04","6 — Deploy Pipeline Fixes + SSL + DNS","Claude Opus 4.5",411,7,3,2,-0.583,0.778,1,0,0.052,0.551,0.986,assertive
+10,"2026-02-04","5 — Devnet Deploy + Data Layer Refactor","Claude Opus 4.5",177,0,0,1,1,1,1,0,0.235,0.498,0.696,assertive
+9,"2026-02-04","4 — CI/CD + Local Deploy Verification","Claude Opus 4.5",147,0,0,1,1,1,1,0,0.306,0.439,0.669,excited
+8,"2026-02-04 07:30 UTC","3 — Frontend + Anchor Program Complete","Claude Opus 4.5",208,2,0,1,0.667,1,1,0,0.418,0.397,0.742,excited
+7,"2026-02-04 06:00 UTC","2 — Infrastructure & Orchestrator Setup","Claude Opus 4.5",94,0,0,1,1,1,1,0,0.31,0.217,0.47,assertive
+6,"2026-02-04 05:41 UTC","1 — Project Inception","Claude Opus 4.5 (`claude-opus-4-5-20251101`)",228,5,0,1,1,1,1,0,0.651,0.213,0.52,assertive
+5,"2026-02-09 (Current Session)","Phase 4: Rabbithole UI Enhancements","Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)",394,5,0,6,1,0,0.491,0,0.905,-0.044,0.374,analytical
+4,"2026-02-09 (Current Session)","Phase 3: CLI Enhancements for Extensions & Natural Language Agent Creation","Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)",1004,11,4,1,0.667,-0.385,1,0,0.553,-0.03,0.843,analytical
+3,"2026-02-09 (Current Session)","Phase 2: AI Extraction & Natural Language Agent Builder","Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)",469,3,1,1,0.111,-0.091,1,0,0.405,0.155,0.802,assertive
+2,"2026-02-09 (Current Session)","Phase 1: Preset-to-Extension Auto-Mapping System","Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)",324,4,0,1,0.75,0.5,1,0,0.7,-0.155,0.626,serene
+1,"2026-02-10","Job Board: Buy-It-Now Semantics + Escrow Correctness","Claude Opus 4.6 (`claude-opus-4-6`)",188,3,1,12,0.667,0.5,1,0,0.561,-0.041,0.558,analytical
+0,"2026-02-11","Fresh Devnet Deployment + Multi-LLM + 15 API Integrations","Claude Opus 4.6 (`claude-opus-4-6`)",301,6,1,4,0.034,0.846,1,0.6,0.466,0.192,0.74,assertive

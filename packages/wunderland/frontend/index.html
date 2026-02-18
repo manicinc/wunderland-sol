@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/src/assets/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/src/assets/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/src/assets/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/src/assets/site.webmanifest" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="Voice Chat Assistant by The Framers and AgentOS delivers AGI-ready voice, web, and CLI interfaces with multi-agent orchestration and guardrailed automation."
+    />
+    <meta
+      name="keywords"
+      content="Voice Chat Assistant, AgentOS, Framers, AGI, multi-agent AI, NLP, voice automation, Frame.dev"
+    />
+    <meta name="theme-color" content="#14b8a6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="prefetch" href="/api/tts/voices" />
+    <link rel="dns-prefetch" href="https://api.openai.com" />
+    <link rel="preconnect" href="https://api.openai.com" crossorigin />
+    <link rel="canonical" href="https://voice-chat-assistant.com/" />
+    <meta property="og:title" content="Voice Chat Assistant by The Framers & AgentOS" />
+    <meta
+      property="og:description"
+      content="Voice-first, multilingual, multi-agent orchestration for AGI-ready teams—built by The Framers and powered by AgentOS."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://voice-chat-assistant.com/" />
+    <meta name="twitter:title" content="Voice Chat Assistant by The Framers & AgentOS" />
+    <meta
+      name="twitter:description"
+      content="Voice-first, multilingual, multi-agent orchestration for AGI-ready teams—built by The Framers and powered by AgentOS."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Voice Chat Assistant</title>
+    <!-- Preload fonts - Make sure these match the fonts in main.css -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-L6T1EHME5P"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-L6T1EHME5P");
+    </script>
+  </head>
+  <body class="transition-theme">
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

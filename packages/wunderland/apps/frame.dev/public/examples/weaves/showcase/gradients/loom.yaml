@@ -1,0 +1,49 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# GRADIENTS LOOM
+# ═══════════════════════════════════════════════════════════════════════════════
+# Demonstrates gradient backgrounds and advanced styling
+
+name: Gradients & Effects
+description: CSS gradients and advanced visual effects
+
+style:
+  icon: Wand2
+  
+  # Rose/pink gradient accent
+  accentColor: "#ec4899"
+  
+  # CSS gradient string (overrides backgroundColor)
+  backgroundGradient: "linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%)"
+  
+  # Text styling for gradient backgrounds
+  textColor: "#831843"
+  darkText: true
+
+metadata:
+  difficulty: advanced
+  estimatedTime: 15
+  tags:
+    - gradients
+    - css
+    - effects
+    - advanced
+
+order: 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

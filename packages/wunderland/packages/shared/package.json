@@ -1,0 +1,35 @@
+{
+  "name": "@framers/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Internal shared utilities and types (plan catalog, rate limit types) for the Framers monorepo.",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./planCatalog": {
+      "types": "./dist/planCatalog.d.ts",
+      "default": "./dist/planCatalog.js"
+    },
+    "./rateLimitTypes": {
+      "types": "./dist/rateLimitTypes.d.ts",
+      "default": "./dist/rateLimitTypes.js"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf dist tsconfig.build.tsbuildinfo",
+    "build": "pnpm clean && pnpm exec tsc -p tsconfig.build.json && node ../../.github/scripts/fix-esm-imports.js dist",
+    "typecheck": "pnpm exec tsc -p tsconfig.build.json --noEmit"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.4.0"
+  }
+}

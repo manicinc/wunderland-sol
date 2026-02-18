@@ -1,0 +1,209 @@
+/**
+ * AgentOS Design System Tokens
+ * Enterprise-grade semantic color system with light/dark mode support
+ */
+
+:root {
+  /* ========================================
+     COLORS - Light Mode
+     ======================================== */
+  
+  /* Backgrounds */
+  --bg-primary: hsl(0 0% 100%);
+  --bg-secondary: hsl(210 40% 98%);
+  --bg-tertiary: hsl(210 40% 96%);
+  --bg-glass: hsla(0 0% 100% / 0.75);
+  --bg-elevated: hsl(0 0% 100%);
+  
+  /* Enterprise gradients - Indigo to Violet */
+  --enterprise-from: hsl(238 85% 60%);
+  --enterprise-to: hsl(270 85% 65%);
+  --enterprise-accent: hsl(250 90% 55%);
+  
+  /* Text */
+  --text-primary: hsl(220 30% 10%);
+  --text-secondary: hsl(220 20% 35%);
+  --text-muted: hsl(220 15% 50%);
+  --text-on-primary: hsl(0 0% 100%);
+  --text-on-accent: hsl(0 0% 100%);
+  
+  /* Brand accents */
+  --accent-primary: hsl(250 85% 60%);
+  --accent-secondary: hsl(280 85% 65%);
+  --accent-tertiary: hsl(320 85% 65%);
+  --accent-warm: hsl(20 90% 58%);
+  
+  /* Borders */
+  --border-primary: hsl(220 15% 88%);
+  --border-subtle: hsl(220 15% 92%);
+  --border-interactive: hsl(250 85% 60%);
+  
+  /* Semantic colors */
+  --success: hsl(145 80% 42%);
+  --warning: hsl(35 90% 48%);
+  --error: hsl(0 85% 50%);
+  --info: hsl(210 100% 52%);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Focus ring */
+  --focus-ring: 0 0 0 3px hsla(250 85% 60% / 0.3);
+  
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  
+  /* Font sizes - Fluid scale */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.15vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.825rem + 0.2vw, 0.9375rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.35rem + 0.6vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.65rem + 0.9vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 1.95rem + 1.2vw, 3rem);
+  --text-5xl: clamp(3rem, 2.5rem + 2vw, 4rem);
+  --text-6xl: clamp(3.75rem, 3rem + 3vw, 5rem);
+  
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.1;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
+  /* Letter spacing */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  
+  /* Font weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* ========================================
+     SPACING & LAYOUT
+     ======================================== */
+  
+  /* Border radius */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-full: 9999px;
+  
+  /* ========================================
+     ANIMATION
+     ======================================== */
+  
+  /* Durations */
+  --duration-instant: 75ms;
+  --duration-fast: 120ms;
+  --duration-smooth: 180ms;
+  --duration-movement: 300ms;
+  --duration-slow: 450ms;
+  
+  /* Easing curves */
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ========================================
+   DARK MODE OVERRIDES
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Backgrounds */
+    --bg-primary: hsl(240 15% 3%);
+    --bg-secondary: hsl(240 12% 6%);
+    --bg-tertiary: hsl(240 10% 10%);
+    --bg-glass: hsla(240 15% 3% / 0.85);
+    --bg-elevated: hsl(240 12% 8%);
+    
+    /* Enterprise gradients - Deeper, richer tones */
+    --enterprise-from: hsl(238 95% 55%);
+    --enterprise-to: hsl(270 95% 60%);
+    --enterprise-accent: hsl(250 100% 65%);
+    
+    /* Text */
+    --text-primary: hsl(210 40% 98%);
+    --text-secondary: hsl(210 30% 80%);
+    --text-muted: hsl(210 20% 60%);
+    --text-on-primary: hsl(222 47% 8%);
+    --text-on-accent: hsl(0 0% 100%);
+    
+    /* Brand accents - Brighter for dark */
+    --accent-primary: hsl(250 100% 70%);
+    --accent-secondary: hsl(280 100% 75%);
+    --accent-tertiary: hsl(320 100% 75%);
+    --accent-warm: hsl(20 100% 65%);
+    
+    /* Borders */
+    --border-primary: hsl(222 40% 18%);
+    --border-subtle: hsl(222 40% 12%);
+    --border-interactive: hsl(250 100% 70%);
+    
+    /* Shadows - Softer in dark mode */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.6);
+    
+    /* Focus ring */
+    --focus-ring: 0 0 0 3px hsla(250 100% 70% / 0.4);
+  }
+}
+
+/* ========================================
+   SEMANTIC TOKENS (auto-switch themes)
+   ======================================== */
+
+:root {
+  /* Background semantic */
+  --color-background-primary: var(--bg-primary);
+  --color-background-secondary: var(--bg-secondary);
+  --color-background-tertiary: var(--bg-tertiary);
+  --color-background-glass: var(--bg-glass);
+  --color-background-elevated: var(--bg-elevated);
+  
+  /* Text semantic */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-on-primary: var(--text-on-primary);
+  --color-text-on-accent: var(--text-on-accent);
+  
+  /* Accent semantic */
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-tertiary: var(--accent-tertiary);
+  --color-accent-warm: var(--accent-warm);
+  --color-accent-warm-soft: color-mix(in oklch, var(--accent-warm) 60%, transparent);
+  
+  /* Enterprise semantic */
+  --color-enterprise-from: var(--enterprise-from);
+  --color-enterprise-to: var(--enterprise-to);
+  --color-enterprise-accent: var(--enterprise-accent);
+  
+  /* Border semantic */
+  --color-border-primary: var(--border-primary);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-interactive: var(--border-interactive);
+}
+

@@ -1,0 +1,201 @@
+// File: frontend/src/styles/components/_forms.scss
+/**
+ * @file _forms.scss
+ * @description Base styling for form elements (inputs, textareas, selects, toggles)
+ * for the "Ephemeral Harmony" theme, featuring neomorphic and holographic touches.
+ * Ensures accessibility and consistent theming.
+ * @version 2.0.3 - Corrected SASS parameter names in mixin calls to use 'fb-' prefix. Ensured calc() usage.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+// --- Common Base for Form Inputs, Textareas, and Selects ---
+.form-element-base {
+  display: block;
+  width: 100%;
+  padding: var.$spacing-sm var.$spacing-md;
+  font-family: var(--font-family-sans, #{var.$font-family-sans});
+  font-size: var.$font-size-base-default;
+  line-height: var.$line-height-base-default;
+  color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  background-color: hsla(var(--color-bg-secondary-h, var.$default-color-bg-secondary-h), var(--color-bg-secondary-s, var.$default-color-bg-secondary-s), var(--color-bg-secondary-l, var.$default-color-bg-secondary-l), 0.5);
+  border: 1px solid hsl(var(--color-border-primary-h, var.$default-color-border-primary-h), var(--color-border-primary-s, var.$default-color-border-primary-s), var(--color-border-primary-l, var.$default-color-border-primary-l));
+  border-radius: var.$radius-lg;
+  transition: border-color var.$duration-quick var.$ease-out-quad,
+              box-shadow var.$duration-quick var.$ease-out-quad,
+              background-color var.$duration-quick var.$ease-out-quad;
+  box-shadow: inset 0 1px 3px hsla(var(--shadow-color-h, var.$default-shadow-color-h), var(--shadow-color-s, var.$default-shadow-color-s), var(--shadow-color-l, var.$default-shadow-color-l), 0.1);
+
+  &::placeholder {
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+    opacity: 0.7;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: hsla(var(--color-accent-primary-h, var.$default-color-accent-primary-h), var(--color-accent-primary-s, var.$default-color-accent-primary-s), var(--color-accent-primary-l, var.$default-color-accent-primary-l), 0.8);
+    background-color: hsla(var(--color-bg-secondary-h, var.$default-color-bg-secondary-h), var(--color-bg-secondary-s, var.$default-color-bg-secondary-s), var(--color-bg-secondary-l, var.$default-color-bg-secondary-l), 0.8);
+    box-shadow: inset 0 1px 3px hsla(var(--shadow-color-h, var.$default-shadow-color-h), var(--shadow-color-s, var.$default-shadow-color-s), var(--shadow-color-l, var.$default-shadow-color-l), 0.05),
+                0 0 0 2px hsla(var(--color-bg-primary-h, var.$default-color-bg-primary-h), var(--color-bg-primary-s, var.$default-color-bg-primary-s), var(--color-bg-primary-l, var.$default-color-bg-primary-l), 0.5),
+                0 0 0 4px hsla(var(--color-accent-primary-h, var.$default-color-accent-primary-h), var(--color-accent-primary-s, var.$default-color-accent-primary-s), var(--color-accent-primary-l, var.$default-color-accent-primary-l), 0.5),
+                0 0 12px 2px hsla(var(--color-accent-primary-h, var.$default-color-accent-primary-h), var(--color-accent-primary-s, var.$default-color-accent-primary-s), var(--color-accent-primary-l, var.$default-color-accent-primary-l), 0.3);
+  }
+
+  &:disabled,
+  &[disabled] {
+    background-color: hsla(var(--color-bg-tertiary-h, var.$default-color-bg-tertiary-h), var(--color-bg-tertiary-s, var.$default-color-bg-tertiary-s), var(--color-bg-tertiary-l, var.$default-color-bg-tertiary-l), 0.3);
+    border-color: hsla(var(--color-border-primary-h, var.$default-color-border-primary-h), var(--color-border-primary-s, var.$default-color-border-primary-s), var(--color-border-primary-l, var.$default-color-border-primary-l), 0.2);
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+  }
+}
+
+// --- Specific Styles for Different Form Elements ---
+.form-input {
+  @extend .form-element-base;
+}
+
+.form-textarea {
+  @extend .form-element-base;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-select {
+  @extend .form-element-base;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgb(var(--color-text-muted-rgb, #{var.$default-color-text-muted-h} #{var.$default-color-text-muted-s} #{var.$default-color-text-muted-l}))'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var.$spacing-md center;
+  background-size: 1.5em 1.5em;
+  padding-right: calc(#{var.$spacing-md} * 2 + 1.5em); // SASS calc
+
+  &:disabled {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(var(--color-text-muted-rgb, #{var.$default-color-text-muted-h} #{var.$default-color-text-muted-s} #{var.$default-color-text-muted-l}), 0.5)'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+  }
+}
+
+.form-select-analog {
+  @extend .form-select;
+  background-color: hsla(var(--color-bg-tertiary-h, var.$default-color-bg-tertiary-h), var(--color-bg-tertiary-s, var.$default-color-bg-tertiary-s), var(--color-bg-tertiary-l, var.$default-color-bg-tertiary-l), 0.7);
+  border: 1px solid hsla(var(--color-border-primary-h, var.$default-color-border-primary-h), var(--color-border-primary-s, var.$default-color-border-primary-s), var(--color-border-primary-l, var.$default-color-border-primary-l), 0.4);
+  
+  @include mixins.neomorphic-inset(
+    $fill-color-var-prefix: '--color-bg-tertiary',
+    $blur: 2px, $distance: 4px,
+    $shadow-opacity-var: '--shadow-opacity-soft',
+    $radius: var.$radius-lg,
+    $shadow-h-var: '--shadow-color-h', $shadow-s-var: '--shadow-color-s', $shadow-l-var: '--shadow-color-l',
+    $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+    $fb-fill-h: var.$default-color-bg-tertiary-h, $fb-fill-s: var.$default-color-bg-tertiary-s, $fb-fill-l: var.$default-color-bg-tertiary-l, $fb-fill-a: var.$fb-fill-a, // Use correct fallback alpha var
+    $fb-shadow-op: var.$default-shadow-opacity-soft,
+    $fb-shadow-h: var.$default-shadow-color-h, $fb-shadow-s: var.$default-shadow-color-s, $fb-shadow-l: var.$default-shadow-color-l,
+    $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+  );
+
+  &:focus,
+  &:focus-visible {
+    border-color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  }
+}
+
+.toggle-switch-analog {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  height: 28px;
+  width: 52px;
+
+  .toggle-switch-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-switch-track {
+    width: 100%;
+    height: 100%;
+    background-color: hsla(var(--color-bg-tertiary-h, var.$default-color-bg-tertiary-h), var(--color-bg-tertiary-s, var.$default-color-bg-tertiary-s), var(--color-bg-tertiary-l, var.$default-color-bg-tertiary-l), 0.6);
+    border-radius: var.$radius-full;
+    transition: background-color var.$duration-quick var.$ease-out-quad;
+    
+    @include mixins.neomorphic-inset(
+      $fill-color-var-prefix: '--color-bg-tertiary', $fb-fill-a: 0.6,
+      $blur: 2px, $distance: 3px,
+      $shadow-opacity-var: '--shadow-opacity-soft', $fb-shadow-op: 0.05,
+      $radius: var.$radius-full,
+      $shadow-h-var: '--shadow-color-h', $shadow-s-var: '--shadow-color-s', $shadow-l-var: '--shadow-color-l',
+      $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+      $fb-fill-h: var.$default-color-bg-tertiary-h, $fb-fill-s: var.$default-color-bg-tertiary-s, $fb-fill-l: var.$default-color-bg-tertiary-l,
+      $fb-shadow-h: var.$default-shadow-color-h, $fb-shadow-s: var.$default-shadow-color-s, $fb-shadow-l: var.$default-shadow-color-l,
+      $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+    );
+
+    .toggle-switch-input:checked + & {
+      background-color: hsla(var(--color-accent-primary-h, var.$default-color-accent-primary-h), var(--color-accent-primary-s, var.$default-color-accent-primary-s), var(--color-accent-primary-l, var.$default-color-accent-primary-l), 0.7);
+      @include mixins.neomorphic-inset(
+        $fill-color-var-prefix: '--color-accent-primary', $fb-fill-a: 0.7,
+        $blur: 2px, $distance: 3px,
+        $shadow-opacity-var: '--shadow-opacity-soft', $fb-shadow-op: 0.05,
+        $radius: var.$radius-full,
+        $shadow-h-var: '--shadow-color-h', $shadow-s-var: '--shadow-color-s', $shadow-l-var: '--shadow-color-l',
+        $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+        $fb-fill-h: var.$default-color-accent-primary-h, $fb-fill-s: var.$default-color-accent-primary-s, $fb-fill-l: var.$default-color-accent-primary-l,
+        $fb-shadow-h: var.$default-shadow-color-h, $fb-shadow-s: var.$default-shadow-color-s, $fb-shadow-l: var.$default-shadow-color-l,
+        $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+      );
+    }
+  }
+
+  .toggle-switch-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    background-color: hsl(var(--color-bg-primary-h, var.$default-color-bg-primary-h), var(--color-bg-primary-s, var.$default-color-bg-primary-s), var(--color-bg-primary-l, var.$default-color-bg-primary-l));
+    border-radius: 50%;
+    transition: transform var.$duration-smooth var.$ease-elastic;
+    
+    @include mixins.neomorphic-extrude(
+      $bg-color-var-prefix: '--color-bg-primary', $fb-bg-a: var.$fb-bg-a, // Use correct fallback alpha var
+      $distance: 2px, $blur: 4px,
+      $shadow-opacity-var: '--shadow-opacity-medium', $fb-shadow-op: 0.15,
+      $radius: 50%,
+      $shadow-h-var: '--shadow-color-h', $shadow-s-var: '--shadow-color-s', $shadow-l-var: '--shadow-color-l',
+      $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+      $fb-bg-h: var.$default-color-bg-primary-h, $fb-bg-s: var.$default-color-bg-primary-s, $fb-bg-l: var.$default-color-bg-primary-l,
+      $fb-shadow-h: var.$default-shadow-color-h, $fb-shadow-s: var.$default-shadow-color-s, $fb-shadow-l: var.$default-shadow-color-l,
+      $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+    );
+
+    .toggle-switch-input:checked ~ & {
+      transform: translateX(24px);
+      background-color: hsl(var(--color-accent-secondary-h, var.$default-color-accent-secondary-h), var(--color-accent-secondary-s, var.$default-color-accent-secondary-s), var(--color-accent-secondary-l, var.$default-color-accent-secondary-l));
+      @include mixins.neomorphic-extrude(
+        $bg-color-var-prefix: '--color-accent-secondary', $fb-bg-a: var.$fb-bg-a, // Use correct fallback alpha var
+        $distance: 2px, $blur: 4px,
+        $shadow-opacity-var: '--shadow-opacity-medium', $fb-shadow-op: 0.15,
+        $radius: 50%,
+        $shadow-h-var: '--shadow-color-h', $shadow-s-var: '--shadow-color-s', $shadow-l-var: '--shadow-color-l',
+        $highlight-l-modifier-css-var: '--shadow-highlight-modifier',
+        $fb-bg-h: var.$default-color-accent-secondary-h, $fb-bg-s: var.$default-color-accent-secondary-s, $fb-bg-l: var.$default-color-accent-secondary-l,
+        $fb-shadow-h: var.$default-shadow-color-h, $fb-shadow-s: var.$default-shadow-color-s, $fb-shadow-l: var.$default-shadow-color-l,
+        $fb-highlight-l-factor: var.$default-shadow-highlight-l-factor
+      );
+    }
+  }
+
+  .toggle-switch-input:focus-visible + .toggle-switch-track {
+    @include mixins.focus-ring(
+      $base-bg-color-var-prefix: '--color-bg-primary', 
+      $ring-accent-color-var-prefix: '--color-accent-primary'
+    );
+  }
+}

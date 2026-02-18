@@ -1,0 +1,205 @@
+{
+  "name": "@framers/agentos",
+  "version": "0.1.23",
+  "description": "Modular AgentOS orchestration library",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./config/extension-secrets.json": "./dist/config/extension-secrets.json",
+    "./skills": {
+      "import": "./dist/skills.js",
+      "default": "./dist/skills.js",
+      "types": "./dist/skills.d.ts"
+    },
+    "./core/guardrails": {
+      "import": "./dist/core/guardrails/index.js",
+      "default": "./dist/core/guardrails/index.js",
+      "types": "./dist/core/guardrails/index.d.ts"
+    },
+    "./core/guardrails/index": {
+      "import": "./dist/core/guardrails/index.js",
+      "default": "./dist/core/guardrails/index.js",
+      "types": "./dist/core/guardrails/index.d.ts"
+    },
+    "./core/safety": {
+      "import": "./dist/core/safety/index.js",
+      "default": "./dist/core/safety/index.js",
+      "types": "./dist/core/safety/index.d.ts"
+    },
+    "./core/safety/index": {
+      "import": "./dist/core/safety/index.js",
+      "default": "./dist/core/safety/index.js",
+      "types": "./dist/core/safety/index.d.ts"
+    },
+    "./core/safety/*": {
+      "import": "./dist/core/safety/*.js",
+      "default": "./dist/core/safety/*.js",
+      "types": "./dist/core/safety/*.d.ts"
+    },
+    "./core/hitl": {
+      "import": "./dist/core/hitl/index.js",
+      "default": "./dist/core/hitl/index.js",
+      "types": "./dist/core/hitl/index.d.ts"
+    },
+    "./rag": {
+      "import": "./dist/rag/index.js",
+      "default": "./dist/rag/index.js",
+      "types": "./dist/rag/index.d.ts"
+    },
+    "./rag/reranking": {
+      "import": "./dist/rag/reranking/index.js",
+      "default": "./dist/rag/reranking/index.js",
+      "types": "./dist/rag/reranking/index.d.ts"
+    },
+    "./rag/graphrag": {
+      "import": "./dist/rag/graphrag/index.js",
+      "default": "./dist/rag/graphrag/index.js",
+      "types": "./dist/rag/graphrag/index.d.ts"
+    },
+    "./rag/*": {
+      "import": "./dist/rag/*.js",
+      "default": "./dist/rag/*.js",
+      "types": "./dist/rag/*.d.ts"
+    },
+    "./config/*": {
+      "import": "./dist/config/*.js",
+      "default": "./dist/config/*.js",
+      "types": "./dist/config/*.d.ts"
+    },
+    "./core/tools": {
+      "import": "./dist/core/tools/index.js",
+      "default": "./dist/core/tools/index.js",
+      "types": "./dist/core/tools/index.d.ts"
+    },
+    "./core/tools/index": {
+      "import": "./dist/core/tools/index.js",
+      "default": "./dist/core/tools/index.js",
+      "types": "./dist/core/tools/index.d.ts"
+    },
+    "./core/tools/*": {
+      "import": "./dist/core/tools/*.js",
+      "default": "./dist/core/tools/*.js",
+      "types": "./dist/core/tools/*.d.ts"
+    },
+    "./package.json": "./package.json",
+    "./*": {
+      "import": "./dist/*.js",
+      "default": "./dist/*.js",
+      "types": "./dist/*.d.ts"
+    },
+    "./*/*": {
+      "import": "./dist/*/*.js",
+      "default": "./dist/*/*.js",
+      "types": "./dist/*/*.d.ts"
+    },
+    "./*/*/*": {
+      "import": "./dist/*/*/*.js",
+      "default": "./dist/*/*/*.js",
+      "types": "./dist/*/*/*.d.ts"
+    },
+    "./*/*/*/*": {
+      "import": "./dist/*/*/*/*.js",
+      "default": "./dist/*/*/*/*.js",
+      "types": "./dist/*/*/*/*.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "clean": "rimraf dist tsconfig.build.tsbuildinfo",
+    "build": "npm run clean && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && node scripts/fix-esm-imports.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "node scripts/strip-nbsp.mjs && eslint \"src/**/*.{ts,js}\"",
+    "test": "vitest run",
+    "dev:test": "vitest",
+    "docs:clean": "rimraf docs/api ../../docs-generated/library ../../docs-generated/api",
+    "docs": "npm run docs:clean && pnpm --dir ../../ exec typedoc --options packages/agentos/typedoc.json && pnpm --dir ../../ exec typedoc --options typedoc.json && pnpm --dir ../../ exec node scripts/generate-api-docs.js && pnpm --dir ../../ exec node apps/agentos.sh/scripts/copy-docs.js",
+    "docs:watch": "npm run docs:clean && pnpm --dir ../../ exec typedoc --options packages/agentos/typedoc.json && pnpm --dir ../../ exec typedoc --options typedoc.json && pnpm --dir ../../ exec node scripts/generate-api-docs.js && concurrently \"pnpm --dir ../../ exec typedoc --options packages/agentos/typedoc.json --watch\" \"pnpm --dir ../../ exec typedoc --options typedoc.json --watch\" \"pnpm --dir ../../ exec node apps/agentos.sh/scripts/copy-docs.js --watch\""
+  },
+  "keywords": [
+    "agentos",
+    "orchestration",
+    "typescript",
+    "llm",
+    "tools"
+  ],
+  "author": "Voice Chat Assistant Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@eslint/js": "^9.11.0",
+    "@opentelemetry/context-async-hooks": "^2.0.1",
+    "@opentelemetry/sdk-metrics": "^2.0.1",
+    "@opentelemetry/sdk-trace-base": "^2.0.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.4",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
+    "@types/natural": "^5.1.5",
+    "@types/node": "^20.12.12",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "eslint": "^9.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.3.2",
+    "rimraf": "^5.0.7",
+    "semantic-release": "^24.1.0",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.0",
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/api-logs": "^0.201.1",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "axios": "^1.7.7",
+    "lru-cache": "^11.1.0",
+    "natural": "^6.12.0",
+    "pino": "^9.14.0",
+    "uuid": "^11.1.0",
+    "yaml": "^2.8.1"
+  },
+  "peerDependencies": {
+    "@framers/sql-storage-adapter": ">=0.4.0",
+    "graphology": ">=0.25.0",
+    "graphology-communities-louvain": ">=2.0.0",
+    "graphology-types": ">=0.24.0",
+    "hnswlib-node": ">=3.0.0",
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@framers/sql-storage-adapter": {
+      "optional": true
+    },
+    "graphology": {
+      "optional": true
+    },
+    "graphology-communities-louvain": {
+      "optional": true
+    },
+    "graphology-types": {
+      "optional": true
+    },
+    "hnswlib-node": {
+      "optional": true
+    }
+  }
+}

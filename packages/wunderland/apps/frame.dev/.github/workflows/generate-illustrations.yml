@@ -1,0 +1,261 @@
+# Auto-Generate Illustrations on Commit
+#
+# This workflow triggers illustration generation for files that are
+# EXPLICITLY MARKED with `generateIllustration: true` in their frontmatter.
+#
+# It does NOT generate illustrations for all files - only selected ones.
+#
+# Required secrets:
+#   - WEBHOOK_SECRET: Secret for authenticating webhook calls
+#   - WEBHOOK_URL: URL to your deployed webhook endpoint
+#
+# Optional secrets:
+#   - CALLBACK_URL: URL to receive job completion notifications
+
+name: Generate Illustrations
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'content/**/*.md'
+      - 'content/**/*.mdx'
+      - 'codex/**/*.md'
+      - 'codex/**/*.mdx'
+  workflow_dispatch:
+    inputs:
+      file_paths:
+        description: 'Comma-separated list of file paths to process (optional)'
+        required: false
+        type: string
+      force_all_marked:
+        description: 'Process all files with generateIllustration: true'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  find-and-generate:
+    name: Find Files & Generate Illustrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit to detect changes
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Find files marked for illustration generation
+        id: find-files
+        run: |
+          echo "Finding files marked for illustration generation..."
+
+          # Create a script to parse frontmatter and find selected files
+          cat > find-marked-files.js << 'SCRIPT'
+          const fs = require('fs');
+          const path = require('path');
+
+          // Parse YAML frontmatter (simple parser)
+          function parseFrontmatter(content) {
+            const match = content.match(/^---\n([\s\S]*?)\n---/);
+            if (!match) return {};
+
+            const yaml = match[1];
+            const result = {};
+
+            // Simple line-by-line parsing
+            for (const line of yaml.split('\n')) {
+              const colonIndex = line.indexOf(':');
+              if (colonIndex > 0) {
+                const key = line.slice(0, colonIndex).trim();
+                let value = line.slice(colonIndex + 1).trim();
+
+                // Parse booleans
+                if (value === 'true') value = true;
+                else if (value === 'false') value = false;
+                // Parse numbers
+                else if (/^\d+$/.test(value)) value = parseInt(value);
+                // Remove quotes
+                else if (value.startsWith('"') && value.endsWith('"')) {
+                  value = value.slice(1, -1);
+                }
+
+                result[key] = value;
+              }
+            }
+            return result;
+          }
+
+          // Get content without frontmatter
+          function getContent(content) {
+            return content.replace(/^---\n[\s\S]*?\n---\n*/, '').trim();
+          }
+
+          // Find all markdown files
+          function findMarkdownFiles(dir, files = []) {
+            if (!fs.existsSync(dir)) return files;
+
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const fullPath = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                findMarkdownFiles(fullPath, files);
+              } else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) {
+                files.push(fullPath);
+              }
+            }
+            return files;
+          }
+
+          // Main
+          const changedFiles = process.argv[2] ? process.argv[2].split(',').filter(Boolean) : [];
+          const forceAllMarked = process.argv[3] === 'true';
+          const manualPaths = process.argv[4] ? process.argv[4].split(',').filter(Boolean) : [];
+
+          let filesToCheck = [];
+
+          if (manualPaths.length > 0) {
+            // Manual workflow dispatch with specific files
+            filesToCheck = manualPaths;
+          } else if (forceAllMarked) {
+            // Find all files in content directories
+            filesToCheck = [
+              ...findMarkdownFiles('content'),
+              ...findMarkdownFiles('codex'),
+            ];
+          } else if (changedFiles.length > 0) {
+            // Only check changed files
+            filesToCheck = changedFiles.filter(f => f.endsWith('.md') || f.endsWith('.mdx'));
+          }
+
+          const selectedChunks = [];
+
+          for (const filePath of filesToCheck) {
+            if (!fs.existsSync(filePath)) continue;
+
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const frontmatter = parseFrontmatter(content);
+
+            // Only include if generateIllustration is explicitly true
+            if (frontmatter.generateIllustration === true) {
+              selectedChunks.push({
+                id: filePath.replace(/\//g, '-').replace(/\.(md|mdx)$/, ''),
+                title: frontmatter.title || path.basename(filePath, path.extname(filePath)),
+                content: getContent(content).slice(0, 2000), // Limit content size
+                filePath: filePath,
+                generateIllustration: true,
+                pageRange: { start: 0, end: 0 },
+                illustrationPoints: [0],
+              });
+            }
+          }
+
+          // Output results
+          console.log(JSON.stringify({
+            totalChecked: filesToCheck.length,
+            selectedCount: selectedChunks.length,
+            chunks: selectedChunks,
+          }));
+          SCRIPT
+
+          # Get changed files from git diff
+          if [ "${{ github.event_name }}" = "push" ]; then
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null | grep -E '\.(md|mdx)$' | tr '\n' ',' || echo "")
+          else
+            CHANGED_FILES=""
+          fi
+
+          # Run the script
+          RESULT=$(node find-marked-files.js "$CHANGED_FILES" "${{ inputs.force_all_marked }}" "${{ inputs.file_paths }}")
+
+          echo "Result: $RESULT"
+
+          # Extract count
+          SELECTED_COUNT=$(echo "$RESULT" | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).selectedCount)")
+
+          echo "selected_count=$SELECTED_COUNT" >> $GITHUB_OUTPUT
+          echo "payload=$RESULT" >> $GITHUB_OUTPUT
+
+          # Save full payload to file (for large payloads)
+          echo "$RESULT" > /tmp/payload.json
+
+      - name: Check if generation needed
+        id: check
+        run: |
+          if [ "${{ steps.find-files.outputs.selected_count }}" = "0" ]; then
+            echo "No files marked for illustration generation"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Found ${{ steps.find-files.outputs.selected_count }} files marked for generation"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger illustration generation
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          # Build the webhook payload
+          CHUNKS=$(cat /tmp/payload.json | node -e "console.log(JSON.stringify(JSON.parse(require('fs').readFileSync(0, 'utf-8')).chunks))")
+
+          # Create the full payload
+          cat > /tmp/webhook-payload.json << EOF
+          {
+            "projectTitle": "${{ github.repository }} - Auto Generation",
+            "chunks": $CHUNKS,
+            "provider": "openai",
+            "batchSize": 3,
+            "commitSha": "${{ github.sha }}",
+            "repository": "${{ github.repository }}",
+            "callbackUrl": "${{ secrets.CALLBACK_URL || '' }}"
+          }
+          EOF
+
+          echo "Sending webhook request..."
+
+          # Send the webhook
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -H "X-Webhook-Secret: ${{ secrets.WEBHOOK_SECRET }}" \
+            -d @/tmp/webhook-payload.json)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Webhook request failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+          # Extract job ID for logging
+          JOB_ID=$(echo "$BODY" | node -e "try { console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).job?.id || 'unknown') } catch { console.log('unknown') }")
+          echo "Started job: $JOB_ID"
+
+          # Create summary
+          echo "## Illustration Generation Triggered" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Job ID**: \`$JOB_ID\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files processed**: ${{ steps.find-files.outputs.selected_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary (no files to process)
+        if: steps.check.outputs.skip == 'true'
+        run: |
+          echo "## No Illustrations to Generate" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No files with \`generateIllustration: true\` were found in this commit." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To enable auto-generation for a file, add to its frontmatter:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`yaml" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "title: Your Title" >> $GITHUB_STEP_SUMMARY
+          echo "generateIllustration: true" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

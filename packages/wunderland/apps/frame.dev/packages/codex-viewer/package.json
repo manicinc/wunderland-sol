@@ -1,0 +1,66 @@
+{
+  "name": "@framers/codex-viewer",
+  "version": "0.1.0",
+  "description": "Embeddable GitHub-based knowledge viewer with analog paper styling, semantic search, and wiki features",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "vitest run",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "codex",
+    "knowledge-base",
+    "github",
+    "markdown",
+    "wiki",
+    "documentation",
+    "react",
+    "nextjs",
+    "semantic-search"
+  ],
+  "author": "Framers AI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/frame.dev",
+    "directory": "packages/codex-viewer"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "dependencies": {
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
+    "rehype-raw": "^7.0.0",
+    "lucide-react": "^0.460.0",
+    "framer-motion": "^11.15.0",
+    "fuse.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "tsup": "^8.3.5",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.0"
+  }
+}
+

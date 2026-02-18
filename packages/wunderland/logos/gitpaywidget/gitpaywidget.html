@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitPayWidget - Complete Brand System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #f8f7ff 100%);
+            color: #1a1a1a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.1);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-family: 'Caveat', cursive;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        .tagline {
+            font-family: 'Caveat', cursive;
+            font-size: 1.4rem;
+            color: #7c3aed;
+            margin-top: 0.25rem;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid rgba(139, 92, 246, 0.08);
+        }
+        
+        h2 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8b5cf6;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .control-group {
+            background: linear-gradient(135deg, #faf9ff, #f9f7ff);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+        }
+        
+        .control-group h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7c3aed;
+        }
+        
+        .control-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            transition: color 0.2s ease;
+        }
+        
+        .control-group label:hover {
+            color: #7c3aed;
+        }
+        
+        .control-group input[type="checkbox"], .control-group input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #8b5cf6;
+        }
+        
+        .control-group input[type="text"] {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .control-group input[type="text"]:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .tab-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .tab-divider {
+            width: 1px;
+            height: 24px;
+            background: #e5e7eb;
+            margin: 0 0.5rem;
+        }
+        
+        .color-tabs, .style-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .color-tab, .style-tab {
+            padding: 0.5rem 1.25rem;
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-tab.active, .style-tab.active {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+            transform: scale(1.05);
+        }
+        
+        .color-tab:hover:not(.active), .style-tab:hover:not(.active) {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.04);
+        }
+        
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-item {
+            text-align: center;
+        }
+        
+        .preview-box {
+            background: #faf9ff;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            margin-bottom: 0.75rem;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-box:hover {
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.08);
+        }
+        
+        .preview-box.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .preview-box.brand {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+        
+        .preview-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 0.625rem 0.875rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
+        }
+        
+        .download-btn.secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .download-btn.secondary:hover {
+            background: #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .download-section-title {
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: #6b7280;
+            margin-top: 1.75rem;
+            margin-bottom: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .icon-preview {
+            background: #faf9ff;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .icon-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.1);
+        }
+        
+        .icon-preview.dark {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+        
+        .icon-label {
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-top: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        /* Brand Guidelines Styles */
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .color-swatch {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        
+        .color-preview {
+            height: 100px;
+            position: relative;
+        }
+        
+        .color-info {
+            padding: 1rem;
+        }
+        
+        .color-name {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .color-values {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.8;
+            color: #6b7280;
+        }
+        
+        .typography-sample {
+            padding: 1.5rem;
+            background: #faf9ff;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .code-block {
+            background: #1a1a1a;
+            color: #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.813rem;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+        
+        .code-comment {
+            color: #6b7280;
+        }
+        
+        .code-property {
+            color: #ec4899;
+        }
+        
+        .code-value {
+            color: #8b5cf6;
+        }
+        
+        .manic-credit {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .manic-credit a {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .manic-credit a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>GitPayWidget</h1>
+            <p class="subtitle">Complete Brand System</p>
+            <p class="tagline">plug in, pay, and play!</p>
+        </header>
+        
+        <!-- Primary Logo Section -->
+        <section class="section">
+            <h2>Primary Horizontal Logo</h2>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h3>Logo Components</h3>
+                    <label>
+                        <input type="checkbox" id="includeText" checked onchange="updateLogoDisplay()">
+                        Include full text
+                    </label>
+                    <label>
+                        <input type="checkbox" id="includeTagline" checked onchange="updateLogoDisplay()">
+                        Include tagline
+                    </label>
+                    <label>
+                        <input type="checkbox" id="includeIcon" checked onchange="updateLogoDisplay()">
+                        Include icon
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Tagline Text</h3>
+                    <input type="text" id="taglineText" value="plug in, pay, and play!" placeholder="Enter tagline text" oninput="updateLogoDisplay(); updateVerticalDisplay()">
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab-group style-tabs">
+                    <button class="style-tab active" onclick="setStyle('playful')" data-style="playful">Playful</button>
+                    <button class="style-tab" onclick="setStyle('clean')" data-style="clean">Clean</button>
+                    <button class="style-tab" onclick="setStyle('sketch')" data-style="sketch">Sketch</button>
+                </div>
+                
+                <div class="tab-divider"></div>
+                
+                <div class="tab-group color-tabs">
+                    <button class="color-tab active" onclick="setActiveColor('purple')" data-color="purple">
+                        <span class="color-dot" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)"></span>
+                        Purple
+                    </button>
+                    <button class="color-tab" onclick="setActiveColor('ocean')" data-color="ocean">
+                        <span class="color-dot" style="background: linear-gradient(135deg, #0ea5e9, #6366f1)"></span>
+                        Ocean
+                    </button>
+                    <button class="color-tab" onclick="setActiveColor('sunset')" data-color="sunset">
+                        <span class="color-dot" style="background: linear-gradient(135deg, #f97316, #ec4899)"></span>
+                        Sunset
+                    </button>
+                    <button class="color-tab" onclick="setActiveColor('forest')" data-color="forest">
+                        <span class="color-dot" style="background: linear-gradient(135deg, #10b981, #06b6d4)"></span>
+                        Forest
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg" id="logoLight">
+                            <!-- Logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark">
+                        <svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg" id="logoDark">
+                            <!-- Logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box brand">
+                        <svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg" id="logoBrand">
+                            <!-- Logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Brand Background</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">SVG Vector Formats</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('primary')">SVG Light</button>
+                <button class="download-btn" onclick="downloadSVG('primary-dark')">SVG Dark</button>
+            </div>
+            
+            <div class="download-section-title">PNG Transparent Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 1)">PNG @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 2)">PNG @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 3)">PNG @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'transparent', 4)">PNG @4x</button>
+            </div>
+            
+            <div class="download-section-title">PNG with Backgrounds</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 1)">White @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'white', 2)">White @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 1)">Dark @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('primary', 'dark', 2)">Dark @2x</button>
+            </div>
+        </section>
+        
+        <!-- Vertical Layout Section -->
+        <section class="section">
+            <h2>Vertical / Stacked Layout</h2>
+            
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h3>Vertical Components</h3>
+                    <label>
+                        <input type="checkbox" id="verticalIncludeText" checked onchange="updateVerticalDisplay()">
+                        Include text
+                    </label>
+                    <label>
+                        <input type="checkbox" id="verticalIncludeTagline" checked onchange="updateVerticalDisplay()">
+                        Include tagline
+                    </label>
+                    <label>
+                        <input type="checkbox" id="verticalIncludeIcon" checked onchange="updateVerticalDisplay()">
+                        Include icon
+                    </label>
+                </div>
+                
+                <div class="control-group">
+                    <h3>Alignment</h3>
+                    <label>
+                        <input type="radio" name="verticalAlign" value="center" checked onchange="updateVerticalDisplay()">
+                        Center aligned
+                    </label>
+                    <label>
+                        <input type="radio" name="verticalAlign" value="left" onchange="updateVerticalDisplay()">
+                        Left aligned
+                    </label>
+                </div>
+            </div>
+            
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="preview-box">
+                        <svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" id="verticalLight">
+                            <!-- Vertical logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Light Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box dark">
+                        <svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" id="verticalDark">
+                            <!-- Vertical logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Dark Background</p>
+                </div>
+                
+                <div class="preview-item">
+                    <div class="preview-box brand">
+                        <svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" id="verticalBrand">
+                            <!-- Vertical logo will be generated here -->
+                        </svg>
+                    </div>
+                    <p class="preview-label">Brand Background</p>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Vertical SVG Formats</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('vertical')">SVG Light</button>
+                <button class="download-btn" onclick="downloadSVG('vertical-dark')">SVG Dark</button>
+            </div>
+            
+            <div class="download-section-title">Vertical PNG Transparent</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 1)">PNG @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 2)">PNG @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 3)">PNG @3x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'transparent', 4)">PNG @4x</button>
+            </div>
+            
+            <div class="download-section-title">Vertical PNG with Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'white', 1)">White @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'white', 2)">White @2x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'dark', 1)">Dark @1x</button>
+                <button class="download-btn secondary" onclick="downloadPNG('vertical', 'dark', 2)">Dark @2x</button>
+            </div>
+        </section>
+        
+        <!-- Icon Section -->
+        <section class="section">
+            <h2>Icon / Favicon Variations</h2>
+            
+            <div class="icon-grid">
+                <div class="icon-preview">
+                    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon64">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label">64×64</div>
+                </div>
+                
+                <div class="icon-preview">
+                    <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon32">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label">32×32</div>
+                </div>
+                
+                <div class="icon-preview">
+                    <svg width="16" height="16" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon16">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label">16×16</div>
+                </div>
+                
+                <div class="icon-preview dark">
+                    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" id="icon64dark">
+                        <!-- Icon will be generated here -->
+                    </svg>
+                    <div class="icon-label" style="color: #e5e7eb">Dark Mode</div>
+                </div>
+            </div>
+            
+            <div class="download-section-title">Icon SVG Files</div>
+            <div class="download-grid">
+                <button class="download-btn" onclick="downloadSVG('icon')">Icon SVG</button>
+                <button class="download-btn" onclick="downloadSVG('icon-dark')">Icon Dark SVG</button>
+            </div>
+            
+            <div class="download-section-title">Icon PNG Transparent</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 16)">16×16</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 32)">32×32</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 64)">64×64</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 128)">128×128</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 256)">256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 512)">512×512</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'transparent', 1024)">1024×1024</button>
+            </div>
+            
+            <div class="download-section-title">Icon PNG with Background</div>
+            <div class="download-grid">
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'white', 256)">White 256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'white', 512)">White 512×512</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'dark', 256)">Dark 256×256</button>
+                <button class="download-btn secondary" onclick="downloadPNG('icon', 'dark', 512)">Dark 512×512</button>
+            </div>
+        </section>
+        
+        <!-- Brand Guidelines Section -->
+        <section class="section">
+            <h2>Brand Guidelines</h2>
+            
+            <h3 style="margin: 2rem 0 1.5rem; font-size: 1.125rem; color: #7c3aed;">Color Palette</h3>
+            <div class="brand-grid" id="colorPalette">
+                <!-- Color swatches will be generated here -->
+            </div>
+            
+            <h3 style="margin: 2.5rem 0 1.5rem; font-size: 1.125rem; color: #7c3aed;">Typography</h3>
+            <div class="typography-sample">
+                <div style="font-family: 'Caveat', cursive; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">
+                    GitPayWidget - Caveat Bold
+                </div>
+                <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; margin-bottom: 1rem;">
+                    Tagline Text - Space Grotesk Regular
+                </div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 1rem; color: #6b7280;">
+                    Code Examples - JetBrains Mono
+                </div>
+            </div>
+            
+            <h3 style="margin: 2.5rem 0 1.5rem; font-size: 1.125rem; color: #7c3aed;">CSS Variables</h3>
+            <div class="code-block" id="cssVariables">
+                <span class="code-comment">/* GitPayWidget Brand Colors */</span><br>
+                <span class="code-property">--gpw-purple-primary</span>: <span class="code-value">#8b5cf6</span>;<br>
+                <span class="code-property">--gpw-purple-secondary</span>: <span class="code-value">#ec4899</span>;<br>
+                <span class="code-property">--gpw-purple-tertiary</span>: <span class="code-value">#7c3aed</span>;<br>
+                <span class="code-property">--gpw-accent-yellow</span>: <span class="code-value">#fbbf24</span>;<br><br>
+                
+                <span class="code-comment">/* Typography */</span><br>
+                <span class="code-property">--gpw-font-display</span>: <span class="code-value">'Caveat', cursive</span>;<br>
+                <span class="code-property">--gpw-font-body</span>: <span class="code-value">'Space Grotesk', sans-serif</span>;<br>
+                <span class="code-property">--gpw-font-mono</span>: <span class="code-value">'JetBrains Mono', monospace</span>;<br><br>
+                
+                <span class="code-comment">/* Spacing */</span><br>
+                <span class="code-property">--gpw-space-xs</span>: <span class="code-value">0.25rem</span>;<br>
+                <span class="code-property">--gpw-space-sm</span>: <span class="code-value">0.5rem</span>;<br>
+                <span class="code-property">--gpw-space-md</span>: <span class="code-value">1rem</span>;<br>
+                <span class="code-property">--gpw-space-lg</span>: <span class="code-value">2rem</span>;<br>
+                <span class="code-property">--gpw-space-xl</span>: <span class="code-value">3rem</span>;
+            </div>
+            
+            <h3 style="margin: 2.5rem 0 1.5rem; font-size: 1.125rem; color: #7c3aed;">Usage Guidelines</h3>
+            <div style="background: #faf9ff; padding: 1.5rem; border-radius: 12px; line-height: 1.8;">
+                <p style="margin-bottom: 1rem;"><strong>Clear Space:</strong> Maintain minimum clear space equal to the height of the dollar sign icon around the logo.</p>
+                <p style="margin-bottom: 1rem;"><strong>Minimum Size:</strong> Never display the logo smaller than 120px wide (horizontal) or 80px wide (vertical).</p>
+                <p style="margin-bottom: 1rem;"><strong>Color Usage:</strong> Use the primary purple gradient for main brand touchpoints. Ocean, sunset, and forest variants for specific contexts.</p>
+                <p><strong>Do Not:</strong> Stretch, rotate, add effects, change colors outside the palette, or place on busy backgrounds without proper contrast.</p>
+            </div>
+        </section>
+        
+        <div class="manic-credit">
+            Designed & Built by <a href="https://manic.agency" target="_blank">Manic Agency</a> • Playful payments for the modern web
+        </div>
+    </div>
+    
+    <script>
+        // Premium color palettes with full specifications
+        const colors = {
+            purple: {
+                primary: '#8b5cf6',
+                secondary: '#ec4899',
+                tertiary: '#7c3aed',
+                gradient1: '#8b5cf6',
+                gradient2: '#ec4899',
+                gradient3: '#fbbf24',
+                accent: '#fbbf24',
+                light: '#f3e8ff',
+                dark: '#581c87',
+                rgb: {
+                    primary: 'rgb(139, 92, 246)',
+                    secondary: 'rgb(236, 72, 153)',
+                    accent: 'rgb(251, 191, 36)'
+                }
+            },
+            ocean: {
+                primary: '#0ea5e9',
+                secondary: '#6366f1',
+                tertiary: '#0284c7',
+                gradient1: '#0ea5e9',
+                gradient2: '#6366f1',
+                gradient3: '#06b6d4',
+                accent: '#fbbf24',
+                light: '#e0f2fe',
+                dark: '#075985',
+                rgb: {
+                    primary: 'rgb(14, 165, 233)',
+                    secondary: 'rgb(99, 102, 241)',
+                    accent: 'rgb(251, 191, 36)'
+                }
+            },
+            sunset: {
+                primary: '#f97316',
+                secondary: '#ec4899',
+                tertiary: '#dc2626',
+                gradient1: '#f97316',
+                gradient2: '#ec4899',
+                gradient3: '#fbbf24',
+                accent: '#8b5cf6',
+                light: '#fff7ed',
+                dark: '#9a3412',
+                rgb: {
+                    primary: 'rgb(249, 115, 22)',
+                    secondary: 'rgb(236, 72, 153)',
+                    accent: 'rgb(139, 92, 246)'
+                }
+            },
+            forest: {
+                primary: '#10b981',
+                secondary: '#06b6d4',
+                tertiary: '#059669',
+                gradient1: '#10b981',
+                gradient2: '#06b6d4',
+                gradient3: '#14b8a6',
+                accent: '#ec4899',
+                light: '#d1fae5',
+                dark: '#047857',
+                rgb: {
+                    primary: 'rgb(16, 185, 129)',
+                    secondary: 'rgb(6, 182, 212)',
+                    accent: 'rgb(236, 72, 153)'
+                }
+            }
+        };
+        
+        let currentColor = 'purple';
+        let currentStyle = 'playful';
+        
+        // Generate intricate, premium logo design
+        function generateLogo(colorKey, isDark = false) {
+            const colorSet = colors[colorKey];
+            const includeText = document.getElementById('includeText').checked;
+            const includeTagline = document.getElementById('includeTagline').checked;
+            const includeIcon = document.getElementById('includeIcon').checked;
+            const taglineText = document.getElementById('taglineText').value;
+            
+            const textColor = isDark ? '#ffffff' : '#1a1a1a';
+            const subtitleColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(107,114,128,0.9)';
+            
+            const gradientId = `gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            const cardGradientId = `card-gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            const shimmerGradientId = `shimmer-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            
+            const isPlayful = currentStyle === 'playful';
+            const isSketch = currentStyle === 'sketch';
+            
+            const iconElement = includeIcon ? `
+                <g transform="translate(25, 35)">
+                    <ellipse cx="32" cy="45" rx="28" ry="3" fill="${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"/>
+                    
+                    <g transform="rotate(-12 32 25)">
+                        <rect x="0" y="0" width="64" height="42" 
+                              fill="url(#${cardGradientId})" 
+                              stroke="${isDark ? colorSet.gradient1 : colorSet.primary}"
+                              stroke-width="${isPlayful ? '2.5' : '1.5'}"
+                              rx="7" ry="7"
+                              stroke-dasharray="${isSketch ? '0.5 3.5' : ''}"
+                              opacity="0.95"/>
+                        
+                        <rect x="0" y="0" width="64" height="42" 
+                              fill="url(#${shimmerGradientId})" 
+                              rx="7" ry="7"
+                              opacity="0.3"/>
+                        
+                        <g transform="translate(10, 8)">
+                            <rect x="0" y="0" width="14" height="10" 
+                                  fill="${isDark ? colorSet.accent : colorSet.gradient3}" 
+                                  rx="1.5"
+                                  opacity="0.8"/>
+                            <path d="M2 2 L12 2 M2 4 L12 4 M2 6 L12 6 M2 8 L12 8" 
+                                  stroke="${isDark ? '#1a1a1a' : 'white'}" 
+                                  stroke-width="0.5" 
+                                  opacity="0.4"/>
+                            <rect x="5" y="3" width="4" height="4" 
+                                  fill="${isDark ? '#fbbf24' : colorSet.primary}" 
+                                  opacity="0.6"/>
+                        </g>
+                        
+                        <rect x="0" y="26" width="64" height="7" 
+                              fill="${isDark ? 'rgba(255,255,255,0.2)' : colorSet.dark}" 
+                              opacity="0.4"/>
+                        <rect x="0" y="28" width="64" height="3" 
+                              fill="${isDark ? 'rgba(255,255,255,0.1)' : colorSet.dark}" 
+                              opacity="0.3"/>
+                        
+                        <g transform="translate(10, 18)">
+                            <circle cx="0" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            <circle cx="4" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            <circle cx="8" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            <circle cx="12" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            
+                            <circle cx="18" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            <circle cx="22" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            <circle cx="26" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                            <circle cx="30" cy="0" r="1" fill="${isDark ? '#fff' : colorSet.tertiary}" opacity="0.4"/>
+                        </g>
+                        
+                        <g transform="translate(48, 8)">
+                            <path d="M0 8 Q3 6, 3 4 T6 2" 
+                                  stroke="${isDark ? '#fff' : colorSet.accent}" 
+                                  stroke-width="1.5" 
+                                  fill="none" 
+                                  opacity="0.6"/>
+                            <path d="M2 6 Q4 5, 4 4 T6 3" 
+                                  stroke="${isDark ? '#fff' : colorSet.accent}" 
+                                  stroke-width="1.5" 
+                                  fill="none" 
+                                  opacity="0.4"/>
+                        </g>
+                        
+                        <g transform="translate(32, 10)">
+                            <circle cx="0" cy="0" r="8" 
+                                    fill="${isDark ? 'rgba(255,255,255,0.1)' : colorSet.light}" 
+                                    opacity="0.5"/>
+                            <text x="0" y="3" 
+                                  font-family="'Caveat', cursive" 
+                                  font-size="12" 
+                                  font-weight="700" 
+                                  fill="${isDark ? '#fff' : colorSet.primary}"
+                                  text-anchor="middle">$</text>
+                        </g>
+                        
+                        <ellipse cx="50" cy="35" rx="6" ry="4" 
+                                 fill="url(#${gradientId})" 
+                                 opacity="0.3"/>
+                    </g>
+                    
+                    ${isPlayful ? `
+                        <circle cx="70" cy="15" r="2" fill="${colorSet.accent}" opacity="0.4"/>
+                        <circle cx="74" cy="20" r="1.5" fill="${colorSet.gradient2}" opacity="0.3"/>
+                        <circle cx="68" cy="22" r="1" fill="${colorSet.gradient3}" opacity="0.2"/>
+                        
+                        <path d="M-5 35 Q-2 33, 0 35 T5 35" 
+                              stroke="${colorSet.gradient1}" 
+                              stroke-width="1" 
+                              fill="none" 
+                              opacity="0.3"/>
+                    ` : ''}
+                </g>` : '';
+            
+            const textElement = includeText ? `
+                <g transform="translate(${includeIcon ? '105' : '30'}, 55)">
+                    <text font-family="'Caveat', cursive" 
+                          font-size="${isPlayful ? '36' : '34'}" 
+                          font-weight="700" 
+                          fill="${textColor}"
+                          letter-spacing="-1">
+                        <tspan fill="${isDark ? colorSet.gradient1 : colorSet.primary}">GitPay</tspan><tspan fill="${isDark ? colorSet.gradient2 : colorSet.secondary}">Widget</tspan>
+                    </text>
+                </g>` : '';
+            
+            const taglineElement = includeTagline && taglineText ? `
+                <text x="${includeIcon ? '105' : '30'}" y="80" 
+                      font-family="'Space Grotesk', sans-serif" 
+                      font-size="11" 
+                      font-weight="500" 
+                      fill="${subtitleColor}" 
+                      letter-spacing="0.3"
+                      opacity="0.9">${taglineText}</text>` : '';
+            
+            return `
+                <defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${colorSet.gradient1};stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:${colorSet.gradient2};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${colorSet.gradient3};stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="${cardGradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${isDark ? colorSet.dark : colorSet.light};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${isDark ? colorSet.primary : 'white'};stop-opacity:0.9" />
+                    </linearGradient>
+                    
+                    <linearGradient id="${shimmerGradientId}" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:transparent;stop-opacity:0" />
+                        <stop offset="50%" style="stop-color:${isDark ? 'white' : colorSet.accent};stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:transparent;stop-opacity:0" />
+                    </linearGradient>
+                    
+                    <filter id="shadow-${colorKey}" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="3" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.1' : '0.08'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <g filter="url(#shadow-${colorKey})">
+                    ${iconElement}
+                    ${textElement}
+                </g>
+                ${taglineElement}
+            `;
+        }
+        
+        // Generate vertical logo
+        function generateVerticalLogo(colorKey, isDark = false) {
+            const colorSet = colors[colorKey];
+            const includeText = document.getElementById('verticalIncludeText').checked;
+            const includeTagline = document.getElementById('verticalIncludeTagline').checked;
+            const includeIcon = document.getElementById('verticalIncludeIcon').checked;
+            const taglineText = document.getElementById('taglineText').value;
+            const alignment = document.querySelector('input[name="verticalAlign"]:checked').value;
+            
+            const textColor = isDark ? '#ffffff' : '#1a1a1a';
+            const subtitleColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(107,114,128,0.9)';
+            
+            const centerX = alignment === 'center' ? 100 : 30;
+            const iconX = alignment === 'center' ? 68 : 0;
+            
+            const gradientId = `v-gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            const cardGradientId = `v-card-gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            
+            const iconElement = includeIcon ? `
+                <g transform="translate(${iconX}, 30)">
+                    <ellipse cx="32" cy="45" rx="25" ry="3" fill="${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}"/>
+                    
+                    <g transform="rotate(-12 32 25)">
+                        <rect x="0" y="0" width="64" height="42" 
+                              fill="url(#${cardGradientId})" 
+                              stroke="${isDark ? colorSet.gradient1 : colorSet.primary}"
+                              stroke-width="2"
+                              rx="7" ry="7"
+                              opacity="0.95"/>
+                        
+                        <g transform="translate(10, 8)">
+                            <rect x="0" y="0" width="14" height="10" 
+                                  fill="${isDark ? colorSet.accent : colorSet.gradient3}" 
+                                  rx="1.5"
+                                  opacity="0.8"/>
+                            <rect x="5" y="3" width="4" height="4" 
+                                  fill="${isDark ? '#fbbf24' : colorSet.primary}" 
+                                  opacity="0.6"/>
+                        </g>
+                        
+                        <rect x="0" y="26" width="64" height="7" 
+                              fill="${isDark ? 'rgba(255,255,255,0.2)' : colorSet.dark}" 
+                              opacity="0.4"/>
+                        
+                        <text x="32" y="18" 
+                              font-family="'Caveat', cursive" 
+                              font-size="14" 
+                              font-weight="700" 
+                              fill="${isDark ? '#fff' : colorSet.primary}"
+                              text-anchor="middle"
+                              opacity="0.9">$</text>
+                        
+                        <g transform="translate(48, 8)">
+                            <path d="M0 6 Q2 4, 2 2 T4 0" 
+                                  stroke="${isDark ? '#fff' : colorSet.accent}" 
+                                  stroke-width="1.2" 
+                                  fill="none" 
+                                  opacity="0.5"/>
+                        </g>
+                    </g>
+                </g>` : '';
+            
+            const textElement = includeText ? `
+                <text x="${centerX}" y="${includeIcon ? '120' : '60'}" 
+                      font-family="'Caveat', cursive" 
+                      font-size="38" 
+                      font-weight="700" 
+                      text-anchor="${alignment === 'center' ? 'middle' : 'start'}"
+                      letter-spacing="-1">
+                    <tspan fill="${isDark ? colorSet.gradient1 : colorSet.primary}">GitPay</tspan><tspan fill="${isDark ? colorSet.gradient2 : colorSet.secondary}">Widget</tspan>
+                </text>` : '';
+            
+            const taglineElement = includeTagline && taglineText ? `
+                <text x="${centerX}" y="${includeIcon ? '145' : '85'}" 
+                      font-family="'Space Grotesk', sans-serif" 
+                      font-size="11" 
+                      font-weight="500" 
+                      fill="${subtitleColor}" 
+                      text-anchor="${alignment === 'center' ? 'middle' : 'start'}"
+                      letter-spacing="0.3"
+                      opacity="0.9">${taglineText}</text>` : '';
+            
+            return `
+                <defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${colorSet.gradient1};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${colorSet.gradient2};stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="${cardGradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${isDark ? colorSet.dark : colorSet.light};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${isDark ? colorSet.primary : 'white'};stop-opacity:0.9" />
+                    </linearGradient>
+                </defs>
+                
+                ${iconElement}
+                ${textElement}
+                ${taglineElement}
+            `;
+        }
+        
+        // Generate icon (refined standalone version)
+        function generateIcon(colorKey, isDark = false) {
+            const colorSet = colors[colorKey];
+            const gradientId = `icon-gradient-${colorKey}-${isDark ? 'dark' : 'light'}`;
+            
+            return `
+                <defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${colorSet.gradient1};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${colorSet.gradient2};stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <filter id="icon-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+                        <feOffset dx="0" dy="2" result="offsetblur"/>
+                        <feFlood flood-color="${isDark ? '#ffffff' : '#000000'}" flood-opacity="${isDark ? '0.15' : '0.1'}"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <g transform="translate(8, 11)" filter="url(#icon-shadow)">
+                    <g transform="rotate(-10 24 21)">
+                        <rect x="0" y="0" width="48" height="32" 
+                              fill="${isDark ? 'none' : 'url(#' + gradientId + ')'}" 
+                              stroke="${isDark ? 'white' : 'url(#' + gradientId + ')'}" 
+                              stroke-width="${isDark ? '2' : '0'}" 
+                              rx="5" ry="5"
+                              opacity="0.95"/>
+                        
+                        <rect x="8" y="6" width="10" height="7" 
+                              fill="${isDark ? 'white' : 'white'}" 
+                              opacity="${isDark ? '0.9' : '0.7'}"
+                              rx="1"/>
+                        
+                        <rect x="0" y="20" width="48" height="5" 
+                              fill="${isDark ? 'white' : colorSet.dark}" 
+                              opacity="0.2"/>
+                        
+                        <text x="30" y="16" 
+                              font-family="'Caveat', cursive" 
+                              font-size="14" 
+                              font-weight="700" 
+                              fill="${isDark ? 'white' : 'white'}"
+                              opacity="0.9">$</text>
+                        
+                        <g transform="translate(38, 6)">
+                            <path d="M0 4 Q2 3, 2 2 T4 1" 
+                                  stroke="${isDark ? 'white' : 'white'}" 
+                                  stroke-width="1" 
+                                  fill="none" 
+                                  opacity="0.5"/>
+                        </g>
+                    </g>
+                </g>
+            `;
+        }
+        
+        // Generate color palette display
+        function generateColorPalette() {
+            const colorSet = colors[currentColor];
+            const paletteHTML = `
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: ${colorSet.primary}"></div>
+                    <div class="color-info">
+                        <div class="color-name">Primary</div>
+                        <div class="color-values">
+                            HEX: ${colorSet.primary}<br>
+                            RGB: ${colorSet.rgb.primary}
+                        </div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: ${colorSet.secondary}"></div>
+                    <div class="color-info">
+                        <div class="color-name">Secondary</div>
+                        <div class="color-values">
+                            HEX: ${colorSet.secondary}<br>
+                            RGB: ${colorSet.rgb.secondary}
+                        </div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: ${colorSet.accent}"></div>
+                    <div class="color-info">
+                        <div class="color-name">Accent</div>
+                        <div class="color-values">
+                            HEX: ${colorSet.accent}<br>
+                            RGB: ${colorSet.rgb.accent}
+                        </div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-preview" style="background: linear-gradient(135deg, ${colorSet.gradient1}, ${colorSet.gradient2})"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gradient</div>
+                        <div class="color-values">
+                            Start: ${colorSet.gradient1}<br>
+                            End: ${colorSet.gradient2}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('colorPalette').innerHTML = paletteHTML;
+        }
+        
+        // Update displays
+        function updateLogoDisplay() {
+            document.getElementById('logoLight').innerHTML = generateLogo(currentColor, false);
+            document.getElementById('logoDark').innerHTML = generateLogo(currentColor, true);
+            document.getElementById('logoBrand').innerHTML = generateLogo(currentColor, false);
+            updateIconDisplay();
+            generateColorPalette();
+        }
+        
+        function updateIconDisplay() {
+            document.getElementById('icon64').innerHTML = generateIcon(currentColor, false);
+            document.getElementById('icon32').innerHTML = generateIcon(currentColor, false);
+            document.getElementById('icon16').innerHTML = generateIcon(currentColor, false);
+            document.getElementById('icon64dark').innerHTML = generateIcon(currentColor, true);
+        }
+        
+        function updateVerticalDisplay() {
+            document.getElementById('verticalLight').innerHTML = generateVerticalLogo(currentColor, false);
+            document.getElementById('verticalDark').innerHTML = generateVerticalLogo(currentColor, true);
+            document.getElementById('verticalBrand').innerHTML = generateVerticalLogo(currentColor, false);
+        }
+        
+        // Set active color
+        function setActiveColor(color) {
+            currentColor = color;
+            document.querySelectorAll('.color-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-color="${color}"]`).classList.add('active');
+            updateLogoDisplay();
+            updateVerticalDisplay();
+        }
+        
+        // Set style
+        function setStyle(style) {
+            currentStyle = style;
+            document.querySelectorAll('.style-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-style="${style}"]`).classList.add('active');
+            updateLogoDisplay();
+            updateVerticalDisplay();
+        }
+        
+        // Download functions
+        function downloadSVG(type) {
+            let svgContent, filename;
+            
+            if (type === 'primary') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+${generateLogo(currentColor, false)}
+</svg>`;
+                filename = `gitpaywidget-${currentColor}-${currentStyle}.svg`;
+            } else if (type === 'primary-dark') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="360" height="120" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+${generateLogo(currentColor, true)}
+</svg>`;
+                filename = `gitpaywidget-${currentColor}-${currentStyle}-dark.svg`;
+            } else if (type === 'vertical') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, false)}
+</svg>`;
+                filename = `gitpaywidget-vertical-${currentColor}-${currentStyle}.svg`;
+            } else if (type === 'vertical-dark') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, true)}
+</svg>`;
+                filename = `gitpaywidget-vertical-${currentColor}-${currentStyle}-dark.svg`;
+            } else if (type === 'icon-dark') {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+${generateIcon(currentColor, true)}
+</svg>`;
+                filename = `gitpaywidget-icon-${currentColor}-dark.svg`;
+            } else {
+                svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+${generateIcon(currentColor, false)}
+</svg>`;
+                filename = `gitpaywidget-icon-${currentColor}.svg`;
+            }
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function downloadPNG(type, background, scale) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            let svgContent, filename;
+            
+            if (type === 'primary') {
+                canvas.width = 360 * scale;
+                canvas.height = 120 * scale;
+                const isDark = background === 'dark';
+                svgContent = `<svg width="${360 * scale}" height="${120 * scale}" viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+${generateLogo(currentColor, isDark)}
+</svg>`;
+                filename = `gitpaywidget-${currentColor}-${background}-${scale}x.png`;
+            } else if (type === 'vertical') {
+                canvas.width = 200 * scale;
+                canvas.height = 250 * scale;
+                const isDark = background === 'dark';
+                svgContent = `<svg width="${200 * scale}" height="${250 * scale}" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+${generateVerticalLogo(currentColor, isDark)}
+</svg>`;
+                filename = `gitpaywidget-vertical-${currentColor}-${background}-${scale}x.png`;
+            } else {
+                canvas.width = scale;
+                canvas.height = scale;
+                const isDark = background === 'dark';
+                svgContent = `<svg width="${scale}" height="${scale}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+${generateIcon(currentColor, isDark)}
+</svg>`;
+                filename = `gitpaywidget-icon-${currentColor}-${background === 'transparent' ? 'trans' : background}-${scale}x${scale}.png`;
+            }
+            
+            // Fill background if needed
+            if (background === 'white') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (background === 'dark') {
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            // transparent = no fill
+            
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(function(pngBlob) {
+                    const a = document.createElement('a');
+                    const pngUrl = URL.createObjectURL(pngBlob);
+                    a.href = pngUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(pngUrl);
+                }, 'image/png');
+                URL.revokeObjectURL(url);
+            };
+            
+            img.src = url;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLogoDisplay();
+            updateVerticalDisplay();
+        });
+    </script>
+</body>
+</html>

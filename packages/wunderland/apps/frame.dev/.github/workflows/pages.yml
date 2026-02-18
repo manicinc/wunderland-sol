@@ -1,0 +1,157 @@
+name: Deploy frame.dev to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - codex-content-updated
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        # version is read from package.json packageManager field
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: Configure Git for private repos
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "git@github.com:"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "git+ssh://git@github.com/"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "git+https://git@github.com/"
+          git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "git+https://git@github.com:"
+
+      - name: Verify PAT access
+        run: |
+          echo "PAT length: ${#GH_PAT}"
+          RES=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${GH_PAT}" https://api.github.com/repos/framersai/codex-extensions)
+          echo "GitHub API status: $RES"
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+
+      - name: Debug git config
+        run: |
+          git config -l --show-origin | sort
+          git ls-remote https://x-access-token:${{ secrets.GH_PAT }}@github.com/framersai/codex-extensions.git HEAD || true
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.css') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install
+        env:
+          GIT_ASKPASS: echo
+          GIT_TERMINAL_PROMPT: 0
+
+      - name: Cache Embeddings
+        id: embeddings-cache
+        uses: actions/cache@v4
+        with:
+          path: public/codex-embeddings.json
+          key: embeddings-${{ hashFiles('scripts/generate-embeddings.js') }}
+          restore-keys: |
+            embeddings-
+
+      - name: Generate Semantic Embeddings
+        if: steps.embeddings-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 10
+        continue-on-error: true
+        run: pnpm run embeddings:full
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          NODE_OPTIONS: --max_old_space_size=4096
+
+      - name: Build static site
+        run: pnpm run build
+        env:
+          NODE_OPTIONS: --max_old_space_size=6144  # Increase heap to 6GB for large builds
+          STATIC_EXPORT: 'true'  # Enable static export mode (no API routes)
+          NEXT_PUBLIC_STATIC_EXPORT: 'true'  # Client-side flag for static mode detection
+          NEXT_PUBLIC_CODEX_DEFAULT_MODE: 'github'  # Use GitHub API for content (not IndexedDB)
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_ENABLE_ORT: 'true'
+          # Summarization config - use BERT by default for highest quality
+          NEXT_PUBLIC_SUMMARIZATION_ALGORITHM: 'bert'
+          NEXT_PUBLIC_AUTO_SUMMARIZE_ON_PUBLISH: 'true'
+          NEXT_PUBLIC_SUMMARIZATION_CACHING: 'true'
+          # Analytics (marketing pages only - excluded from /quarry/app/* routes)
+          # Domain-specific: different IDs for frame.dev vs quarry.space
+          NEXT_PUBLIC_GA_ID_FRAME: ${{ vars.NEXT_PUBLIC_GA_ID_FRAME }}
+          NEXT_PUBLIC_CLARITY_ID_FRAME: ${{ vars.NEXT_PUBLIC_CLARITY_ID_FRAME }}
+          NEXT_PUBLIC_GA_ID_QUARRY: ${{ vars.NEXT_PUBLIC_GA_ID_QUARRY }}
+          NEXT_PUBLIC_CLARITY_ID_QUARRY: ${{ vars.NEXT_PUBLIC_CLARITY_ID_QUARRY }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      
+      - name: Trigger Codex re-indexing
+        if: success()
+        run: |
+          echo "Sending repository_dispatch to framersai/codex..."
+          RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GH_PAT }}" \
+            https://api.github.com/repos/framersai/codex/dispatches \
+            -d '{"event_type":"frame-deploy-complete","client_payload":{"source":"frame.dev","ref":"${{ github.sha }}"}}')
+          
+          echo "$RESPONSE"
+          HTTP_CODE=$(echo "$RESPONSE" | grep "HTTP_CODE" | cut -d: -f2)
+          
+          if [ "$HTTP_CODE" = "204" ]; then
+            echo "✓ Successfully sent repository_dispatch to framersai/codex"
+            echo "Note: Codex repo must have a workflow listening for 'frame-deploy-complete' events"
+          else
+            echo "⚠ repository_dispatch returned HTTP $HTTP_CODE (expected 204)"
+            echo "Check that GH_PAT has 'repo' or 'public_repo' scope"
+          fi
+

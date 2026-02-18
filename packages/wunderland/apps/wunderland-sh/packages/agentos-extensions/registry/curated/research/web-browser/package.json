@@ -1,0 +1,64 @@
+{
+  "name": "@framers/agentos-ext-web-browser",
+  "version": "1.1.0",
+  "description": "Browser automation extension for AgentOS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "manifest.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "agentos",
+    "extension",
+    "browser",
+    "automation",
+    "scraping",
+    "puppeteer"
+  ],
+  "author": {
+    "name": "Framers AI",
+    "email": "team@frame.dev",
+    "url": "https://frame.dev"
+  },
+  "contributors": [
+    {
+      "name": "Johnny Dunn",
+      "email": "johnnyfived@protonmail.com",
+      "url": "https://github.com/jddunn"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions",
+    "directory": "registry/curated/research/web-browser"
+  },
+  "peerDependencies": {
+    "@framers/agentos": "^0.1.0"
+  },
+  "dependencies": {
+    "puppeteer-core": "^22.0.0",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "devDependencies": {
+    "@framers/agentos": "workspace:*",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}

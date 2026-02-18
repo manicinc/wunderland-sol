@@ -1,0 +1,30 @@
+{
+  "welcome": {
+    "subject": "Welcome to Voice Chat Assistant",
+    "greeting": "Hello {{name}}",
+    "body": "Thank you for joining Voice Chat Assistant. Your account has been successfully created.",
+    "action": "Get Started",
+    "footer": "If you have any questions, please don't hesitate to contact us."
+  },
+  "passwordReset": {
+    "subject": "Reset Your Password",
+    "greeting": "Hello {{name}}",
+    "body": "We received a request to reset your password. Click the link below to create a new password.",
+    "action": "Reset Password",
+    "expire": "This link will expire in {{hours}} hours.",
+    "ignore": "If you didn't request this, please ignore this email."
+  },
+  "verification": {
+    "subject": "Verify Your Email",
+    "greeting": "Hello {{name}}",
+    "body": "Please verify your email address to complete your registration.",
+    "action": "Verify Email",
+    "expire": "This link will expire in {{hours}} hours."
+  },
+  "notification": {
+    "subject": "New Notification",
+    "greeting": "Hello {{name}}",
+    "body": "You have a new notification.",
+    "action": "View Notification"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.productivity.gmail",
+  "name": "Gmail Email Extension",
+  "version": "0.1.0",
+  "description": "Gmail email integration with OAuth2 — list, read, send, reply, search messages and manage labels.",
+  "categories": ["productivity", "email"],
+  "platforms": ["gmail"],
+  "sdk": "googleapis",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "gmailListMessages",
+      "displayName": "List Gmail Messages"
+    },
+    {
+      "kind": "tool",
+      "id": "gmailReadMessage",
+      "displayName": "Read Gmail Message"
+    },
+    {
+      "kind": "tool",
+      "id": "gmailSendMessage",
+      "displayName": "Send Gmail Message"
+    },
+    {
+      "kind": "tool",
+      "id": "gmailReplyMessage",
+      "displayName": "Reply to Gmail Message"
+    },
+    {
+      "kind": "tool",
+      "id": "gmailSearchMessages",
+      "displayName": "Search Gmail Messages"
+    },
+    {
+      "kind": "tool",
+      "id": "gmailListLabels",
+      "displayName": "List Gmail Labels"
+    }
+  ],
+  "requiredSecrets": [
+    "google.clientId",
+    "google.clientSecret",
+    "google.refreshToken"
+  ],
+  "features": [
+    "List inbox messages with filtering",
+    "Read full email content with MIME parsing",
+    "Compose and send new emails",
+    "Reply to existing email threads",
+    "Full-text search using Gmail query syntax",
+    "List and inspect email labels/folders",
+    "OAuth2 authentication with refresh token"
+  ]
+}

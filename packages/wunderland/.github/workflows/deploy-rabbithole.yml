@@ -1,0 +1,169 @@
+name: Deploy RabbitHole (Linode)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'apps/rabbithole'
+      - 'apps/rabbithole/**'
+      - 'backend/**'
+      - 'packages/**'
+      - 'deployment/rabbithole/**'
+      - '.github/workflows/deploy-rabbithole.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        with:
+          host: ${{ secrets.RABBITHOLE_LINODE_HOST }}
+          username: root
+          key: ${{ secrets.RABBITHOLE_SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          envs: GH_PAT
+          script: |
+            set -euo pipefail
+
+            # Use PAT for all github.com HTTPS (needed for private submodules)
+            git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
+
+            REPO_DIR="/app/rabbithole"
+            REPO_URL="https://${GH_PAT}@github.com/manicinc/voice-chat-assistant.git"
+
+            # ── 1. Pull latest code ──
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              echo "[deploy] First deploy — cloning repo..."
+              git clone --recurse-submodules "$REPO_URL" "$REPO_DIR"
+            else
+              echo "[deploy] Pulling latest..."
+              cd "$REPO_DIR"
+              git remote set-url origin "$REPO_URL"
+              git fetch origin
+              git reset --hard origin/master
+              git submodule deinit -f --all 2>/dev/null || true
+              git submodule update --init --recursive --force
+            fi
+
+            cd "$REPO_DIR"
+
+            # ── 1b. Load env vars (NEXT_PUBLIC_* must be present at build time) ──
+            while IFS='=' read -r key val; do
+              # Skip comments and empty lines
+              [[ "$key" =~ ^#.*$ || -z "$key" ]] && continue
+              # Strip surrounding quotes from value
+              val="${val%\"}" && val="${val#\"}"
+              val="${val%\'}" && val="${val#\'}"
+              export "$key=$val"
+            done < /etc/rabbithole/env
+
+            # ── 1c. Ensure critical env vars are correct ──
+            if ! grep -q '^AUTH_URL=' /etc/rabbithole/env; then
+              echo "AUTH_URL=https://rabbithole.inc" >> /etc/rabbithole/env
+              echo "[deploy] WARNING: AUTH_URL was missing — auto-added"
+            fi
+            export AUTH_URL=https://rabbithole.inc
+
+            if ! grep -q '^INTERNAL_API_URL=' /etc/rabbithole/env; then
+              echo "INTERNAL_API_URL=http://localhost:3001/api" >> /etc/rabbithole/env
+              echo "[deploy] WARNING: INTERNAL_API_URL was missing — auto-added"
+            fi
+
+            # NEXT_PUBLIC_API_URL must be /api for production (proxied via nginx).
+            # Override regardless of what's in env file — this is build-time critical.
+            export NEXT_PUBLIC_API_URL=/api
+            export NEXT_PUBLIC_OAUTH_GOOGLE=true
+            export NEXT_PUBLIC_OAUTH_GITHUB=true
+
+            # ── 2. Install dependencies ──
+            echo "[deploy] Installing dependencies..."
+            pnpm install --no-frozen-lockfile
+
+            # ── 3. Build workspace packages in dependency order ──
+            echo "[deploy] Building workspace packages..."
+            pnpm --filter @framers/shared build
+            pnpm --filter @framers/sql-storage-adapter build
+            pnpm --filter @framers/agentos build
+            pnpm --filter @framers/agentos-extensions-registry build
+            pnpm --filter @framers/agentos-skills-registry build
+
+            # ── 4. Build Next.js frontend (--webpack needed for standalone output) ──
+            echo "[deploy] Building rabbithole frontend..."
+            pnpm --filter rabbithole exec next build --webpack
+
+            # ── 5. Compile bot bootstrap (instrumentation.ts bots aren't traced by webpack) ──
+            STANDALONE_APP="$REPO_DIR/apps/rabbithole/.next/standalone/apps/rabbithole"
+            echo "[deploy] Compiling bot bootstrap with esbuild..."
+            node_modules/.bin/esbuild apps/rabbithole/src/bots/index.ts \
+              --bundle --platform=node --format=cjs \
+              --outfile="$STANDALONE_APP/boot-bots.js" \
+              --external:discord.js --external:"@discordjs/*" \
+              --external:telegraf --external:openai \
+              --external:zlib-sync --external:bufferutil --external:utf-8-validate
+
+            # Generate start.js wrapper that loads bots + Next.js server
+            cat > "$STANDALONE_APP/start.js" << 'STARTJS'
+            const path = require("path");
+            process.env.NEXT_RUNTIME = "nodejs";
+
+            async function main() {
+              // Start bots if enabled (compiled from src/bots/ by esbuild)
+              try {
+                const bots = require("./boot-bots.js");
+                if (process.env.DISCORD_BOT_ENABLED === "true") {
+                  await bots.startDiscordBot();
+                }
+                if (process.env.TELEGRAM_BOT_ENABLED === "true") {
+                  await bots.startTelegramBot();
+                }
+                console.log("[start.js] Bot bootstrap completed");
+              } catch (e) {
+                console.error("[start.js] Bot bootstrap error:", e.message);
+              }
+
+              // Start Next.js standalone server
+              require("./server.js");
+            }
+            main();
+            STARTJS
+
+            # ── 5b. Link static assets into standalone output ──
+            ln -sfn "$REPO_DIR/apps/rabbithole/.next/static" "$STANDALONE_APP/.next/static"
+            ln -sfn "$REPO_DIR/apps/rabbithole/public" "$STANDALONE_APP/public"
+
+            # ── 6. Ensure nginx config is correct ──
+            echo "[deploy] Syncing nginx config..."
+            cp "$REPO_DIR/deployment/rabbithole/nginx-rabbithole.conf" /etc/nginx/sites-available/rabbithole
+            ln -sfn /etc/nginx/sites-available/rabbithole /etc/nginx/sites-enabled/rabbithole
+            nginx -t && systemctl reload nginx
+
+            # ── 7. Update systemd service + restart ──
+            echo "[deploy] Updating systemd service..."
+            cp "$REPO_DIR/deployment/rabbithole/rabbithole.service" /etc/systemd/system/rabbithole.service
+            systemctl daemon-reload
+            systemctl restart rabbithole
+
+            # ── 8. Update API bridge if changed ──
+            if [ -f "$REPO_DIR/deployment/rabbithole/api-server.js" ]; then
+              echo "[deploy] Updating API bridge..."
+              cp "$REPO_DIR/deployment/rabbithole/api-server.js" /opt/rabbithole-api/server.js
+              systemctl restart rabbithole-api
+            fi
+
+            # ── 9. Health check ──
+            sleep 5
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/ || echo "000")
+            echo "[deploy] Health check: HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "[deploy] WARNING: Frontend not returning 200"
+              journalctl -u rabbithole --no-pager -n 20
+            fi
+
+            echo "[deploy] Done."

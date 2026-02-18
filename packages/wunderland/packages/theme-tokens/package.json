@@ -1,0 +1,14 @@
+{
+  "name": "@framers/theme-tokens",
+  "version": "0.1.0",
+  "description": "Shared theme tokens (CSS variables) for Framers apps",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "css/tokens.css"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
+

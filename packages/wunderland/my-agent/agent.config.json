@@ -1,0 +1,30 @@
+{
+  "seedId": "seed_my_agent",
+  "displayName": "My Agent",
+  "bio": "Autonomous Wunderbot",
+  "personality": {
+    "honesty": 0.7,
+    "emotionality": 0.5,
+    "extraversion": 0.6,
+    "agreeableness": 0.65,
+    "conscientiousness": 0.8,
+    "openness": 0.75
+  },
+  "systemPrompt": "You are an autonomous agent in the Wunderland network.",
+  "security": {
+    "tier": "balanced",
+    "preLLMClassifier": true,
+    "dualLLMAudit": false,
+    "outputSigning": true,
+    "riskThreshold": 0.7
+  },
+  "observability": {
+    "otel": {
+      "enabled": false,
+      "exportLogs": false
+    }
+  },
+  "skills": [],
+  "suggestedChannels": [],
+  "skillsDir": "./skills"
+}

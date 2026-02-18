@@ -1,0 +1,48 @@
+/**
+ * Pomodoro Timer Plugin Styles
+ */
+
+.pomodoro-widget {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Timer circle animation */
+.pomodoro-widget svg circle {
+  transition: stroke-dashoffset 1s linear;
+}
+
+/* Pulse animation for running timer */
+.pomodoro-widget.running .timer-display {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Button hover effects */
+.pomodoro-widget button {
+  transition: all 0.2s ease;
+}
+
+.pomodoro-widget button:active {
+  transform: scale(0.95);
+}
+
+/* Mode tab indicator */
+.pomodoro-widget .mode-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}

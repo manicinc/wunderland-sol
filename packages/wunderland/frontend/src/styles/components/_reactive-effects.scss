@@ -1,0 +1,432 @@
+// File: frontend/src/styles/components/_reactive-effects.scss
+/**
+ * @file _reactive-effects.scss
+ * @description Global reactive effects for pulse, ripple, glow, and border animations
+ * Integrates with reactive store for dynamic, state-driven visual feedback
+ * @version 1.0.0
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+// ============================================
+// Reactive Effect Mixins
+// ============================================
+
+@mixin reactive-border-pulse(
+  $color-var-prefix: '--color-accent-primary',
+  $duration: 2s,
+  $glow-radius: 10px
+) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(
+      45deg,
+      hsla(var(#{$color-var-prefix}-h), var(#{$color-var-prefix}-s), var(#{$color-var-prefix}-l), var(--reactive-pulse-intensity, 0.5)),
+      hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), calc(var(--reactive-pulse-intensity, 0.5) * 0.7)),
+      hsla(var(#{$color-var-prefix}-h), var(#{$color-var-prefix}-s), var(#{$color-var-prefix}-l), var(--reactive-pulse-intensity, 0.5))
+    );
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: exclude;
+    mask-composite: exclude;
+    opacity: 0;
+    animation: reactive-border-pulse $duration ease-in-out infinite;
+    pointer-events: none;
+    filter: blur(1px);
+    will-change: opacity, filter;
+  }
+  
+  &.reactive-active::before {
+    opacity: 1;
+  }
+}
+
+@mixin reactive-glow(
+  $color-var-prefix: '--color-accent-glow',
+  $base-radius: 20px,
+  $spread: 0.5
+) {
+  box-shadow: 
+    0 0 calc($base-radius * var(--reactive-glow-intensity, 0.5))
+    hsla(
+      var(#{$color-var-prefix}-h), 
+      var(#{$color-var-prefix}-s), 
+      var(#{$color-var-prefix}-l), 
+      calc(var(--reactive-glow-intensity, 0.5) * $spread)
+    ),
+    inset 0 0 calc($base-radius * var(--reactive-glow-intensity, 0.5) * 0.5)
+    hsla(
+      var(#{$color-var-prefix}-h), 
+      var(#{$color-var-prefix}-s), 
+      var(#{$color-var-prefix}-l), 
+      calc(var(--reactive-glow-intensity, 0.5) * $spread * 0.3)
+    );
+  transition: box-shadow var.$duration-smooth ease-out;
+}
+
+@mixin reactive-ripple-container() {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: var(--ripple-y, 50%);
+    left: var(--ripple-x, 50%);
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      hsla(
+        var(--color-accent-interactive-h), 
+        var(--color-accent-interactive-s), 
+        calc(var(--color-accent-interactive-l) + 20%), 
+        var(--reactive-ripple-intensity, 0.5)
+      ) 0%,
+      transparent 70%
+    );
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+  }
+  
+  &.ripple-active::after {
+    animation: reactive-ripple-expand 1.2s ease-out forwards;
+  }
+}
+
+// ============================================
+// Reactive Element Classes
+// ============================================
+
+// Main content area reactive container
+.reactive-container {
+  @include reactive-glow();
+  transition: all var.$duration-smooth var.$ease-out-quad;
+  
+  &.state-listening,
+  &.state-transcribing {
+    @include reactive-border-pulse('--color-voice-user', var(--reactive-pulse-duration, 2s));
+  }
+  
+  &.state-thinking {
+    @include reactive-border-pulse('--color-accent-secondary', 3s, 15px);
+  }
+  
+  &.state-responding,
+  &.state-speaking {
+    @include reactive-border-pulse('--color-voice-ai-speaking', var(--reactive-pulse-duration, 1.5s));
+    @include reactive-glow('--color-voice-ai-speaking', 30px, 0.6);
+  }
+}
+
+// Input fields with reactive states
+.reactive-input {
+  @include reactive-ripple-container();
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      var(--gradient-angle, 45deg),
+      hsla(var(--reactive-gradient-start), calc(var(--reactive-intensity, 0.5) * 0.8)),
+      hsla(var(--reactive-gradient-end), calc(var(--reactive-intensity, 0.5) * 0.5)),
+      hsla(var(--reactive-gradient-start), calc(var(--reactive-intensity, 0.5) * 0.8))
+    );
+    background-size: 200% 200%;
+    animation: gradient-shift calc(3s / var(--reactive-gradient-speed, 0.5)) linear infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: exclude;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var.$duration-quick ease-out;
+    pointer-events: none;
+  }
+  
+  &:focus-within::before {
+    opacity: 1;
+  }
+  
+  &.processing::before {
+    animation-duration: calc(1.5s / var(--reactive-gradient-speed, 0.5));
+  }
+}
+
+// Buttons with reactive feedback
+.reactive-button {
+  @include reactive-ripple-container();
+  position: relative;
+  transition: all var.$duration-quick var.$ease-out-quad;
+  
+  &:hover {
+    transform: translateY(-1px);
+    @include reactive-glow('--color-accent-interactive', 15px, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &.pulse-active {
+    animation: button-pulse 0.6s ease-out;
+  }
+}
+
+// Cards with reactive borders
+.reactive-card {
+  @include reactive-border-pulse();
+  @include reactive-glow('--color-accent-primary', 25px, 0.3);
+  
+  &.highlight {
+    --reactive-pulse-intensity: 0.8;
+    --reactive-glow-intensity: 0.7;
+  }
+}
+
+// Message bubbles with reactive states
+.reactive-message {
+  position: relative;
+  transition: all var.$duration-smooth ease-out;
+  
+  &.streaming {
+    @include reactive-border-pulse('--color-accent-secondary', 1s);
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.8) 50%,
+        transparent 100%
+      );
+      animation: scan-line 2s linear infinite;
+    }
+  }
+}
+
+// Voice visualization container
+.reactive-voice-viz {
+  @include reactive-glow('--color-voice-user', 40px, 0.7);
+  
+  &.active {
+    --reactive-glow-intensity: calc(0.5 + var(--voice-amplitude, 0) * 0.5);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: inherit;
+      background: radial-gradient(
+        circle,
+        hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), calc(var(--voice-amplitude, 0) * 0.3)) 0%,
+        transparent 60%
+      );
+      animation: voice-pulse 0.5s ease-out infinite;
+      pointer-events: none;
+    }
+  }
+}
+
+// Header with reactive state
+.reactive-header {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      hsla(var(--reactive-gradient-start), 0) 0%,
+      hsla(var(--reactive-gradient-start), var(--reactive-intensity, 0.5)) 25%,
+      hsla(var(--reactive-gradient-end), var(--reactive-intensity, 0.5)) 75%,
+      hsla(var(--reactive-gradient-end), 0) 100%
+    );
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var.$duration-smooth var.$ease-out-quad;
+  }
+  
+  &.state-active::after {
+    transform: scaleX(1);
+  }
+}
+
+// Neural network effect overlay
+.reactive-neural-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--reactive-neural-activity, 0);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 80%, hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.05) 0%, transparent 50%);
+    animation: neural-shift 20s ease-in-out infinite;
+  }
+}
+
+// ============================================
+// Animation Keyframes
+// ============================================
+
+@keyframes reactive-border-pulse {
+  0%, 100% {
+    opacity: calc(0.3 + var(--reactive-pulse-intensity, 0.5) * 0.4);
+    background-position: 0% 50%;
+    filter: blur(1px);
+  }
+  50% {
+    opacity: calc(0.6 + var(--reactive-pulse-intensity, 0.5) * 0.4);
+    background-position: 100% 50%;
+    filter: blur(0.5px);
+  }
+}
+
+@keyframes reactive-ripple-expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: calc(var(--ripple-size, 500px) * 2);
+    height: calc(var(--ripple-size, 500px) * 2);
+    opacity: 0;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes button-pulse {
+  0% {
+    box-shadow: 0 0 0 0 hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0);
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes voice-pulse {
+  0% {
+    transform: scale(1);
+    opacity: calc(var(--voice-amplitude, 0) * 0.3);
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes neural-shift {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  33% {
+    transform: scale(1.1) rotate(120deg);
+  }
+  66% {
+    transform: scale(0.9) rotate(240deg);
+  }
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+
+// Quick application of reactive effects
+.has-reactive-border {
+  @include reactive-border-pulse();
+}
+
+.has-reactive-glow {
+  @include reactive-glow();
+}
+
+.has-reactive-ripple {
+  @include reactive-ripple-container();
+}
+
+// State-based automatic effects
+[data-reactive-state="listening"] {
+  @include reactive-border-pulse('--color-voice-user');
+  @include reactive-glow('--color-voice-user', 20px);
+}
+
+[data-reactive-state="responding"] {
+  @include reactive-border-pulse('--color-voice-ai-speaking');
+  @include reactive-glow('--color-voice-ai-speaking', 25px);
+}
+
+[data-reactive-state="thinking"] {
+  @include reactive-border-pulse('--color-accent-secondary', 3s);
+  
+  &::before {
+    background-size: 400% 400%;
+    animation-duration: 3s;
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .reactive-container::before,
+  .reactive-input::before,
+  .reactive-button::after,
+  .reactive-card::before,
+  .reactive-message::after,
+  .reactive-voice-viz::before,
+  .reactive-header::after,
+  .reactive-neural-overlay::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .has-reactive-border::before,
+  .has-reactive-glow,
+  .has-reactive-ripple::after {
+    animation: none !important;
+  }
+}

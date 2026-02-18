@@ -1,0 +1,22 @@
+{
+  "$schema": "../../schemas/theme.schema.json",
+  "id": "com.yourname.theme-name",
+  "name": "Your Theme Name",
+  "version": "1.0.0",
+  "description": "Description of your theme's aesthetic",
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "url": "https://your-website.com"
+  },
+  "category": "dark",
+  "tags": ["dark", "modern", "your-tags"],
+  "compatibility": {
+    "codexViewer": {
+      "minimum": "1.0.0"
+    }
+  },
+  "preview": "preview.png",
+  "verified": false
+}
+

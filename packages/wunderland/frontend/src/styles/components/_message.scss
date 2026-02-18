@@ -1,0 +1,638 @@
+// File: frontend/src/styles/components/_message.scss
+/**
+ * @file _message.scss
+ * @version 3.0.0
+ * @description Enhanced styles for Message.vue with character-level animations,
+ * living text effects, and theme-specific treatments. Implements organic
+ * conversation flow with "Her"-inspired aesthetics and terminal variants.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+// -----------------------------------------------------------------------------
+// Message Container with State Effects
+// -----------------------------------------------------------------------------
+.message-container-ephemeral {
+  position: relative;
+  margin-bottom: var.$spacing-md;
+  animation: messageAppear 0.5s var.$ease-out-cubic forwards;
+  opacity: 0;
+  transform: translateY(10px);
+  
+  @keyframes messageAppear {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  // Group messages from same sender
+  &.is-grouped {
+    margin-bottom: var.$spacing-xs;
+    
+    .message-bubble-ephemeral {
+      border-radius: var(--radius-lg, var.$radius-lg) var(--radius-xl, var.$radius-xl) var(--radius-xl, var.$radius-xl) var(--radius-lg, var.$radius-lg);
+    }
+    
+    &.message-user .message-bubble-ephemeral {
+      border-radius: var(--radius-xl, var.$radius-xl) var(--radius-lg, var.$radius-lg) var(--radius-lg, var.$radius-lg) var(--radius-xl, var.$radius-xl);
+    }
+  }
+  
+  // Living aura for recent messages
+  &.message-recent {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: var(--radius-xl, var.$radius-xl);
+      background: radial-gradient(
+        ellipse at center,
+        hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.1) 0%,
+        transparent 70%
+      );
+      opacity: 0;
+      animation: messageAura 3s var.$ease-in-out-sine;
+      pointer-events: none;
+      
+      @keyframes messageAura {
+        0%, 100% {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    }
+  }
+  
+  // Streaming state with wave effect
+  &.message-streaming {
+    .message-bubble-ephemeral {
+      position: relative;
+      overflow: hidden;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.2),
+          transparent
+        );
+        animation: streamWave 2s linear infinite;
+        
+        @keyframes streamWave {
+          to {
+            left: 100%;
+          }
+        }
+      }
+    }
+  }
+  
+  // Error state
+  &.message-error {
+    animation-name: messageErrorShake;
+    
+    @keyframes messageErrorShake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-2px);
+      }
+      20%, 40%, 60%, 80% {
+        transform: translateX(2px);
+      }
+    }
+    
+    .message-bubble-ephemeral {
+      background-color: hsla(
+        var(--color-error-h),
+        var(--color-error-s),
+        calc(var(--color-error-l) * 0.2),
+        0.1
+      );
+      border-color: hsla(var(--color-error-h), var(--color-error-s), var(--color-error-l), 0.5);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Message Layout (User vs Assistant)
+// -----------------------------------------------------------------------------
+.message-wrapper-ephemeral {
+  display: flex;
+  align-items: flex-start;
+  gap: var.$spacing-sm;
+  max-width: 85%;
+  
+  @media (min-width: var.$breakpoint-md) {
+    max-width: 75%;
+  }
+  
+  // User messages align right
+  .message-user & {
+    margin-left: auto;
+    flex-direction: row-reverse;
+  }
+  
+  // Assistant messages align left
+  .message-assistant & {
+    margin-right: auto;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Avatar with State Indicators
+// -----------------------------------------------------------------------------
+.message-avatar-ephemeral {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full, var.$radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform var.$duration-quick var.$ease-out-cubic;
+  
+  // User avatar
+  .message-user & {
+    background: linear-gradient(
+      135deg,
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.9),
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), calc(var(--color-voice-user-l) * 0.8), 0.9)
+    );
+    color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  }
+  
+  // Assistant avatar
+  .message-assistant & {
+    background: linear-gradient(
+      135deg,
+      hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.9),
+      hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) * 0.8), 0.9)
+    );
+    color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+    
+    // Thinking indicator
+    &.avatar-thinking {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+        animation: avatarThinking 1s linear infinite;
+        
+        @keyframes avatarThinking {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      }
+    }
+  }
+  
+  .avatar-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .avatar-letter {
+    font-weight: 600;
+    font-size: var.$font-size-sm;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Message Bubble with Dynamic Content
+// -----------------------------------------------------------------------------
+.message-bubble-ephemeral {
+  background-color: hsla(
+    var(--color-bg-secondary-h),
+    var(--color-bg-secondary-s),
+    var(--color-bg-secondary-l),
+    0.9
+  );
+  border: 1px solid hsla(
+    var(--color-border-secondary-h),
+    var(--color-border-secondary-s),
+    var(--color-border-secondary-l),
+    0.5
+  );
+  border-radius: var(--radius-xl, var.$radius-xl);
+  padding: var.$spacing-md var.$spacing-lg;
+  position: relative;
+  overflow: hidden;
+  transition: all var.$duration-quick var.$ease-out-cubic;
+  
+  // User message styling
+  .message-user & {
+    background: linear-gradient(
+      135deg,
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), calc(var(--color-voice-user-l) * 0.15), 0.9),
+      hsla(var(--color-voice-user-h), var(--color-voice-user-s), calc(var(--color-voice-user-l) * 0.1), 0.9)
+    );
+    border-color: hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), 0.3);
+    color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+  }
+  
+  // Assistant message styling
+  .message-assistant & {
+    background-color: hsla(
+      var(--color-bg-secondary-h),
+      var(--color-bg-secondary-s),
+      calc(var(--color-bg-secondary-l) * 1.05),
+      0.95
+    );
+  }
+  
+  // Hover effect
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 12px hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l), 0.1),
+      0 2px 4px hsla(var(--shadow-color-h), var(--shadow-color-s), var(--shadow-color-l), 0.05);
+    
+    .message-metadata-ephemeral {
+      opacity: 1;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Message Content with Text Animation
+// -----------------------------------------------------------------------------
+.message-content-ephemeral {
+  position: relative;
+  word-wrap: break-word;
+  line-height: 1.6;
+  
+  // Character animation container
+  .char-animate-wrapper {
+    display: inline;
+    
+    .char {
+      display: inline-block;
+      opacity: 0;
+      transform-origin: center bottom;
+      animation: charBloom var(--char-duration, 50ms) var(--char-delay) var.$ease-out-cubic forwards;
+      
+      // Special effects for punctuation
+      &.char-punctuation {
+        animation-name: charPunctuationPop;
+      }
+      
+      // Spaces need special handling
+      &.char-space {
+        width: 0.25em;
+        animation: none;
+        opacity: 1;
+      }
+      
+      // Code characters get different animation
+      &.char-code {
+        font-family: var(--font-family-mono, var.$font-family-mono);
+        animation-name: charCodeReveal;
+      }
+    }
+  }
+  
+  // Word animation container
+  .word-animate-wrapper {
+    .word {
+      display: inline-block;
+      opacity: 0;
+      margin-right: 0.25em;
+      animation: wordMaterialize var(--word-duration, 150ms) var(--word-delay) var.$ease-out-quint forwards;
+      
+      // Emphasized words get special treatment
+      &.word-emphasis {
+        animation-name: wordMaterializeEmphasis;
+      }
+    }
+  }
+  
+  // Line animation (for code blocks)
+  .line-animate-wrapper {
+    .line {
+      display: block;
+      opacity: 0;
+      transform-origin: left center;
+      animation: lineCascade var(--line-duration, 300ms) var(--line-delay) var.$ease-out-cubic forwards;
+      position: relative;
+      
+      // Line numbers for code
+      &.has-line-number {
+        padding-left: 3em;
+        
+        &::before {
+          content: attr(data-line-number);
+          position: absolute;
+          left: 0;
+          color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+          font-size: 0.85em;
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+  
+  // Living text effects for recent messages
+  &.text-living {
+    .char,
+    .word {
+      animation: textBreathe 4s var.$ease-in-out-sine infinite;
+      animation-delay: calc(var(--index) * 100ms);
+    }
+  }
+  
+  // Markdown content styling
+  p {
+    margin-bottom: var.$spacing-sm;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  code {
+    @include mixins.glassmorphic-pane(
+      '--color-bg-code-inline',
+      '--color-border-code-inline',
+      '--blur-code',
+      '--shadow-depth-xs'
+    );
+    padding: 0.2em 0.4em;
+    font-size: 0.9em;
+  }
+  
+  pre {
+    margin: var.$spacing-sm 0;
+    
+    code {
+      display: block;
+      padding: var.$spacing-md;
+      overflow-x: auto;
+      
+      @include mixins.custom-scrollbar(
+        '--color-accent-secondary',
+        0.3,
+        0.5,
+        '--color-bg-code-block',
+        0.1,
+        4px
+      );
+    }
+  }
+  
+  // Links with hover animation
+  a {
+    color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+    text-decoration: none;
+    position: relative;
+    transition: color var.$duration-quick var.$ease-out-quad;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+      transition: width var.$duration-quick var.$ease-out-cubic;
+    }
+    
+    &:hover {
+      color: hsl(var(--color-accent-interactive-h), calc(var(--color-accent-interactive-s) + 10%), calc(var(--color-accent-interactive-l) + 10%));
+      
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Special Animation Variants
+// -----------------------------------------------------------------------------
+
+// Punctuation pop animation
+@keyframes charPunctuationPop {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(180deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5) rotate(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+// Code reveal animation
+@keyframes charCodeReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scaleY(0);
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(0) scaleY(1.2);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    filter: blur(0);
+  }
+}
+
+// Emphasized word animation
+@keyframes wordMaterializeEmphasis {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+    filter: blur(8px);
+    text-shadow: 0 0 20px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-5px) scale(1.1);
+    filter: blur(2px);
+    text-shadow: 0 0 15px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    text-shadow: 0 0 5px hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.4);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Message Metadata
+// -----------------------------------------------------------------------------
+.message-metadata-ephemeral {
+  display: flex;
+  align-items: center;
+  gap: var.$spacing-sm;
+  margin-top: var.$spacing-xs;
+  font-size: var.$font-size-xs;
+  color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+  opacity: 0.7;
+  transition: opacity var.$duration-quick var.$ease-out-quad;
+  
+  .metadata-time {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-xs;
+    
+    .time-icon {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+  }
+  
+  .metadata-model {
+    padding: 2px 6px;
+    background-color: hsla(
+      var(--color-bg-tertiary-h),
+      var(--color-bg-tertiary-s),
+      var(--color-bg-tertiary-l),
+      0.5
+    );
+    border-radius: var(--radius-sm, var.$radius-sm);
+    font-family: var(--font-family-mono, var.$font-family-mono);
+    font-size: 0.75em;
+  }
+  
+  .metadata-tokens {
+    display: flex;
+    align-items: center;
+    gap: var.$spacing-xs;
+    
+    .token-icon {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Terminal Theme Overrides
+// -----------------------------------------------------------------------------
+.theme-terminus-dark,
+.theme-terminus-light {
+  .message-bubble-ephemeral {
+    border-radius: 0;
+    border-width: 1px;
+    background: none;
+    border-style: solid;
+    position: relative;
+    
+    // Terminal box drawing
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border: 1px solid hsl(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l));
+    }
+    
+    &::before {
+      top: -1px;
+      left: -1px;
+      border-right: none;
+      border-bottom: none;
+    }
+    
+    &::after {
+      bottom: -1px;
+      right: -1px;
+      border-left: none;
+      border-top: none;
+    }
+  }
+  
+  .message-content-ephemeral {
+    font-family: var(--font-family-mono);
+    
+    .char {
+      animation: terminalCharType 0s var(--char-delay) steps(1) forwards;
+      text-shadow: var(--text-shadow-phosphor);
+      
+      @keyframes terminalCharType {
+        to {
+          opacity: 1;
+        }
+      }
+    }
+    
+    // Terminal cursor effect
+    &.is-typing::after {
+      content: '█';
+      color: hsl(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l));
+      animation: terminalCursorBlink var(--terminal-cursor-blink) steps(1) infinite;
+      margin-left: 2px;
+    }
+  }
+  
+  // ASCII decorations
+  .message-avatar-ephemeral {
+    border-radius: 0;
+    background: none;
+    border: 1px solid hsl(var(--color-phosphor-h), var(--color-phosphor-s), var(--color-phosphor-l));
+    font-family: monospace;
+    
+    &::before {
+      content: '[';
+      position: absolute;
+      left: -8px;
+      color: hsl(var(--color-phosphor-h), var(--color-phosphor-s), calc(var(--color-phosphor-l) * 0.7));
+    }
+    
+    &::after {
+      content: ']';
+      position: absolute;
+      right: -8px;
+      color: hsl(var(--color-phosphor-h), var(--color-phosphor-s), calc(var(--color-phosphor-l) * 0.7));
+    }
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .message-container-ephemeral {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .char,
+  .word,
+  .line {
+    animation-duration: 0.01ms !important;
+    opacity: 1 !important;
+  }
+}

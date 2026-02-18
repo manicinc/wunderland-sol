@@ -1,0 +1,6 @@
+id: openstrand-schema
+title: Schema Reference
+summary: Authoritative definitions for weaves, looms, strands, and metadata.
+tags: [schema, reference]
+defaultStrand: hierarchy
+

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.channels.webchat",
+  "name": "WebChat Channel Extension",
+  "version": "0.1.0",
+  "description": "Lightweight web chat channel adapter — delegates to WunderlandGateway (Socket.IO) for transport. No external SDK required.",
+  "categories": ["channel", "communication"],
+  "platforms": ["webchat"],
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "webchatChannelSendMessage",
+      "displayName": "Send WebChat Message"
+    },
+    {
+      "kind": "messaging-channel",
+      "id": "webchatChannel",
+      "displayName": "WebChat Channel Adapter"
+    }
+  ],
+  "requiredSecrets": [],
+  "features": [
+    "Text messages",
+    "Image attachments",
+    "Typing indicators",
+    "Read receipts",
+    "Gateway-bridged transport via WunderlandGateway",
+    "No external SDK dependencies"
+  ]
+}

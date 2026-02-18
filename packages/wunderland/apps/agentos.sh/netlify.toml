@@ -1,0 +1,92 @@
+# Redirects for non-locale paths to default English locale
+[[redirects]]
+  from = "/docs"
+  to = "/en/docs/"
+  status = 301
+
+[[redirects]]
+  from = "/docs/*"
+  to = "/en/docs/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/about"
+  to = "/en/about/"
+  status = 301
+
+[[redirects]]
+  from = "/faq"
+  to = "/en/faq/"
+  status = 301
+
+[[redirects]]
+  from = "/blog"
+  to = "/en/blog/"
+  status = 301
+
+[[redirects]]
+  from = "/blog/*"
+  to = "/en/blog/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/careers"
+  to = "/en/careers/"
+  status = 301
+
+[[redirects]]
+  from = "/careers/*"
+  to = "/en/careers/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/legal"
+  to = "/en/legal/"
+  status = 301
+
+[[redirects]]
+  from = "/legal/*"
+  to = "/en/legal/:splat"
+  status = 301
+
+# Root path to English homepage
+[[redirects]]
+  from = "/"
+  to = "/en/"
+  status = 301
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+# Proxy TypeDoc API docs from GitHub Pages
+[[redirects]]
+  from = "/docs-generated/library/*"
+  to = "https://framersai.github.io/agentos/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/docs-generated/api/*"
+  to = "https://framersai.github.io/agentos/api/:splat"
+  status = 200
+  force = true

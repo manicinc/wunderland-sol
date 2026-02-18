@@ -1,0 +1,100 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.provenance.anchor-providers",
+  "name": "Provenance Anchor Providers",
+  "version": "1.0.0",
+  "description": "External anchor providers for the AgentOS provenance system — WORM storage, transparency logs, and blockchain timestamping",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": [
+    "provenance",
+    "anchor",
+    "blockchain",
+    "ethereum",
+    "opentimestamps",
+    "rekor",
+    "sigstore",
+    "worm",
+    "s3-object-lock",
+    "transparency-log",
+    "tamper-evidence"
+  ],
+  "agentosVersion": "^0.1.0",
+  "categories": ["provenance", "enterprise"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "extensions": [
+    {
+      "kind": "provenance",
+      "id": "wormSnapshotProvider",
+      "displayName": "WORM Snapshot Provider",
+      "description": "S3 Object Lock / WORM storage for compliance-grade anchor archival",
+      "entry": "./dist/providers/WormSnapshotProvider.js",
+      "proofLevel": "externally-archived"
+    },
+    {
+      "kind": "provenance",
+      "id": "rekorProvider",
+      "displayName": "Rekor Transparency Log Provider",
+      "description": "Sigstore Rekor transparency log for publicly auditable anchor records",
+      "entry": "./dist/providers/RekorProvider.js",
+      "proofLevel": "publicly-auditable"
+    },
+    {
+      "kind": "provenance",
+      "id": "openTimestampsProvider",
+      "displayName": "OpenTimestamps Provider",
+      "description": "Bitcoin-anchored timestamping via the OpenTimestamps protocol",
+      "entry": "./dist/providers/OpenTimestampsProvider.js",
+      "proofLevel": "publicly-timestamped"
+    },
+    {
+      "kind": "provenance",
+      "id": "ethereumProvider",
+      "displayName": "Ethereum On-Chain Anchor Provider",
+      "description": "Ethereum on-chain anchor with transaction receipt and finalized block proof",
+      "entry": "./dist/providers/EthereumProvider.js",
+      "proofLevel": "publicly-timestamped"
+    },
+    {
+      "kind": "provenance",
+      "id": "solanaProvider",
+      "displayName": "Solana On-Chain Anchor Provider",
+      "description": "Solana on-chain anchor via the Wunderland program (content hash + manifest hash)",
+      "entry": "./dist/providers/SolanaProvider.js",
+      "proofLevel": "publicly-timestamped"
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "provider.type": {
+        "type": "string",
+        "enum": ["none", "worm-snapshot", "rekor", "opentimestamps", "ethereum", "solana", "composite"],
+        "default": "none",
+        "description": "Which anchor provider to use for external publishing"
+      },
+      "provider.endpoint": {
+        "type": "string",
+        "description": "Provider endpoint URL (e.g., Rekor server, Ethereum RPC)"
+      },
+      "provider.timeoutMs": {
+        "type": "number",
+        "default": 30000,
+        "description": "Request timeout in milliseconds"
+      },
+      "provider.retries": {
+        "type": "number",
+        "default": 3,
+        "minimum": 0,
+        "maximum": 10,
+        "description": "Number of retries on transient failures"
+      }
+    }
+  }
+}

@@ -1,0 +1,723 @@
+// Admin dashboard styles - Holographic Brutalist
+@use '../styles/main.scss' as *;
+
+// ============================================================================
+// LAYOUT
+// ============================================================================
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ============================================================================
+// SIDEBAR
+// ============================================================================
+
+.sidebar {
+    background: $void-deep;
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    padding: $sp-6;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+
+    @media (max-width: 1024px) {
+        display: none;
+    }
+
+    &__brand {
+        display: flex;
+        align-items: center;
+        gap: $sp-3;
+        margin-bottom: $sp-8;
+        padding-bottom: $sp-6;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    &__logo {
+        width: 36px;
+        height: 36px;
+        @include neumorphic-panel;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: $gradient-holographic;
+            opacity: 0.4;
+            z-index: -1;
+            filter: blur(3px);
+        }
+
+        span {
+            font-family: $font-display;
+            font-weight: 700;
+            font-size: 1rem;
+            @include holographic-text;
+        }
+    }
+
+    &__name {
+        font-family: $font-display;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    &__section {
+        margin-bottom: $sp-6;
+    }
+
+    &__section-title {
+        @include mono-text;
+        font-size: 0.625rem;
+        color: $text-dim;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin-bottom: $sp-3;
+    }
+
+    &__nav {
+        display: flex;
+        flex-direction: column;
+        gap: $sp-1;
+    }
+
+    &__link {
+        display: flex;
+        align-items: center;
+        gap: $sp-3;
+        padding: $sp-3 $sp-4;
+        font-family: $font-mono;
+        font-size: 0.8125rem;
+        color: $text-muted;
+        border-radius: $radius-md;
+        transition: all $transition-base;
+        border-left: 2px solid transparent;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: $text-pure;
+        }
+
+        &--active {
+            background: rgba($holo-cyan, 0.08);
+            color: $holo-cyan;
+            border-left-color: $holo-cyan;
+            box-shadow: 0 0 20px rgba($holo-cyan, 0.05);
+        }
+    }
+
+    &__footer {
+        position: absolute;
+        bottom: $sp-6;
+        left: $sp-6;
+        right: $sp-6;
+    }
+}
+
+// ============================================================================
+// MAIN CONTENT
+// ============================================================================
+
+.admin-main {
+    padding: $sp-8;
+    background: $void-abyss;
+    min-height: 100vh;
+    position: relative;
+
+    &::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba($text-dim, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba($text-dim, 0.02) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    >* {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+// ============================================================================
+// PAGE HEADER
+// ============================================================================
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $sp-8;
+    padding-bottom: $sp-6;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+    &__title {
+        @include brutalist-heading;
+        font-size: 1.75rem;
+        @include holographic-text;
+    }
+
+    &__subtitle {
+        @include mono-text;
+        color: $text-dim;
+        margin-top: $sp-2;
+    }
+
+    &__actions {
+        display: flex;
+        gap: $sp-3;
+    }
+}
+
+// ============================================================================
+// STATS GRID
+// ============================================================================
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $sp-5;
+    margin-bottom: $sp-8;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    @include neumorphic-panel;
+    padding: $sp-5;
+    position: relative;
+    overflow: hidden;
+    transition: all $transition-base;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: $gradient-holographic;
+        opacity: 0.5;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-neumorphic-float;
+    }
+
+    &--cyan::before {
+        background: $holo-cyan;
+        opacity: 1;
+    }
+
+    &--gold::before {
+        background: $holo-gold;
+        opacity: 1;
+    }
+
+    &--emerald::before {
+        background: $holo-emerald;
+        opacity: 1;
+    }
+
+    &--coral::before {
+        background: $holo-coral;
+        opacity: 1;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: $sp-3;
+    }
+
+    &__label {
+        @include mono-text;
+        font-size: 0.625rem;
+        color: $text-dim;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    &__icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $text-dim;
+    }
+
+    &__value {
+        font-family: $font-display;
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1;
+        @include holographic-text;
+        margin-bottom: $sp-2;
+    }
+
+    &__delta {
+        @include mono-text;
+        font-size: 0.6875rem;
+
+        &--up {
+            color: $holo-emerald;
+        }
+
+        &--down {
+            color: $holo-coral;
+        }
+
+        &--neutral {
+            color: $text-dim;
+        }
+    }
+}
+
+// ============================================================================
+// SECTIONS
+// ============================================================================
+
+.section {
+    margin-bottom: $sp-8;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $sp-4;
+    }
+
+    &__title {
+        font-family: $font-display;
+        font-size: 1.125rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+}
+
+// ============================================================================
+// DATA TABLE
+// ============================================================================
+
+.data-table {
+    width: 100%;
+    @include neumorphic-panel;
+    overflow: hidden;
+
+    &__header {
+        display: grid;
+        padding: $sp-4;
+        background: $void-raised;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        @include mono-text;
+        font-size: 0.625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: $text-dim;
+    }
+
+    &__row {
+        display: grid;
+        padding: $sp-4;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        align-items: center;
+        transition: background $transition-base;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        &--clickable {
+            cursor: pointer;
+
+            &:hover {
+                background: rgba($holo-cyan, 0.03);
+            }
+        }
+    }
+
+    &__cell {
+        font-size: 0.875rem;
+
+        &--mono {
+            @include mono-text;
+            font-size: 0.75rem;
+            color: $text-muted;
+        }
+
+        &--bold {
+            font-weight: 500;
+        }
+    }
+
+    &__empty {
+        padding: $sp-12;
+        text-align: center;
+        color: $text-dim;
+    }
+}
+
+.task-table {
+
+    &__header,
+    &__row {
+        grid-template-columns: 1fr 120px 100px 100px 80px 80px;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 1fr 100px 100px;
+        }
+    }
+}
+
+// ============================================================================
+// RISK INDICATOR
+// ============================================================================
+
+.risk-indicator {
+    display: flex;
+    align-items: center;
+    gap: $sp-2;
+
+    &__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+
+        &--low {
+            background: $holo-emerald;
+            box-shadow: 0 0 8px rgba($holo-emerald, 0.5);
+        }
+
+        &--medium {
+            background: $holo-gold;
+            box-shadow: 0 0 8px rgba($holo-gold, 0.5);
+        }
+
+        &--high {
+            background: $holo-coral;
+            box-shadow: 0 0 8px rgba($holo-coral, 0.5);
+        }
+
+        &--critical {
+            background: $holo-coral;
+            box-shadow: 0 0 12px rgba($holo-coral, 0.6);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    }
+
+    &__label {
+        @include mono-text;
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 12px rgba($holo-coral, 0.6);
+    }
+
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 20px rgba($holo-coral, 0.8);
+    }
+}
+
+// ============================================================================
+// FILTERS
+// ============================================================================
+
+.filters {
+    display: flex;
+    gap: $sp-4;
+    margin-bottom: $sp-6;
+    flex-wrap: wrap;
+
+    &__search {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+        max-width: 400px;
+
+        &-icon {
+            position: absolute;
+            left: $sp-4;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-dim;
+        }
+
+        &-input {
+            width: 100%;
+            @include neumorphic-inset;
+            padding: $sp-3 $sp-4 $sp-3 $sp-10;
+            font-family: $font-mono;
+            font-size: 0.8125rem;
+            color: $text-pure;
+            border: 1px solid transparent;
+            outline: none;
+            transition: all $transition-base;
+
+            &::placeholder {
+                color: $text-dim;
+            }
+
+            &:focus {
+                border-color: rgba($holo-cyan, 0.3);
+                box-shadow: 0 0 20px rgba($holo-cyan, 0.08);
+            }
+        }
+    }
+
+    &__select {
+        @include neumorphic-inset;
+        padding: $sp-3 $sp-4;
+        font-family: $font-mono;
+        font-size: 0.8125rem;
+        color: $text-pure;
+        border: 1px solid transparent;
+        outline: none;
+        cursor: pointer;
+        min-width: 140px;
+        transition: all $transition-base;
+
+        &:focus {
+            border-color: rgba($holo-cyan, 0.3);
+        }
+
+        option {
+            background: $void-elevated;
+        }
+    }
+}
+
+// ============================================================================
+// BULK ACTIONS
+// ============================================================================
+
+.bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: $sp-4;
+    padding: $sp-4;
+    @include neumorphic-panel;
+    margin-bottom: $sp-4;
+
+    &__count {
+        @include mono-text;
+        color: $text-muted;
+    }
+
+    &__buttons {
+        display: flex;
+        gap: $sp-2;
+        margin-left: auto;
+    }
+}
+
+// ============================================================================
+// MODAL
+// ============================================================================
+
+.modal {
+    &-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba($void-abyss, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: $sp-6;
+    }
+
+    &-content {
+        @include neumorphic-panel;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: $gradient-holographic;
+        }
+    }
+
+    &-header {
+        padding: $sp-6;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+        &__title {
+            font-family: $font-display;
+            font-size: 1.125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        &__description {
+            @include mono-text;
+            color: $text-muted;
+            margin-top: $sp-2;
+        }
+    }
+
+    &-body {
+        padding: $sp-6;
+    }
+
+    &-footer {
+        padding: $sp-4 $sp-6;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+        display: flex;
+        justify-content: flex-end;
+        gap: $sp-3;
+    }
+}
+
+// ============================================================================
+// TOAST
+// ============================================================================
+
+.toast {
+    position: fixed;
+    bottom: $sp-6;
+    right: $sp-6;
+    z-index: 200;
+    @include neumorphic-panel;
+    padding: $sp-4 $sp-6;
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+    min-width: 300px;
+
+    &--success {
+        border-left: 3px solid $holo-emerald;
+        box-shadow: $shadow-neumorphic-up, 0 0 30px rgba($holo-emerald, 0.1);
+    }
+
+    &--error {
+        border-left: 3px solid $holo-coral;
+        box-shadow: $shadow-neumorphic-up, 0 0 30px rgba($holo-coral, 0.1);
+    }
+
+    &--info {
+        border-left: 3px solid $holo-cyan;
+        box-shadow: $shadow-neumorphic-up, 0 0 30px rgba($holo-cyan, 0.1);
+    }
+
+    &__message {
+        font-size: 0.875rem;
+        flex: 1;
+    }
+
+    &__close {
+        color: $text-dim;
+        cursor: pointer;
+        transition: color $transition-base;
+
+        &:hover {
+            color: $text-pure;
+        }
+    }
+}
+
+// ============================================================================
+// CHECKBOX
+// ============================================================================
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    @include neumorphic-inset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all $transition-base;
+
+    &:hover {
+        border-color: rgba($holo-cyan, 0.3);
+    }
+
+    &--checked {
+        background: $holo-cyan;
+        border-color: $holo-cyan;
+        box-shadow: 0 0 12px rgba($holo-cyan, 0.3);
+
+        svg {
+            color: $void-abyss;
+        }
+    }
+}
+
+// ============================================================================
+// QUEUE TABLE
+// ============================================================================
+
+.queue-table {
+
+    &__header,
+    &__row {
+        grid-template-columns: 32px 1fr 110px 90px 90px 60px 70px;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: 32px 1fr 100px 80px;
+        }
+    }
+}
+
+// ============================================================================
+// DIVIDER
+// ============================================================================
+
+.divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+}

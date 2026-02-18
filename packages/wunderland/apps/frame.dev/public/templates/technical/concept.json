@@ -1,0 +1,82 @@
+{
+  "id": "concept",
+  "name": "Concept Explanation",
+  "category": "technical",
+  "icon": "Lightbulb",
+  "description": "Explain a concept, theory, principle, or abstract idea with clarity",
+  "shortDescription": "Deep dive into concepts and ideas",
+  "difficulty": "intermediate",
+  "estimatedTime": "20 min",
+  "tags": ["concept", "explanation", "theory", "education"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 90,
+  "defaultData": {
+    "contentType": "concept"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Concept Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "What concept are you explaining?"
+    },
+    {
+      "name": "summary",
+      "label": "One-Line Summary",
+      "type": "text",
+      "required": true,
+      "placeholder": "Explain this concept in one sentence"
+    },
+    {
+      "name": "difficulty",
+      "label": "Difficulty Level",
+      "type": "select",
+      "required": true,
+      "options": ["beginner", "intermediate", "advanced"],
+      "defaultValue": "intermediate"
+    },
+    {
+      "name": "prerequisites",
+      "label": "Prerequisites",
+      "type": "tags",
+      "required": false,
+      "placeholder": "What should readers know first?"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Related topics"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title", "summary"],
+    "optional": ["tags", "difficulty", "prerequisites", "contentType", "relatedConcepts"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ndifficulty: {difficulty}\ncontentType: concept\nprerequisites: [{prerequisites}]\n---\n\n# {title}\n\n> {summary}\n\n## What is {title}?\n\nProvide a clear, accessible definition. Start simple, then add nuance.\n\n**In essence:** [One sentence core idea]\n\n## Why Does It Matter?\n\nExplain the significance and real-world relevance:\n\n- **Practical Application**: How is this used?\n- **Problem It Solves**: What challenge does it address?\n- **Impact**: Why should someone care?\n\n## Key Principles\n\n### Principle 1: [Name]\n\nDetailed explanation...\n\n### Principle 2: [Name]\n\nDetailed explanation...\n\n### Principle 3: [Name]\n\nDetailed explanation...\n\n## How It Works\n\nBreak down the mechanics or underlying process:\n\n```\n[Optional: diagram, code, or visual representation]\n```\n\n1. **Step/Phase 1**: Description\n2. **Step/Phase 2**: Description\n3. **Step/Phase 3**: Description\n\n## Examples\n\n### Example 1: [Simple Case]\n\nConcrete illustration for beginners...\n\n### Example 2: [Real-World Application]\n\nPractical scenario demonstrating the concept...\n\n### Example 3: [Edge Case or Advanced]\n\nMore nuanced application...\n\n## Common Misconceptions\n\n| Misconception | Reality |\n|---------------|----------|\n| \"It's just...\" | Actually, it's... |\n| \"You need X to...\" | In fact, you can... |\n\n## Comparison with Related Concepts\n\n| Aspect | {title} | Alternative |\n|--------|---------|-------------|\n| Purpose | ... | ... |\n| When to Use | ... | ... |\n| Tradeoffs | ... | ... |\n\n## Deep Dive Resources\n\n- **Beginner**: [Resource name](#)\n- **Intermediate**: [Resource name](#)\n- **Advanced**: [Resource name](#)\n\n## Summary\n\n**Key Takeaways:**\n1. Main point 1\n2. Main point 2\n3. Main point 3\n\n## Related Concepts\n\n- [[Related Concept 1]]\n- [[Related Concept 2]]\n- [[Related Concept 3]]\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

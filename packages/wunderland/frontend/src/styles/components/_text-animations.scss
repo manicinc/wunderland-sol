@@ -1,0 +1,416 @@
+// File: frontend/src/styles/components/_text-animations.scss
+/**
+ * @file _text-animations.scss
+ * @description Enhanced text reveal animations with multiple styles
+ * Integrates with reactive store for dynamic, state-driven text effects
+ * @version 1.0.0
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+// ============================================
+// Text Animation Base Classes
+// ============================================
+
+.text-unit {
+  &-char, &-word, &-line {
+    display: inline-block;
+    will-change: opacity, transform, filter;
+    backface-visibility: hidden;
+    animation-fill-mode: both;
+  }
+  
+  &-char {
+    // Preserve spacing for characters
+    &.whitespace {
+      width: 0.3em;
+    }
+  }
+  
+  &-word {
+    // Preserve spacing between words
+    &.whitespace {
+      width: 0.25em;
+    }
+  }
+  
+  &-line {
+    display: block;
+    width: 100%;
+  }
+}
+
+// Special character styling
+.punctuation {
+  color: hsl(var(--color-text-secondary-h), var(--color-text-secondary-s), var(--color-text-secondary-l));
+}
+
+.number {
+  color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+  font-weight: 600;
+}
+
+.code {
+  font-family: var.$font-family-mono;
+  background: hsla(var(--color-bg-code-inline-h), var(--color-bg-code-inline-s), var(--color-bg-code-inline-l), 0.3);
+  padding: 0.1em 0.2em;
+  border-radius: var.$radius-xs;
+}
+
+.emphasis {
+  font-weight: 700;
+  color: hsl(var(--color-text-accent-h), var(--color-text-accent-s), var(--color-text-accent-l));
+}
+
+// ============================================
+// Animation Styles
+// ============================================
+
+// Organic - Natural fade and bloom
+.animate-text-organic {
+  animation: text-organic 0.6s var.$ease-out-quart;
+  
+  @keyframes text-organic {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) scale(0.9);
+      filter: blur(4px);
+    }
+    50% {
+      opacity: 0.7;
+      transform: translateY(5px) scale(0.95);
+      filter: blur(2px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+}
+
+// Digital - Glitch and snap
+.animate-text-digital {
+  animation: text-digital 0.4s steps(4, end);
+  
+  @keyframes text-digital {
+    0% {
+      opacity: 0;
+      transform: translateX(-5px) scaleX(0.8);
+      text-shadow: -2px 0 #ff0080, 2px 0 #00ff00;
+    }
+    25% {
+      opacity: 0.3;
+      transform: translateX(3px) scaleX(1.1);
+      text-shadow: -1px 0 #ff0080, 1px 0 #00ff00;
+    }
+    50% {
+      opacity: 0.6;
+      transform: translateX(-2px) scaleX(0.95);
+      text-shadow: -1px 0 #ff0080, 1px 0 #00ff00;
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scaleX(1);
+      text-shadow: none;
+    }
+  }
+}
+
+// Quantum - Phase in with particles
+.animate-text-quantum {
+  animation: text-quantum 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  
+  @keyframes text-quantum {
+    0% {
+      opacity: 0;
+      transform: scale(0) rotate(180deg);
+      filter: hue-rotate(180deg) brightness(2);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.2) rotate(90deg);
+      filter: hue-rotate(90deg) brightness(1.5);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      filter: hue-rotate(0deg) brightness(1);
+    }
+  }
+  
+  &.with-particles::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, 
+      hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.8) 0%,
+      transparent 70%
+    );
+    animation: quantum-particle 0.6s ease-out forwards;
+    pointer-events: none;
+  }
+  
+  @keyframes quantum-particle {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(20);
+      opacity: 0;
+    }
+  }
+}
+
+// Terminal - Typewriter with cursor
+.animate-text-terminal {
+  animation: text-terminal 0.1s steps(1, end);
+  position: relative;
+  
+  @keyframes text-terminal {
+    0% {
+      opacity: 0;
+      color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) + 20%));
+    }
+    100% {
+      opacity: 1;
+      color: inherit;
+    }
+  }
+  
+  &::after {
+    content: '▋';
+    position: absolute;
+    right: -0.5em;
+    top: 0;
+    color: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+    animation: terminal-cursor 0.5s steps(2, start) infinite;
+  }
+  
+  &:not(:last-child)::after {
+    display: none;
+  }
+  
+  @keyframes terminal-cursor {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+}
+
+// Cascade - Waterfall effect
+.animate-text-cascade {
+  animation: text-cascade 0.5s var.$ease-out-cubic;
+  transform-origin: top center;
+  
+  @keyframes text-cascade {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px) scaleY(0.5);
+      filter: blur(2px);
+    }
+    40% {
+      opacity: 0.6;
+      transform: translateY(-5px) scaleY(0.8);
+      filter: blur(1px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scaleY(1);
+      filter: blur(0);
+    }
+  }
+  
+  &.with-trail {
+    &::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 1px;
+      height: 20px;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.6) 100%
+      );
+      animation: cascade-trail 0.3s ease-out forwards;
+      animation-delay: inherit;
+      pointer-events: none;
+    }
+  }
+  
+  @keyframes cascade-trail {
+    0% {
+      transform: translateX(-50%) scaleY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(-50%) scaleY(1);
+      opacity: 0;
+    }
+  }
+}
+
+// Wave - Sinusoidal motion
+.animate-text-wave {
+  --wave-amplitude: 10px;
+  --wave-offset: 0;
+  animation: text-wave 0.6s ease-out;
+  
+  @keyframes text-wave {
+    0% {
+      opacity: 0;
+      transform: translateY(calc(sin(var(--wave-offset) * 3.14159) * var(--wave-amplitude))) scale(0.8);
+    }
+    25% {
+      opacity: 0.3;
+      transform: translateY(calc(sin((var(--wave-offset) + 0.25) * 3.14159) * var(--wave-amplitude))) scale(0.9);
+    }
+    50% {
+      opacity: 0.7;
+      transform: translateY(calc(sin((var(--wave-offset) + 0.5) * 3.14159) * var(--wave-amplitude))) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+// Neural - Network-inspired connections
+.animate-text-neural {
+  --glow-intensity: 0.5;
+  animation: text-neural 0.7s var.$ease-out-quint;
+  position: relative;
+  
+  @keyframes text-neural {
+    0% {
+      opacity: 0;
+      transform: scale(0) rotate(90deg);
+      filter: brightness(2) saturate(0);
+    }
+    30% {
+      opacity: 0.4;
+      transform: scale(1.1) rotate(45deg);
+      filter: brightness(1.5) saturate(0.5);
+    }
+    60% {
+      opacity: 0.8;
+      transform: scale(0.95) rotate(10deg);
+      filter: brightness(1.2) saturate(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      filter: brightness(1) saturate(1);
+    }
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    background: radial-gradient(
+      circle,
+      hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), calc(var(--glow-intensity) * 0.6)) 0%,
+      transparent 70%
+    );
+    animation: neural-glow 0.7s ease-out forwards;
+    animation-delay: inherit;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  @keyframes neural-glow {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+}
+
+// ============================================
+// State-Based Modifiers
+// ============================================
+
+// When in listening state, text appears more fluid
+.state-listening {
+  .text-unit-char,
+  .text-unit-word {
+    animation-timing-function: var.$ease-in-out-sine;
+  }
+}
+
+// When in thinking state, text has more glow
+.state-thinking {
+  .animate-text-organic,
+  .animate-text-neural {
+    text-shadow: 0 0 calc(5px * var(--reactive-glow-intensity)) 
+                 hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.5);
+  }
+}
+
+// When in responding state, text is more vibrant
+.state-responding {
+  .text-unit-char,
+  .text-unit-word {
+    filter: saturate(1.2) brightness(1.1);
+  }
+}
+
+// ============================================
+// Complexity-Based Variations
+// ============================================
+
+// For complex content, slow down animations
+[data-text-complexity="high"] {
+  .text-unit-char,
+  .text-unit-word {
+    animation-duration: calc(var(--animation-duration) * 1.3);
+  }
+}
+
+// For code blocks, use terminal style
+.code-block {
+  .text-unit-char,
+  .text-unit-word {
+    @extend .animate-text-terminal;
+  }
+}
+
+// ============================================
+// Reduced Motion
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-text-organic,
+  .animate-text-digital,
+  .animate-text-quantum,
+  .animate-text-terminal,
+  .animate-text-cascade,
+  .animate-text-wave,
+  .animate-text-neural {
+    animation: reduced-text-appear 0.1s ease-out !important;
+  }
+  
+  @keyframes reduced-text-appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .with-particles::after,
+  .with-trail::before,
+  .animate-text-neural::before {
+    display: none !important;
+  }
+}

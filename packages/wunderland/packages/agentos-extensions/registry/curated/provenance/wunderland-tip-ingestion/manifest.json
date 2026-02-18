@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.provenance.wunderland-tip-ingestion",
+  "name": "Wunderland Tip Ingestion",
+  "version": "1.0.0",
+  "description": "Deterministic IPFS pinning and on-chain tip ingestion utilities for Wunderland agents",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": [
+    "wunderland",
+    "agentos",
+    "provenance",
+    "tip-ingestion",
+    "ipfs",
+    "solana",
+    "blockchain"
+  ],
+  "agentosVersion": "^0.1.0",
+  "categories": ["provenance", "integrations"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "provides": {
+    "classes": ["IpfsPinner", "TipIngester"],
+    "modules": ["src/IpfsPinner.ts", "src/TipIngester.ts"]
+  }
+}

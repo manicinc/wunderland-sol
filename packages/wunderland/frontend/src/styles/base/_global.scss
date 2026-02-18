@@ -1,0 +1,689 @@
+// File: frontend/src/styles/base/_global.scss
+/**
+ * @file _global.scss
+ * @description Enhanced global base styles with reactive state integration
+ * Includes "Her"-inspired ambient effects, reactive state CSS variables,
+ * and seamless integration with the reactive store system
+ * @version 4.1.1 - Removed redundant loop causing undefined variable error. Defaults handled by :root.
+ */
+
+@use 'sass:math';
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+
+// ============================================
+// CSS Custom Properties from Reactive Store
+// ============================================
+:root {
+  // Reactive state variables (dynamically updated by reactive store)
+  --reactive-intensity: 0.3;
+  --reactive-pulse-rate: 0.3;
+  --reactive-pulse-intensity: 0.5;
+  --reactive-gradient-shift: 0;
+  --reactive-gradient-speed: 0.5;
+  --reactive-glow-intensity: 0.3;
+  --reactive-glow-radius: 10px;
+  --reactive-particle-activity: 0.2;
+  --reactive-neural-activity: 0;
+  --reactive-warmth: 0.5;
+  --reactive-ripple-scale: 0;
+  --reactive-ripple-intensity: 0.5;
+  --reactive-border-pulse-speed: 2s;
+  --reactive-text-stream-speed: 0.7;
+  --reactive-pulse-duration: 2s;
+  --reactive-glow-duration: 2s;
+  
+  // Dynamic gradients
+  --reactive-gradient-start: hsl(var(--color-accent-primary-h), var(--color-accent-primary-s), var(--color-accent-primary-l));
+  --reactive-gradient-end: hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l));
+  
+  // Effect colors
+  --reactive-ripple-color: hsla(var(--color-accent-glow-h), var(--color-accent-glow-s), var(--color-accent-glow-l), 0.5);
+  --reactive-neural-color: hsla(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l), 0.6);
+  
+  // Voice amplitude (updated by voice visualization)
+  --voice-amplitude: 0;
+}
+
+// ============================================
+// Base HTML & Body Styling
+// ============================================
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  height: 100%;
+  // The problematic @each loop has been removed from here.
+  // CSS custom properties defined in :root are globally available and apply to <html>.
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  position: relative;
+  
+  font-family: var(--font-family-sans, #{var.$font-family-sans});
+  font-size: var(--font-size-base, #{var.$font-size-base-default});
+  line-height: var(--line-height-base, #{var.$line-height-base-default});
+  letter-spacing: var(--letter-spacing-base, #{var.$letter-spacing-base-default});
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  @supports (height: 100dvh) {
+    min-height: 100dvh;
+  }
+  
+  // Base background with reactive gradient
+  background: linear-gradient(
+    135deg,
+    hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l)) 0%,
+    hsl(
+      calc(var(--color-bg-primary-h) + var(--reactive-gradient-shift) * 30),
+      var(--color-bg-primary-s),
+      calc(var(--color-bg-primary-l) - var(--reactive-warmth) * 5%)
+    ) 100%
+  );
+  transition: background var.$duration-smooth var.$ease-out-quad;
+  
+  // Ambient noise texture
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: var.$z-index-negative;
+    background-image: 
+      radial-gradient(
+        circle at 20% 80%,
+        hsla(var(--reactive-gradient-start), calc(0.02 * var(--reactive-intensity))) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        hsla(var(--reactive-gradient-end), calc(0.02 * var(--reactive-intensity))) 0%,
+        transparent 50%
+      ),
+      var(--bg-noise-texture, none);
+    background-size: 100% 100%, 100% 100%, var(--bg-noise-size, 200px);
+    opacity: calc(var(--bg-noise-opacity, 0.02) + var(--reactive-neural-activity) * 0.03);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: ambient-shift 30s ease-in-out infinite;
+  }
+  
+  // Neural network overlay (active during thinking states)
+  &::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: var.$z-index-negative + 1;
+    opacity: var(--reactive-neural-activity);
+    pointer-events: none;
+    background-image: 
+      linear-gradient(0deg, transparent 24%, hsla(var(--reactive-neural-color), 0.05) 25%, hsla(var(--reactive-neural-color), 0.05) 26%, transparent 27%, transparent 74%, hsla(var(--reactive-neural-color), 0.05) 75%, hsla(var(--reactive-neural-color), 0.05) 76%, transparent 77%, transparent),
+      linear-gradient(90deg, transparent 24%, hsla(var(--reactive-neural-color), 0.05) 25%, hsla(var(--reactive-neural-color), 0.05) 26%, transparent 27%, transparent 74%, hsla(var(--reactive-neural-color), 0.05) 75%, hsla(var(--reactive-neural-color), 0.05) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
+    animation: neural-grid-move 20s linear infinite;
+    transition: opacity var.$duration-smooth ease-out;
+  }
+}
+
+// App-specific states
+body[data-app-state] {
+  &[data-app-state="listening"] {
+    &::before {
+      animation-duration: 15s;
+    }
+  }
+  
+  &[data-app-state="thinking"] {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l)) 0%,
+      hsl(
+        calc(var(--color-bg-primary-h) + 15),
+        calc(var(--color-bg-primary-s) * 0.9),
+        calc(var(--color-bg-primary-l) - 3%)
+      ) 100%
+    );
+  }
+  
+  &[data-app-state="responding"] {
+    &::before {
+      opacity: calc(var(--bg-noise-opacity, 0.02) + 0.03);
+    }
+  }
+}
+
+// ============================================
+// Global Reactive Classes
+// ============================================
+
+// Elements that respond to state changes
+.reactive-element {
+  transition: all var.$duration-smooth var.$ease-out-quad;
+  will-change: transform, opacity, filter;
+}
+
+// Global glow effect based on reactive intensity
+.has-reactive-glow {
+  filter: drop-shadow(
+    0 0 calc(var(--reactive-glow-radius) * var(--reactive-glow-intensity))
+    hsla(var(--reactive-gradient-start), calc(var(--reactive-glow-intensity) * 0.5))
+  );
+}
+
+// ============================================
+// Enhanced Scrollbars with Reactive State
+// ============================================
+::-webkit-scrollbar {
+  width: calc(8px + var(--reactive-intensity) * 4px);
+  height: calc(8px + var(--reactive-intensity) * 4px);
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(
+    to bottom,
+    hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.1) 0%,
+    hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), calc(var(--color-bg-secondary-l) - 5%), 0.2) 100%
+  );
+  border-radius: var.$radius-sm;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    hsla(var(--reactive-gradient-start), calc(0.4 + var(--reactive-intensity) * 0.3)) 0%,
+    hsla(var(--reactive-gradient-end), calc(0.3 + var(--reactive-intensity) * 0.2)) 100%
+  );
+  border-radius: var.$radius-full;
+  border: 2px solid hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.15);
+  background-clip: padding-box;
+  transition: all var.$duration-quick var.$ease-out-quad;
+  
+  &:hover {
+    background: linear-gradient(
+      135deg,
+      hsla(var(--reactive-gradient-start), calc(0.6 + var(--reactive-intensity) * 0.3)) 0%,
+      hsla(var(--reactive-gradient-end), calc(0.5 + var(--reactive-intensity) * 0.2)) 100%
+    );
+    box-shadow: 0 0 calc(10px * var(--reactive-glow-intensity)) hsla(var(--reactive-gradient-start), 0.5);
+  }
+}
+
+// Firefox
+* {
+  scrollbar-width: thin;
+  scrollbar-color: 
+    hsla(var(--reactive-gradient-start), calc(0.4 + var(--reactive-intensity) * 0.3))
+    hsla(var(--color-bg-secondary-h), var(--color-bg-secondary-s), var(--color-bg-secondary-l), 0.15);
+}
+
+// ============================================
+// Enhanced Focus States with Reactive Glow
+// ============================================
+:focus-visible {
+  outline: none;
+  @include mixins.focus-ring(
+    $base-bg-color-var-prefix: '--color-bg-primary',
+    $ring-accent-color-var-prefix: '--color-accent-interactive',
+    $offset-width: 2px,
+    $ring-thickness: 2px,
+    $ring-opacity: 0.85
+  );
+  filter: brightness(calc(1 + var(--reactive-intensity) * 0.1));
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at center,
+      hsla(var(--reactive-gradient-start), calc(var(--reactive-glow-intensity) * 0.3)) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0;
+    animation: focus-pulse 1.5s ease-out;
+  }
+}
+
+// ============================================
+// Text Selection with Reactive Colors
+// ============================================
+::selection {
+  background: linear-gradient(
+    135deg,
+    hsla(var(--reactive-gradient-start), 0.85) 0%,
+    hsla(var(--reactive-gradient-end), 0.85) 100%
+  );
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  text-shadow: 0 0 calc(5px * var(--reactive-glow-intensity)) hsla(var(--reactive-gradient-start), 0.5);
+}
+
+::-moz-selection {
+  background: linear-gradient(
+    135deg,
+    hsla(var(--reactive-gradient-start), 0.85) 0%,
+    hsla(var(--reactive-gradient-end), 0.85) 100%
+  );
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  text-shadow: 0 0 calc(5px * var(--reactive-glow-intensity)) hsla(var(--reactive-gradient-start), 0.5);
+}
+
+// ============================================
+// Enhanced Links with Reactive States
+// ============================================
+a {
+  color: hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l));
+  text-decoration: none;
+  position: relative;
+  transition: all var.$duration-quick var.$ease-out-quad;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      hsla(var(--reactive-gradient-start), 0) 0%,
+      hsla(var(--reactive-gradient-start), calc(0.8 * var(--reactive-intensity))) 50%,
+      hsla(var(--reactive-gradient-end), 0) 100%
+    );
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var.$duration-quick var.$ease-out-cubic;
+  }
+  
+  &:hover,
+  &:focus-visible {
+    color: hsl(
+      var(--color-accent-interactive-h),
+      calc(var(--color-accent-interactive-s) * (1 + var(--reactive-warmth) * 0.1)),
+      calc(var(--color-accent-interactive-l) - 8%)
+    );
+    text-shadow: 0 0 calc(10px * var(--reactive-glow-intensity)) hsla(var(--reactive-gradient-start), 0.3);
+    
+    &::before {
+      transform: scaleX(1);
+    }
+  }
+}
+
+// ============================================
+// Reactive Container Classes
+// ============================================
+#app {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  
+  // Apply reactive container effects
+  &[data-reactive-state] {
+    transition: all var.$duration-smooth ease-out;
+  }
+}
+
+// Main content containers with reactive borders
+.main-content,
+.chat-container,
+.voice-input-container {
+  @extend .reactive-element;
+  position: relative;
+  
+  &[data-reactive-state="listening"],
+  &[data-reactive-state="transcribing"] {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(
+        var(--gradient-angle, 45deg),
+        hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), var(--reactive-pulse-intensity)),
+        hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), calc(var(--reactive-pulse-intensity) * 0.7)),
+        hsla(var(--color-voice-user-h), var(--color-voice-user-s), var(--color-voice-user-l), var(--reactive-pulse-intensity))
+      );
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: exclude;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: reactive-border-pulse var(--reactive-pulse-duration) ease-in-out infinite;
+      pointer-events: none;
+    }
+  }
+  
+  &[data-reactive-state="thinking"] {
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(
+        circle at var(--think-x, 50%) var(--think-y, 50%),
+        hsla(var(--reactive-neural-color), calc(var(--reactive-neural-activity) * 0.3)) 0%,
+        transparent 40%
+      );
+      animation: think-wander 10s ease-in-out infinite;
+    }
+  }
+}
+
+// ============================================
+// Skip Link with Reactive Glow
+// ============================================
+.skip-link-ephemeral {
+  position: absolute;
+  left: -9999px;
+  top: var.$spacing-md;
+  z-index: var.$z-index-dev-tools;
+  padding: var.$spacing-sm var.$spacing-lg;
+  border-radius: var.$radius-md;
+  font-weight: 600;
+  text-decoration: none;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--color-accent-interactive-h), var(--color-accent-interactive-s), var(--color-accent-interactive-l)) 0%,
+    hsl(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l)) 100%
+  );
+  color: hsl(var(--color-text-on-primary-h), var(--color-text-on-primary-s), var(--color-text-on-primary-l));
+  box-shadow: 
+    var(--shadow-depth-xl),
+    0 0 20px hsla(var(--reactive-gradient-start), 0.5);
+  transition: all 0.25s var.$ease-out-expo;
+  transform: translateY(-150%);
+  opacity: 0;
+
+  &:focus,
+  &:active {
+    left: var.$spacing-md;
+    transform: translateY(0);
+    opacity: 1;
+    animation: skip-link-glow 1.5s ease-out;
+  }
+}
+
+// ============================================
+// Particle System Container
+// ============================================
+.particle-system {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var.$z-index-negative + 2;
+  opacity: var(--reactive-particle-activity);
+  
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(
+      circle,
+      hsla(var(--reactive-gradient-start), 0.8) 0%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    animation: particle-float 20s linear infinite;
+    
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        left: math.percentage($i * 0.05);
+        top: math.percentage((($i * 3) % 100) / 100);
+        animation-delay: #{($i % 10) * 0.7}s;
+        animation-duration: #{20 + ($i % 10)}s;
+        transform: scale(#{0.5 + ($i % 10) * 0.1});
+      }
+    }
+  }
+}
+
+// ============================================
+// Theme-Specific Enhancements
+// ============================================
+
+// Retro Terminus CRT effects with reactive integration
+html[data-theme='retro-terminus-dark'],
+html[data-theme='retro-terminus-light'] {
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: var.$z-index-content-overlay + 1;
+    background: 
+      linear-gradient(
+        to bottom,
+        hsla(0, 0%, 0%, calc(var(--crt-scanline-opacity, 0.03) * (1 + var(--reactive-intensity) * 0.5))) 50%,
+        hsla(0, 0%, 100%, calc(var(--crt-scanline-opacity, 0.03) * (1 + var(--reactive-intensity) * 0.5))) 50%
+      );
+    background-size: 100% 4px;
+    pointer-events: none;
+    animation: crt-scanline calc(20s / (1 + var(--reactive-intensity) * 0.5)) linear infinite;
+    mix-blend-mode: multiply;
+  }
+}
+
+// Sakura theme particles
+html[data-theme*='sakura'] {
+  .particle-system .particle {
+    background: radial-gradient(
+      circle,
+      hsla(var(--color-accent-primary-h), var(--color-accent-primary-s), calc(var(--color-accent-primary-l) + 20%), 0.9) 0%,
+      hsla(var(--color-accent-secondary-h), var(--color-accent-secondary-s), var(--color-accent-secondary-l), 0.3) 50%,
+      transparent 70%
+    );
+    animation-name: particle-fall;
+  }
+}
+
+// ============================================
+// Overflow Control
+// ============================================
+body.overflow-hidden-by-app-overlay {
+  overflow: hidden !important;
+  
+  &::before,
+  &::after {
+    animation-play-state: paused;
+  }
+}
+
+// ============================================
+// Animation Keyframes
+// ============================================
+
+@keyframes ambient-shift {
+  0%, 100% {
+    transform: translateX(0) translateY(0) scale(1);
+    opacity: calc(var(--bg-noise-opacity, 0.02) + var(--reactive-neural-activity) * 0.03);
+  }
+  25% {
+    transform: translateX(-5%) translateY(2%) scale(1.05);
+    opacity: calc(var(--bg-noise-opacity, 0.02) + var(--reactive-neural-activity) * 0.04);
+  }
+  50% {
+    transform: translateX(3%) translateY(-3%) scale(0.98);
+    opacity: calc(var(--bg-noise-opacity, 0.02) + var(--reactive-neural-activity) * 0.02);
+  }
+  75% {
+    transform: translateX(-2%) translateY(4%) scale(1.02);
+    opacity: calc(var(--bg-noise-opacity, 0.02) + var(--reactive-neural-activity) * 0.035);
+  }
+}
+
+@keyframes neural-grid-move {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 50px 50px, 50px 50px;
+  }
+}
+
+@keyframes reactive-border-pulse {
+  0%, 100% {
+    opacity: calc(0.3 + var(--reactive-pulse-intensity) * 0.4);
+    background-position: 0% 50%;
+    filter: blur(1px);
+  }
+  50% {
+    opacity: calc(0.6 + var(--reactive-pulse-intensity) * 0.4);
+    background-position: 100% 50%;
+    filter: blur(0.5px);
+  }
+}
+
+@keyframes think-wander {
+  0%, 100% {
+    --think-x: 50%;
+    --think-y: 50%;
+  }
+  25% {
+    --think-x: 30%;
+    --think-y: 30%;
+  }
+  50% {
+    --think-x: 70%;
+    --think-y: 60%;
+  }
+  75% {
+    --think-x: 40%;
+    --think-y: 70%;
+  }
+}
+
+@keyframes focus-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes skip-link-glow {
+  0% {
+    box-shadow: 
+      var(--shadow-depth-xl),
+      0 0 20px hsla(var(--reactive-gradient-start), 0.5);
+  }
+  50% {
+    box-shadow: 
+      var(--shadow-depth-xl),
+      0 0 40px hsla(var(--reactive-gradient-start), 0.8),
+      0 0 60px hsla(var(--reactive-gradient-end), 0.5);
+  }
+  100% {
+    box-shadow: 
+      var(--shadow-depth-xl),
+      0 0 20px hsla(var(--reactive-gradient-start), 0.5);
+  }
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--reactive-particle-activity);
+  }
+  90% {
+    opacity: var(--reactive-particle-activity);
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-fall {
+  0% {
+    transform: translateY(-100vh) translateX(0) rotate(0deg) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--reactive-particle-activity);
+  }
+  90% {
+    opacity: var(--reactive-particle-activity);
+  }
+  100% {
+    transform: translateY(100vh) translateX(50px) rotate(360deg) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes crt-scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100vh;
+  }
+}
+
+// ============================================
+// Reduced Motion Preferences
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after,
+  .particle-system,
+  .reactive-element::before,
+  .reactive-element::after {
+    animation: none !important;
+    transition: opacity 0.3s ease !important;
+  }
+  
+  .particle {
+    display: none;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ============================================
+// Print Styles
+// ============================================
+@media print {
+  body::before,
+  body::after,
+  .particle-system,
+  .reactive-element::before,
+  .reactive-element::after {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+}

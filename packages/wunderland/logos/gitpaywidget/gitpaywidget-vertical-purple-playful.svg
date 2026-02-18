@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+                    <linearGradient id="v-gradient-purple-light" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="v-card-gradient-purple-light" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f3e8ff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:white;stop-opacity:0.9" />
+                    </linearGradient>
+                </defs>
+                
+                
+                <g transform="translate(68, 30)">
+                    <ellipse cx="32" cy="45" rx="25" ry="3" fill="rgba(0,0,0,0.08)"/>
+                    
+                    <g transform="rotate(-12 32 25)">
+                        <rect x="0" y="0" width="64" height="42" 
+                              fill="url(#v-card-gradient-purple-light)" 
+                              stroke="#8b5cf6"
+                              stroke-width="2"
+                              rx="7" ry="7"
+                              opacity="0.95"/>
+                        
+                        <g transform="translate(10, 8)">
+                            <rect x="0" y="0" width="14" height="10" 
+                                  fill="#fbbf24" 
+                                  rx="1.5"
+                                  opacity="0.8"/>
+                            <rect x="5" y="3" width="4" height="4" 
+                                  fill="#8b5cf6" 
+                                  opacity="0.6"/>
+                        </g>
+                        
+                        <rect x="0" y="26" width="64" height="7" 
+                              fill="#581c87" 
+                              opacity="0.4"/>
+                        
+                        <text x="32" y="18" 
+                              font-family="'Caveat', cursive" 
+                              font-size="14" 
+                              font-weight="700" 
+                              fill="#8b5cf6"
+                              text-anchor="middle"
+                              opacity="0.9">$</text>
+                        
+                        <g transform="translate(48, 8)">
+                            <path d="M0 6 Q2 4, 2 2 T4 0" 
+                                  stroke="#fbbf24" 
+                                  stroke-width="1.2" 
+                                  fill="none" 
+                                  opacity="0.5"/>
+                        </g>
+                    </g>
+                </g>
+                
+                <text x="100" y="120" 
+                      font-family="'Caveat', cursive" 
+                      font-size="38" 
+                      font-weight="700" 
+                      text-anchor="middle"
+                      letter-spacing="-1">
+                    <tspan fill="#8b5cf6">GitPay</tspan><tspan fill="#ec4899">Widget</tspan>
+                </text>
+                
+                <text x="100" y="145" 
+                      font-family="'Space Grotesk', sans-serif" 
+                      font-size="11" 
+                      font-weight="500" 
+                      fill="rgba(107,114,128,0.9)" 
+                      text-anchor="middle"
+                      letter-spacing="0.3"
+                      opacity="0.9">plug in, pay, and play!</text>
+            
+</svg>

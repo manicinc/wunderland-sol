@@ -1,0 +1,71 @@
+// File: frontend/src/styles/components/agents/_agent-chat-log.scss
+/**
+ * @file _agent-chat-log.scss
+ * @description Styles for the AgentChatLog.vue component.
+ * @version 1.0.1 - Corrected CSS variable fallbacks.
+ */
+
+@use '../../abstracts/variables' as var;
+@use '../../abstracts/mixins' as commonMixins; // General project mixins
+
+.agent-chat-log {
+  // Tailwind classes like flex-grow, p-3, md:p-4, space-y-3, overflow-y-auto
+  // are applied directly in the template and handle main layout.
+  // SCSS here focuses on themeable appearance and specific component styles.
+
+  // Themed background for the chat log area
+  // CORRECTED SECTION:
+  background-color: hsla(
+    var(--color-bg-chatlog-h, #{var.$default-color-bg-secondary-h}), 
+    var(--color-bg-chatlog-s, #{var.$default-color-bg-secondary-s}),
+    // Example: you can do calculations on the SCSS var for the fallback:
+    var(--color-bg-chatlog-l, #{calc(var.$default-color-bg-secondary-l - 5%)}), 
+    var(--color-bg-chatlog-a, 0.2) // Alpha for the chatlog background
+  );
+  min-height: 200px; // From your original scoped style
+  border-radius: var.$radius-lg; // Optional: if it should have its own rounded corners as a pane
+  // box-shadow: var.$shadow-depth-sm; // Optional: if it should have a shadow, use $scss-box-shadow-* vars
+
+  // Apply custom scrollbar using the mixin
+  @include commonMixins.custom-scrollbar(
+    '--color-accent-primary', // $thumb-color-var-prefix for HSL components of the thumb
+    0.45,                     // $thumb-base-alpha
+    0.65,                     // $thumb-hover-alpha
+    // Track color - making it very subtle or transparent against the chat log background
+    hsla(var(--color-bg-primary-h), var(--color-bg-primary-s), var(--color-bg-primary-l), 0.1) // Assuming --color-bg-primary HSL vars exist for this
+  );
+
+  .empty-chat-placeholder { // Class for the empty state div
+    text-align: center;
+    padding-top: var.$spacing-xl;
+    padding-bottom: var.$spacing-xl;
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+    font-style: italic;
+    font-size: var.$font-size-sm;
+  }
+}
+
+// Class applied to each <Message> component instance via the <transition-group>
+.chat-message-item {
+  opacity: 1; // Default state for transition
+  transform: translateY(0); // Default state for transition
+}
+
+// Transitions for messages (from your original scoped style)
+.chat-message-fade-enter-active {
+  transition: all 0.4s var.$ease-out-quad; // Assumes var.$ease-out-quad is defined in _variables.scss
+}
+.chat-message-fade-leave-active {
+  transition: all 0.3s var.$ease-in-quad; // Assumes var.$ease-in-quad is defined in _variables.scss
+}
+.chat-message-fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.chat-message-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(-10px);
+}
+.chat-message-fade-move {
+  transition: transform 0.3s var.$ease-out-quad; // Assumes var.$ease-out-quad is defined in _variables.scss
+}

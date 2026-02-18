@@ -1,0 +1,246 @@
+name: Deploy Rabbit Hole to Linode
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "20"
+  APP_DIR: /opt/rabbithole
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js app
+        env:
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+          NEXT_PUBLIC_CLARITY_ID: ${{ vars.NEXT_PUBLIC_CLARITY_ID }}
+          NEXT_PUBLIC_OAUTH_GOOGLE: ${{ vars.NEXT_PUBLIC_OAUTH_GOOGLE }}
+          NEXT_PUBLIC_OAUTH_GITHUB: ${{ vars.NEXT_PUBLIC_OAUTH_GITHUB }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_WUNDERLAND_ENABLE_CHAIN_PROOFS: ${{ vars.NEXT_PUBLIC_WUNDERLAND_ENABLE_CHAIN_PROOFS }}
+        run: npx next build
+
+      - name: Prepare deployment tarball
+        run: |
+          mkdir -p deploy
+          cp -r .next/standalone/* deploy/
+
+          # Copy full .next build output over standalone's partial .next/
+          # This ensures all manifests, server chunks, and static assets are present
+          rsync -a --ignore-existing .next/ deploy/.next/
+
+          # Copy public assets
+          mkdir -p deploy/public
+          cp -r public/* deploy/public/ 2>/dev/null || true
+
+          # Install serverExternalPackages that Turbopack marks as external
+          # These aren't bundled into the build and must be in node_modules at runtime
+          echo "=== Installing server external packages ==="
+          mkdir -p /tmp/ext-deps && cd /tmp/ext-deps
+          echo '{}' > package.json
+          npm install discord.js telegraf openai 2>&1 | tail -3
+          cp -r node_modules/* $GITHUB_WORKSPACE/deploy/node_modules/
+          cd $GITHUB_WORKSPACE
+
+          # Turbopack appends hashes to external package names (e.g. discord.js-abc123)
+          # Create symlinks so Node.js can resolve the hashed names
+          echo "=== Creating Turbopack external symlinks ==="
+          for hashed in $(grep -roh '[a-z][a-z0-9./@_-]*-[0-9a-f]\{16\}' deploy/.next/server/chunks/*.js 2>/dev/null | sort -u); do
+            base=$(echo "$hashed" | sed 's/-[0-9a-f]\{16\}$//')
+            if [ -d "deploy/node_modules/$base" ]; then
+              ln -sf "$base" "deploy/node_modules/$hashed"
+              echo "  $hashed -> $base"
+            fi
+          done
+
+          # Create start.js wrapper that explicitly runs instrumentation
+          # (Next.js standalone server doesn't call register() automatically)
+          cat > deploy/start.js << 'STARTJS'
+          const path = require("path");
+          process.env.NEXT_RUNTIME = "nodejs";
+          async function main() {
+            try {
+              const inst = require("./.next/server/instrumentation.js");
+              if (inst.register) {
+                await inst.register();
+                console.log("[start.js] Instrumentation completed");
+              }
+            } catch (e) {
+              console.error("[start.js] Instrumentation error:", e.message);
+            }
+            require("./server.js");
+          }
+          main();
+          STARTJS
+
+          # Verify key files exist
+          echo "=== Verifying standalone output ==="
+          ls deploy/server.js
+          ls deploy/start.js
+          ls deploy/.next/BUILD_ID
+
+          # Create tarball
+          cd deploy && tar czf ../deploy.tar.gz . && cd ..
+          ls -lh deploy.tar.gz
+
+      - name: Deploy to Linode
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DEPLOY_HOST: ${{ secrets.RABBITHOLE_LINODE_HOST }}
+        run: |
+          set -euo pipefail
+
+          # Write SSH key
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no"
+
+          # Stop services, kill docker containers on port 80/443, and clean
+          ssh $SSH_OPTS root@"$DEPLOY_HOST" 'systemctl stop rabbithole 2>/dev/null || true; systemctl stop nginx 2>/dev/null || true; pkill nginx 2>/dev/null || true; docker stop $(docker ps -q) 2>/dev/null || true; fuser -k 80/tcp 2>/dev/null || true; fuser -k 443/tcp 2>/dev/null || true; sleep 1; rm -rf /opt/rabbithole; mkdir -p /opt/rabbithole'
+
+          # Env file at /etc/rabbithole/env is managed manually on the server.
+          # SCP your .env there once: scp .env root@<host>:/etc/rabbithole/env
+          # Deploys will NEVER overwrite it.
+          ssh $SSH_OPTS root@"$DEPLOY_HOST" 'mkdir -p /etc/rabbithole'
+
+          # Upload tarball
+          scp $SSH_OPTS deploy.tar.gz root@"$DEPLOY_HOST":/tmp/deploy.tar.gz
+
+          # Clean up key
+          rm -f ~/.ssh/deploy_key
+
+      - name: Extract and start
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.RABBITHOLE_LINODE_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
+          script: |
+            set -euo pipefail
+
+            # Extract
+            cd /opt/rabbithole
+            tar xzf /tmp/deploy.tar.gz
+            rm /tmp/deploy.tar.gz
+
+            # Verify
+            echo "=== Verify structure ==="
+            ls -la /opt/rabbithole/server.js
+            ls -la /opt/rabbithole/.next/BUILD_ID
+
+            # Install Node.js if not present
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+              apt-get install -y nodejs
+            fi
+
+            # Create systemd service
+            cat > /etc/systemd/system/rabbithole.service << 'UNIT'
+            [Unit]
+            Description=Rabbit Hole Inc - Next.js App
+            After=network.target
+
+            [Service]
+            Type=simple
+            User=root
+            WorkingDirectory=/opt/rabbithole
+            ExecStart=/usr/bin/node start.js
+            Restart=on-failure
+            RestartSec=5
+            Environment=NODE_ENV=production
+            Environment=PORT=3000
+            Environment=HOSTNAME=0.0.0.0
+            EnvironmentFile=-/etc/rabbithole/env
+
+            [Install]
+            WantedBy=multi-user.target
+            UNIT
+
+            # Setup Nginx with SSL (self-signed cert for Cloudflare Full mode)
+            if ! command -v nginx &> /dev/null; then
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get install -y nginx
+            fi
+
+            # Generate self-signed cert if not present
+            if [ ! -f /etc/ssl/certs/rabbithole.crt ]; then
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /etc/ssl/private/rabbithole.key \
+                -out /etc/ssl/certs/rabbithole.crt \
+                -subj "/CN=rabbithole.inc/O=Rabbit Hole Inc/C=US"
+            fi
+
+            cat > /etc/nginx/sites-available/rabbithole << 'NGINX'
+            server {
+                listen 80;
+                listen 443 ssl;
+                server_name rabbithole.inc www.rabbithole.inc _;
+
+                ssl_certificate /etc/ssl/certs/rabbithole.crt;
+                ssl_certificate_key /etc/ssl/private/rabbithole.key;
+
+                # Backend API → NestJS on port 3001
+                location /api/ {
+                    proxy_pass http://127.0.0.1:3001/api/;
+                    proxy_http_version 1.1;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto $scheme;
+                }
+
+                # Next.js app → port 3000
+                location / {
+                    proxy_pass http://127.0.0.1:3000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade $http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto $scheme;
+                    proxy_cache_bypass $http_upgrade;
+                }
+            }
+            NGINX
+            ln -sf /etc/nginx/sites-available/rabbithole /etc/nginx/sites-enabled/
+            rm -f /etc/nginx/sites-enabled/default
+
+            systemctl daemon-reload
+            systemctl enable rabbithole
+            systemctl restart rabbithole
+            nginx -t
+            pkill nginx 2>/dev/null || true
+            sleep 1
+            systemctl reset-failed nginx 2>/dev/null || true
+            systemctl start nginx || {
+              echo "=== nginx failed to start, checking logs ==="
+              journalctl -xeu nginx.service --no-pager -n 30
+              ss -tlnp | grep ':80\|:443' || true
+              exit 1
+            }
+
+            sleep 3
+            systemctl is-active rabbithole && echo "App is running!" || (journalctl -u rabbithole --no-pager -n 20 && exit 1)
+            systemctl is-active nginx && echo "Nginx is running!"

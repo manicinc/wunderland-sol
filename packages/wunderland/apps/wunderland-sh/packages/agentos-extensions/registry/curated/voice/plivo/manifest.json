@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.voice.plivo",
+  "name": "Plivo Voice Provider Extension",
+  "version": "0.1.0",
+  "description": "Plivo telephony provider for voice calls — supports outbound/inbound calls, XML response generation, notify and conversation modes.",
+  "categories": ["voice", "telephony"],
+  "platforms": ["plivo"],
+  "sdk": "plivo",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "plivoVoiceCall",
+      "displayName": "Plivo Voice Call"
+    },
+    {
+      "kind": "voice-provider",
+      "id": "plivoVoiceProvider",
+      "displayName": "Plivo Voice Provider"
+    }
+  ],
+  "requiredSecrets": ["plivo.authId", "plivo.authToken"],
+  "features": [
+    "Outbound voice calls via Plivo Voice API",
+    "Inbound call handling with XML responses",
+    "Notify mode (TTS message + hangup)",
+    "Conversation mode (Speak + Gather + Redirect loop)",
+    "HMAC-SHA256 webhook signature verification",
+    "In-call TTS via Plivo Speak API",
+    "Call hangup and status tracking"
+  ]
+}

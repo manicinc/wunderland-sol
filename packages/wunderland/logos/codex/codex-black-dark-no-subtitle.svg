@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="380" height="120" viewBox="0 0 380 120" xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+                    <filter id="shadow-black-dark" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                        <feOffset dx="0" dy="4" result="offsetblur"/>
+                        <feFlood flood-color="#ffffff" flood-opacity="0.2"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    
+                    <!-- Gradient for Codex with more interesting colors -->
+                    <linearGradient id="codex-gradient-black-dark" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                             <stop offset="50%" style="stop-color:#f3f4f6;stop-opacity:1" />
+                             <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Icon with improved depth -->
+                
+                <g transform="translate(70, 30)" filter="url(#shadow-black-dark)">
+                    <!-- Back layer - shadow -->
+                    <rect x="3" y="3" width="16" height="16" fill="#ffffff" opacity="0.2" rx="1.5"/>
+                    <rect x="21" y="3" width="16" height="16" fill="#ffffff" opacity="0.2" rx="1.5"/>
+                    <rect x="3" y="21" width="16" height="16" fill="#ffffff" opacity="0.2" rx="1.5"/>
+                    <rect x="21" y="21" width="16" height="16" fill="#ffffff" opacity="0.2" rx="1.5"/>
+                    
+                    <!-- Mid layer -->
+                    <rect x="1.5" y="1.5" width="16" height="16" fill="#ffffff" opacity="0.4" rx="1.5"/>
+                    <rect x="19.5" y="1.5" width="16" height="16" fill="#ffffff" opacity="0.4" rx="1.5"/>
+                    <rect x="1.5" y="19.5" width="16" height="16" fill="#ffffff" opacity="0.4" rx="1.5"/>
+                    <rect x="19.5" y="19.5" width="16" height="16" fill="#ffffff" opacity="0.4" rx="1.5"/>
+                    
+                    <!-- Main layer -->
+                    <rect x="0" y="0" width="16" height="16" fill="#ffffff" rx="1.5"/>
+                    <rect x="18" y="0" width="16" height="16" fill="#ffffff" rx="1.5"/>
+                    <rect x="0" y="18" width="16" height="16" fill="#ffffff" rx="1.5"/>
+                    <rect x="18" y="18" width="16" height="16" fill="#ffffff" rx="1.5"/>
+                    
+                    <!-- Data flow lines -->
+                    <line x1="17" y1="8" x2="17" y2="26" stroke="white" stroke-width="1.5" opacity="0.5"/>
+                    <line x1="8" y1="17" x2="26" y2="17" stroke="white" stroke-width="1.5" opacity="0.5"/>
+                </g>
+                
+                <!-- Frame text (if included) -->
+                
+                
+                <!-- Codex with regular case and gradient -->
+                <text x="130" y="52" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="34" font-weight="600" fill="url(#codex-gradient-black-dark)" letter-spacing="-0.2" opacity="0.95">Codex</text>
+                
+                <!-- Subtitle (if included) -->
+                
+            
+</svg>

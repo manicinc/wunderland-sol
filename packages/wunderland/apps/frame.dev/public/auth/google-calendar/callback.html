@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Calendar Authorization</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f9fafb;
+      color: #1f2937;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 400px;
+    }
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      color: #6b7280;
+      margin: 0;
+    }
+    .error {
+      color: #dc2626;
+    }
+    .success {
+      color: #059669;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="content">
+    <div class="icon">⏳</div>
+    <h1>Processing...</h1>
+    <p>Please wait...</p>
+  </div>
+  <script>
+    (function() {
+      // Parse URL parameters
+      var params = new URLSearchParams(window.location.search);
+      var code = params.get('code');
+      var error = params.get('error');
+      var errorDescription = params.get('error_description');
+
+      // Update UI
+      var container = document.getElementById('content');
+
+      if (error) {
+        container.innerHTML =
+          '<div class="icon">❌</div>' +
+          '<h1>Authorization Failed</h1>' +
+          '<p class="error">' + (errorDescription || error) + '</p>' +
+          '<p>You can close this window.</p>';
+      } else if (code) {
+        container.innerHTML =
+          '<div class="icon">✓</div>' +
+          '<h1 class="success">Authorization Successful</h1>' +
+          '<p>You can close this window.</p>';
+      }
+
+      // Send message to parent window
+      if (window.opener) {
+        try {
+          if (error) {
+            window.opener.postMessage({
+              type: 'GOOGLE_OAUTH_ERROR',
+              error: errorDescription || error
+            }, window.location.origin);
+          } else if (code) {
+            window.opener.postMessage({
+              type: 'GOOGLE_OAUTH_SUCCESS',
+              code: code
+            }, window.location.origin);
+          }
+        } catch (e) {
+          console.error('Failed to post message to opener:', e);
+        }
+      }
+
+      // Close window after short delay
+      setTimeout(function() {
+        window.close();
+      }, 2000);
+    })();
+  </script>
+</body>
+</html>

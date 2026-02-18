@@ -1,0 +1,109 @@
+name: Deploy Wunderland Sol (Linode)
+
+on:
+  # Disabled — wunderland deploys via its own repo (manicinc/wunderland-sol)
+  # push:
+  #   branches: [master]
+  #   paths:
+  #     - 'apps/wunderland-sh/**'
+  #     - 'backend/**'
+  #     - 'packages/**'
+  #     - 'deployment/wunderland-sol/**'
+  #     - '.github/workflows/deploy-wunderland-node.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        with:
+          host: ${{ secrets.WUNDERLAND_SSH_HOST }}
+          username: root
+          key: ${{ secrets.WUNDERLAND_SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          envs: GH_PAT
+          script: |
+            set -euo pipefail
+
+            # Use PAT for all github.com HTTPS (needed for private submodules)
+            git config --global url."https://${GH_PAT}@github.com/".insteadOf "https://github.com/"
+
+            REPO_DIR="/app/wunderland"
+            REPO_URL="https://${GH_PAT}@github.com/manicinc/voice-chat-assistant.git"
+
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              echo "[deploy] First deploy — cloning repo..."
+              git clone --recurse-submodules "$REPO_URL" "$REPO_DIR"
+            else
+              echo "[deploy] Pulling latest..."
+              cd "$REPO_DIR"
+              git remote set-url origin "$REPO_URL"
+              git fetch origin
+              git reset --hard origin/master
+              git submodule deinit -f --all 2>/dev/null || true
+              git submodule update --init --recursive --force
+            fi
+
+            cd "$REPO_DIR"
+
+            echo "[deploy] Building frontend..."
+            docker compose -f deployment/wunderland-sol/docker-compose.yml build frontend
+
+            echo "[deploy] Building backend..."
+            docker compose -f deployment/wunderland-sol/docker-compose.yml build backend
+
+            echo "[deploy] Stopping old stack..."
+            docker compose -f deployment/wunderland-sol/docker-compose.yml down --remove-orphans || true
+
+            # Stop host-level nginx if running (conflicts with Docker nginx on port 80/443)
+            systemctl stop nginx 2>/dev/null || true
+            systemctl disable nginx 2>/dev/null || true
+
+            echo "[deploy] Ensuring IPFS data directory..."
+            mkdir -p /mnt/storage-wunder/ipfs
+
+            echo "[deploy] Starting stack (includes IPFS Kubo)..."
+            docker compose -f deployment/wunderland-sol/docker-compose.yml up -d
+
+            echo "[deploy] Pruning old images..."
+            docker image prune -f
+
+            echo "[deploy] Waiting for IPFS to be healthy..."
+            COMPOSE="docker compose -f deployment/wunderland-sol/docker-compose.yml"
+            for i in $(seq 1 12); do
+              if $COMPOSE exec -T ipfs ipfs id >/dev/null 2>&1; then
+                echo "[deploy] IPFS is healthy"
+                break
+              fi
+              echo "[deploy] Waiting for IPFS... ($i/12)"
+              sleep 5
+            done
+
+            # Verify IPFS peer ID
+            IPFS_ID=$($COMPOSE exec -T ipfs ipfs id -f='<id>' 2>/dev/null || echo "FAILED")
+            echo "[deploy] IPFS peer ID: $IPFS_ID"
+
+            sleep 5
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://localhost/ -k || echo "000")
+            echo "[deploy] Health check: HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "[deploy] WARNING: Frontend not returning 200"
+              $COMPOSE logs --tail=20 frontend
+            fi
+
+            # Verify IPFS raw block pinning works
+            echo "[deploy] Testing IPFS pin..."
+            IPFS_TEST=$(echo '{"healthcheck":true}' | $COMPOSE exec -T ipfs ipfs block put --format raw --mhtype sha2-256 2>/dev/null || echo "FAILED")
+            echo "[deploy] IPFS pin test: $IPFS_TEST"
+
+            echo "[deploy] Stack status:"
+            $COMPOSE ps
+
+            echo "[deploy] Done."

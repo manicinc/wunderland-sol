@@ -1,0 +1,130 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY & READING EXPERIENCE
+   Advanced prose styling for Quarry Codex (Book, Terminal, Modern)
+   
+   Note: This file is imported after globals.css which has Tailwind directives.
+   Styles are applied in import order.
+═══════════════════════════════════════════════════════════════════════════════ */
+
+/* 
+   BASE PROSE CONFIGURATION
+   We extend the tailwind typography plugin classes
+*/
+.prose-codex {
+  max-width: none;
+}
+
+.prose-codex :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-heading, inherit);
+  letter-spacing: -0.025em;
+}
+
+.prose-codex :where(a) {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.prose-codex :where(a):hover {
+  color: hsl(var(--primary) / 0.8);
+}
+
+.prose-codex :where(img) {
+  border-radius: 0.5rem;
+}
+
+.prose-codex :where(hr) {
+  border-color: hsl(var(--border));
+}
+
+/* 
+   THEME: FRAME (Modern / Default)
+   Clean, sans-serif, high readability, medium contrast
+*/
+[data-theme="light"] .prose-codex,
+[data-theme="dark"] .prose-codex {
+  --tw-prose-body: hsl(var(--foreground));
+  --tw-prose-headings: hsl(var(--foreground));
+  font-family: var(--font-inter);
+  line-height: 1.7;
+}
+
+/* 
+   THEME: SEPIA (The Book)
+   Serif, warm, larger text, "Justified" feel
+*/
+[data-theme*="sepia"] .prose-codex {
+  --tw-prose-body: hsl(var(--foreground));
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-bold: hsl(var(--foreground));
+  
+  font-family: var(--font-crimson);
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+[data-theme*="sepia"] .prose-codex p {
+  margin-bottom: 1.5em;
+  text-indent: 0;
+}
+
+/* Drop Cap for the first letter of the first paragraph */
+[data-theme*="sepia"] .prose-codex > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  float: left;
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 3.5em;
+  line-height: 0.8;
+  color: hsl(var(--primary));
+}
+
+[data-theme*="sepia"] .prose-codex blockquote {
+  border-left-width: 4px;
+  border-color: hsl(var(--primary) / 0.5);
+  background-color: hsl(var(--primary) / 0.05);
+  padding: 1rem 1.5rem;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  font-style: italic;
+  font-family: var(--font-fraunces);
+}
+
+/* 
+   THEME: TERMINAL (The Matrix)
+   Monospace, scanlines, green/amber
+*/
+[data-theme*="terminal"] .prose-codex {
+  font-family: var(--font-mono);
+  --tw-prose-body: hsl(var(--foreground));
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-links: hsl(var(--primary));
+  --tw-prose-code: hsl(var(--primary));
+  
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+[data-theme*="terminal"] .prose-codex h1,
+[data-theme*="terminal"] .prose-codex h2 {
+  text-transform: uppercase;
+  border-bottom: 1px dashed hsl(var(--border));
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px hsl(var(--primary));
+}
+
+[data-theme*="terminal"] .prose-codex a {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 4px;
+}
+
+[data-theme*="terminal"] .prose-codex code {
+  background-color: hsl(var(--primary) / 0.2);
+  padding: 0 0.25rem;
+}
+
+
+

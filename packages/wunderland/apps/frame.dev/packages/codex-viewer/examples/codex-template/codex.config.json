@@ -1,0 +1,20 @@
+{
+  "name": "Codex Template",
+  "tagline": "Analog knowledge OS starter",
+  "defaultWeave": "openstrand",
+  "links": [
+    {
+      "label": "Frame.dev Codex docs",
+      "href": "https://frame.dev/codex"
+    },
+    {
+      "label": "OpenStrand wiki",
+      "href": "https://frame.dev/codex#openstrand"
+    },
+    {
+      "label": "Codex Viewer npm",
+      "href": "https://www.npmjs.com/package/@framers/codex-viewer"
+    }
+  ]
+}
+

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.research.web-browser",
+  "name": "Web Browser Extension",
+  "version": "1.1.0",
+  "description": "Browser automation capabilities for AgentOS - navigate pages, scrape content, click links, and capture screenshots",
+  "author": {
+    "name": "Frame.dev",
+    "email": "support@frame.dev",
+    "url": "https://github.com/framersai"
+  },
+  "license": "MIT",
+  "keywords": ["browser", "scraping", "automation", "puppeteer", "playwright", "web", "navigate"],
+  "agentosVersion": "^2.0.0",
+  "categories": ["productivity", "research", "automation"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions"
+  },
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "browser_navigate",
+      "displayName": "Navigate to URL",
+      "description": "Navigate browser to a URL and get page content",
+      "entry": "./dist/tools/navigate.js"
+    },
+    {
+      "kind": "tool",
+      "id": "browser_scrape",
+      "displayName": "Scrape Content",
+      "description": "Extract content from web page using CSS selectors",
+      "entry": "./dist/tools/scrape.js"
+    },
+    {
+      "kind": "tool",
+      "id": "browser_click",
+      "displayName": "Click Element",
+      "description": "Click on an element in the current page",
+      "entry": "./dist/tools/click.js"
+    },
+    {
+      "kind": "tool",
+      "id": "browser_screenshot",
+      "displayName": "Take Screenshot",
+      "description": "Capture screenshot of current page or element",
+      "entry": "./dist/tools/screenshot.js"
+    },
+    {
+      "kind": "tool",
+      "id": "browser_type",
+      "displayName": "Type Text",
+      "description": "Type text into an input field",
+      "entry": "./dist/tools/type.js"
+    },
+    {
+      "kind": "tool",
+      "id": "browser_snapshot",
+      "displayName": "Page Snapshot",
+      "description": "Extract a structured snapshot of the current page DOM",
+      "entry": "./dist/tools/snapshot.js"
+    }
+  ],
+  "configuration": {
+    "properties": {
+      "browser.headless": {
+        "type": "boolean",
+        "default": true,
+        "description": "Run browser in headless mode"
+      },
+      "browser.timeout": {
+        "type": "number",
+        "default": 30000,
+        "minimum": 5000,
+        "maximum": 120000,
+        "description": "Default timeout for browser operations (ms)"
+      },
+      "browser.userAgent": {
+        "type": "string",
+        "description": "Custom user agent string"
+      },
+      "browser.viewport.width": {
+        "type": "number",
+        "default": 1920,
+        "description": "Browser viewport width"
+      },
+      "browser.viewport.height": {
+        "type": "number",
+        "default": 1080,
+        "description": "Browser viewport height"
+      }
+    }
+  },
+  "dependencies": {
+    "puppeteer-core": "^22.0.0"
+  }
+}
+
+

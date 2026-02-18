@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+                    <filter id="icon-shadow-green-light" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="2" result="offsetblur"/>
+                        <feFlood flood-color="#000000" flood-opacity="0.15"/>
+                        <feComposite in2="offsetblur" operator="in"/>
+                        <feMerge>
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+                
+                <g transform="translate(14, 14)" filter="url(#icon-shadow-green-light)">
+                    <!-- Shadow layers -->
+                    <rect x="3" y="3" width="14" height="14" fill="#10b981" opacity="0.3" rx="1"/>
+                    <rect x="19" y="3" width="14" height="14" fill="#10b981" opacity="0.3" rx="1"/>
+                    <rect x="3" y="19" width="14" height="14" fill="#10b981" opacity="0.3" rx="1"/>
+                    <rect x="19" y="19" width="14" height="14" fill="#10b981" opacity="0.3" rx="1"/>
+                    
+                    <!-- Mid depth -->
+                    <rect x="1.5" y="1.5" width="14" height="14" fill="#10b981" opacity="0.5" rx="1"/>
+                    <rect x="17.5" y="1.5" width="14" height="14" fill="#10b981" opacity="0.5" rx="1"/>
+                    <rect x="1.5" y="17.5" width="14" height="14" fill="#10b981" opacity="0.5" rx="1"/>
+                    <rect x="17.5" y="17.5" width="14" height="14" fill="#10b981" opacity="0.5" rx="1"/>
+                    
+                    <!-- Main blocks -->
+                    <rect x="0" y="0" width="14" height="14" fill="#10b981" rx="1"/>
+                    <rect x="16" y="0" width="14" height="14" fill="#10b981" rx="1"/>
+                    <rect x="0" y="16" width="14" height="14" fill="#10b981" rx="1"/>
+                    <rect x="16" y="16" width="14" height="14" fill="#10b981" rx="1"/>
+                    
+                    <!-- Cross lines -->
+                    <line x1="15" y1="7" x2="15" y2="23" stroke="white" stroke-width="1" opacity="0.6"/>
+                    <line x1="7" y1="15" x2="23" y2="15" stroke="white" stroke-width="1" opacity="0.6"/>
+                </g>
+            
+</svg>

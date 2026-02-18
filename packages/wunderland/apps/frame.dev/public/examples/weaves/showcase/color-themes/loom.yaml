@@ -1,0 +1,48 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# COLOR THEMES LOOM
+# ═══════════════════════════════════════════════════════════════════════════════
+# Demonstrates color customization options
+
+name: Color Themes
+description: Custom colors and accent styling examples
+
+style:
+  # Using emoji instead of icon
+  emoji: "🎨"
+  
+  # Teal/cyan accent
+  accentColor: "#06b6d4"
+  backgroundColor: "#ecfeff"
+  
+  # Border color (optional)
+  borderColor: "#22d3ee"
+  
+  darkText: true
+
+metadata:
+  difficulty: beginner
+  estimatedTime: 5
+  tags:
+    - colors
+    - themes
+    - styling
+
+order: 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

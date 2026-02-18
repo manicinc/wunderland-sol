@@ -1,0 +1,71 @@
+{
+  "name": "@framers/agentos-ext-tip-ingestion",
+  "version": "1.1.0",
+  "description": "Deterministic IPFS pinning and on-chain tip ingestion utilities for Wunderland agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./manifest.json": "./manifest.json",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "agentos",
+    "wunderland",
+    "provenance",
+    "solana",
+    "ipfs",
+    "tips",
+    "blockchain"
+  ],
+  "author": {
+    "name": "Framers AI",
+    "email": "team@frame.dev",
+    "url": "https://frame.dev"
+  },
+  "contributors": [
+    {
+      "name": "Johnny Dunn",
+      "email": "johnnyfived@protonmail.com",
+      "url": "https://github.com/jddunn"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/framersai/agentos-extensions.git",
+    "directory": "registry/curated/provenance/wunderland-tip-ingestion"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "wunderland": ">=0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "wunderland": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "wunderland": ">=0.2.0",
+    "@types/node": "^20.12.12",
+    "@vitest/coverage-v8": "^1.6.0",
+    "rimraf": "^5.0.7",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

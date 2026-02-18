@@ -1,0 +1,39 @@
+{
+  "$schema": "https://agentos.sh/schemas/extension-manifest-v1.json",
+  "id": "com.framers.channels.discord",
+  "name": "Discord Channel Extension",
+  "version": "0.1.0",
+  "description": "Bidirectional Discord messaging via discord.js — supports text, embeds, images, documents, threads, reactions, and guild management.",
+  "categories": ["channel", "communication"],
+  "platforms": ["discord"],
+  "sdk": "discord.js",
+  "extensions": [
+    {
+      "kind": "tool",
+      "id": "discordChannelSendMessage",
+      "displayName": "Send Discord Message"
+    },
+    {
+      "kind": "tool",
+      "id": "discordChannelSendMedia",
+      "displayName": "Send Discord Media"
+    },
+    {
+      "kind": "messaging-channel",
+      "id": "discordChannel",
+      "displayName": "Discord Channel Adapter"
+    }
+  ],
+  "requiredSecrets": ["discord.botToken"],
+  "features": [
+    "Text messages with Markdown formatting",
+    "Rich embed support with fields and colors",
+    "Image and document attachments",
+    "Thread creation and management",
+    "Message reactions",
+    "Typing indicators",
+    "Guild and DM support",
+    "Message editing and deletion",
+    "User mentions"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "architecture",
+  "name": "Architecture Document",
+  "category": "technical",
+  "icon": "Building2",
+  "description": "Document system architecture, design decisions, and technical structure",
+  "shortDescription": "System design and architecture documentation",
+  "difficulty": "advanced",
+  "estimatedTime": "45 min",
+  "tags": ["architecture", "design", "system", "technical"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": false,
+  "popularity": 70,
+  "defaultData": {
+    "contentType": "architecture"
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: architecture\nstatus: {status}\nversion: \"{version}\"\n---\n\n# {title}\n\n> {summary}\n\n## Status\n\n| Attribute | Value |\n|-----------|-------|\n| Status | {status} |\n| Version | {version} |\n| Last Updated | {date} |\n| Owner | [Name] |\n| Reviewers | [Names] |\n\n## Context & Problem Statement\n\n### Background\n\nWhat situation or problem prompted this architecture?\n\n### Goals\n\n- Primary goal 1\n- Primary goal 2\n- Primary goal 3\n\n### Non-Goals\n\n- What this architecture does NOT address\n- Explicit exclusions\n\n### Constraints\n\n- Technical constraint 1\n- Business constraint 2\n- Resource constraint 3\n\n## Architecture Overview\n\n### High-Level Diagram\n\n```\n┌─────────────────────────────────────────────────────┐\n│                    System Name                       │\n├─────────────────────────────────────────────────────┤\n│  ┌─────────┐    ┌─────────┐    ┌─────────┐        │\n│  │ Layer 1 │───▶│ Layer 2 │───▶│ Layer 3 │        │\n│  └─────────┘    └─────────┘    └─────────┘        │\n└─────────────────────────────────────────────────────┘\n```\n\n### Key Components\n\n| Component | Purpose | Technology |\n|-----------|---------|------------|\n| Component 1 | What it does | Stack used |\n| Component 2 | What it does | Stack used |\n| Component 3 | What it does | Stack used |\n\n## Detailed Design\n\n### Component 1: [Name]\n\n**Responsibility:** What this component owns\n\n**Interfaces:**\n- Input: Description\n- Output: Description\n\n**Internal Structure:**\n```\nDiagram or description\n```\n\n### Component 2: [Name]\n\n**Responsibility:** What this component owns\n\n**Data Flow:**\n1. Step 1\n2. Step 2\n3. Step 3\n\n### Data Model\n\n```\nEntity Relationship or Schema diagram\n```\n\n| Entity | Attributes | Relationships |\n|--------|------------|---------------|\n| Entity1 | attr1, attr2 | → Entity2 |\n| Entity2 | attr1, attr2 | ← Entity1 |\n\n## Decision Log\n\n### Decision 1: [Topic]\n\n**Context:** Why was a decision needed?\n\n**Options Considered:**\n1. Option A: Pros/Cons\n2. Option B: Pros/Cons\n3. Option C: Pros/Cons\n\n**Decision:** Option chosen and rationale\n\n**Consequences:**\n- Positive: Benefit 1\n- Negative: Tradeoff 1\n\n### Decision 2: [Topic]\n\n...\n\n## Quality Attributes\n\n### Performance\n\n- Target: X requests/second\n- Latency: < Y ms p99\n- Strategy: How achieved\n\n### Scalability\n\n- Horizontal scaling approach\n- Vertical scaling limits\n- Bottlenecks and mitigations\n\n### Security\n\n- Authentication: Method\n- Authorization: Model\n- Data protection: Approach\n\n### Reliability\n\n- Availability target: X%\n- Failure modes and recovery\n- Monitoring and alerting\n\n## Deployment\n\n### Infrastructure\n\n```\nDeployment diagram\n```\n\n### Environments\n\n| Environment | Purpose | URL |\n|-------------|---------|-----|\n| Development | Testing | dev.example.com |\n| Staging | Pre-prod | staging.example.com |\n| Production | Live | example.com |\n\n## Migration Plan\n\n### Phase 1: [Description]\n- Task 1\n- Task 2\n\n### Phase 2: [Description]\n- Task 1\n- Task 2\n\n### Rollback Plan\n\nHow to revert if issues arise...\n\n## Risks & Mitigations\n\n| Risk | Likelihood | Impact | Mitigation |\n|------|------------|--------|------------|\n| Risk 1 | Medium | High | Strategy |\n| Risk 2 | Low | Medium | Strategy |\n\n## Future Considerations\n\n- Potential evolution 1\n- Potential evolution 2\n\n## References\n\n- [Related ADR](#)\n- [External Documentation](#)\n- [Similar Systems](#)\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

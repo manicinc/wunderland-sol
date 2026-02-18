@@ -1,0 +1,134 @@
+// File: frontend/src/styles/components/_diagram-viewer.scss
+/**
+ * @file _diagram-viewer.scss
+ * @description Styles for the DiagramViewer.vue component, ensuring Mermaid diagrams
+ * are rendered correctly within the "Ephemeral Harmony" theme, including theme-aware
+ * styling for diagram elements, controls, and error states.
+ *
+ * @role Defines the visual appearance and layout for Mermaid diagram rendering and interaction.
+ * @dependencies `../abstracts/variables`, `../abstracts/mixins`, `./buttons`.
+ * @assumptions DiagramViewer.vue component structure uses classes like `.diagram-viewer-wrapper-ephemeral`,
+ * `.diagram-controls-ephemeral`, `.mermaid-diagram-container`, etc.
+ * Mermaid library handles the direct SVG rendering; these styles adapt its container and controls.
+ * CSS custom properties for theming are available.
+ * @version 1.1.1 - Ensured consistent use of CSS variables and SCSS fallbacks.
+ */
+
+@use '../abstracts/variables' as var;
+@use '../abstracts/mixins' as mixins;
+@use './buttons' as buttonsFile;
+
+.diagram-viewer-wrapper-ephemeral {
+  position: relative; // For positioning controls or overlays
+  padding: var.$spacing-md;
+  border-radius: var.$radius-xl;
+  margin-bottom: var.$spacing-lg; // Space below diagram viewer
+
+  @include mixins.glassmorphic-pane(
+    $bg-color-css-var-prefix: '--color-bg-secondary', // Use secondary background for a distinct panel
+    $border-color-css-var-prefix: '--color-border-glass',
+    $blur-amount-css-var: '--blur-glass',
+    $shadow-css-var: '--shadow-depth-lg', // Prominent shadow for the diagram panel
+    // SCSS Fallbacks
+    $fb-bg-h: var.$default-color-bg-secondary-h, $fb-bg-s: var.$default-color-bg-secondary-s, $fb-bg-l: var.$default-color-bg-secondary-l, $fb-bg-a: 0.8, // Slightly more opaque glass
+    $fb-border-h: var.$default-color-border-glass-h, $fb-border-s: var.$default-color-border-glass-s, $fb-border-l: var.$default-color-border-glass-l, $fb-border-a: 0.35,
+    $fb-blur: var.$default-blur-glass,
+    $fb-shadow: var.$scss-box-shadow-lg
+  );
+
+  // Header for title and controls
+  .diagram-header-ephemeral {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var.$spacing-md;
+    padding-bottom: var.$spacing-sm;
+    border-bottom: 1px solid hsla(var(--color-border-primary-h, var.$default-color-border-primary-h), var(--color-border-primary-s, var.$default-color-border-primary-s), var(--color-border-primary-l, var.$default-color-border-primary-l), 0.2);
+
+    .diagram-title-ephemeral {
+      font-family: var(--font-family-display, #{var.$font-family-display});
+      font-size: var.$font-size-lg;
+      font-weight: 500;
+      color: hsl(var(--color-text-primary-h), var(--color-text-primary-s), var(--color-text-primary-l));
+      @include mixins.text-glow($glow-color-var-prefix: '--color-accent-secondary', $fb-glow-a: 0.25, $glow-radius: 4px);
+    }
+  }
+
+  // Controls for zoom, pan, download
+  .diagram-controls-ephemeral {
+    display: flex;
+    gap: var.$spacing-sm;
+    .control-button-ephemeral { // Reusing class from CompactMessageRenderer for consistency
+      @include buttonsFile.btn-ghost;
+      @include buttonsFile.btn-icon-modifier;
+      padding: calc(#{var.$spacing-xs} * 1.2) !important; // SASS calc
+      .icon { width: 1.1rem; height: 1.1rem; }
+    }
+  }
+
+  // Container for the Mermaid SVG output
+  .mermaid-diagram-container {
+    display: flex; // Center the diagram if it's smaller than the container
+    justify-content: center;
+    align-items: center;
+    min-height: 200px; // Ensure a minimum height for small diagrams
+    background-color: hsla(var(--color-bg-primary-h, var.$default-color-bg-primary-h), var(--color-bg-primary-s, var.$default-color-bg-primary-s), var(--color-bg-primary-l, var.$default-color-bg-primary-l), 0.1); // Very subtle inner background
+    border-radius: var.$radius-lg;
+    padding: var.$spacing-sm;
+    overflow: auto; // Allow panning/scrolling if diagram is larger than container
+
+    // Custom scrollbar for the diagram container itself
+    @include mixins.custom-scrollbar(
+      $thumb-color-var-prefix: '--color-accent-primary',
+      $thumb-base-alpha: 0.3,
+      $thumb-hover-alpha: 0.5,
+      $track-color-var-prefix: '--color-bg-primary',
+      $track-alpha: 0.05,
+      $width: 5px // Slim scrollbar for diagram area
+    );
+
+    // Mermaid generates an SVG directly. We style its container.
+    // Specific Mermaid element styling (nodes, edges, text) is done via Mermaid's theme/init configuration.
+    // This SCSS ensures the SVG itself is responsive and fits well.
+    .mermaid, // Class typically applied by Mermaid to the SVG container div
+    > svg {   // Direct SVG child if Mermaid outputs it without a wrapper div
+      max-width: 100%;
+      height: auto; // Maintain aspect ratio
+      display: block; // Remove extra space below SVG
+      // Ensure Mermaid diagram text color is theme-aware if not handled by Mermaid themes
+      // This is a broad override, prefer Mermaid's own theming capabilities.
+      // text { fill: hsl(var(--color-text-diagram-h, var(--color-text-primary-h)), /* ... */) !important; }
+    }
+  }
+
+  // Loading state
+  .diagram-loading-ephemeral {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px; // Same min-height as diagram container
+    color: hsl(var(--color-text-muted-h), var(--color-text-muted-s), var(--color-text-muted-l));
+    font-size: var.$font-size-sm;
+    // Add a spinner or loading animation here if desired
+    // Example: &::after { content: 'Loading Diagram...'; /* Add spinner styles */ }
+  }
+
+  // Error state
+  .diagram-error-ephemeral {
+    padding: var.$spacing-md;
+    border-radius: var.$radius-md;
+    background-color: hsla(var(--color-error-h, var.$default-color-error-h), var(--color-error-s, var.$default-color-error-s), var(--color-error-l, var.$default-color-error-l), 0.1);
+    border: 1px solid hsla(var(--color-error-h, var.$default-color-error-h), var(--color-error-s, var.$default-color-error-s), var(--color-error-l, var.$default-color-error-l), 0.3);
+    color: hsl(var(--color-error-text-h, var.$default-color-error-text-h), var(--color-error-text-s, var.$default-color-error-text-s), var(--color-error-text-l, var.$default-color-error-text-l));
+    font-size: var.$font-size-sm;
+    white-space: pre-wrap; // Preserve formatting of error messages
+    overflow-x: auto; // Scroll for long error messages
+    @include mixins.custom-scrollbar(
+      $thumb-color-var-prefix: '--color-error', // Use error color for thumb
+      $thumb-base-alpha: 0.5,
+      $track-color-var-prefix: '--color-error', // Use error color for track (very faint)
+      $track-alpha: 0.1,
+      $width: 4px
+    );
+  }
+}

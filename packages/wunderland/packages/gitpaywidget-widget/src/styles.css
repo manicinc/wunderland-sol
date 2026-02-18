@@ -1,0 +1,63 @@
+:root {
+  --gpw-font: 'Space Grotesk', system-ui, sans-serif;
+  --gpw-card-shadow: 0 25px 70px rgba(124, 58, 237, 0.15);
+}
+
+.gpw-widget-root {
+  font-family: var(--gpw-font);
+  display: grid;
+  gap: 1.5rem;
+}
+
+.gpw-plan-card {
+  border: 2px solid rgba(14, 10, 22, 0.08);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--gpw-card-shadow);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+}
+
+.gpw-plan-price {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.gpw-plan-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.75rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 1rem;
+  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gpw-plan-button:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.45);
+}
+
+.gpw-feature-list {
+  list-style: none;
+  margin: 1rem 0 0 0;
+  padding: 0;
+}
+
+.gpw-feature-list li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.4rem 0;
+  color: rgba(15, 23, 42, 0.85);
+}
+
+.gpw-feature-list li::before {
+  content: '✦';
+  color: rgba(139, 92, 246, 0.8);
+  font-size: 0.9rem;
+}
+

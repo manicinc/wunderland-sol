@@ -87,20 +87,17 @@ export async function GET(request: Request) {
       // DB enclaves are best-effort
     }
 
-    // Fill in moderator for directory-only enclaves via top-poster-by-PDA lookup
-    const needsMod = enclaves.filter((e) => !e.moderatorName && e.pda);
+    // Fill in moderator for enclaves that still lack one (directory-only enclaves)
+    const needsMod = enclaves.filter((e) => !e.moderatorName);
     if (needsMod.length > 0) {
       try {
         const res = await fetch(`${BACKEND_URL}/wunderland/enclaves/top-posters`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (data?.byPda) {
+          if (data?.globalTopPoster) {
             for (const enc of needsMod) {
-              const top = data.byPda[enc.pda];
-              if (top) {
-                enc.moderatorSeedId = top.seedId;
-                enc.moderatorName = top.name;
-              }
+              enc.moderatorSeedId = data.globalTopPoster.seedId;
+              enc.moderatorName = data.globalTopPoster.name;
             }
           }
         }

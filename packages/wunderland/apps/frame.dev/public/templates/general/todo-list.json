@@ -1,0 +1,83 @@
+{
+  "id": "todo-list",
+  "name": "Todo List",
+  "category": "general",
+  "icon": "ListTodo",
+  "description": "Track tasks with checkboxes, priorities, and due dates. Perfect for daily todos, project tasks, or any actionable list.",
+  "shortDescription": "Actionable task list with checkboxes",
+  "difficulty": "beginner",
+  "estimatedTime": "5 min",
+  "tags": ["todo", "tasks", "checklist", "productivity", "organize"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 92,
+  "defaultData": {
+    "contentType": "todo"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "List Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "What is this todo list for?"
+    },
+    {
+      "name": "summary",
+      "label": "Description",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Context or goals for this list"
+    },
+    {
+      "name": "dueDate",
+      "label": "Due Date",
+      "type": "date",
+      "required": false,
+      "placeholder": "When should this be completed?"
+    },
+    {
+      "name": "priority",
+      "label": "Priority",
+      "type": "select",
+      "required": false,
+      "placeholder": "Select priority level",
+      "options": ["low", "medium", "high", "urgent"],
+      "defaultValue": "medium"
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Categorize this list"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "dueDate", "priority", "contentType", "progress"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ncontentType: todo\npriority: {priority}\ndueDate: {dueDate}\nprogress: 0\ncreated: {date}\n---\n\n# {title}\n\n{summary}\n\n## Progress\n\n<!-- Auto-calculated: X of Y tasks complete -->\n\n**Status:** 🔴 Not Started | **Priority:** {priority}\n\n---\n\n## 🔴 High Priority\n\n- [ ] Critical task 1\n- [ ] Critical task 2\n- [ ] Critical task 3\n\n## 🟡 Medium Priority\n\n- [ ] Standard task 1\n- [ ] Standard task 2\n- [ ] Standard task 3\n\n## 🟢 Low Priority\n\n- [ ] Nice to have 1\n- [ ] Nice to have 2\n\n## ✅ Completed\n\n<!-- Move completed tasks here -->\n\n- [x] Example completed task\n\n---\n\n## Notes\n\nAdditional context, blockers, or reminders...\n\n## Quick Add\n\n<!-- Use this section to quickly jot down new tasks, then organize them above -->\n\n- [ ] \n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

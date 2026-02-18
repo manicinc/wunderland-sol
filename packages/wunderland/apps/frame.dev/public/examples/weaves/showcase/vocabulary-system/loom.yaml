@@ -1,0 +1,40 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# VOCABULARY SYSTEM LOOM - Dynamic NLP Classification
+# ═══════════════════════════════════════════════════════════════════════════════
+# This loom demonstrates the dynamic vocabulary system that uses real NLP
+# instead of hardcoded keyword lists. Features WordNet, embeddings, and
+# taxonomy utilities for intelligent text classification.
+
+name: Dynamic Vocabulary System
+description: Real NLP text classification with WordNet synonyms, semantic embeddings, and taxonomy utilities - no hardcoded keywords
+
+style:
+  icon: BookOpen
+  accentColor: "#84cc16"
+  backgroundColor: "#f7fee7"
+  backgroundGradient: "linear-gradient(135deg, #ecfccb 0%, #bef264 50%, #84cc16 100%)"
+  darkText: true
+
+metadata:
+  author: Frame Team
+  created: "2025-01-02"
+  updated: "2025-01-02"
+  tags:
+    - nlp
+    - vocabulary
+    - wordnet
+    - embeddings
+    - classification
+    - semantic-search
+    - taxonomy
+    - offline-first
+  license: MIT
+  references:
+    - title: "WordNet - A Lexical Database for English"
+      url: "https://wordnet.princeton.edu/"
+    - title: "MiniLM-L6-v2 - Sentence Embeddings"
+      url: "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2"
+
+order: 2
+featured: true
+hidden: false

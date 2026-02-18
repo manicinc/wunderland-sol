@@ -1,0 +1,10 @@
+name: "Semantic Similarity"
+description: "Measures how close the output meaning is to the expected answer. Adjust threshold in the UI (common values: 0.7 moderate, 0.85 strict, 0.9+ exact)."
+type: semantic-similarity
+config:
+  threshold: 0.8
+inspiration: |
+  Cosine similarity on provider embeddings (OpenAI text-embedding-3-small,
+  Ollama, or LLM-generated fallback). Captures meaning beyond surface-level
+  string matching. Falls back to weighted token overlap when embeddings
+  are unavailable.

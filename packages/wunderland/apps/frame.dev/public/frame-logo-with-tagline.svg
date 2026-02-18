@@ -1,0 +1,20 @@
+<svg viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Frame.dev logo -->
+  <g>
+    <!-- F shape -->
+    <path d="M10 20h30v5H15v10h20v5H15v15h-5V20z" fill="#111827"/>
+    
+    <!-- Decorative dot -->
+    <circle cx="50" cy="40" r="3" fill="#10B981"/>
+    
+    <!-- Text -->
+    <text x="60" y="42" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#111827">
+      Frame<tspan fill="#10B981">.dev</tspan>
+    </text>
+  </g>
+  
+  <!-- Tagline -->
+  <text x="10" y="65" font-family="Georgia, serif" font-size="14" font-style="italic" fill="#64748B">
+    The OS for humans, the codex of humanity.
+  </text>
+</svg>

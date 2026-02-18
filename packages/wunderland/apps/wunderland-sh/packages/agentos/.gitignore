@@ -1,0 +1,19 @@
+dist/
+tsconfig.tsbuildinfo
+tsconfig.build.tsbuildinfo
+**/*.js
+!eslint.config.js
+!scripts/*.js
+**/*.js.map
+**/*.d.ts.map
+
+node_modules/
+
+# Prisma generated client
+src/generated/
+
+# Generated documentation
+docs/api/
+
+# Test coverage reports
+coverage/

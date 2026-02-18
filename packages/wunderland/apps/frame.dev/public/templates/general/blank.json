@@ -1,0 +1,74 @@
+{
+  "id": "blank",
+  "name": "Blank Strand",
+  "category": "general",
+  "icon": "FileText",
+  "description": "Start from scratch with a minimal template",
+  "shortDescription": "Empty canvas for any content",
+  "difficulty": "beginner",
+  "estimatedTime": "5 min",
+  "tags": ["starter", "flexible", "minimal"],
+  "version": "1.0.0",
+  "author": "Frame Team",
+  "featured": true,
+  "popularity": 100,
+  "defaultData": {
+    "contentType": "general"
+  },
+  "fields": [
+    {
+      "name": "title",
+      "label": "Title",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter a descriptive title",
+      "validation": {
+        "minLength": 3,
+        "maxLength": 100
+      }
+    },
+    {
+      "name": "summary",
+      "label": "Summary",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Brief description of this strand",
+      "validation": {
+        "maxLength": 300
+      }
+    },
+    {
+      "name": "tags",
+      "label": "Tags",
+      "type": "tags",
+      "required": false,
+      "placeholder": "Add relevant tags"
+    }
+  ],
+  "frontmatter": {
+    "required": ["title"],
+    "optional": ["summary", "tags", "difficulty", "contentType"]
+  },
+  "template": "---\ntitle: \"{title}\"\nsummary: \"{summary}\"\ntags: [{tags}]\ndifficulty: {difficulty}\n---\n\n# {title}\n\n{summary}\n\n## Overview\n\nWrite your content here...\n\n## Key Points\n\n- Point 1\n- Point 2\n- Point 3\n\n## Notes\n\nAdditional thoughts and observations...\n"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

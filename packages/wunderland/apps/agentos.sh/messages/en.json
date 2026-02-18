@@ -1,0 +1,670 @@
+{
+  "metadata": {
+    "title": "AgentOS | Portable AI Agent Runtime for Adaptive & Emergent Intelligence",
+    "description": "Build adaptive, emergent AI agents with AgentOS—the portable universal runtime for enterprise RAG, multi-agent orchestration, and permanent intelligence.",
+    "ogTitle": "AgentOS | Adaptive AI Intelligence for Enterprise-Ready Agents",
+    "ogDescription": "Build adaptive, emergent AI agents with memory, tools, and agency. Open‑source runtime featuring GMI roles, multi‑agent orchestration, and enterprise guardrails. By Framers (frame.dev).",
+    "twitterTitle": "AgentOS | Adaptive AI Intelligence for Enterprise-Ready Agents",
+    "twitterDescription": "Build adaptive, emergent AI agents with AgentOS. Open‑source runtime with GMI roles, agency orchestration, and enterprise guardrails. By Framers."
+  },
+  "nav": {
+    "features": "Features",
+    "docs": "API Docs",
+    "guides": "Guides",
+    "apiReference": "API Reference",
+    "changelog": "Changelog",
+    "openapi": "OpenAPI",
+    "faq": "FAQ",
+    "about": "About",
+    "github": "GitHub",
+    "marketplace": "Marketplace"
+  },
+  "hero": {
+    "badge": "Open Source · Adaptive · Emergent",
+    "title": "Portable AI Agent Runtime for Adaptive & Emergent Intelligence",
+    "subtitle": "Build adaptive, emergent AI agents with memory, tools, and agency. TypeScript runtime featuring GMI roles, multi-agent orchestration, and enterprise guardrails.",
+    "cycleWords": ["Adaptive","Emergent"],
+    "cycleWordsTail": ["emergent","adaptive"],
+    "headlinePairs": [
+      { "top": "Adaptive Intelligence", "bottom": "for Autonomous Agents" },
+      { "top": "Emergent Intelligence", "bottom": "for Enterprise Orchestration" },
+      { "top": "Adaptive Intelligence", "bottom": "for Safety-Critical Workflows" },
+      { "top": "Emergent Intelligence", "bottom": "for Parallel AI Teams" }
+    ],
+    "technicalHighlights": [
+      { "title": "Streaming-first runtime", "detail": "Token-level delivery across personas, guardrails, and channels." },
+      { "title": "Deterministic orchestration", "detail": "Parallel GMIs with auditable routing, approvals, and budgets." },
+      { "title": "Zero-copy memory fabric", "detail": "Vector, episodic, and working memory stitched together for recall." },
+      { "title": "Portable intelligence capsules", "detail": "Export full AgentOS instances as Markdown or JSON and ingest anywhere." }
+    ],
+    "visualStats": [
+      { "label": "Agencies live", "value": "128" },
+      { "label": "Approval SLA", "value": "3.2 min" },
+      { "label": "Guardrail coverage", "value": "98%" }
+    ],
+    "ctaPrimary": "Try Voice Chat Assistant",
+    "ctaSecondary": "Star on GitHub",
+    "marketplaceLead": "Need curated agents?",
+    "marketplaceCta": "Marketplace coming soon",
+    "codeLabel": "npm install @framers/agentos",
+    "copyToast": "Copied to clipboard!",
+    "copyAria": "Copy command",
+    "getStarted": "Get Started",
+    "viewOnGithub": "View on GitHub",
+    "copiedToClipboard": "Copied to clipboard!",
+    "stats": {
+      "githubStars": "GitHub Stars",
+      "contributors": "Contributors",
+      "forks": "Forks",
+      "securityScore": "Security Score"
+    },
+    "compliance": {
+      "gdpr": "GDPR & PII Compliant",
+      "soc2": "SOC2 (Coming Soon)",
+      "enterpriseSupport": "Enterprise Support Available"
+    },
+    "capabilities": {
+      "ts": { "label": "TypeScript Native", "value": "Type-Safe" },
+      "oss": { "label": "Open Source", "value": "Apache 2.0" },
+      "streaming": { "label": "Real-time Streaming", "value": "Async Ready" },
+      "memory": { "label": "Persistent Memory", "value": "Built-in" }
+    },
+    "heroVisualAlt": "AgentOS orchestration workspace preview"
+  },
+  "features": {
+    "sectionTitle": "Enterprise‑Ready Features",
+    "sectionSubtitle": "Production-grade infrastructure for building, deploying, and scaling AI agents",
+    "multiAgent": {
+      "title": "Emergent Multi-Agent Coordination",
+      "description": "Spawn researcher, analyst, critic, and executor personas from a single goal. Shared context, budgets, and approvals keep every branch in sync.",
+      "pill": "🆕 v0.1.3",
+      "bullet1": "Deterministic routing or adaptive fan-out",
+      "bullet2": "Citations + memory stitched automatically"
+    },
+    "toolPacks": {
+      "title": "Tool & Guardrail Packs",
+      "description": "Ship opinionated extensions for search, vision, code execution, or custom APIs with built-in permissions and retries.",
+      "pill": "Extension Ecosystem",
+      "bullet1": "Manifest-driven tool registry",
+      "bullet2": "Guardrail presets + compliance tags"
+    },
+    "language": {
+      "title": "Language & Translation",
+      "description": "Auto-detect locale and tone per surface. Personas stay fluent across voice, chat, and docs with translation providers of your choice.",
+      "pill": "Multilingual Ready",
+      "bullet1": "Persona-aware tone adaptation",
+      "bullet2": "Fallback routing by locale"
+    },
+    "storage": {
+      "title": "Storage & Deployment",
+      "description": "Switch between PostgreSQL, better-sqlite3, sql.js, or your own data layers. Every agent step is synced and replayable.",
+      "pill": "Deploy Anywhere",
+      "bullet1": "Reference server templates",
+      "bullet2": "Snapshot + replay tooling"
+    },
+    "workbench": {
+      "title": "Local-First Workbench",
+      "description": "Prototype entire agencies in-browser with persisted SQL, timeline scrubbers, and a built-in marketplace of personas.",
+      "pill": "Offline Capable",
+      "bullet1": "Inspect reasoning + OpenTelemetry traces live",
+      "bullet2": "Sync artifacts back to the cloud",
+      "bullet3": "Export full agencies as Markdown/JSON bundles"
+    },
+    "guardrails": {
+      "title": "Guardrails & Safety",
+      "description": "Built-in content moderation, PII detection, and compliance checks. Circuit breakers, cost guards, and stuck detection prevent runaway loops and excessive spending.",
+      "pill": "Enterprise Safety",
+      "bullet1": "Circuit breaker + cost guard + stuck detection",
+      "bullet2": "Content filtering & approval workflows"
+    },
+    "streaming": {
+      "title": "Streaming Runtime",
+      "description": "Token-level streaming with real-time output. Built for low-latency interactions with support for SSE, WebSockets, and custom transports.",
+      "pill": "Real-time",
+      "bullet1": "Token-by-token delivery",
+      "bullet2": "Multi-channel support"
+    },
+    "workflow": {
+      "title": "Workflow Engine",
+      "description": "Define complex multi-step workflows with conditional branching, parallel execution, and automatic retry logic.",
+      "pill": "Orchestration",
+      "bullet1": "Visual workflow builder",
+      "bullet2": "Parallel task execution"
+    }
+  },
+  "marketplace": {
+    "comingSoon": "Agent Marketplace Coming Soon",
+    "description": "Share, buy, and sell your AgentOS agencies. We'll handle CI/CD, infrastructure, payouts, and compliance so you can focus on adaptive, emergent, permanent intelligence."
+  },
+  "caseStudies": {
+    "comingSoon": "Case Studies Coming Soon",
+    "description": "Real-world AgentOS implementations and production deployments"
+  },
+  "footer": {
+    "tagline": "TypeScript runtime for adaptive AI agents by Frame.dev",
+    "resources": "Resources",
+    "docsGuides": "Docs (Guides)",
+    "apiReferenceTSDoc": "API Reference (TypeDoc/TSDoc)",
+    "examples": "Examples",
+    "releaseNotes": "Release Notes",
+    "discord": "Discord",
+    "company": "Company",
+    "contact": "Contact",
+    "legal": "Legal",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "license": "Apache 2.0 (core) + MIT (agents, extensions, guardrails)",
+    "copyright": "© {year} Frame.dev. All rights reserved."
+  },
+  "cta": {
+    "title": "Ready to Build Adaptive AI Agents?",
+    "description": "Join developers building the next generation of intelligent systems with AgentOS.",
+    "getStarted": "Get Started",
+    "talkToUs": "Talk to Us",
+    "badge": "Join the AI Revolution",
+    "exploreLabel": "Or explore AgentOS today:",
+    "tryVoiceChat": "Try Voice Chat",
+    "browseCode": "Browse Code",
+    "marketplace": "Marketplace"
+  },
+  "LanguageSwitcher": {
+    "switchLanguage": "Switch language",
+    "currentLanguage": "Current language: {language}",
+    "selectLanguage": "Select language"
+  },
+  "skipToContent": "Skip to content",
+  "skipToMain": "Skip to main content",
+  "productCards": {
+    "title": "Core Capabilities",
+    "subtitle": "Enterprise-grade features to build, scale, and ship intelligent AI agents",
+    "stats": {
+      "contextWindow": "Context Window",
+      "inferenceLatency": "Inference Latency",
+      "activePersonas": "Active Personas",
+      "parallelTasks": "Parallel Tasks",
+      "taskThroughput": "Task Throughput",
+      "orchestrationOverhead": "Orchestration Overhead",
+      "vectorCapacity": "Vector Capacity",
+      "retrievalSpeed": "Retrieval Speed",
+      "compressionRatio": "Compression Ratio",
+      "endToEndLatency": "End-to-End Latency",
+      "streamBandwidth": "Stream Bandwidth",
+      "connectionStability": "Connection Stability"
+    },
+    "cards": {
+      "adaptive": {
+        "title": "Adaptive Intelligence",
+        "description": "Real-time learning and context-aware decision-making that evolves with every interaction"
+      },
+      "distributed": {
+        "title": "Distributed Cognition",
+        "description": "Parallel processing across multiple agents with seamless coordination and load balancing"
+      },
+      "memory": {
+        "title": "Persistent Memory",
+        "description": "Boundless storage with instant recall via advanced vector embeddings and semantic search"
+      },
+      "streaming": {
+        "title": "Real-time Streaming",
+        "description": "Ultra-low latency event architecture with WebSocket support and 99.99% uptime"
+      }
+    }
+  },
+  "enterprise": {
+    "title": "Enterprise Ready Features",
+    "subtitle": "Building blocks of enterprise-grade infrastructure, each layer adding security and scale",
+    "features": {
+      "security": {
+        "title": "Security Foundation",
+        "items": ["AES-256 Encryption","Zero-Trust Architecture","End-to-End Security"]
+      },
+      "compliance": {
+        "title": "Compliance & Privacy",
+        "items": ["GDPR Compliant","PII Redaction","Data Residency Controls"]
+      },
+      "auth": {
+        "title": "Authentication",
+        "items": ["SSO/SAML 2.0","OAuth 2.0","MFA Support"]
+      },
+      "audit": {
+        "title": "Audit & Monitoring",
+        "items": ["Real-time Monitoring","Audit Logs","Anomaly Detection"]
+      },
+      "soc2": {
+        "title": "SOC2 Compliance",
+        "items": ["Type II (In Progress)","Annual Audits","Continuous Compliance"]
+      },
+      "scale": {
+        "title": "Enterprise Scale",
+        "items": ["Auto-scaling","99.99% SLA","Global CDN"]
+      }
+    },
+    "legend": {
+      "fullyImplemented": {
+        "title": "Fully Implemented",
+        "description": "GDPR compliance, PII redaction, and core security features are production-ready"
+      },
+      "inProgress": {
+        "title": "In Progress",
+        "description": "SOC2 Type II certification underway, expected completion Q2 2024"
+      },
+      "enterpriseSupport": {
+        "title": "Enterprise Support",
+        "description": "24/7 support with vca.chat integration and dedicated success managers"
+      }
+    },
+    "trustBadge": "Trusted by industry leaders",
+    "wipLabel": "WIP",
+    "currentlyDevelopment": "Currently in development"
+  },
+  "multiAgent": {
+    "title": "Multi-Agent Collaboration Network",
+    "subtitle": "Researcher, Analyst, Creator, Critic, Executor stream insights in parallel",
+    "description": "Orchestrator routes, memory persists - choose the right pattern for your use case",
+    "patterns": {
+      "consensus": {
+        "title": "Consensus-Based Collaboration",
+        "description": "Multiple agents vote on decisions with weighted confidence scores",
+        "workflow": {
+          "steps": [
+            "All agents analyze input simultaneously",
+            "Each agent proposes solution with confidence score",
+            "Weighted voting based on expertise",
+            "Consensus threshold validation",
+            "Execute agreed-upon action"
+          ],
+          "duration": "200-500ms",
+          "throughput": "1000 decisions/min"
+        },
+        "useCases": [
+          {
+            "title": "Financial Trading Decisions",
+            "description": "Multiple AI analysts vote on trade recommendations",
+            "metrics": [
+              { "label": "Accuracy", "value": "94%" },
+              { "label": "Consensus Time", "value": "< 200ms" },
+              { "label": "Risk Reduction", "value": "67%" }
+            ]
+          },
+          {
+            "title": "Content Moderation",
+            "description": "Multiple agents evaluate content for policy violations",
+            "metrics": [
+              { "label": "False Positives", "value": "-82%" },
+              { "label": "Coverage", "value": "99.9%" },
+              { "label": "Review Speed", "value": "10k/hour" }
+            ]
+          },
+          {
+            "title": "Medical Diagnosis Support",
+            "description": "Specialist agents collaborate on patient diagnosis",
+            "metrics": [
+              { "label": "Diagnostic Accuracy", "value": "97%" },
+              { "label": "Second Opinion Rate", "value": "100%" },
+              { "label": "Time to Diagnosis", "value": "-45%" }
+            ]
+          }
+        ],
+        "proscons": {
+          "pros": [
+            "High accuracy through collective intelligence",
+            "Built-in validation and error checking",
+            "Reduces individual agent bias",
+            "Transparent decision trail"
+          ],
+          "cons": [
+            "Higher latency than single agent",
+            "Requires more compute resources",
+            "Potential for deadlock scenarios",
+            "Complex conflict resolution"
+          ]
+        }
+      },
+      "sequential": {
+        "title": "Sequential Pipeline",
+        "description": "Agents process tasks in a defined order, each building on the previous",
+        "workflow": {
+          "steps": [
+            "Researcher gathers initial data",
+            "Analyst processes and structures information",
+            "Creator generates solution",
+            "Critic validates and refines",
+            "Executor implements final output"
+          ],
+          "duration": "500-2000ms",
+          "throughput": "500 tasks/min"
+        },
+        "useCases": [
+          {
+            "title": "Document Processing Pipeline",
+            "description": "Extract → Analyze → Summarize → Format → Deliver",
+            "metrics": [
+              { "label": "Accuracy", "value": "96%" },
+              { "label": "Processing Time", "value": "1.2s/doc" },
+              { "label": "Error Rate", "value": "< 0.1%" }
+            ]
+          },
+          {
+            "title": "Customer Support Escalation",
+            "description": "Triage → Research → Solution → Review → Response",
+            "metrics": [
+              { "label": "Resolution Rate", "value": "89%" },
+              { "label": "Avg Handle Time", "value": "45s" },
+              { "label": "Customer Satisfaction", "value": "4.7/5" }
+            ]
+          },
+          {
+            "title": "Code Review & Refactoring",
+            "description": "Analyze → Identify Issues → Suggest Fixes → Test → Deploy",
+            "metrics": [
+              { "label": "Bug Detection", "value": "92%" },
+              { "label": "Code Quality", "value": "+35%" },
+              { "label": "Review Time", "value": "-60%" }
+            ]
+          }
+        ],
+        "proscons": {
+          "pros": [
+            "Clear workflow and accountability",
+            "Easy to debug and monitor",
+            "Predictable resource usage",
+            "Simple error recovery"
+          ],
+          "cons": [
+            "Single point of failure risks",
+            "Limited parallelization",
+            "Higher total latency",
+            "Bottleneck potential"
+          ]
+        }
+      },
+      "parallel": {
+        "title": "Parallel Execution",
+        "description": "Agents work simultaneously on different aspects of the same task",
+        "workflow": {
+          "steps": [
+            "Task decomposition by orchestrator",
+            "Parallel assignment to all agents",
+            "Concurrent processing",
+            "Result aggregation",
+            "Orchestrator merges outputs"
+          ],
+          "duration": "100-300ms",
+          "throughput": "5000 tasks/min"
+        },
+        "useCases": [
+          {
+            "title": "Real-time Market Analysis",
+            "description": "Analyze stocks, bonds, forex, crypto simultaneously",
+            "metrics": [
+              { "label": "Coverage", "value": "10k assets" },
+              { "label": "Update Frequency", "value": "100ms" },
+              { "label": "Parallel Streams", "value": "128" }
+            ]
+          },
+          {
+            "title": "Multi-language Translation",
+            "description": "Translate content into multiple languages at once",
+            "metrics": [
+              { "label": "Languages", "value": "50+" },
+              { "label": "Speed", "value": "< 500ms" },
+              { "label": "Consistency", "value": "98%" }
+            ]
+          },
+          {
+            "title": "A/B Testing & Optimization",
+            "description": "Test multiple variations simultaneously",
+            "metrics": [
+              { "label": "Variants", "value": "100+" },
+              { "label": "Decision Time", "value": "< 1s" },
+              { "label": "Confidence", "value": "95%" }
+            ]
+          }
+        ],
+        "proscons": {
+          "pros": [
+            "Maximum throughput and speed",
+            "Excellent scalability",
+            "Fault isolation between agents",
+            "Real-time processing capability"
+          ],
+          "cons": [
+            "Higher resource consumption",
+            "Complex synchronization",
+            "Potential race conditions",
+            "Challenging debugging"
+          ]
+        }
+      }
+    },
+    "ui": {
+      "workflowSteps": "Workflow Steps:",
+      "latency": "Latency",
+      "throughput": "Throughput",
+      "pros": "Pros",
+      "cons": "Cons",
+      "useCases": "Use Cases",
+      "case": "Case",
+      "implementation": "Implementation",
+      "showCode": "Show Code",
+      "hideCode": "Hide Code",
+      "setupTime": "Setup time: ~5 minutes",
+      "performance": "Performance: Production-ready",
+      "codePrompt": "Click \"Show Code\" to see how to implement {pattern} in your application."
+    },
+    "agents": {
+      "researcher": "Researcher",
+      "analyst": "Analyst",
+      "creator": "Creator",
+      "critic": "Critic",
+      "executor": "Executor",
+      "orchestrator": "Orchestrator"
+    }
+  }
+  ,
+  "ecosystem": {
+    "title": "The AgentOS Ecosystem",
+    "subtitle": "Explore the portable AgentOS ecosystem powering adaptive, emergent, permanent intelligence—SDKs, agents, RAG utilities, and deployment kits for enterprise AI teams.",
+    "stats": {
+      "repositories": "Repositories",
+      "weeklyDownloads": "Weekly Downloads",
+      "githubStars": "GitHub Stars"
+    },
+    "categories": {
+      "core": { "title": "Core Framework", "description": "Essential components and protocols" },
+      "tools": { "title": "Developer Tools", "description": "SDKs, clients, and extensions" },
+      "apps": { "title": "Applications", "description": "Ready-to-use applications and platforms" },
+      "infrastructure": { "title": "Infrastructure", "description": "Storage, deployment, and operations" },
+      "community": { "title": "Community", "description": "Forums, discussions, and resources" }
+    },
+    "starsSuffix": "stars",
+    "updatedLabel": "Updated {date}",
+    "cta": {
+      "title": "Join the AgentOS Community",
+      "description": "Contribute to open-source AI development, share your agents, and collaborate with developers worldwide.",
+      "followOnGithub": "Follow on GitHub",
+      "joinDiscord": "Join Discord Community",
+      "contributeCode": "Contribute Code"
+    }
+  },
+  "codeExamples": {
+    "badge": "Code Examples",
+    "title": "Build with AgentOS",
+    "subtitle": "Production-ready code examples and patterns for building intelligent agent systems",
+    "categories": {
+      "all": "All Examples",
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "integration": "Integration",
+      "deployment": "Deployment"
+    },
+    "selectExample": "Select Example",
+    "tabs": {
+      "synchronous": "Synchronous",
+      "streaming": "Streaming"
+    },
+    "copyButton": "Copy code",
+    "docsButton": "View Docs",
+    "runButton": "Try in Playground",
+    "examples": {
+      "basicAgent": {
+        "title": "Create Your First Agent",
+        "description": "Basic agent setup with memory and tools"
+      },
+      "gmiRoles": {
+        "title": "GMI Roles & Agencies",
+        "description": "Implementing Generalised Mind Instance roles"
+      },
+      "memorySystem": {
+        "title": "Advanced Memory Management",
+        "description": "Implementing persistent and contextual memory"
+      },
+      "toolIntegration": {
+        "title": "External Tool Integration",
+        "description": "Connect APIs and services as agent tools"
+      },
+      "skillsIntegration": {
+        "title": "Skills & Extensions",
+        "description": "Browse the curated catalog and register extensions programmatically"
+      },
+      "realtimeStream": {
+        "title": "Real-time Streaming Responses",
+        "description": "Stream agent responses for better UX"
+      },
+      "deployment": {
+        "title": "Production Deployment",
+        "description": "Deploy AgentOS with Docker and Kubernetes"
+      }
+    },
+    "cta": {
+      "title": "Ready to Build Your First Agent?",
+      "description": "Get started with AgentOS in less than 5 minutes. Install the SDK and follow our interactive tutorial.",
+      "button": "Start Building",
+      "time": "5 min"
+    }
+  },
+  "socialProof": {
+    "badge": "Social proof",
+    "title": "Trusted deployments (revealing soon)",
+    "subtitle": "We’re onboarding AI agency teams across finance, operations, and support. Logos and case studies unlock with their launches—stay tuned.",
+    "reveal": "Reveal #{index}",
+    "comingSoon": "Coming soon",
+    "latestUpdates": "Latest updates",
+    "cta": { "ask": "Want to be featured?" },
+    "placeholders": {
+      "helios": "Multi-market research pods (coming soon)",
+      "northwind": "Product localization + CRM sync (coming soon)",
+      "atlas": "Adaptive support routing (coming soon)"
+    }
+  },
+  "gmiSection": {
+    "title": "Parallel Agency",
+    "subtitle": "Build sophisticated AI systems with adaptive personas and emergent, dynamic behaviors. Route inbound support tickets to the right persona, push CRM updates safely, and keep every RAG workflow inside deterministic guardrails. AgentOS GMIs enable autonomous agents that learn, adapt, and evolve—then export those insights as portable intelligence bundles.",
+    "useCaseTitle": "Use case",
+    "outcomeTitle": "Outcome",
+    "whatYouGetTitle": "What you get",
+    "whatYouGetItems": [
+      "Persona library for research, analysis, creation, critique, execution, and future GMIs.",
+      "Deterministic orchestration with guardrails, budgets, approvals, and SOC2/GDPR-ready event trails.",
+      "Unified memory fabric (working, episodic, vector) plus portable exports for Markdown/JSON ingestion."
+    ],
+    "architectureTitle": "AgentOS Architecture (streaming)",
+    "currentlySelected": "Currently selected",
+    "exampleTitle": "Example",
+    "ctaExploreDocs": "Explore GMI Documentation",
+    "agents": {
+      "researcher": { "name": "Researcher", "description": "Discovers and analyzes information", "persona": "curious, precise" },
+      "analyst": { "name": "Analyst", "description": "Processes and interprets data", "persona": "skeptical, methodical" },
+      "creator": { "name": "Creator", "description": "Generates content and solutions", "persona": "clear, persuasive" },
+      "executor": { "name": "Executor", "description": "Takes actions and implements", "persona": "reliable, action-oriented" },
+      "orchestrator": { "name": "Orchestrator", "description": "Coordinates multi-agent tasks", "persona": "balanced, gatekeeper" },
+      "critic": { "name": "Critic", "description": "Reviews outputs and flags issues" }
+    },
+    "snapshots": [
+      { "useCase": "Route support + CRM updates", "outcome": "Researcher gathers context, Analyst verifies facts, and Executor pushes the outcome into Salesforce or Linear automatically." },
+      { "useCase": "Safety-critical approvals", "outcome": "Orchestrator enforces guardrails, memory logs every decision, and Event Stream keeps auditors in the loop for SOC2/GDPR." },
+      { "useCase": "RAG-powered expansion packs", "outcome": "Creator + Executor personas adapt content by locale while Gateway throttles workloads and exports full runs as Markdown/JSON." }
+    ],
+    "architecture": {
+      "ui": { "label": "User Interfaces", "subtitle": "Voice • Web • CLI", "details": "Entrypoints where users speak, type, and automate tasks.", "example": "Capture a voice prompt for a real‑time, fact‑checked briefing.", "outcome": "Every interface streams into the same shared AgentOS memory and policy store." },
+      "gateway": { "label": "API Gateway", "subtitle": "Auth • Rate‑limit", "details": "Front door for requests; applies auth, quotas, and routing.", "example": "Throttle bursty inputs; attach tenant identity to requests.", "outcome": "Tenants, rate budgets, and approvals stay deterministic even when agents spawn in parallel." },
+      "orchestrator": { "label": "GMI Orchestrator", "subtitle": "Routing • Guardrails", "details": "Coordinates agent roles, tools, and safety policies.", "example": "Parallelize research, analysis, creation, and critique.", "outcome": "Adaptive and deterministic agency modes keep emergent intelligence auditable." },
+      "agents": { "label": "Agent Pool", "subtitle": "Researcher • Analyst • Creator • Critic • Executor", "details": "Specialized GMIs stream outputs; orchestrator merges.", "example": "Researcher fetches sources while Analyst verifies claims.", "outcome": "Each persona can be exported as Markdown/JSON capsules and ingested into other runtimes." },
+      "memory": { "label": "Memory System", "subtitle": "Vector DB • Knowledge Graph", "details": "Long‑term memory stores facts, embeddings, and relations.", "example": "Semantic search recalls prior decisions and context.", "outcome": "Zero-copy working, episodic, and vector layers keep adaptive and permanent intelligence aligned." },
+      "events": { "label": "Event Stream", "subtitle": "Monitoring • Analytics", "details": "Observability and compliance pipeline for every step.", "example": "Emit spans for audits; alert on policy violations.", "outcome": "Every action is replayable for SOC2, GDPR, and custom guardrails." }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers about AgentOS, orchestration concepts, and how it powers the OS family.",
+    "questions": {
+      "whatIsAgentOS": {
+        "question": "What is AgentOS?",
+        "answer": "AgentOS is a modular platform for building adaptive, policy‑aware agents with tooling, memory, and multi‑agent collaboration."
+      },
+      "integration": {
+        "question": "How does it integrate with VCA?",
+        "answer": "VCA.Chat runs on AgentOS; it showcases agents, extensions, and streaming interactions."
+      },
+      "customPersonas": {
+        "question": "Can I build custom personas and agencies?",
+        "answer": "Yes. Define personas, agencies, and workflows with evolution rules, guardrails, and extensions."
+      }
+    },
+    "seeAlso": "See also",
+    "links": {
+      "vcaFaq": "VCA.Chat FAQ",
+      "frameFaq": "Frame.dev FAQ",
+      "manic": "Manic Agency",
+      "lookingGlass": "The Looking Glass — AI newsletter & blog"
+    }
+  },
+  "about": {
+    "hero": {
+      "weAreFramers": "we are the framers",
+      "title": "About AgentOS",
+      "description": "AgentOS is an open‑source TypeScript runtime for building adaptive, emergent AI agent systems. Built by {link}, AgentOS powers intelligent applications with GMI orchestration, persistent memory, and enterprise‑grade guardrails."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "p1": "We’re building the most advanced AI agent runtime for developers who want to create intelligent, adaptive systems without compromising on control, safety, or performance.",
+      "p2": "AgentOS combines cutting-edge AI orchestration with production-ready infrastructure, enabling developers to build everything from simple chatbots to complex multi-agent systems with {span} memory architecture."
+    },
+    "team": {
+      "title": "The Team",
+      "description": "AgentOS is developed by the team at {link}, a company focused on building the future of AI‑powered development tools. We're a distributed team of engineers, designers, and AI researchers passionate about making advanced AI accessible to all developers.",
+      "generalInquiries": "General Inquiries",
+      "enterpriseSupport": "Enterprise & Support",
+      "enterpriseSupportDesc": "For production deployments, enterprise licensing, and dedicated support",
+      "hiring": "We are Hiring!",
+      "joinUs": "Join us in building the future of autonomous agents."
+    },
+    "connect": {
+      "title": "Connect With Us",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "frameDev": "Frame.dev",
+      "ourCompany": "Our Company"
+    },
+    "license": {
+      "title": "Open Source Licensing",
+      "core": "AgentOS Core Engine",
+      "coreDesc": "The core AgentOS runtime, GMI orchestration, and infrastructure",
+      "extensions": "Extensions & Agents",
+      "extensionsDesc": "Community-built agents, extensions, and guardrails",
+      "footer": "We believe in open source. AgentOS is free to use, modify, and distribute. For enterprise support and production deployments, contact us at {link}"
+    },
+    "cta": {
+      "title": "Ready to Build?",
+      "viewOnGithub": "View on GitHub",
+      "backToHome": "Back to Home"
+    }
+  },
+  "videoDemo": {
+    "title": "See AgentOS in Action",
+    "subtitle": "Watch how easy it is to build adaptive AI agents",
+    "watchButton": "Watch Demo",
+    "duration": "Duration"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "./schemas/registry.schema.json",
+  "version": "1.0.0",
+  "updated": "2025-11-27T00:00:00.000Z",
+  "categories": {
+    "plugins": {
+      "codex": ["indexer", "validator", "transformer", "analyzer", "exporter"],
+      "viewer": [
+        "ui-component",
+        "visualization",
+        "navigation",
+        "search",
+        "accessibility",
+        "integration"
+      ]
+    },
+    "themes": ["light", "dark", "sepia", "terminal", "high-contrast", "custom"]
+  },
+  "plugins": {
+    "curated": [],
+    "community": [],
+    "templates": [
+      {
+        "id": "com.framers.template.codex-tool",
+        "name": "Codex Tool Plugin Template",
+        "version": "1.0.0",
+        "type": "codex",
+        "category": "indexer",
+        "path": "templates/codex-tool",
+        "description": "Template for creating Codex data processing tools",
+        "repository": "https://github.com/framersai/codex-extensions/tree/main/templates/codex-tool"
+      },
+      {
+        "id": "com.framers.template.viewer-ui",
+        "name": "Viewer UI Plugin Template",
+        "version": "1.0.0",
+        "type": "viewer",
+        "category": "ui-component",
+        "path": "templates/viewer-ui",
+        "description": "Template for creating Codex Viewer UI plugins",
+        "repository": "https://github.com/framersai/codex-extensions/tree/main/templates/viewer-ui"
+      },
+      {
+        "id": "com.framers.template.viewer-visualization",
+        "name": "Viewer Visualization Plugin Template",
+        "version": "1.0.0",
+        "type": "viewer",
+        "category": "visualization",
+        "path": "templates/viewer-visualization",
+        "description": "Template for creating data visualization plugins",
+        "repository": "https://github.com/framersai/codex-extensions/tree/main/templates/viewer-visualization"
+      },
+      {
+        "id": "com.framers.template.theme",
+        "name": "Theme Template",
+        "version": "1.0.0",
+        "type": "theme",
+        "path": "templates/theme",
+        "description": "Template for creating custom Codex Viewer themes",
+        "repository": "https://github.com/framersai/codex-extensions/tree/main/templates/theme"
+      }
+    ]
+  },
+  "themes": {
+    "curated": [
+      {
+        "id": "com.framers.theme.paper-light",
+        "name": "Paper Light",
+        "version": "1.0.0",
+        "category": "light",
+        "path": "themes/curated/paper-light",
+        "description": "Clean paper-inspired light theme with warm tones",
+        "preview": "themes/curated/paper-light/preview.png",
+        "author": {
+          "name": "Framers AI",
+          "email": "support@frame.dev"
+        },
+        "verified": true
+      },
+      {
+        "id": "com.framers.theme.terminal-green",
+        "name": "Terminal Green",
+        "version": "1.0.0",
+        "category": "terminal",
+        "path": "themes/curated/terminal-green",
+        "description": "Classic green phosphor terminal aesthetic",
+        "preview": "themes/curated/terminal-green/preview.png",
+        "author": {
+          "name": "Framers AI",
+          "email": "support@frame.dev"
+        },
+        "verified": true
+      },
+      {
+        "id": "com.framers.theme.midnight-ink",
+        "name": "Midnight Ink",
+        "version": "1.0.0",
+        "category": "dark",
+        "path": "themes/curated/midnight-ink",
+        "description": "Deep dark theme with subtle blue accents",
+        "preview": "themes/curated/midnight-ink/preview.png",
+        "author": {
+          "name": "Framers AI",
+          "email": "support@frame.dev"
+        },
+        "verified": true
+      }
+    ],
+    "community": []
+  },
+  "stats": {
+    "totalPlugins": 0,
+    "curatedPlugins": 0,
+    "communityPlugins": 0,
+    "totalThemes": 3,
+    "curatedThemes": 3,
+    "communityThemes": 0,
+    "templateCount": 4,
+    "totalDownloads": 0
+  }
+}

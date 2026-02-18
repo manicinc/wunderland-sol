@@ -1,0 +1,213 @@
+name: Deploy to Linode
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  DEPLOY_DIR: /app/wunderland
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create deployment archive
+        run: |
+          # tar exits 1 on "file changed as we read it" — non-fatal, only fail on exit >= 2
+          set +e
+          tar czf deploy.tar.gz \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='dist' \
+            --exclude='.env' \
+            --exclude='.env.local' \
+            --exclude='*.sqlite' \
+            --exclude='*.sqlite-journal' \
+            --exclude='db_data' \
+            --exclude='anchor/target' \
+            --exclude='docs-site/node_modules' \
+            --exclude='docs-site/.docusaurus' \
+            --exclude='docs-site/build' \
+            --exclude='.git' \
+            .
+          TAR_EXIT=$?
+          set -e
+          if [ $TAR_EXIT -gt 1 ]; then
+            echo "tar failed with exit code $TAR_EXIT"
+            exit 1
+          fi
+          ls -lh deploy.tar.gz
+
+      - name: Upload source to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: deploy.tar.gz
+          target: /tmp/
+
+      - name: Deploy with Docker Compose
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+
+            DEPLOY_DIR=/app/wunderland
+
+            # ── Ensure storage and SSL directories ──
+            mkdir -p /mnt/storage-wunder/{ipfs,db,media,logs/nginx}
+            mkdir -p /app/ssl
+
+            # Generate self-signed SSL cert if none exists (Cloudflare Full mode)
+            if [ ! -f /app/ssl/origin.crt ]; then
+              echo "[deploy] Generating self-signed SSL cert..."
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /app/ssl/origin.key \
+                -out /app/ssl/origin.crt \
+                -subj "/CN=wunderland.sh/O=Wunderland/C=US"
+            fi
+
+            # ── Stop old systemd services (migration from previous deploy) ──
+            systemctl stop wunderland-sol 2>/dev/null || true
+            systemctl disable wunderland-sol 2>/dev/null || true
+            systemctl stop ipfs 2>/dev/null || true
+            systemctl disable ipfs 2>/dev/null || true
+            systemctl stop nginx 2>/dev/null || true
+
+            # ── Extract fresh source ──
+            rm -rf ${DEPLOY_DIR}/src-new
+            mkdir -p ${DEPLOY_DIR}/src-new
+            cd ${DEPLOY_DIR}/src-new
+            tar xzf /tmp/deploy.tar.gz
+            rm -f /tmp/deploy.tar.gz
+
+            # Stop existing compose stack before swapping source
+            if [ -d ${DEPLOY_DIR}/src/deployment ]; then
+              cd ${DEPLOY_DIR}/src/deployment
+              docker compose down 2>/dev/null || true
+            fi
+
+            # Kill any lingering containers from previous deploys (different project names)
+            for name in wunderland-sol deployment; do
+              for svc in ipfs backend frontend nginx; do
+                docker rm -f "${name}-${svc}-1" 2>/dev/null || true
+                docker rm -f "${name}_${svc}_1" 2>/dev/null || true
+              done
+            done
+
+            # Force-release ports held by stale docker-proxy processes
+            for port in 4001 80 443; do
+              fuser -k ${port}/tcp 2>/dev/null || true
+            done
+            # Prune orphaned networks that may hold port bindings
+            docker network prune -f 2>/dev/null || true
+            sleep 2
+
+            # Move to a stable directory before the swap — docker compose
+            # caches its CWD and fails with "getwd: no such file or directory"
+            # if the previous CWD is deleted during the atomic swap.
+            cd /tmp
+
+            # Atomic swap
+            rm -rf ${DEPLOY_DIR}/src-old
+            if [ -d ${DEPLOY_DIR}/src ]; then
+              mv ${DEPLOY_DIR}/src ${DEPLOY_DIR}/src-old
+            fi
+            mv ${DEPLOY_DIR}/src-new ${DEPLOY_DIR}/src
+            rm -rf ${DEPLOY_DIR}/src-old
+
+            # ── Ensure .env exists ──
+            # Pre-place your .env at /app/wunderland/.env on the server.
+            # It gets symlinked into the deployment dir for docker-compose.
+            if [ -f ${DEPLOY_DIR}/.env ]; then
+              ln -sf ${DEPLOY_DIR}/.env ${DEPLOY_DIR}/src/deployment/.env
+            elif [ ! -f ${DEPLOY_DIR}/src/deployment/.env ]; then
+              echo "ERROR: No .env file found!"
+              echo "Create one at ${DEPLOY_DIR}/.env with your secrets."
+              echo "See .env.example for required variables."
+              exit 1
+            fi
+
+            # ── Install Docker if not present ──
+            if ! command -v docker &> /dev/null; then
+              echo "[deploy] Installing Docker..."
+              curl -fsSL https://get.docker.com | sh
+              systemctl enable docker
+              systemctl start docker
+            fi
+
+            # ── Ensure swap for Docker builds (prevents OOM kills) ──
+            if [ ! -f /swapfile ]; then
+              echo "[deploy] Creating 2GB swap..."
+              fallocate -l 2G /swapfile
+              chmod 600 /swapfile
+              mkswap /swapfile
+              swapon /swapfile
+              echo '/swapfile none swap sw 0 0' >> /etc/fstab
+            elif ! swapon --show | grep -q /swapfile; then
+              swapon /swapfile 2>/dev/null || true
+            fi
+
+            # ── Deploy full stack with Docker Compose (build sequentially) ──
+            cd ${DEPLOY_DIR}/src/deployment
+            docker compose build --no-cache backend
+            docker compose build --no-cache frontend
+            # Start stack — retry once if port conflict from slow docker-proxy cleanup
+            if ! docker compose up -d 2>&1; then
+              echo "[deploy] First attempt failed — killing stale port holders and retrying..."
+              docker compose down 2>/dev/null || true
+              for port in 4001 80 443; do
+                fuser -k ${port}/tcp 2>/dev/null || true
+              done
+              docker network prune -f 2>/dev/null || true
+              sleep 5
+              docker compose up -d
+            fi
+
+            # ── Prune old images ──
+            docker image prune -f 2>/dev/null || true
+
+            # ── Health checks ──
+            echo "[deploy] Waiting for services to start..."
+            sleep 15
+
+            echo "=== Service Status ==="
+            docker compose ps
+
+            echo ""
+            echo "=== Backend Health ==="
+            if curl -sf http://localhost:3001/api/health; then
+              echo ""
+              echo "Backend: OK"
+            else
+              echo "WARNING: Backend health check failed. Checking logs..."
+              docker compose logs --tail=30 backend
+            fi
+
+            echo ""
+            echo "=== Frontend ==="
+            if curl -sf -o /dev/null http://localhost:3011; then
+              echo "Frontend: OK"
+            else
+              echo "WARNING: Frontend not responding. Checking logs..."
+              docker compose logs --tail=30 frontend
+            fi
+
+            echo ""
+            echo "=== IPFS ==="
+            if docker compose exec -T ipfs ipfs id >/dev/null 2>&1; then
+              echo "IPFS: OK"
+            else
+              echo "WARNING: IPFS not responding"
+            fi
+
+            echo ""
+            echo "[deploy] Done. Full stack deployed (IPFS + Backend + Frontend + Nginx)."

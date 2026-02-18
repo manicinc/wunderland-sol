@@ -1,0 +1,56 @@
+# Gitleaks configuration for secret detection
+# https://github.com/gitleaks/gitleaks
+
+title = "Codex Extensions Secret Detection"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API Key"
+regex = '''sk-[a-zA-Z0-9]{48}'''
+tags = ["api", "openai"]
+
+[[rules]]
+id = "github-token"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[a-zA-Z0-9]{36}'''
+tags = ["api", "github"]
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["aws", "cloud"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey|api[_-]?secret)\s*[=:]\s*['\"][a-zA-Z0-9_-]{20,}['\"]'''
+tags = ["api", "generic"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----'''
+tags = ["key", "private"]
+
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''eyJ[a-zA-Z0-9_-]*\.eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*'''
+tags = ["jwt", "token"]
+
+[allowlist]
+description = "Allowlisted files and patterns"
+paths = [
+  '''\.test\.ts$''',
+  '''\.spec\.ts$''',
+  '''\.md$''',
+  '''CHANGELOG\.md$''',
+]
+regexes = [
+  '''sk-[a-zA-Z0-9]{48}''',  # Example patterns in docs
+]
+

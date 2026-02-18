@@ -1,0 +1,62 @@
+{
+  "name": "Quarry – AI-Native Knowledge Management",
+  "short_name": "Quarry",
+  "description": "AI-native personal knowledge management system with semantic search, knowledge graphs, and LLM integration",
+  "start_url": "/quarry",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#10b981",
+  "orientation": "any",
+  "categories": ["productivity", "education", "reference"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/quarry-icon-green-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Quarry",
+      "short_name": "Search",
+      "description": "Search the knowledge base",
+      "url": "/quarry?search=true",
+      "icons": [{ "src": "/quarry-icon-green-512x512.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "Browse Quarry",
+      "short_name": "Browse",
+      "description": "Browse knowledge weaves",
+      "url": "/quarry",
+      "icons": [{ "src": "/quarry-icon-green-512x512.png", "sizes": "512x512" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/quarry-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Quarry on desktop"
+    },
+    {
+      "src": "/screenshots/quarry-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "label": "Quarry on mobile"
+    }
+  ]
+}
