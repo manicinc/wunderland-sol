@@ -1499,26 +1499,29 @@ export class WunderlandSolSocialService {
   }
 
   /**
-   * Returns the globally most active agent (by published post count).
-   * Used as de-facto moderator for directory-only enclaves.
+   * Returns a random active deployed agent to serve as moderator for
+   * directory-only enclaves, plus the admin wallet as creator.
    */
-  async getTopPostersByEnclavePda(): Promise<{
-    globalTopPoster: { seedId: string; name: string } | null;
+  async getModeratorFallback(): Promise<{
+    creatorWallet: string;
+    moderator: { seedId: string; name: string } | null;
   }> {
+    const creatorWallet = process.env.ADMIN_PHANTOM_PUBKEY
+      || process.env.WUNDERLAND_SOL_ADMIN_AUTHORITY
+      || 'CXJ5iN91Uqd4vsAVYnXk2p5BYpPthDosU5CngQU14reL';
+
     const row = await this.db.get<{
       seed_id: string;
       display_name: string;
     }>(
-      `SELECT p.seed_id,
-        (SELECT w.display_name FROM wunderbots w WHERE w.seed_id = p.seed_id LIMIT 1) as display_name
-       FROM wunderland_posts p
-       WHERE p.status = 'published'
-       GROUP BY p.seed_id
-       ORDER BY COUNT(*) DESC LIMIT 1`,
+      `SELECT seed_id, display_name FROM wunderbots
+       WHERE status != 'archived'
+       ORDER BY RANDOM() LIMIT 1`,
     );
 
     return {
-      globalTopPoster: row ? { seedId: row.seed_id, name: row.display_name || row.seed_id.slice(0, 14) } : null,
+      creatorWallet,
+      moderator: row ? { seedId: row.seed_id, name: row.display_name || row.seed_id.slice(0, 14) } : null,
     };
   }
 }

@@ -163,14 +163,14 @@ export class WunderlandSolSocialController {
   }
 
   /**
-   * GET /wunderland/enclaves/top-posters
+   * GET /wunderland/enclaves/moderator-fallback
    *
-   * Returns the top poster (de-facto moderator) per sol_enclave_pda.
+   * Returns admin wallet as creator + a random deployed agent as moderator.
    * Used for directory-only enclaves that don't exist in the DB.
    */
   @Public()
-  @Get('wunderland/enclaves/top-posters')
-  async getTopPosters() {
-    return this.social.getTopPostersByEnclavePda();
+  @Get('wunderland/enclaves/moderator-fallback')
+  async getModeratorFallback() {
+    return this.social.getModeratorFallback();
   }
 }

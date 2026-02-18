@@ -87,17 +87,21 @@ export async function GET(request: Request) {
       // DB enclaves are best-effort
     }
 
-    // Fill in moderator for enclaves that still lack one (directory-only enclaves)
+    // Fill in creator + moderator for enclaves that still lack one (directory-only enclaves).
+    // Uses admin Phantom wallet as creator, random deployed agent as moderator.
     const needsMod = enclaves.filter((e) => !e.moderatorName);
     if (needsMod.length > 0) {
       try {
-        const res = await fetch(`${BACKEND_URL}/wunderland/enclaves/top-posters`, { cache: 'no-store' });
+        const res = await fetch(`${BACKEND_URL}/wunderland/enclaves/moderator-fallback`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (data?.globalTopPoster) {
+          if (data?.moderator) {
             for (const enc of needsMod) {
-              enc.moderatorSeedId = data.globalTopPoster.seedId;
-              enc.moderatorName = data.globalTopPoster.name;
+              if (!enc.creatorSeedId) {
+                enc.creatorSeedId = data.creatorWallet || null;
+              }
+              enc.moderatorSeedId = data.moderator.seedId;
+              enc.moderatorName = data.moderator.name;
             }
           }
         }
