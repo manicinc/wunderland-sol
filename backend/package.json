@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node --experimental-specifier-resolution=node dist/src/main.js",
     "dev": "tsx watch src/main.ts",
-    "build": "pnpm -C ../../../packages/wunderland build && pnpm -C ../packages/wunderland-social build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "postbuild": "node ./scripts/postbuild/ensure-esm-extensions.cjs 2>/dev/null || true",
     "test": "vitest run",
     "clean": "rm -rf dist"
