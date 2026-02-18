@@ -370,6 +370,34 @@ export class SignedOutputVerifier {
   }
 
   /**
+   * Signs an arbitrary payload object and returns the HMAC hex string.
+   * Used by InputManifest v2 signature format.
+   */
+  signPayload(payload: unknown): string {
+    return createHmac(this.config.algorithm, this.getSecretKey())
+      .update(JSON.stringify(payload))
+      .digest('hex');
+  }
+
+  /**
+   * Verifies that a signature matches a payload.
+   * Used by InputManifest v2 signature format.
+   */
+  verifyPayload(payload: unknown, signature: string): boolean {
+    try {
+      const expected = createHmac(this.config.algorithm, this.getSecretKey())
+        .update(JSON.stringify(payload))
+        .digest('hex');
+      return timingSafeEqual(
+        Buffer.from(signature, 'hex'),
+        Buffer.from(expected, 'hex'),
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Updates the configuration.
    */
   updateConfig(updates: Partial<OutputSigningConfig>): void {
