@@ -413,6 +413,7 @@ export class WunderlandVectorMemoryService implements OnModuleDestroy {
     postId: string;
     content: string;
     replyToPostId?: string | null;
+    enclaveId?: string | null;
     createdAt?: string;
     publishedAt?: string | null;
   }): Promise<void> {
@@ -428,6 +429,7 @@ export class WunderlandVectorMemoryService implements OnModuleDestroy {
         kind: 'wunderland_post',
         postId: input.postId,
         replyToPostId: input.replyToPostId ?? '',
+        enclaveId: input.enclaveId ?? '',
         createdAt: input.createdAt ?? '',
         publishedAt: input.publishedAt ?? '',
       },
@@ -463,6 +465,63 @@ export class WunderlandVectorMemoryService implements OnModuleDestroy {
     const result = await this.retrievalAugmentor.retrieveContext(input.query, retrievalOptions);
     const chunks = result.retrievedChunks ?? [];
     const context = chunks.map((c, idx) => `(${idx + 1}) ${c.content}`).join('\n');
+
+    return { chunks, context };
+  }
+
+  /**
+   * Query the public network memory (all seeds) for relevant posts/chunks.
+   *
+   * Intended for "what has the network already said about X?" use-cases in
+   * autonomous writing, where cross-agent context improves synthesis.
+   */
+  public async queryNetworkPosts(input: {
+    query: string;
+    topK: number;
+    excludeSeedId?: string;
+    enclaveId?: string;
+    options?: Pick<RagRetrievalOptions, 'strategy' | 'strategyParams' | 'rerankerConfig'>;
+  }): Promise<{ chunks: RagRetrievedChunk[]; context: string }> {
+    await this.ensureInitialized();
+    if (!this.retrievalAugmentor) throw new Error('Vector memory not initialized.');
+
+    const query = String(input.query ?? '').trim();
+    if (!query) return { chunks: [], context: '' };
+
+    const defaults = this.getDefaultQueryOptions();
+    const enclaveId = typeof input.enclaveId === 'string' ? input.enclaveId.trim() : '';
+    const metadataFilter: any = { kind: { $eq: 'wunderland_post' } };
+    if (enclaveId) metadataFilter.enclaveId = { $eq: enclaveId };
+
+    const retrievalOptions: RagRetrievalOptions = {
+      topK: Math.max(1, Math.min(200, Number(input.topK ?? 40))),
+      targetDataSourceIds: [this.dataSourceId],
+      metadataFilter,
+      strategy: input.options?.strategy ?? defaults.strategy ?? 'similarity',
+      strategyParams: { ...(defaults.strategyParams ?? {}), ...(input.options?.strategyParams ?? {}) },
+      rerankerConfig: input.options?.rerankerConfig ?? defaults.rerankerConfig,
+      includeEmbeddings: false,
+      tokenBudgetForContext: 4200,
+    };
+
+    const result = await this.retrievalAugmentor.retrieveContext(query, retrievalOptions);
+    let chunks = (result.retrievedChunks ?? []) as RagRetrievedChunk[];
+
+    const excludeSeedId = typeof input.excludeSeedId === 'string' ? input.excludeSeedId.trim() : '';
+    if (excludeSeedId) {
+      chunks = chunks.filter((chunk: any) => String(chunk?.metadata?.seedId ?? '') !== excludeSeedId);
+    }
+
+    const context = chunks
+      .slice(0, 18)
+      .map((c: any, idx) => {
+        const seedId = String(c?.metadata?.seedId ?? '').trim();
+        const postId = String(c?.metadata?.postId ?? '').trim();
+        const who = seedId ? seedId : 'unknown';
+        const pid = postId ? ` postId=${postId}` : '';
+        return `(${idx + 1}) [${who}${pid}] ${String(c?.content ?? '').trim()}`;
+      })
+      .join('\n');
 
     return { chunks, context };
   }

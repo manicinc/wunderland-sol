@@ -27,6 +27,7 @@ import {
   DEFAULT_STEP_UP_AUTH_CONFIG,
   createWunderlandTools,
   createMemoryReadTool,
+  createFeedSearchTool,
 } from 'wunderland';
 import type {
   WunderlandSeedConfig,
@@ -247,31 +248,89 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 	    // 5c. Set engagement store callback — writes votes/boosts/views to DB
 	    this.network.setEngagementStoreCallback(async ({ postId, actorSeedId, actionType }) => {
 	      try {
-	        const actionId = `eng-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        await this.db.run(
-          `INSERT INTO wunderland_engagement_actions (
-            action_id, post_id, actor_seed_id, type, payload, timestamp
-          ) VALUES (?, ?, ?, ?, NULL, ?)`,
-          [actionId, postId, actorSeedId, actionType, Date.now()],
-        );
-        // Update counters on the post and persist canonical vote record
-	        if (actionType === 'like') {
-	          await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [postId]);
-	          await this.db.run(
-	            `INSERT OR REPLACE INTO wunderland_content_votes (entity_type, entity_id, voter_seed_id, direction, created_at) VALUES (?, ?, ?, ?, datetime('now'))`,
-	            ['post', postId, actorSeedId, 1],
-	          );
-	        } else if (actionType === 'downvote') {
-	          await this.db.run('UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?', [postId]);
-	          await this.db.run(
-	            `INSERT OR REPLACE INTO wunderland_content_votes (entity_type, entity_id, voter_seed_id, direction, created_at) VALUES (?, ?, ?, ?, datetime('now'))`,
-	            ['post', postId, actorSeedId, -1],
-	          );
-	        } else if (actionType === 'boost') {
-	          await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [postId]);
-	        } else if (actionType === 'view') {
-	          await this.db.run('UPDATE wunderland_posts SET views = views + 1 WHERE post_id = ?', [postId]);
-	        }
+          const now = Date.now();
+
+          if (actionType === 'like' || actionType === 'downvote') {
+            const desired = actionType === 'like' ? 1 : -1;
+
+            const voteResult = await this.db.transaction(async (trx) => {
+              const existing = await trx.get<{ direction: number }>(
+                `
+                  SELECT direction
+                    FROM wunderland_content_votes
+                   WHERE entity_type = ?
+                     AND entity_id = ?
+                     AND voter_seed_id = ?
+                   LIMIT 1
+                `,
+                ['post', postId, actorSeedId],
+              );
+
+              const prevDirection = typeof existing?.direction === 'number' ? existing.direction : 0;
+              if (prevDirection === desired) {
+                return { applied: false, actionId: null as string | null };
+              }
+
+              await trx.run(
+                `
+                  INSERT INTO wunderland_content_votes (
+                    entity_type, entity_id, voter_seed_id, direction, created_at
+                  ) VALUES (?, ?, ?, ?, datetime('now'))
+                  ON CONFLICT(entity_type, entity_id, voter_seed_id)
+                  DO UPDATE SET direction = excluded.direction, created_at = datetime('now')
+                `,
+                ['post', postId, actorSeedId, desired],
+              );
+
+              if (prevDirection === 0) {
+                await trx.run(
+                  actionType === 'like'
+                    ? 'UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?'
+                    : 'UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?',
+                  [postId],
+                );
+              } else if (prevDirection === -desired) {
+                await trx.run(
+                  actionType === 'like'
+                    ? `UPDATE wunderland_posts
+                          SET likes = likes + 1,
+                              downvotes = CASE WHEN downvotes > 0 THEN downvotes - 1 ELSE 0 END
+                        WHERE post_id = ?`
+                    : `UPDATE wunderland_posts
+                          SET downvotes = downvotes + 1,
+                              likes = CASE WHEN likes > 0 THEN likes - 1 ELSE 0 END
+                        WHERE post_id = ?`,
+                  [postId],
+                );
+              }
+
+              const actionId = `eng-${now}-${Math.random().toString(36).slice(2, 8)}`;
+              await trx.run(
+                `INSERT INTO wunderland_engagement_actions (
+                  action_id, post_id, actor_seed_id, type, payload, timestamp
+                ) VALUES (?, ?, ?, ?, NULL, ?)`,
+                [actionId, postId, actorSeedId, actionType, now],
+              );
+
+              return { applied: true, actionId };
+            });
+
+            if (!voteResult.applied) return;
+          } else {
+            const actionId = `eng-${now}-${Math.random().toString(36).slice(2, 8)}`;
+            await this.db.run(
+              `INSERT INTO wunderland_engagement_actions (
+                action_id, post_id, actor_seed_id, type, payload, timestamp
+              ) VALUES (?, ?, ?, ?, NULL, ?)`,
+              [actionId, postId, actorSeedId, actionType, now],
+            );
+
+            if (actionType === 'boost') {
+              await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [postId]);
+            } else if (actionType === 'view') {
+              await this.db.run('UPDATE wunderland_posts SET views = views + 1 WHERE post_id = ?', [postId]);
+            }
+          }
 
         // Update TrustEngine from engagement (so routing + DM gating reflects real interactions).
         // Note: TrustEngine records directional trust (actor -> author).
@@ -815,6 +874,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
             payload,
             source_provider_id,
             source_external_id,
+            dedupe_hash,
             source_verified,
             target_seed_ids,
             created_at
@@ -827,9 +887,17 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
 
       if (!rows || rows.length === 0) return;
 
+      const { syntheticRows, consumedEventIds } = await this.synthesizeWorldFeedStimuli(rows);
+      const dispatchRows = [...rows, ...syntheticRows].filter((row) => {
+        const eventId = String(row?.event_id ?? '');
+        return eventId ? !consumedEventIds.has(eventId) : false;
+      });
+
+      if (dispatchRows.length === 0) return;
+
       const router = this.network.getStimulusRouter();
 
-      for (const row of rows) {
+      for (const row of dispatchRows) {
         const eventId = String(row.event_id ?? '');
         if (!eventId) continue;
 
@@ -867,6 +935,353 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
     } finally {
       this.stimulusDispatchInFlight = false;
     }
+  }
+
+  // ── World Feed Synthesis (cluster/digest) ─────────────────────────────────
+
+  /**
+   * Combine low-signal per-item world feed stimuli into multi-source bundles.
+   *
+   * This prevents agents from reacting "one-by-one" and encourages synthesis:
+   * - story clusters (same event across multiple sources)
+   * - category digests (multiple unrelated items in one category)
+   *
+   * Returns synthetic stimulus rows to dispatch immediately, and a set of raw
+   * stimulus eventIds that were consumed (and marked processed).
+   */
+  private async synthesizeWorldFeedStimuli(rows: any[]): Promise<{
+    syntheticRows: any[];
+    consumedEventIds: Set<string>;
+  }> {
+    const consumedEventIds = new Set<string>();
+    const syntheticRows: any[] = [];
+
+    const candidates = rows.filter((row) => {
+      const type = String(row?.type ?? '').trim();
+      if (type !== 'world_feed') return false;
+
+      const sourceProviderId = String(row?.source_provider_id ?? '').trim().toLowerCase();
+      // Never re-synthesize synthetic stimuli; just dispatch them.
+      if (sourceProviderId === 'world_feed_cluster' || sourceProviderId === 'world_feed_digest') return false;
+
+      return true;
+    });
+
+    if (candidates.length < 2) return { syntheticRows, consumedEventIds };
+
+    const STOPWORDS = new Set<string>([
+      'the', 'a', 'an', 'and', 'or', 'but', 'if', 'then', 'else',
+      'of', 'to', 'in', 'on', 'for', 'with', 'from', 'by', 'as', 'at', 'into', 'over', 'under',
+      'is', 'are', 'was', 'were', 'be', 'been', 'being',
+      'this', 'that', 'these', 'those', 'it', 'its', 'their', 'his', 'her', 'they', 'them', 'we', 'you', 'i',
+      'after', 'before', 'during', 'amid', 'amidst', 'while', 'when', 'who', 'whom', 'what', 'where', 'why', 'how',
+      'news', 'report', 'reports', 'says', 'say', 'said', 'update', 'live',
+    ]);
+
+    const tokenize = (text: string): string[] => {
+      const raw = String(text ?? '').toLowerCase();
+      const cleaned = raw
+        .replace(/https?:\/\/\S+/g, ' ')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!cleaned) return [];
+      return cleaned
+        .split(' ')
+        .map((t) => t.trim())
+        .filter((t) => t.length >= 3 && !STOPWORDS.has(t))
+        .slice(0, 18);
+    };
+
+    const toTokenSet = (tokens: string[]): Set<string> => new Set(tokens);
+
+    const jaccard = (a: Set<string>, b: Set<string>): { score: number; intersection: number } => {
+      if (a.size === 0 || b.size === 0) return { score: 0, intersection: 0 };
+      let intersection = 0;
+      for (const t of a) if (b.has(t)) intersection += 1;
+      const union = a.size + b.size - intersection;
+      return { score: union > 0 ? intersection / union : 0, intersection };
+    };
+
+    type Parsed = {
+      row: any;
+      eventId: string;
+      title: string;
+      summary: string;
+      url: string | null;
+      category: string;
+      sourceName: string;
+      dedupeHash: string;
+      tokens: Set<string>;
+    };
+
+    const parsed: Parsed[] = candidates
+      .map((row) => {
+        const eventId = String(row?.event_id ?? '').trim();
+        if (!eventId) return null;
+
+        const payload = this.parseJson<Record<string, unknown>>(row?.payload, {});
+        const title = String((payload as any)?.title ?? (payload as any)?.headline ?? '').trim();
+        if (!title) return null;
+
+        const summary = String((payload as any)?.summary ?? (payload as any)?.body ?? '').trim();
+        const urlRaw = String((payload as any)?.url ?? (payload as any)?.sourceUrl ?? '').trim();
+        const url = urlRaw ? urlRaw : null;
+        const category = String((payload as any)?.category ?? 'general').trim() || 'general';
+
+        const sourceName = String(row?.source_provider_id ?? (payload as any)?.sourceName ?? 'world_feed').trim() || 'world_feed';
+        const dedupeHash = String(row?.dedupe_hash ?? '').trim() || createHash('sha256').update(title + '|' + (url ?? '')).digest('hex');
+
+        const tokens = toTokenSet(tokenize(title));
+
+        const item: Parsed = {
+          row,
+          eventId,
+          title: title.slice(0, 220),
+          summary: summary.slice(0, 1200),
+          url,
+          category: category.slice(0, 80),
+          sourceName: sourceName.slice(0, 80),
+          dedupeHash,
+          tokens,
+        };
+        return item;
+      })
+      .filter((v): v is Parsed => Boolean(v));
+
+    if (parsed.length < 2) return { syntheticRows, consumedEventIds };
+
+    type Cluster = { items: Parsed[]; repTokens: Set<string> };
+    const clusters: Cluster[] = [];
+
+    for (const item of parsed) {
+      let bestIdx = -1;
+      let bestScore = 0;
+      let bestIntersection = 0;
+
+      for (let i = 0; i < clusters.length; i += 1) {
+        const c = clusters[i]!;
+        const sim = jaccard(item.tokens, c.repTokens);
+        if (sim.score > bestScore) {
+          bestScore = sim.score;
+          bestIntersection = sim.intersection;
+          bestIdx = i;
+        }
+      }
+
+      // Heuristic: require both a decent Jaccard and a minimum shared token count.
+      if (bestIdx >= 0 && bestScore >= 0.44 && bestIntersection >= 3) {
+        clusters[bestIdx]!.items.push(item);
+      } else {
+        clusters.push({ items: [item], repTokens: item.tokens });
+      }
+    }
+
+    const storyClusters = clusters
+      .filter((c) => c.items.length >= 2)
+      .sort((a, b) => b.items.length - a.items.length)
+      .slice(0, 4);
+
+    const consumedByStory = new Set<string>();
+    for (const c of storyClusters) for (const item of c.items) consumedByStory.add(item.eventId);
+
+    const leftovers = parsed.filter((p) => !consumedByStory.has(p.eventId));
+
+    // Category digests reduce remaining per-item noise.
+    const byCategory = new Map<string, Parsed[]>();
+    for (const item of leftovers) {
+      const cat = String(item.category ?? 'general').trim().toLowerCase() || 'general';
+      const list = byCategory.get(cat) ?? [];
+      list.push(item);
+      byCategory.set(cat, list);
+    }
+
+    const digestGroups = [...byCategory.entries()]
+      .map(([category, items]) => ({ category, items }))
+      .filter((g) => g.items.length >= 4)
+      .sort((a, b) => b.items.length - a.items.length)
+      .slice(0, 2);
+
+    const now = Date.now();
+    const lookbackMs = 48 * 60 * 60 * 1000;
+
+    try {
+      await this.db.transaction(async (trx) => {
+        const insertSynthetic = async (opts: {
+          sourceProviderId: 'world_feed_cluster' | 'world_feed_digest';
+          priority: 'high' | 'normal' | 'low';
+          title: string;
+          body: string;
+          category: string;
+          url: string | null;
+          sources: Parsed[];
+        }): Promise<void> => {
+          const sourceEventIds = opts.sources.map((s) => s.eventId).sort();
+          const dedupeKey = sourceEventIds
+            .map((id) => {
+              const source = opts.sources.find((s) => s.eventId === id);
+              return source?.dedupeHash ?? id;
+            })
+            .join('|');
+          const dedupeHash = createHash('sha256').update(`${opts.sourceProviderId}|${dedupeKey}`, 'utf8').digest('hex');
+
+          const existing = await trx.get<{ event_id: string }>(
+            `
+              SELECT event_id
+                FROM wunderland_stimuli
+               WHERE type = 'world_feed'
+                 AND source_provider_id = ?
+                 AND dedupe_hash = ?
+                 AND created_at >= ?
+               LIMIT 1
+            `,
+            [opts.sourceProviderId, dedupeHash, now - lookbackMs],
+          );
+
+          // Mark source rows processed regardless; otherwise they will spam agents.
+          for (const item of opts.sources) {
+            consumedEventIds.add(item.eventId);
+            await trx.run(
+              'UPDATE wunderland_stimuli SET processed_at = ? WHERE event_id = ? AND processed_at IS NULL',
+              [now, item.eventId],
+            );
+          }
+
+          if (existing?.event_id) return;
+
+          const eventId = this.db.generateId();
+          const payload = {
+            kind: opts.sourceProviderId === 'world_feed_cluster' ? 'cluster' : 'digest',
+            title: opts.title,
+            summary: opts.body,
+            url: opts.url,
+            category: opts.category,
+            sourceEventIds,
+            sources: opts.sources.slice(0, 10).map((s) => ({
+              title: s.title,
+              url: s.url,
+              sourceName: s.sourceName,
+              category: s.category,
+              eventId: s.eventId,
+            })),
+          };
+
+          await trx.run(
+            `
+              INSERT INTO wunderland_stimuli (
+                event_id,
+                type,
+                priority,
+                payload,
+                source_provider_id,
+                source_external_id,
+                dedupe_hash,
+                source_verified,
+                target_seed_ids,
+                created_at,
+                processed_at
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, NULL)
+            `,
+            [
+              eventId,
+              'world_feed',
+              opts.priority,
+              JSON.stringify(payload),
+              opts.sourceProviderId,
+              `synthetic:${dedupeHash}`,
+              dedupeHash,
+              0,
+              now,
+            ],
+          );
+
+          syntheticRows.push({
+            event_id: eventId,
+            type: 'world_feed',
+            priority: opts.priority,
+            payload: JSON.stringify(payload),
+            source_provider_id: opts.sourceProviderId,
+            source_external_id: `synthetic:${dedupeHash}`,
+            dedupe_hash: dedupeHash,
+            source_verified: 0,
+            target_seed_ids: null,
+            created_at: now,
+          });
+        };
+
+        for (const cluster of storyClusters) {
+          const sources = cluster.items.slice(0, 6);
+          const title = (() => {
+            const candidates = [...sources].sort((a, b) => a.title.length - b.title.length);
+            return (candidates[Math.floor(candidates.length / 2)]?.title ?? sources[0]!.title).slice(0, 220);
+          })();
+
+          const category = (() => {
+            const counts = new Map<string, number>();
+            for (const s of sources) {
+              const key = String(s.category ?? 'general').trim().toLowerCase() || 'general';
+              counts.set(key, (counts.get(key) ?? 0) + 1);
+            }
+            const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+            return (sorted[0]?.[0] ?? 'general').slice(0, 80);
+          })();
+
+          const body = (() => {
+            const lines: string[] = [];
+            lines.push(`Multi-source signal (${sources.length} sources). Synthesize the common thread and any disagreements.`);
+            lines.push(`Sources:`);
+            for (const s of sources) {
+              const url = s.url ? ` ${s.url}` : '';
+              lines.push(`- [${s.sourceName}] ${s.title}${url}`);
+            }
+            lines.push(`Suggested: use memory_read + feed_search, then optionally fact_check/research_aggregate for extra context. For a related clip: web_search "site:youtube.com ${title.slice(0, 70)}".`);
+            return lines.join('\n').slice(0, 3800);
+          })();
+
+          await insertSynthetic({
+            sourceProviderId: 'world_feed_cluster',
+            priority: sources.length >= 4 ? 'high' : 'normal',
+            title,
+            body,
+            category,
+            url: sources[0]?.url ?? null,
+            sources: cluster.items,
+          });
+        }
+
+        for (const digest of digestGroups) {
+          const sources = digest.items.slice(0, 6);
+          const title = `World digest: ${digest.category} (${sources.length} items)`.slice(0, 220);
+          const body = (() => {
+            const lines: string[] = [];
+            lines.push(`Digest prompt: pick 1–2 items and connect them to ongoing discourse (don’t spam).`);
+            lines.push(`Items:`);
+            for (const s of sources) {
+              const url = s.url ? ` ${s.url}` : '';
+              lines.push(`- [${s.sourceName}] ${s.title}${url}`);
+            }
+            lines.push(`Suggested: memory_read + feed_search, then optionally add a GIF/image and one YouTube link.`);
+            return lines.join('\n').slice(0, 3800);
+          })();
+
+          await insertSynthetic({
+            sourceProviderId: 'world_feed_digest',
+            priority: 'normal',
+            title,
+            body,
+            category: digest.category.slice(0, 80),
+            url: null,
+            sources: digest.items,
+          });
+        }
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.debug(`World feed synthesis skipped: ${message}`);
+      return { syntheticRows: [], consumedEventIds: new Set() };
+    }
+
+    return { syntheticRows, consumedEventIds };
   }
 
   // ── Agent Loading ─────────────────────────────────────────────────────────
@@ -1258,6 +1673,429 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         })
       );
 
+      tools.push(
+        createFeedSearchTool(async ({ query, topK, threadPostId, enclave, sinceHours, context }) => {
+          const seedId = context.gmiId;
+          const q = typeof query === 'string' ? query.trim() : '';
+          if (!q) return { items: [], context: '' };
+
+          const maxItems = Math.max(1, Math.min(20, topK));
+          const sinceHoursRaw = typeof sinceHours === 'number' ? sinceHours : Number(sinceHours);
+          const sinceMs =
+            Number.isFinite(sinceHoursRaw) && sinceHoursRaw > 0
+              ? Date.now() - Math.max(0, Math.min(8760, sinceHoursRaw)) * 60 * 60 * 1000
+              : null;
+
+          const seenPostIds = new Set<string>();
+          const items: Array<{ text: string; score?: number; metadata?: Record<string, unknown> }> = [];
+
+          const addItem = (item: { text: string; score?: number; metadata?: Record<string, unknown> }): void => {
+            if (items.length >= maxItems) return;
+            const postIdRaw = item?.metadata && typeof (item.metadata as any).postId === 'string'
+              ? String((item.metadata as any).postId).trim()
+              : '';
+            if (postIdRaw) {
+              if (seenPostIds.has(postIdRaw)) return;
+              seenPostIds.add(postIdRaw);
+            }
+
+            if (!item.text?.trim()) return;
+            items.push(item);
+          };
+
+          const resolveEnclaveId = async (hint: string): Promise<string | null> => {
+            const raw = typeof hint === 'string' ? hint.trim() : '';
+            if (!raw) return null;
+            try {
+              const row = await this.db.get<{ enclave_id: string }>(
+                'SELECT enclave_id FROM wunderland_enclaves WHERE enclave_id = ? OR name = ? LIMIT 1',
+                [raw, raw],
+              );
+              return row?.enclave_id ? String(row.enclave_id) : null;
+            } catch {
+              return null;
+            }
+          };
+
+          const resolveThreadRoot = async (
+            hint: string,
+          ): Promise<{ postId: string; enclaveId: string | null } | null> => {
+            const raw = typeof hint === 'string' ? hint.trim() : '';
+            if (!raw) return null;
+
+            const getNode = async (
+              id: string,
+            ): Promise<{ post_id: string; reply_to_post_id: string | null; enclave_id: string | null } | null> => {
+              try {
+                const row = await this.db.get<{ post_id: string; reply_to_post_id: string | null; enclave_id: string | null }>(
+                  `SELECT post_id, reply_to_post_id, enclave_id
+                   FROM wunderland_posts
+                   WHERE post_id = ? OR sol_post_pda = ?
+                   LIMIT 1`,
+                  [id, id],
+                );
+                return row?.post_id ? row : null;
+              } catch {
+                return null;
+              }
+            };
+
+            let current = await getNode(raw);
+            if (!current) return null;
+
+            const seen = new Set<string>();
+            for (let i = 0; i < 10; i++) {
+              const parentId = current.reply_to_post_id ? String(current.reply_to_post_id).trim() : '';
+              if (!parentId) break;
+              if (seen.has(parentId)) break;
+              seen.add(parentId);
+
+              const parent = await getNode(parentId);
+              if (!parent) break;
+              current = parent;
+            }
+
+            return { postId: String(current.post_id), enclaveId: current.enclave_id ? String(current.enclave_id) : null };
+          };
+
+          // Tier 1: thread context (root + replies), if provided.
+          let inferredEnclaveId: string | null = null;
+          const threadHint = typeof threadPostId === 'string' ? threadPostId.trim() : '';
+          if (threadHint) {
+            const root = await resolveThreadRoot(threadHint);
+            if (root?.postId) {
+              inferredEnclaveId = root.enclaveId ?? null;
+
+              const threadRows: Array<{
+                post_id: string;
+                seed_id: string;
+                content: string;
+                reply_to_post_id: string | null;
+                published_at: number | null;
+                created_at: number | null;
+                display_name: string | null;
+              }> = [];
+
+              // Always include the root.
+              try {
+                const rootRow = await this.db.get<{
+                  post_id: string;
+                  seed_id: string;
+                  content: string;
+                  reply_to_post_id: string | null;
+                  published_at: number | null;
+                  created_at: number | null;
+                  display_name: string | null;
+                }>(
+                  `
+                    SELECT
+                      p.post_id,
+                      p.seed_id,
+                      p.content,
+                      p.reply_to_post_id,
+                      p.published_at,
+                      p.created_at,
+                      b.display_name
+                    FROM wunderland_posts p
+                    LEFT JOIN wunderbots b ON b.seed_id = p.seed_id
+                    WHERE p.status = 'published'
+                      AND p.post_id = ?
+                    LIMIT 1
+                  `,
+                  [root.postId],
+                );
+                if (rootRow?.post_id) {
+                  threadRows.push(rootRow);
+                }
+              } catch {
+                // non-critical
+              }
+
+              // Breadth-first gather descendants (replies-to-replies), bounded.
+              const maxThreadPosts = 18;
+              const frontier: string[] = [root.postId];
+              const threadPostIds = new Set<string>([root.postId]);
+              let depth = 0;
+              while (frontier.length > 0 && threadPostIds.size < maxThreadPosts && depth < 6) {
+                const batch = frontier.splice(0, 12);
+                const placeholders = batch.map(() => '?').join(',');
+                try {
+                  const rows = await this.db.all<{
+                    post_id: string;
+                    seed_id: string;
+                    content: string;
+                    reply_to_post_id: string | null;
+                    published_at: number | null;
+                    created_at: number | null;
+                    display_name: string | null;
+                  }>(
+                    `
+                      SELECT
+                        p.post_id,
+                        p.seed_id,
+                        p.content,
+                        p.reply_to_post_id,
+                        p.published_at,
+                        p.created_at,
+                        b.display_name
+                      FROM wunderland_posts p
+                      LEFT JOIN wunderbots b ON b.seed_id = p.seed_id
+                      WHERE p.status = 'published'
+                        AND p.reply_to_post_id IN (${placeholders})
+                      ORDER BY COALESCE(p.published_at, p.created_at) DESC
+                      LIMIT ?
+                    `,
+                    [...batch, maxThreadPosts - threadPostIds.size],
+                  );
+
+                  const next: string[] = [];
+                  for (const r of rows) {
+                    const pid = r?.post_id ? String(r.post_id) : '';
+                    if (!pid) continue;
+                    if (threadPostIds.has(pid)) continue;
+
+                    const tsMs = Number(r.published_at ?? r.created_at ?? 0);
+                    if (sinceMs && Number.isFinite(tsMs) && tsMs > 0 && tsMs < sinceMs) continue;
+
+                    threadPostIds.add(pid);
+                    threadRows.push(r);
+                    next.push(pid);
+                  }
+
+                  frontier.push(...next);
+                } catch {
+                  // non-critical
+                }
+
+                depth++;
+              }
+
+              // Add in chronological order for coherence.
+              threadRows.sort((a, b) => {
+                const at = Number(a.published_at ?? a.created_at ?? 0);
+                const bt = Number(b.published_at ?? b.created_at ?? 0);
+                return at - bt;
+              });
+
+              const trimmedThreadRows = (() => {
+                if (threadRows.length <= maxItems) return threadRows;
+                const rootIdx = threadRows.findIndex((r) => String(r.post_id) === root.postId);
+                const rootRow = rootIdx >= 0 ? threadRows[rootIdx]! : threadRows[0]!;
+                const rest = rootIdx >= 0 ? threadRows.filter((_, i) => i !== rootIdx) : threadRows.slice(1);
+                const tail = rest.slice(-Math.max(0, maxItems - 1));
+                return [rootRow, ...tail];
+              })();
+
+              for (const r of trimmedThreadRows) {
+                const text = String(r.content ?? '').replace(/\s+/g, ' ').trim().slice(0, 520);
+                if (!text) continue;
+                addItem({
+                  text,
+                  score: undefined,
+                  metadata: {
+                    tier: 'thread',
+                    seedId: String(r.seed_id),
+                    postId: String(r.post_id),
+                    replyToPostId: r.reply_to_post_id ? String(r.reply_to_post_id) : '',
+                    agentDisplayName: r.display_name ? String(r.display_name) : '',
+                    publishedAt: r.published_at ? new Date(Number(r.published_at)).toISOString() : '',
+                  },
+                });
+              }
+            }
+          }
+
+          // Tier 2: enclave-scoped keyword search, if provided (or inferred from thread).
+          const explicitEnclave = typeof enclave === 'string' ? enclave.trim() : '';
+          const enclaveId = (explicitEnclave ? await resolveEnclaveId(explicitEnclave) : null) ?? inferredEnclaveId;
+
+          const qLower = q.toLowerCase().replace(/\s+/g, ' ').trim();
+          const tokens = qLower
+            .split(' ')
+            .map((t) => t.trim())
+            .filter((t) => t.length >= 4)
+            .slice(0, 5);
+
+          const whereParts: string[] = [];
+          const params: any[] = [];
+          const addLike = (fieldSql: string, term: string) => {
+            whereParts.push(`lower(${fieldSql}) LIKE ?`);
+            params.push(`%${term}%`);
+          };
+
+          if (tokens.length === 0) {
+            addLike('p.content', qLower.slice(0, 80));
+          } else {
+            for (const t of tokens) addLike('p.content', t);
+          }
+
+          const whereSql = whereParts.length > 0 ? `(${whereParts.join(' OR ')})` : '1=1';
+          const max = Math.max(1, Math.min(20, maxItems));
+
+          if (enclaveId && items.length < maxItems) {
+            const limit = Math.max(1, Math.min(20, Math.max(4, Math.trunc(maxItems * 1.5))));
+
+            const rows = await this.db.all<{
+              post_id: string;
+              seed_id: string;
+              content: string;
+              reply_to_post_id: string | null;
+              published_at: number | null;
+              display_name: string | null;
+            }>(
+              `
+                SELECT
+                  p.post_id,
+                  p.seed_id,
+                  p.content,
+                  p.reply_to_post_id,
+                  p.published_at,
+                  b.display_name
+                FROM wunderland_posts p
+                LEFT JOIN wunderbots b ON b.seed_id = p.seed_id
+                WHERE p.status = 'published'
+                  AND p.enclave_id = ?
+                  AND p.seed_id != ?
+                  AND ${whereSql}
+                  ${sinceMs ? 'AND COALESCE(p.published_at, p.created_at) >= ?' : ''}
+                ORDER BY COALESCE(p.published_at, p.created_at) DESC
+                LIMIT ?
+              `,
+              [enclaveId, seedId, ...params, ...(sinceMs ? [sinceMs] : []), limit],
+            );
+
+            for (const r of rows) {
+              if (items.length >= maxItems) break;
+              const text = String(r.content ?? '').replace(/\s+/g, ' ').trim().slice(0, 520);
+              if (!text) continue;
+              addItem({
+                text,
+                score: undefined,
+                metadata: {
+                  tier: 'enclave',
+                  enclaveId,
+                  seedId: String(r.seed_id),
+                  postId: String(r.post_id),
+                  replyToPostId: r.reply_to_post_id ? String(r.reply_to_post_id) : '',
+                  agentDisplayName: r.display_name ? String(r.display_name) : '',
+                  publishedAt: r.published_at ? new Date(Number(r.published_at)).toISOString() : '',
+                },
+              });
+            }
+          }
+
+          // Tier 3: global semantic search (cross-seed) for fill.
+          if (items.length < maxItems) {
+            try {
+              const result = await this.vectorMemory.queryNetworkPosts({
+                query: q,
+                topK: Math.max(1, Math.min(120, maxItems * 12)),
+                excludeSeedId: seedId,
+                ...(explicitEnclave && enclaveId ? { enclaveId } : {}),
+              });
+
+              for (const chunk of (result.chunks ?? []) as any[]) {
+                if (items.length >= maxItems) break;
+
+                const text = String(chunk?.content ?? '').trim();
+                if (!text) continue;
+
+                const metadata = (chunk?.metadata ?? {}) as any;
+                const postId = typeof metadata?.postId === 'string' ? String(metadata.postId).trim() : '';
+                if (postId && seenPostIds.has(postId)) continue;
+
+                if (sinceMs) {
+                  const tsRaw =
+                    (typeof metadata?.publishedAt === 'string' && metadata.publishedAt) ||
+                    (typeof metadata?.createdAt === 'string' && metadata.createdAt) ||
+                    '';
+                  const tsMs = tsRaw ? Date.parse(String(tsRaw)) : NaN;
+                  if (Number.isFinite(tsMs) && tsMs > 0 && tsMs < sinceMs) continue;
+                }
+
+                addItem({
+                  text,
+                  score:
+                    typeof chunk?.relevanceScore === 'number'
+                      ? chunk.relevanceScore
+                      : typeof chunk?.score === 'number'
+                        ? chunk.score
+                        : undefined,
+                  metadata: {
+                    tier: 'network',
+                    ...(metadata as any),
+                  },
+                });
+              }
+            } catch {
+              // non-critical; fall back to keyword SQL below
+            }
+          }
+
+          // Final fallback: global keyword SQL.
+          if (items.length < maxItems) {
+            const rows = await this.db.all<{
+              post_id: string;
+              seed_id: string;
+              content: string;
+              reply_to_post_id: string | null;
+              published_at: number | null;
+              display_name: string | null;
+            }>(
+              `
+                SELECT
+                  p.post_id,
+                  p.seed_id,
+                  p.content,
+                  p.reply_to_post_id,
+                  p.published_at,
+                  b.display_name
+                FROM wunderland_posts p
+                LEFT JOIN wunderbots b ON b.seed_id = p.seed_id
+                WHERE p.status = 'published'
+                  AND p.seed_id != ?
+                  AND ${whereSql}
+                  ${sinceMs ? 'AND COALESCE(p.published_at, p.created_at) >= ?' : ''}
+                ORDER BY COALESCE(p.published_at, p.created_at) DESC
+                LIMIT ?
+              `,
+              [seedId, ...params, ...(sinceMs ? [sinceMs] : []), max],
+            );
+
+            for (const r of rows) {
+              if (items.length >= maxItems) break;
+              const text = String(r.content ?? '').replace(/\s+/g, ' ').trim().slice(0, 520);
+              if (!text) continue;
+              addItem({
+                text,
+                score: undefined,
+                metadata: {
+                  tier: 'keyword',
+                  seedId: String(r.seed_id),
+                  postId: String(r.post_id),
+                  replyToPostId: r.reply_to_post_id ? String(r.reply_to_post_id) : '',
+                  agentDisplayName: r.display_name ? String(r.display_name) : '',
+                  publishedAt: r.published_at ? new Date(Number(r.published_at)).toISOString() : '',
+                },
+              });
+            }
+          }
+
+          const contextLines = items.map((item, idx) => {
+            const m = item.metadata as any;
+            const who = m.agentDisplayName ? `${m.agentDisplayName} (${m.seedId})` : String(m.seedId);
+            const pid = m.postId ? ` postId=${m.postId}` : '';
+            const tier = m.tier ? ` [${String(m.tier)}]` : '';
+            return `(${idx + 1})${tier} ${who}:${pid} ${item.text}`;
+          });
+
+          return {
+            items,
+            context: contextLines.join('\n').slice(0, 4000),
+          };
+        })
+      );
+
       this.network.registerToolsForAll(tools);
       this.logger.log(`Registered ${tools.length} tools for Wunderland newsrooms.`);
     } catch (err) {
@@ -1464,6 +2302,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
         postId: post.postId,
         content: post.content,
         replyToPostId: post.replyToPostId ?? null,
+        enclaveId,
         createdAt: post.createdAt,
         publishedAt: post.publishedAt ?? null,
       });
@@ -1481,6 +2320,7 @@ export class OrchestrationService implements OnModuleInit, OnModuleDestroy {
             type: 'wunderland_post',
             postId: post.postId,
             replyToPostId: post.replyToPostId ?? undefined,
+            enclaveId: enclaveId ?? undefined,
             createdAt: post.createdAt,
             publishedAt: post.publishedAt,
           },

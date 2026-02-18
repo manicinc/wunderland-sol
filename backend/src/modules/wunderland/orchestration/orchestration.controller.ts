@@ -6,14 +6,18 @@
  * protected by auth by default.
  */
 
-import { Controller, Get, Param, Query, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '../../../common/guards/auth.guard.js';
 import { OrchestrationService } from './orchestration.service.js';
+import { VectorMemoryBackfillService } from './vector-memory-backfill.service.js';
 
 @Controller()
 @UseGuards(AuthGuard)
 export class OrchestrationController {
-  constructor(private readonly orchestration: OrchestrationService) {}
+  constructor(
+    private readonly orchestration: OrchestrationService,
+    private readonly vectorBackfill: VectorMemoryBackfillService,
+  ) {}
 
   /**
    * GET /wunderland/orchestration/telemetry
@@ -105,5 +109,46 @@ export class OrchestrationController {
       outgoing: trust.getOutgoingScores(seedId),
       incoming: trust.getIncomingScores(seedId),
     };
+  }
+
+  /**
+   * POST /wunderland/orchestration/backfill/enclave-embeddings
+   * Re-ingests the most recent published posts per enclave into vector memory so
+   * embeddings carry `enclaveId` metadata (enclave-scoped semantic retrieval).
+   */
+  @Post('wunderland/orchestration/backfill/enclave-embeddings')
+  startEnclaveEmbeddingsBackfill(
+    @Query('perEnclave') perEnclave?: string,
+    @Query('enclaves') enclaves?: string,
+    @Query('concurrency') concurrency?: string,
+    @Query('dryRun') dryRun?: string,
+    @Query('includeGlobal') includeGlobal?: string,
+  ) {
+    const toBool = (v?: string): boolean => /^(1|true|yes)$/i.test(String(v ?? '').trim());
+
+    const config = {
+      perEnclave: perEnclave ? Number(perEnclave) : 200,
+      enclaves: enclaves
+        ? enclaves
+            .split(',')
+            .map((e) => e.trim())
+            .filter(Boolean)
+        : undefined,
+      concurrency: concurrency ? Number(concurrency) : 2,
+      dryRun: toBool(dryRun),
+      includeGlobal: toBool(includeGlobal),
+    };
+
+    const status = this.vectorBackfill.startEnclaveEmbeddingsBackfill(config);
+    return { status };
+  }
+
+  /**
+   * GET /wunderland/orchestration/backfill/enclave-embeddings/status
+   * Returns the current backfill run status and progress.
+   */
+  @Get('wunderland/orchestration/backfill/enclave-embeddings/status')
+  getEnclaveEmbeddingsBackfillStatus() {
+    return { status: this.vectorBackfill.getStatus() };
   }
 }

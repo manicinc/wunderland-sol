@@ -98,6 +98,9 @@ export class SocialFeedService {
 
   async engagePost(postId: string, userId: string, dto: EngagePostDto) {
     const now = Date.now();
+    const canonicalPostId = await this.resolveCanonicalPostId(postId);
+    if (!canonicalPostId) throw new PostNotFoundException(postId);
+
     const post = await this.db.get<{
       post_id: string;
       likes: number;
@@ -105,9 +108,9 @@ export class SocialFeedService {
       boosts: number;
       replies: number;
     }>('SELECT post_id, likes, downvotes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1', [
-      postId,
+      canonicalPostId,
     ]);
-    if (!post) throw new PostNotFoundException(postId);
+    if (!post) throw new PostNotFoundException(canonicalPostId);
 
     // Ensure actor seed exists and belongs to the current user (prevents arbitrary spoofing).
     const actor = await this.db.get<{ seed_id: string }>(
@@ -122,52 +125,130 @@ export class SocialFeedService {
       };
     }
 
-    const actionId = this.db.generateId();
-    await this.db.run(
-      `
-        INSERT INTO wunderland_engagement_actions (
-          action_id, post_id, actor_seed_id, type, payload, timestamp
-        ) VALUES (?, ?, ?, ?, ?, ?)
-      `,
-      [
-        actionId,
-        postId,
-        dto.seedId,
-        dto.action,
-        dto.content ? JSON.stringify({ content: dto.content }) : null,
-        now,
-      ]
-    );
+    const apply = await this.db.transaction(async (trx) => {
+      const action = String(dto.action ?? '').trim();
 
-    if (dto.action === 'like') {
-      await this.db.run('UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?', [
-        postId,
-      ]);
-    } else if (dto.action === 'downvote') {
-      await this.db.run('UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?', [
-        postId,
-      ]);
-    } else if (dto.action === 'boost') {
-      await this.db.run('UPDATE wunderland_posts SET boosts = boosts + 1 WHERE post_id = ?', [
-        postId,
-      ]);
-    } else if (dto.action === 'reply') {
-      await this.db.run('UPDATE wunderland_posts SET replies = replies + 1 WHERE post_id = ?', [
-        postId,
-      ]);
-    } else if (dto.action === 'report') {
-      // no counter today; stored as an engagement action only
+      if (action === 'like' || action === 'downvote') {
+        const desired = action === 'like' ? 1 : -1;
+
+        const existing = await trx.get<{ direction: number }>(
+          `
+            SELECT direction
+              FROM wunderland_content_votes
+             WHERE entity_type = ?
+               AND entity_id = ?
+               AND voter_seed_id = ?
+             LIMIT 1
+          `,
+          ['post', canonicalPostId, dto.seedId],
+        );
+
+        const prevDirection = typeof existing?.direction === 'number' ? existing.direction : 0;
+        if (prevDirection === desired) {
+          return { applied: false, actionId: null as string | null };
+        }
+
+        await trx.run(
+          `
+            INSERT INTO wunderland_content_votes (
+              entity_type, entity_id, voter_seed_id, direction, created_at
+            ) VALUES (?, ?, ?, ?, datetime('now'))
+            ON CONFLICT(entity_type, entity_id, voter_seed_id)
+            DO UPDATE SET direction = excluded.direction, created_at = datetime('now')
+          `,
+          ['post', canonicalPostId, dto.seedId, desired],
+        );
+
+        if (prevDirection === 0) {
+          await trx.run(
+            action === 'like'
+              ? 'UPDATE wunderland_posts SET likes = likes + 1 WHERE post_id = ?'
+              : 'UPDATE wunderland_posts SET downvotes = downvotes + 1 WHERE post_id = ?',
+            [canonicalPostId],
+          );
+        } else if (prevDirection === -desired) {
+          await trx.run(
+            action === 'like'
+              ? `UPDATE wunderland_posts
+                    SET likes = likes + 1,
+                        downvotes = CASE WHEN downvotes > 0 THEN downvotes - 1 ELSE 0 END
+                  WHERE post_id = ?`
+              : `UPDATE wunderland_posts
+                    SET downvotes = downvotes + 1,
+                        likes = CASE WHEN likes > 0 THEN likes - 1 ELSE 0 END
+                  WHERE post_id = ?`,
+            [canonicalPostId],
+          );
+        }
+
+        const actionId = this.db.generateId();
+        await trx.run(
+          `
+            INSERT INTO wunderland_engagement_actions (
+              action_id, post_id, actor_seed_id, type, payload, timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?)
+          `,
+          [
+            actionId,
+            canonicalPostId,
+            dto.seedId,
+            action,
+            dto.content ? JSON.stringify({ content: dto.content }) : null,
+            now,
+          ],
+        );
+
+        return { applied: true, actionId };
+      }
+
+      // Non-vote actions: keep old behavior (append-only action + counters).
+      const actionId = this.db.generateId();
+      await trx.run(
+        `
+          INSERT INTO wunderland_engagement_actions (
+            action_id, post_id, actor_seed_id, type, payload, timestamp
+          ) VALUES (?, ?, ?, ?, ?, ?)
+        `,
+        [
+          actionId,
+          canonicalPostId,
+          dto.seedId,
+          action,
+          dto.content ? JSON.stringify({ content: dto.content }) : null,
+          now,
+        ],
+      );
+
+      if (action === 'reply') {
+        await trx.run('UPDATE wunderland_posts SET replies = replies + 1 WHERE post_id = ?', [
+          canonicalPostId,
+        ]);
+      }
+
+      return { applied: true, actionId };
+    });
+
+    if ((dto.action === 'like' || dto.action === 'downvote') && apply.applied && this.sol) {
+      try {
+        this.sol.scheduleCastVote({
+          postId: canonicalPostId,
+          actorSeedId: dto.seedId,
+          value: dto.action === 'like' ? 1 : -1,
+        });
+      } catch {
+        // non-critical
+      }
     }
 
     const updated = await this.db.get<{ likes: number; downvotes: number; boosts: number; replies: number }>(
       'SELECT likes, downvotes, boosts, replies FROM wunderland_posts WHERE post_id = ? LIMIT 1',
-      [postId]
+      [canonicalPostId]
     );
 
     return {
-      postId,
-      applied: true,
-      actionId,
+      postId: canonicalPostId,
+      applied: apply.applied,
+      actionId: apply.actionId ?? undefined,
       counts: updated ?? { likes: post.likes, downvotes: post.downvotes, boosts: post.boosts, replies: post.replies },
       timestamp: new Date(now).toISOString(),
     };
