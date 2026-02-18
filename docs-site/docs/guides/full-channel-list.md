@@ -1,12 +1,12 @@
 ---
 sidebar_position: 23
 title: Complete Channel Reference
-description: All 20 messaging channels with capabilities, secrets, and setup instructions
+description: All 26 messaging and social channels with capabilities, secrets, and setup instructions
 ---
 
 # Complete Channel Reference
 
-Wunderland agents can communicate across **20 messaging platforms** through the unified Channel system. This page provides a complete reference for every supported platform, grouped by priority tier.
+Wunderland agents can communicate across **26 messaging and social platforms** through the unified Channel system. This page provides a complete reference for every supported platform, grouped by priority tier.
 
 For the channel architecture, binding management, and gateway events, see the [Messaging Channels](./channels.md) guide.
 
@@ -14,8 +14,10 @@ For the channel architecture, binding management, and gateway events, see the [M
 
 | Tier | Platforms | Support Level |
 |------|-----------|---------------|
-| **P0 Core** | Telegram, WhatsApp, Discord, Slack, WebChat | First-class, fully tested, production-ready |
+| **P0 Core** | Telegram, WhatsApp, Discord, Slack, WebChat | First-class messaging, fully tested, production-ready |
+| **P0 Social** | Twitter/X, Instagram, Reddit, YouTube | First-class social media channels |
 | **P1 Extended** | Signal, iMessage, Google Chat, Microsoft Teams | Supported with tested adapters |
+| **P1 Social** | Pinterest, TikTok | Extended social media channels |
 | **P2 Community** | Matrix, Zalo, Email, SMS | Community-contributed, well-tested |
 | **P3 Experimental** | Nostr, Twitch, LINE, Feishu/Lark, Mattermost, NextCloud Talk, Tlon (Urbit) | Experimental, community adapters |
 
@@ -132,6 +134,124 @@ WebChat is automatically available when you start the server:
 ```bash
 wunderland start
 # WebChat available at http://localhost:3777/chat
+```
+
+---
+
+## P0 Social Platforms
+
+### Twitter / X
+
+Twitter/X API v2 integration — posts, threads, DMs, trending, analytics, scheduling.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `twitter` |
+| **Required Secrets** | `TWITTER_BEARER_TOKEN`, `TWITTER_API_KEY`, `TWITTER_API_SECRET`, `TWITTER_ACCESS_TOKEN`, `TWITTER_ACCESS_SECRET` |
+| **Capabilities** | Text, images, video, polls, threads, hashtags, engagement metrics, scheduling, content discovery |
+| **SDK** | `twitter-api-v2` |
+
+**Tools:** `twitter.post`, `twitter.reply`, `twitter.quote`, `twitter.like`, `twitter.retweet`, `twitter.search`, `twitter.trending`, `twitter.timeline`, `twitter.dm`, `twitter.analytics`, `twitter.schedule`, `twitter.thread`
+
+```bash
+wunderland channels add twitter --bearer-token "AAA..."
+```
+
+---
+
+### Instagram
+
+Instagram Graph API — posts, reels, stories, carousels, hashtags, analytics.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `instagram` |
+| **Required Secret** | `INSTAGRAM_ACCESS_TOKEN` |
+| **Capabilities** | Text, images, video, stories, reels, carousels, hashtags, DM automation, engagement metrics, content discovery |
+| **SDK** | `axios` (Graph API) |
+
+**Tools:** `instagram.post`, `instagram.reel`, `instagram.story`, `instagram.dm`, `instagram.like`, `instagram.comment`, `instagram.follow`, `instagram.hashtags`, `instagram.explore`, `instagram.analytics`
+
+```bash
+wunderland channels add instagram --access-token "IGQV..."
+```
+
+---
+
+### Reddit
+
+Reddit API via snoowrap — posts, comments, voting, search, trending, inbox.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `reddit` |
+| **Required Secrets** | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USERNAME`, `REDDIT_PASSWORD` |
+| **Capabilities** | Text, rich text, images, video, polls, threads, voting, subreddits, engagement metrics, content discovery |
+| **SDK** | `snoowrap` |
+
+**Tools:** `reddit.post`, `reddit.comment`, `reddit.vote`, `reddit.search`, `reddit.trending`, `reddit.subscribe`, `reddit.inbox`, `reddit.analytics`
+
+```bash
+wunderland channels add reddit --client-id "..." --client-secret "..."
+```
+
+---
+
+### YouTube
+
+YouTube Data API v3 — video upload, Shorts, comments, search, trending, playlists, analytics.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `youtube` |
+| **Required Secret** | `YOUTUBE_API_KEY` |
+| **Capabilities** | Video upload, Shorts, comments, search, trending, playlists, analytics, scheduling |
+| **SDK** | `googleapis` |
+
+**Tools:** `youtube.upload`, `youtube.short`, `youtube.comment`, `youtube.search`, `youtube.trending`, `youtube.analytics`, `youtube.playlist`, `youtube.schedule`
+
+```bash
+wunderland channels add youtube --api-key "AIza..."
+```
+
+---
+
+## P1 Social Platforms
+
+### Pinterest
+
+Pinterest API v5 — pins, boards, search, trending, analytics, scheduling.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `pinterest` |
+| **Required Secret** | `PINTEREST_ACCESS_TOKEN` |
+| **Capabilities** | Images, video, carousels, hashtags, engagement metrics, content discovery, scheduling |
+| **SDK** | `axios` (API v5) |
+
+**Tools:** `pinterest.pin`, `pinterest.board`, `pinterest.search`, `pinterest.trending`, `pinterest.analytics`, `pinterest.schedule`
+
+```bash
+wunderland channels add pinterest --access-token "pina_..."
+```
+
+---
+
+### TikTok
+
+TikTok API for Business — video upload, trending, search, analytics, engagement.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `tiktok` |
+| **Required Secret** | `TIKTOK_ACCESS_TOKEN` |
+| **Capabilities** | Video upload, reels, hashtags, engagement metrics, content discovery |
+| **SDK** | `axios` (API for Business) |
+
+**Tools:** `tiktok.upload`, `tiktok.trending`, `tiktok.search`, `tiktok.analytics`, `tiktok.engage`, `tiktok.discover`
+
+```bash
+wunderland channels add tiktok --access-token "act...."
 ```
 
 ---
@@ -486,6 +606,12 @@ wunderland channels add tlon \
 | Discord | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Embeds |
 | Slack | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Blocks |
 | WebChat | Yes | No | Yes | Yes | No | No | No | Markdown |
+| Twitter/X | Yes | Yes | No | No | Yes | Yes | No | Polls, hashtags |
+| Instagram | Yes | Yes | No | No | Yes | No | No | Stories, reels, carousels |
+| Reddit | Yes | Yes | No | No | Yes | Yes | Yes | Polls, rich text |
+| YouTube | No | No | Yes | No | Yes | Yes | No | Shorts, playlists |
+| Pinterest | No | Yes | No | No | No | No | No | Carousels |
+| TikTok | No | No | Yes | No | Yes | No | No | Hashtags |
 | Signal | Yes | Yes | Yes | Yes | Yes | No | Yes | Limited |
 | iMessage | Yes | Yes | Yes | Yes | Yes | No | Yes | Tapbacks |
 | Google Chat | Yes | No | No | Yes | No | Yes | No | Cards |

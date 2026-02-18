@@ -56,7 +56,27 @@ Every extension declares a `kind` that determines how it integrates with the age
 | Extension | Description | Required Key |
 |-----------|-------------|--------------|
 | **web-browser** | Playwright-based browser automation | None (local) |
+| **browser-automation** | Full browser automation — navigate, click, fill, screenshot, extract, sessions, captcha solving, proxy rotation (10 tools) | None (optional: `TWOCAPTCHA_API_KEY`) |
 | **cli-executor** | System command execution (sandboxed) | None (local) |
+
+### Research
+
+| Extension | Description | Required Key |
+|-----------|-------------|--------------|
+| **deep-research** | Multi-source investigation — academic papers, web aggregation, scraping, trending, cross-referencing (5 tools) | `SERPER_API_KEY` |
+| **content-extraction** | Extract clean content from URLs, YouTube transcripts, Wikipedia, PDFs, and structured web data (5 tools) | None |
+
+### Security & Credentials
+
+| Extension | Description | Required Key |
+|-----------|-------------|--------------|
+| **credential-vault** | Encrypted credential storage — set, get, list, rotate, and import API keys and tokens (5 tools) | None |
+
+### Communications
+
+| Extension | Description | Required Key |
+|-----------|-------------|--------------|
+| **notifications** | Unified multi-channel notification router — send, broadcast, and schedule notifications (3 tools) | None |
 
 ## Available Voice Providers
 

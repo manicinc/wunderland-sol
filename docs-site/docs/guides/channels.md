@@ -4,9 +4,9 @@ sidebar_position: 15
 
 # Messaging Channels
 
-Wunderland agents can communicate across **20 messaging platforms** through the unified Channel system. Each platform is backed by a `ChannelAdapter` that normalizes messages into a common `ChannelMessage` format, allowing your agent to handle conversations identically regardless of the source.
+Wunderland agents can communicate across **26 messaging and social platforms** through the unified Channel system. Each platform is backed by a `ChannelAdapter` that normalizes messages into a common `ChannelMessage` format, allowing your agent to handle conversations identically regardless of the source.
 
-For a complete reference of all 20 platforms including capabilities, required secrets, and setup instructions, see the [Complete Channel Reference](./full-channel-list.md).
+For a complete reference of all 26 platforms including capabilities, required secrets, and setup instructions, see the [Complete Channel Reference](./full-channel-list.md).
 
 ## Architecture Overview
 
@@ -30,12 +30,14 @@ All channel bindings are stored in the `wunderland_channel_bindings` database ta
 
 ## Platform Tiers
 
-Platforms are organized into three priority tiers:
+Platforms are organized into priority tiers:
 
 | Tier | Platforms | Description |
 |------|-----------|-------------|
-| **P0 Core** | Telegram, WhatsApp, Discord, Slack, WebChat | First-class support, fully tested |
+| **P0 Core** | Telegram, WhatsApp, Discord, Slack, WebChat | First-class messaging support, fully tested |
+| **P0 Social** | Twitter/X, Instagram, Reddit, YouTube | First-class social media channels |
 | **P1 Extended** | Signal, iMessage, Google Chat, Teams | Supported with tested adapters |
+| **P1 Social** | Pinterest, TikTok | Extended social media channels |
 | **P2 Community** | Matrix, Zalo, Email, SMS | Community-contributed, well-tested |
 | **P3 Experimental** | Nostr, Twitch, LINE, Feishu, Mattermost, NextCloud Talk, Tlon | Experimental, community adapters |
 
@@ -170,6 +172,158 @@ wunderland start
 ```
 
 No additional configuration is required. The WebChat interface connects via WebSocket to the Wunderland gateway.
+
+---
+
+## P0 Social Platforms
+
+### Twitter / X
+
+Twitter/X integration via the official API v2.
+
+**Required Secrets:**
+
+| Variable | Description |
+|----------|-------------|
+| `TWITTER_BEARER_TOKEN` | Bearer token for read-only API access |
+| `TWITTER_API_KEY` | API key for OAuth 1.0a (write access) |
+| `TWITTER_API_SECRET` | API secret |
+| `TWITTER_ACCESS_TOKEN` | User access token |
+| `TWITTER_ACCESS_SECRET` | User access secret |
+
+**Capabilities:** Text, images, video, polls, threads, hashtags, engagement metrics, scheduling, content discovery, reactions (likes).
+
+**Tools:** `twitter.post`, `twitter.reply`, `twitter.quote`, `twitter.like`, `twitter.retweet`, `twitter.search`, `twitter.trending`, `twitter.timeline`, `twitter.dm`, `twitter.analytics`, `twitter.schedule`, `twitter.thread`
+
+**Setup:**
+
+1. Apply for a [Twitter Developer account](https://developer.twitter.com)
+2. Create a project and app, generate API keys
+3. Add to Wunderland:
+
+```bash
+wunderland channels add twitter \
+  --bearer-token "AAA..." \
+  --api-key "..." --api-secret "..." \
+  --access-token "..." --access-secret "..."
+```
+
+---
+
+### Instagram
+
+Instagram integration via the Graph API for business accounts.
+
+**Required Secrets:**
+
+| Variable | Description |
+|----------|-------------|
+| `INSTAGRAM_ACCESS_TOKEN` | Instagram Graph API access token |
+
+**Capabilities:** Text, images, video, stories, reels, carousels, hashtags, DM automation, engagement metrics, content discovery.
+
+**Tools:** `instagram.post`, `instagram.reel`, `instagram.story`, `instagram.dm`, `instagram.like`, `instagram.comment`, `instagram.follow`, `instagram.hashtags`, `instagram.explore`, `instagram.analytics`
+
+**Setup:**
+
+1. Create a [Facebook Developer app](https://developers.facebook.com) linked to an Instagram Business account
+2. Generate a long-lived access token
+3. Add to Wunderland:
+
+```bash
+wunderland channels add instagram --access-token "IGQV..."
+```
+
+---
+
+### Reddit
+
+Reddit integration via the official API (OAuth2).
+
+**Required Secrets:**
+
+| Variable | Description |
+|----------|-------------|
+| `REDDIT_CLIENT_ID` | OAuth2 client ID from [Reddit apps](https://www.reddit.com/prefs/apps) |
+| `REDDIT_CLIENT_SECRET` | OAuth2 client secret |
+| `REDDIT_USERNAME` | Reddit account username |
+| `REDDIT_PASSWORD` | Reddit account password |
+
+**Capabilities:** Text, rich text, images, video, polls, threads, voting, subreddit channels, engagement metrics, content discovery.
+
+**Tools:** `reddit.post`, `reddit.comment`, `reddit.vote`, `reddit.search`, `reddit.trending`, `reddit.subscribe`, `reddit.inbox`, `reddit.analytics`
+
+**Setup:**
+
+1. Go to [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) and create a "script" app
+2. Note the client ID and secret
+3. Add to Wunderland:
+
+```bash
+wunderland channels add reddit \
+  --client-id "..." --client-secret "..." \
+  --username "..." --password "..."
+```
+
+---
+
+### YouTube
+
+YouTube integration via the Data API v3.
+
+**Required Secrets:**
+
+| Variable | Description |
+|----------|-------------|
+| `YOUTUBE_API_KEY` | YouTube Data API key |
+
+**Capabilities:** Video upload, YouTube Shorts, comments, search, trending, playlists, analytics, scheduling.
+
+**Tools:** `youtube.upload`, `youtube.short`, `youtube.comment`, `youtube.search`, `youtube.trending`, `youtube.analytics`, `youtube.playlist`, `youtube.schedule`
+
+**Setup:**
+
+1. Enable the YouTube Data API v3 in the [Google Cloud Console](https://console.cloud.google.com)
+2. Create an API key (or OAuth credentials for upload)
+3. Add to Wunderland:
+
+```bash
+wunderland channels add youtube --api-key "AIza..."
+```
+
+---
+
+## P1 Social Platforms
+
+### Pinterest
+
+Pinterest integration via the API v5.
+
+**Required Secrets:**
+
+| Variable | Description |
+|----------|-------------|
+| `PINTEREST_ACCESS_TOKEN` | Pinterest API access token |
+
+**Capabilities:** Images, video, carousels, hashtags, engagement metrics, content discovery, scheduling.
+
+**Tools:** `pinterest.pin`, `pinterest.board`, `pinterest.search`, `pinterest.trending`, `pinterest.analytics`, `pinterest.schedule`
+
+---
+
+### TikTok
+
+TikTok integration via the API for Business.
+
+**Required Secrets:**
+
+| Variable | Description |
+|----------|-------------|
+| `TIKTOK_ACCESS_TOKEN` | TikTok API access token |
+
+**Capabilities:** Video upload, reels, reactions, hashtags, engagement metrics, content discovery.
+
+**Tools:** `tiktok.upload`, `tiktok.trending`, `tiktok.search`, `tiktok.analytics`, `tiktok.engage`, `tiktok.discover`
 
 ---
 
