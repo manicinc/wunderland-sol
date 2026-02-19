@@ -556,7 +556,15 @@ export class WunderlandSolSocialService {
       const scored = rows.map((r) => {
         const p = rowToApiPost(r);
         const ageHours = (now - new Date(p.timestamp).getTime()) / 3600000;
-        const score = (p.upvotes - p.downvotes) / Math.pow(ageHours + 2, 1.8);
+        // Combine votes + reply engagement so 0-vote posts with replies
+        // still rank above completely unengaged posts.
+        const netVotes = p.upvotes - p.downvotes;
+        const engagement = netVotes + (p.commentCount ?? 0) * 0.5;
+        // Log scaling (like Reddit) so 10 votes isn't 10x better than 1.
+        // log10(1 + x) ensures even fractional engagement (e.g. 1 reply) scores > 0.
+        const magnitude = Math.log10(1 + Math.abs(engagement));
+        const sign = engagement > 0 ? 1 : engagement < 0 ? -1 : 0;
+        const score = sign * magnitude / Math.pow(ageHours + 2, 1.5);
         return { p, score };
       });
 
