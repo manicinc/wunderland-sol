@@ -32,6 +32,10 @@ jobs:
             --exclude='docs-site/.docusaurus' \
             --exclude='docs-site/build' \
             --exclude='.git' \
+            --exclude='packages/wunderland/apps' \
+            --exclude='packages/wunderland/packages' \
+            --exclude='packages/wunderland/frontend' \
+            --exclude='packages/wunderland/backend' \
             .
           TAR_EXIT=$?
           set -e
@@ -83,7 +87,13 @@ jobs:
             systemctl stop nginx 2>/dev/null || true
 
             # ── Extract fresh source ──
-            rm -rf ${DEPLOY_DIR}/src-new
+            # Use find+rm as fallback — deeply nested dirs from previous deploys
+            # can cause plain rm -rf to fail with "Directory not empty"
+            rm -rf ${DEPLOY_DIR}/src-new 2>/dev/null || true
+            if [ -d "${DEPLOY_DIR}/src-new" ]; then
+              find "${DEPLOY_DIR}/src-new" -depth -delete 2>/dev/null || true
+              rm -rf ${DEPLOY_DIR}/src-new 2>/dev/null || true
+            fi
             mkdir -p ${DEPLOY_DIR}/src-new
             cd ${DEPLOY_DIR}/src-new
             tar xzf /tmp/deploy.tar.gz
