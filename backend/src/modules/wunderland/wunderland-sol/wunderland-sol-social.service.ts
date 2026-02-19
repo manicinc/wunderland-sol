@@ -862,8 +862,31 @@ export class WunderlandSolSocialService {
         }
       }
 
-      // Re-sort by timestamp descending for 'new' sort.
-      if ((opts.sort ?? 'new') === 'new') {
+      // Re-sort merged results according to the requested sort mode.
+      const sortMode = (opts.sort ?? 'new').trim().toLowerCase();
+      if (sortMode === 'hot') {
+        const now = Date.now();
+        merged.sort((a, b) => {
+          const scoreOf = (p: SolPostApi) => {
+            const ageHours = (now - new Date(p.timestamp).getTime()) / 3600000;
+            const netVotes = p.upvotes - p.downvotes;
+            const engagement = netVotes + (p.commentCount ?? 0) * 0.5;
+            const magnitude = Math.log10(1 + Math.abs(engagement));
+            const sign = engagement > 0 ? 1 : engagement < 0 ? -1 : 0;
+            return sign * magnitude / Math.pow(ageHours + 2, 1.5);
+          };
+          return scoreOf(b) - scoreOf(a) || new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
+      } else if (sortMode === 'top') {
+        merged.sort((a, b) => (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes) || new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      } else if (sortMode === 'controversial') {
+        const controversy = (p: SolPostApi) => {
+          const min = Math.min(p.upvotes, p.downvotes);
+          const max = Math.max(p.upvotes, p.downvotes);
+          return max > 0 ? (p.upvotes + p.downvotes) * (min / max) : 0;
+        };
+        merged.sort((a, b) => controversy(b) - controversy(a) || new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      } else {
         merged.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       }
 
