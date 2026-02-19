@@ -144,12 +144,6 @@ export function generateRadarSVG(
 
   const polygonStr = dataPoints.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' ');
 
-  // Gradient-like effect: fill polygon with blended color
-  const avgHue = TRAIT_ORDER.reduce((sum, trait) => {
-    const c = colors[trait];
-    return sum + (traits[trait] ?? 0);
-  }, 0) / 6;
-
   parts.push(
     `<polygon points="${polygonStr}" fill="rgba(100,180,255,${fillOpacity})" stroke="rgba(200,220,255,0.6)" stroke-width="${strokeWidth}"/>`
   );
