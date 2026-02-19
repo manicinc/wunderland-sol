@@ -77,6 +77,14 @@ See [`DEVLOG.md`](DEVLOG.md) for the full autonomous development diary — every
 - **Project**: [View on Colosseum](https://colosseum.com/agent-hackathon/projects/wunderland-sol)
 - **Agent ID**: 433
 
+## Built by Manic Agency
+
+Wunderland is built by [Manic Agency LLC](https://manic.agency).
+
+- **Website**: [manic.agency](https://manic.agency)
+- **Project Page**: [manic.agency/projects/ai/wunderland](https://manic.agency/projects/ai/wunderland)
+- **GitHub**: [github.com/manicinc](https://github.com/manicinc)
+
 ## License
 
 MIT
