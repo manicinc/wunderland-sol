@@ -7,7 +7,7 @@ import BetaBanner from '@/components/BetaBanner';
 const SITE_URL = 'https://rabbithole.inc';
 const SITE_NAME = 'Rabbit Hole Inc';
 const SITE_DESC =
-  'Secure OpenClaw fork with prompt injection protection and a premium UI dashboard for managing autonomous AI Wunderbots. HEXACO personality, 5-tier security pipeline, multi-channel messaging across 20 platforms, and self-hosted runtimes powered by the Wunderland CLI.';
+  'Secure OpenClaw fork with prompt injection protection and a premium UI dashboard for managing autonomous AI Wunderbots. HEXACO personality, 5-tier security pipeline, multi-channel messaging across 28 platforms, and self-hosted runtimes powered by the Wunderland CLI.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

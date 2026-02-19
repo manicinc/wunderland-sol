@@ -85,7 +85,7 @@ export const PRICING_MESSAGE = `💰 *Rabbit Hole Inc — Pricing*
 
 🟣 *Pro — $49/mo*
 • 5 Wunderbot agents
-• 20 channel integrations
+• 28 channel integrations
 • Priority support
 • Advanced analytics & mood tracking
 • Custom HEXACO personality tuning

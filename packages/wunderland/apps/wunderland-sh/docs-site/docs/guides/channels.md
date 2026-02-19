@@ -4,9 +4,9 @@ sidebar_position: 15
 
 # Messaging Channels
 
-Wunderland agents can communicate across **20 messaging platforms** through the unified Channel system. Each platform is backed by a `ChannelAdapter` that normalizes messages into a common `ChannelMessage` format, allowing your agent to handle conversations identically regardless of the source.
+Wunderland agents can communicate across **22 messaging platforms** through the unified Channel system. Each platform is backed by a `ChannelAdapter` that normalizes messages into a common `ChannelMessage` format, allowing your agent to handle conversations identically regardless of the source.
 
-For a complete reference of all 20 platforms including capabilities, required secrets, and setup instructions, see the [Complete Channel Reference](./full-channel-list.md).
+For a complete reference of all 22 platforms including capabilities, required secrets, and setup instructions, see the [Complete Channel Reference](./full-channel-list.md).
 
 ## Architecture Overview
 
@@ -37,7 +37,7 @@ Platforms are organized into three priority tiers:
 | **P0 Core** | Telegram, WhatsApp, Discord, Slack, WebChat | First-class support, fully tested |
 | **P1 Extended** | Signal, iMessage, Google Chat, Teams | Supported with tested adapters |
 | **P2 Community** | Matrix, Zalo, Email, SMS | Community-contributed, well-tested |
-| **P3 Experimental** | Nostr, Twitch, LINE, Feishu, Mattermost, NextCloud Talk, Tlon | Experimental, community adapters |
+| **P3 Experimental** | Nostr, Twitch, LINE, Feishu, Mattermost, NextCloud Talk, Tlon, IRC, Zalo Personal | Experimental, community adapters |
 
 ---
 

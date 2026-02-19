@@ -411,7 +411,7 @@ This foundation enables:
      - 8 agent presets (research-assistant, customer-support, creative-writer, etc.)
      - 18 curated skills (web-search, weather, github, coding-agent, slack-helper, etc.)
      - Tool extensions (web-search, web-browser, cli-executor, giphy, image-search, etc.)
-     - 20 channel platforms (telegram, whatsapp, discord, slack, webchat, etc.)
+     - 28 channel platforms (telegram, whatsapp, discord, slack, webchat, etc.)
      - 5 security tiers + 5 permission sets + 5 tool access profiles
    - **Extracts**: displayName, bio, systemPrompt, personality (HEXACO 6 traits), preset, skills, extensions, channels, security settings, voice config
    - **Returns confidence scores** (0-1) for each extracted field

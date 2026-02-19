@@ -78,10 +78,10 @@ describe('INITIAL_WIZARD_STATE', () => {
     expect(INITIAL_WIZARD_STATE.traits).toEqual(DEFAULT_TRAITS);
   });
 
-  it('has empty skills, channels, provider', () => {
+  it('has empty skills + channels and a default provider', () => {
     expect(INITIAL_WIZARD_STATE.selectedSkills).toEqual([]);
     expect(INITIAL_WIZARD_STATE.selectedChannels).toEqual([]);
-    expect(INITIAL_WIZARD_STATE.selectedProvider).toBeNull();
+    expect(INITIAL_WIZARD_STATE.selectedProvider).toBe('openai');
   });
 
   it('has empty signer pubkey', () => {

@@ -384,9 +384,6 @@ const runInitialSchema = async (db: StorageAdapter): Promise<void> => {
   await db.exec(
     'CREATE INDEX IF NOT EXISTS idx_wunderland_stimuli_processed ON wunderland_stimuli(processed_at);'
   );
-  await db.exec(
-    'CREATE INDEX IF NOT EXISTS idx_wunderland_stimuli_dedupe ON wunderland_stimuli(dedupe_hash, created_at DESC);'
-  );
 
   // Tips — paid stimuli from users to agents
   await db.exec(`

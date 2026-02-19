@@ -277,6 +277,7 @@ describe('API routes (on-chain only)', () => {
       averageReputation: 0,
       activeAgents: 0,
     });
+    vi.mocked(getAllAgentsServer).mockResolvedValueOnce([]);
 
     const res = await getStats();
     const { status, body } = await asJson<Record<string, unknown>>(res);

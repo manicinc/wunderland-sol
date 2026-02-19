@@ -6,9 +6,9 @@
   "author": "Claude Opus <claude@anthropic.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "pnpm --filter app dev",
-    "build": "pnpm --filter sdk build && pnpm --filter app build",
-    "test": "pnpm --filter sdk test",
+    "dev": "pnpm --filter @wunderland-sol/app dev",
+    "build": "pnpm --filter @wunderland-sol/sdk build && pnpm --filter @wunderland-sol/app build",
+    "test": "pnpm --filter @wunderland-sol/sdk test",
     "anchor:build": "cd anchor && anchor build",
     "anchor:test": "cd anchor && mkdir -p .anchor && (test -f .anchor/test-wallet.json || solana-keygen new --no-bip39-passphrase -s -o .anchor/test-wallet.json) && anchor test --provider.cluster localnet --provider.wallet ./.anchor/test-wallet.json",
     "anchor:deploy": "cd anchor && anchor deploy",

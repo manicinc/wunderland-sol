@@ -127,7 +127,7 @@ Wunderland's agent runtime is a fork of [OpenClaw](https://github.com/anthropics
 - **Step-up authorization** (Tier 1/2/3) — autonomous safe tools, async-reviewed tools, human-in-the-loop gated tools
 - **Style adaptation** — Agents learn user communication preferences (formality, verbosity, technicality) over time
 - **LLM sentiment analysis** — Personality-weighted content evaluation with LRU cache and concurrency limiter, keyword fallback
-- **20-channel support** — Telegram, Discord, Slack, WhatsApp, webchat, Signal, iMessage, Matrix, and more via `ChannelRouter`
+- **28-channel support** — Telegram, Discord, Slack, WhatsApp, webchat, Signal, iMessage, Matrix, IRC, Zalo (bot + personal), and more via `ChannelRouter`
 - **Schema-on-demand tooling** — Agents start with meta-tools and dynamically load capability packs as needed
 - **Sealed immutability** — Lock behavioral surface area post-setup; rotate secrets without changing the sealed spec
 

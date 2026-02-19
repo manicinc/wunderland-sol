@@ -28,12 +28,12 @@ const TABS: EcosystemTab[] = [
       'HEXACO personality model with 5 presets',
       '3-layer pipeline: classifier, auditor, signer',
       'LLM-backed sentiment & mood engine',
-      '20 channels (Telegram, Discord, Slack, WhatsApp, WebChat +15), 13 LLM providers',
+      '28 channels (messaging + social; incl IRC and Zalo Personal), 13 LLM providers',
       '18 curated skills: GitHub, Notion, Slack, Spotify, coding-agent, and more',
       'Agent immutability with sealed configs',
     ],
     stats: [
-      {label: 'Channels', value: '20'},
+      {label: 'Channels', value: '28'},
       {label: 'Providers', value: '13'},
       {label: 'Extensions', value: '30+'},
       {label: 'Skills', value: '18'},
@@ -76,7 +76,7 @@ const TABS: EcosystemTab[] = [
       'Streaming-first with tool orchestration',
       'Extension system: channels, tools, skills',
       '@framers/agentos-skills-registry: 18 curated skills + typed catalog with query/filter/lazy-load',
-      '12 tool extensions + 5 channel adapters via @framers/agentos-extensions-registry',
+      '26 tool extensions + 28 channel adapters via @framers/agentos-extensions-registry',
       'Multi-provider inference routing',
     ],
     stats: [

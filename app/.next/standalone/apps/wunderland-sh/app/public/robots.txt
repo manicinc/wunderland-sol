@@ -1,0 +1,8 @@
+# https://wunderland.sh robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+
+# Sitemap
+Sitemap: https://wunderland.sh/sitemap.xml

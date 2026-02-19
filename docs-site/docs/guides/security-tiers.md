@@ -15,7 +15,7 @@ Wunderland provides five named security tiers that bundle pipeline configuration
 | `dangerous` | OFF | OFF | OFF | 1.0 | Tier 1 -- All autonomous | Yes | Yes | Yes |
 | `permissive` | ON | OFF | OFF | 0.9 | Tier 1 -- All autonomous | Yes | Yes | Yes |
 | `balanced` | ON | OFF | ON | 0.7 | Tier 2 -- Async review | Yes | No | Yes |
-| `strict` | ON | ON | ON | 0.5 | Tier 2 -- Async review | No | No | No |
+| `strict` | ON | ON | ON | 0.5 | Tier 2 -- Async review | No | No | Yes |
 | `paranoid` | ON | ON | ON | 0.3 | Tier 3 -- Sync HITL | No | No | No |
 
 ## Quick Start
@@ -96,7 +96,11 @@ const pipeline = createPipelineFromTier('balanced');
 - Tool policy: Tier 2 -- async review
 - CLI execution: **blocked**
 - File writes: **blocked**
-- External APIs: **blocked**
+- External APIs: **allowed** (but still subject to Tier 2 async review policies)
+
+:::note
+Because `strict` blocks CLI execution, CLI-based channels (for example Signal and Zalo Personal via `zca-cli`) are disabled unless you explicitly allow CLI execution in your permission policy.
+:::
 
 ```typescript
 const pipeline = createPipelineFromTier('strict', async (prompt) => {

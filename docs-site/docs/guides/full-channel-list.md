@@ -1,12 +1,12 @@
 ---
 sidebar_position: 23
 title: Complete Channel Reference
-description: All 26 messaging and social channels with capabilities, secrets, and setup instructions
+description: All 28 messaging and social channels with capabilities, secrets, and setup instructions
 ---
 
 # Complete Channel Reference
 
-Wunderland agents can communicate across **26 messaging and social platforms** through the unified Channel system. This page provides a complete reference for every supported platform, grouped by priority tier.
+Wunderland agents can communicate across **28 messaging and social platforms** through the unified Channel system. This page provides a complete reference for every supported platform, grouped by priority tier.
 
 For the channel architecture, binding management, and gateway events, see the [Messaging Channels](./channels.md) guide.
 
@@ -19,7 +19,7 @@ For the channel architecture, binding management, and gateway events, see the [M
 | **P1 Extended** | Signal, iMessage, Google Chat, Microsoft Teams | Supported with tested adapters |
 | **P1 Social** | Pinterest, TikTok | Extended social media channels |
 | **P2 Community** | Matrix, Zalo, Email, SMS | Community-contributed, well-tested |
-| **P3 Experimental** | Nostr, Twitch, LINE, Feishu/Lark, Mattermost, NextCloud Talk, Tlon (Urbit) | Experimental, community adapters |
+| **P3 Experimental** | Nostr, Twitch, LINE, Feishu/Lark, Mattermost, NextCloud Talk, Tlon (Urbit), IRC, Zalo Personal | Experimental, community adapters |
 
 ---
 
@@ -522,7 +522,7 @@ Feishu (Lark) bot integration for the enterprise collaboration platform.
 | Property | Value |
 |----------|-------|
 | **Platform ID** | `feishu` |
-| **Required Secrets** | `FEISHU_APP_ID`, `FEISHU_APP_SECRET` |
+| **Required Secrets** | `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_VERIFICATION_TOKEN` (and `FEISHU_ENCRYPT_KEY` if event encryption is enabled) |
 | **Capabilities** | Text, rich text, cards, files, group chats |
 
 **Setup:**
@@ -597,6 +597,51 @@ wunderland channels add tlon \
 
 ---
 
+### IRC
+
+IRC integration via TCP or TLS. Joins configured channels and normalizes inbound/outbound `PRIVMSG` into `ChannelMessage`.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `irc` |
+| **Required Secrets** | `IRC_HOST`, `IRC_PORT`, `IRC_NICK`, `IRC_CHANNELS` |
+| **Capabilities** | Text, group chats (channels) |
+
+**Setup:**
+
+```bash
+wunderland channels add irc
+# Prompts for IRC_HOST/IRC_PORT/IRC_NICK/IRC_CHANNELS (and optional TLS/NickServ settings)
+```
+
+---
+
+### Zalo Personal
+
+Zalo personal account messaging via `zca-cli` (unofficial). Use at your own risk and ensure compliance with Zalo’s Terms of Service.
+
+| Property | Value |
+|----------|-------|
+| **Platform ID** | `zalouser` |
+| **Required Secrets** | None (requires `zca` installed + authenticated) |
+| **Capabilities** | Text, group chats |
+
+**Setup:**
+
+1. Install `zca` and authenticate: `zca auth login`
+2. (Optional) Set `ZCA_PROFILE` to select a profile (defaults to `default`)
+3. (Optional) Set `ZCA_CLI_PATH` if `zca` is not on `PATH`
+
+```bash
+wunderland channels add zalouser
+```
+
+:::note Sandbox policy
+Because this adapter executes a local binary, it requires CLI execution to be allowed by your runtime permission policy.
+:::
+
+---
+
 ## Channel Capabilities Matrix
 
 | Platform | Text | Images | Files | Typing | Reactions | Threads | Groups | Rich Format |
@@ -627,6 +672,8 @@ wunderland channels add tlon \
 | Mattermost | Yes | Yes | Yes | No | Yes | Yes | No | Markdown |
 | NextCloud | Yes | No | Yes | No | Yes | No | No | Limited |
 | Tlon | Yes | No | No | No | No | No | Yes | Limited |
+| IRC | Yes | No | No | No | No | No | Yes | Plain text |
+| Zalo Personal | Yes | No | No | No | No | No | Yes | Limited |
 
 ## Managing Channels via CLI
 

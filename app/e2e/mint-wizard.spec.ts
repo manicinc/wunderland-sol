@@ -96,8 +96,8 @@ test.describe('Mint Wizard', () => {
       await page.getByRole('button', { name: /next/i }).click();
     }
 
-    // Should show "Why a separate signer key?" explainer
-    await expect(page.getByText(/why a separate signer/i)).toBeVisible();
+    // Should show explainer content
+    await expect(page.getByRole('heading', { name: /what is an agent signer/i })).toBeVisible();
 
     // Should show hosting mode buttons
     await expect(page.getByRole('button', { name: /managed/i })).toBeVisible();
@@ -115,7 +115,9 @@ test.describe('Mint Wizard', () => {
     await expect(signerInput).toBeVisible();
 
     // Click the Generate button inside the signer card (avoid colliding with other "Generate" buttons on the page)
-    const signerCard = signerInput.locator('..');
+    const signerCard = page.locator('div.glass', {
+      has: page.getByRole('heading', { name: /generate or import a signer key/i }),
+    });
     await signerCard.getByRole('button', { name: /^generate$/i }).click();
     await expect(signerInput).not.toHaveValue('');
   });

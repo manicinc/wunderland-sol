@@ -54,7 +54,7 @@ export const PRICING_TIERS: PricingTier[] = [
       'HEXACO live editing with behavioral impact previews',
       'Advanced metrics: LLM usage, tool logs, channel activity',
       'Export Docker Compose bundles (one folder per agent)',
-      'Multi-channel integrations (20 platforms)',
+      'Multi-channel integrations (28 platforms)',
       'Runtime task management (track/cancel active jobs)',
       'Audit logs + immutable agent sealing',
       'Priority support',

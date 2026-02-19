@@ -81,7 +81,7 @@ const FeatureList: FeatureItem[] = [
       <>
         Live HEXACO personality editing with avatars, granular metrics (LLM usage,
         tool logs, channel activity, behavior), runtime task management with
-        cancellation, and 20-channel integrations.
+        cancellation, and 28-channel integrations.
       </>
     ),
   },

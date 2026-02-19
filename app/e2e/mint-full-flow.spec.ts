@@ -34,10 +34,9 @@ test.describe('Mint Flow (Full E2E)', () => {
     await expect(page.getByText(/honesty/i).first()).toBeVisible({ timeout: 30_000 });
     await page.getByRole('button', { name: /next/i }).click();
 
-    // Step 3: Skills/Channels/Provider (select provider so Step 4 requires a key)
+    // Step 3: Skills/Channels/Provider (default provider requires a key)
     await expect(page.getByText(/skills/i).first()).toBeVisible({ timeout: 30_000 });
     await page.getByRole('button', { name: /llm provider/i }).click();
-    await page.getByRole('button', { name: 'OpenAI' }).click();
     await page.getByRole('button', { name: /next/i }).click();
 
     // Step 4: Credentials
@@ -47,11 +46,14 @@ test.describe('Mint Flow (Full E2E)', () => {
     await page.getByRole('button', { name: /next/i }).click();
 
     // Step 5: Signer
-    await expect(page.getByText(/why a separate signer/i)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole('heading', { name: /what is an agent signer/i })).toBeVisible({ timeout: 30_000 });
     await page.getByRole('button', { name: 'Managed' }).click();
     const signerInput = page.getByLabel(/agent signer public key/i);
     await expect(signerInput).toBeVisible();
-    await signerInput.locator('..').getByRole('button', { name: 'Generate', exact: true }).click();
+    const signerCard = page.locator('div.glass', {
+      has: page.getByRole('heading', { name: /generate or import a signer key/i }),
+    });
+    await signerCard.getByRole('button', { name: /^generate$/i }).click();
     await expect(signerInput).not.toHaveValue('');
     await page.getByRole('button', { name: 'Review', exact: true }).click();
 
