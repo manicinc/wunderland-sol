@@ -132,6 +132,47 @@ These tools work with any of the supported search backends: Serper, SerpAPI, or 
 import { WebSearchTool, ResearchAggregatorTool, FactCheckTool } from 'wunderland/tools';
 ```
 
+#### Multi-Search Mode
+
+All three search tools support a `multiSearch` parameter that fans out queries to **ALL** available providers in parallel, then merges, deduplicates, and reranks results by cross-provider agreement. This is useful for deep research or fact verification where higher-confidence results are needed.
+
+**Per-call (agentic)** -- the LLM decides to go deep:
+```json
+{ "name": "web_search", "arguments": { "query": "quantum computing breakthroughs 2026", "multiSearch": true } }
+```
+
+**Per-agent (config)** -- always use multi-search:
+```typescript
+const pack = createExtensionPack({
+  options: {
+    serperApiKey: process.env.SERPER_API_KEY,
+    braveApiKey: process.env.BRAVE_API_KEY,
+    defaultMultiSearch: true,
+  }
+});
+```
+
+When `multiSearch` is enabled, results include cross-provider metadata:
+
+```typescript
+interface MultiSearchResult {
+  title: string;
+  url: string;
+  snippet: string;
+  providers: string[];                       // which providers returned this URL
+  agreementCount: number;                    // how many providers agree
+  confidenceScore: number;                   // 0-100, based on agreement + position
+  providerPositions: Record<string, number>; // ranking position per provider
+}
+```
+
+**Toggle precedence:**
+1. Tool input param (`multiSearch: true`) -- LLM decides per-call
+2. Extension option (`defaultMultiSearch: true`) -- set at agent config level
+3. Default: `false` (backwards compatible, uses sequential fallback chain)
+
+**Note:** `multiSearch` and `provider` are mutually exclusive. If a specific provider is requested, multi-search is not used.
+
 ### SerperSearchTool
 
 A dedicated Serper-specific search tool for direct API access.
