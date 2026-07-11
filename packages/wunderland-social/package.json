@@ -15,7 +15,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@framers/agentos": "^0.9.134",
+    "@framers/agentos": "^0.9.135",
     "wunderland": "^0.72.2"
   },
   "devDependencies": {
