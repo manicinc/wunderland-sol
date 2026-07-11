@@ -13,9 +13,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@framers/agentos": "workspace:*",
-    "@framers/agentos-extensions-registry": "workspace:*",
-    "@framers/sql-storage-adapter": "workspace:*",
+    "@framers/agentos": "^0.9.134",
+    "@framers/agentos-extensions-registry": "^0.18.2",
+    "@framers/sql-storage-adapter": "^0.6.8",
     "@nestjs/common": "^11.1.13",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.13",
@@ -54,7 +54,7 @@
     "telegraf": "^4.16.3",
     "tslib": "^2.8.1",
     "winston": "^3.17.0",
-    "wunderland": "workspace:*"
+    "wunderland": "^0.72.2"
   },
   "devDependencies": {
     "@nestjs/testing": "^11.1.13",
